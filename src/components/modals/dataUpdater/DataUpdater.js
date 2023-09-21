@@ -19,7 +19,7 @@ import { refetchData } from "./utils";
 
 export const DataUpdater = ({
   session, 
-  updatePrevSession 
+  loadUpdatedSession 
 }) => {
 
   const [show, setShow] = useState(true);
@@ -33,7 +33,6 @@ export const DataUpdater = ({
 
     const updatedSession = new Session(session);
     await refetchData(updatedSession);
-
     setUpdatedSession(updatedSession);
     setIsLoading(false);
     setIsDatafetched(true);
@@ -42,32 +41,37 @@ export const DataUpdater = ({
   const handleClose = () => 
   {
     setShow(false);
-    updatePrevSession(session);
+    loadUpdatedSession(session);
   };
+
+  const handleCloseUpdatedSession = () => {
+    setShow(false);
+    loadUpdatedSession(updatedSession);
+  }
 
   return (
     <Modal show={show} size="lg" onHide={handleClose}>
-      <Modal.Header closeButton closeLabel="Fermer">
+      <Modal.Header closeLabel="Fermer">
         <h3>Actualisation des données...</h3>
       </Modal.Header>
       <Modal.Body>
-      <Image
-              src="/illus/sync.svg"
-              alt=""
-              className="d-block mx-auto mb-4"
-              height={150}
-            />
+        <Image
+          src="/illus/sync.svg"
+          alt=""
+          className="d-block mx-auto mb-4"
+          height={150}
+        />
         {isDatafetched && (
           <UpdateDataView
             prevSession={session}
             updatedSession={updatedSession}
-            close={handleClose}
-            updatePrevSession={updatePrevSession}
+            handleCloseUpdatedSession={handleCloseUpdatedSession}
+            handleClose={handleClose}
           ></UpdateDataView>
         )}
+
         {!isDatafetched && !isLoading && (
           <div className="text-center">
-            
             <p className="">
               Il se pourrait que des données plus récentes soient disponibles.
               Souhaitez-vous vérifier si les données sont à jour ?

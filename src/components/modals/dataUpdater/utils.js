@@ -70,8 +70,6 @@ export const refetchData = async (session) =>
   }
 }
 
-// 
-
 export const getProvidersChanges = async (
   currProviders,
   prevProviders 
@@ -88,7 +86,7 @@ export const getProvidersChanges = async (
     for (let indic of indics) {
       const currIndicator = currProvider.footprint.indicators[indic];
       const prevIndicator = prevProvider.footprint.indicators[indic];
-
+   
      if (JSON.stringify(currIndicator)!==JSON.stringify(prevIndicator)) {
       changes.push({
         providerId: currProvider.id,
@@ -156,3 +154,77 @@ export const getProductionFootprintChanges = (
 
   return changes;
 }
+
+export const getComparativeDataChanges = (prevData, currData) => {
+  const metaAggregates = {
+    production: "PRD",
+    intermediateConsumptions: "IC",
+    fixedCapitalConsumptions: "CFC",
+    netValueAdded: "NVA",
+  };
+
+  const metaScales = ["area", "division"];
+
+  const metaSeries = {
+    history: { enpoint: "macro_fpt_a88" },
+    trend: { enpoint: "macro_fpt_trd_a88" },
+    target: { enpoint: "macro_fpt_tgt_a88" },
+  };
+
+  const changes = {};
+
+  // Compare each aggregate, scale, and serie
+  for (const aggregateKey of Object.keys(metaAggregates)) {
+    changes[aggregateKey] = {};
+
+    for (const scale of metaScales) {
+      changes[aggregateKey][scale] = {};
+
+      for (const serie of Object.keys(metaSeries)) {
+        changes[aggregateKey][scale][serie] = [];
+
+        const prevDataset = prevData[aggregateKey][scale][serie].data;
+        const currDataset = currData[aggregateKey][scale][serie].data;
+
+        // Compare each indic in the dataset
+        for (const indic of Object.keys(prevDataset)) {
+          const prevDataArray = prevDataset[indic];
+          const currDataArray = currDataset[indic];
+
+          // Check if the arrays have the same length
+          if (prevDataArray.length !== currDataArray.length) {
+            changes[aggregateKey][scale][serie].push({
+              indic,
+            });
+          } else {
+            // Compare each element in the array
+            for (let i = 0; i < prevDataArray.length; i++) {
+              if (
+                prevDataArray[i].year !== currDataArray[i].year ||
+                prevDataArray[i].value !== currDataArray[i].value
+              ) {
+                changes[aggregateKey][scale][serie].push({
+                  indic,
+                  year: prevDataArray[i].year,
+                  prevValue: prevDataArray[i].value,
+                  currValue: currDataArray[i].value,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Check if there are any changes, and return null if not
+  const hasChanges = Object.keys(changes).some((aggregateKey) =>
+    Object.keys(changes[aggregateKey]).some((scale) =>
+      Object.keys(changes[aggregateKey][scale]).some(
+        (serie) => changes[aggregateKey][scale][serie].length > 0
+      )
+    )
+  );
+
+  return hasChanges ? changes : null;
+};

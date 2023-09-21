@@ -7,24 +7,21 @@ import { Button } from "react-bootstrap";
 // Lib
 import metaIndics from "/lib/indics";
 
-const indics = Object.entries(metaIndics)
-  .filter(([_,metaIndic]) => metaIndic.isAvailable)
-  .map(([indic,_]) => indic);
-
+// Utils
 import { downloadSession, isObjEmpty } from "/src/utils/Utils";
-import { getInitialStatesChanges, getProductionFootprintChanges, getProvidersChanges } from "./utils";
+import { getComparativeDataChanges, getInitialStatesChanges, getProductionFootprintChanges, getProvidersChanges } from "./utils";
 
 const UpdateDataView = ({
   prevSession,
   updatedSession,
-  updatePrevSession,
-  close
+  handleCloseUpdatedSession,
+  handleClose
 }) => {
 
   const [providersChanges, setProvidersChanges] = useState([]);
   const [initialStatesChanges, setInitialStatesChanges] = useState([]);
   const [resultsChanges, setResultsChanges] = useState([]);
-  const [updatedComparativeData, setUpdatedComparativeData] = useState(null);
+  const [comparativeDatachanges, setComparativeDataChanges] = useState(null);
   const [showButton, setShowButton] = useState(false);
   const [isSessionUpdated, setIsSessionUpdated] = useState(false);
   const [isUptodate, setIsuptodate] = useState(false);
@@ -49,19 +46,16 @@ const UpdateDataView = ({
     );
     setInitialStatesChanges([...immobilisationsChanges,...stocksChanges]);
 
-    const compareComparativeData = compareDataUpdates(
+    const comparativeDataChanges = getComparativeDataChanges(
       prevSession.comparativeData,
       updatedSession.comparativeData
     );
-
-    if (compareComparativeData) {
-      setUpdatedComparativeData(compareComparativeData);
-    }
-
+    setComparativeDataChanges(comparativeDataChanges);
+  
     if (
       isObjEmpty(providersChanges) &&
       isObjEmpty(initialStatesChanges) &&
-      isObjEmpty(compareComparativeData) 
+     !comparativeDataChanges
     ) {
       setShowButton(false);
       setIsuptodate(true);
@@ -71,9 +65,6 @@ const UpdateDataView = ({
     }
   }, [prevSession,updatedSession]);
 
-  useEffect(async () => {
-
-  }, [isSessionUpdated]);
 
   // re-compute footprints
   const applyUpdates = async () => 
@@ -93,7 +84,6 @@ const UpdateDataView = ({
       resultsChanges.push(...resultsChangesOnPeriod);
     }
     setResultsChanges(resultsChanges);
-
     setIsSessionUpdated(true);
   }
 
@@ -142,7 +132,7 @@ const UpdateDataView = ({
         >
           Sauvegarder ma session
         </Button>
-        <Button variant="primary" className="my-2" onClick={close}>
+        <Button variant="primary" className="my-2" onClick={handleCloseUpdatedSession}>
           Reprendre mon analyse
         </Button>
       </>
@@ -161,7 +151,7 @@ const UpdateDataView = ({
                 variant="primary"
                 size="md"
                 className="me-1"
-                onClick={close}
+                onClick={handleClose}
               >
                 Fermer
               </Button>
@@ -181,7 +171,7 @@ const UpdateDataView = ({
             label={"comptes de stocks et d'immobilisations"}
           />
         )}
-        {updatedComparativeData && !isObjEmpty(updatedComparativeData) && (
+        {comparativeDatachanges && !isObjEmpty(comparativeDatachanges) && (
           <div className="small my-3 pt-3">
             <h4 className="h6">
               <i className="text-info me-1 bi bi-arrow-repeat"></i>Données
@@ -209,62 +199,7 @@ const UpdateDataView = ({
 
 
 
-function compareDataUpdates(prevData, currData) {
-  const compareComparativeData = {};
 
-  // Parcours des agrégats
-  for (const aggregate in prevData) {
-    if (aggregate !== "activityCode") {
-      const prevSector = prevData[aggregate];
-      const currSector = currData[aggregate];
-
-      // Parcours des datasets "area" et "division"
-      for (const datasetKey in prevSector) {
-        const prevDataset = prevSector[datasetKey];
-        const currDataset = currSector[datasetKey];
-
-        // Parcours des indicateurs dans le dataset
-        for (const dataset in prevDataset) {
-          const prevData = prevDataset[dataset].data;
-          const currData = currDataset[dataset].data;
-
-          for (const indic in prevData) {
-            const prevValues = prevData[indic];
-            const currValues = currData[indic];
-
-            for (let i = 0; i < prevValues.length; i++) {
-              const prevValue = prevValues[i];
-              const currValue = currValues[i];
-       
-              const prevLastUpdate = new Date(prevValue.lastupdate);
-              const currLastUpdate = new Date(currValue.lastupdate);
-
-           
-              if (prevLastUpdate < currLastUpdate) {
-                if (!compareComparativeData[aggregate]) {
-                  compareComparativeData[aggregate] = {};
-                }
-
-                if (!compareComparativeData[aggregate][dataset]) {
-                  compareComparativeData[aggregate][dataset] = {
-                    currLastUpdate,
-                  };
-                } else if (
-                  compareComparativeData[aggregate][dataset].currLastUpdate <
-                  currLastUpdate
-                ) {
-                  compareComparativeData[aggregate][dataset].currLastUpdate = currLastUpdate;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return compareComparativeData;
-}
 
 const FootprintPreview = ({ data, label }) => {
   const nb = Object.entries(data).length;

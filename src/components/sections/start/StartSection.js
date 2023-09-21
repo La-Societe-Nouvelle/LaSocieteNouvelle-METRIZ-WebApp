@@ -116,7 +116,7 @@ export const StartSection = ({
         {showDataUpdater && (
           <DataUpdater
             session={session}
-            updatePrevSession={loadUpdatedSession}
+            loadUpdatedSession={loadUpdatedSession}
           />
         )}
         <div className="mb-5">
