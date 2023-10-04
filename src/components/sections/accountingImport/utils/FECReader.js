@@ -5,7 +5,8 @@ import booksProps from "/lib/books.json";
 
 // Utils
 import { buildMappingAssetAccounts } from "./AmortisationAssetMapping";
-import { getSumItems, roundValue } from "/src/utils/Utils";
+import { roundValue } from "/src/utils/Utils";
+import { readExternalExpensesFromEntry } from "./ExternalExpensesEntryReader";
 
 // FEC colums
 const columnsFEC = [
@@ -921,22 +922,15 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
 
   if (
     /^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum) &&
-    !data.ignoreExternalExpensesEntries.includes(ligneCourante.EcritureNum)
-  ) {
+    !data.ignoreExternalExpensesEntries.includes(ligneCourante.EcritureNum)) 
+  {
     // lecture du compte auxiliaire
-    let lignesFournisseur = journal.filter(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^40/.test(ligne.CompteNum)
-    );
-    let paiementBancaire = journal.some(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^512/.test(ligne.CompteNum)
-    );
+    let lignesFournisseur = journal.filter((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum && /^40/.test(ligne.CompteNum));
+    let paiementBancaire = journal.some((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum && /^512/.test(ligne.CompteNum));
 
     // paiement bancaire (pas de ligne fournisseur)
-    if (paiementBancaire) {
+    if (paiementBancaire) 
+    {
       // expense data
       let expenseData = {
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
@@ -945,32 +939,35 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
         providerNum: "_" + ligneCourante.CompteNum,
         providerLib: "DEPENSES " + ligneCourante.CompteLib,
         isDefaultProviderAccount: true,
-        amount:
-          parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
+
       // push data
       data.externalExpenses.push(expenseData);
       data.defaultProviders.push(expenseData.providerNum);
-    } else if (lignesFournisseur.length > 1) {
-      let ecriture = journal.filter(
-        (ligne) => ligne.EcritureNum == ligneCourante.EcritureNum
-      );
-      let entryData = readExternalExpensesFromEntry(ecriture);
+    }
+
+    // plusieurs fournisseurs
+    else if (lignesFournisseur.length > 1) 
+    {
+      let ecriture = journal.filter((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum);
+
+      data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
+      let entryData = await readExternalExpensesFromEntry(ecriture);
       if (entryData.isExpensesTracked) {
-        data.externalExpenses.push(...entryData.entryData);
-        data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
+        data.externalExpenses.push(...entryData.expensesData);
         data.defaultProviders.push(...entryData.defaultProviders);
-      } else {
-        throw (
-          "Erreur d'association pour le compte de charge " +
-          ligneCourante.CompteNum +
-          " (Numéro d'écriture : " +
-          ligneCourante.EcritureNum +
-          " ) : Plusieurs comptes fournisseurs détectés "
-        );
+      } 
+      else {
+        // error message
+        throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : Plusieurs comptes fournisseurs détectés ");
       }
-    } else {
+    } 
+    
+    // fournisseur unique (ou non trouvé)
+    else 
+    {
       let ligneFournisseur = lignesFournisseur[0] || {};
       // expense data
       let expenseData = {
@@ -1732,208 +1729,4 @@ const getSubEntriesByAssetType = (entry) => {
   if (rowsIntangibleAssets.length > 0) subEntries.push(rowsIntangibleAssets);
 
   return subEntries;
-};
-
-/* The function return an object with the following elements :
- *  - entryData (Array) : data from the entry to add the "main" data object
- *  - status (Boolean) : status of the reading
- *  - message (String) : -
- */
-
-const readExternalExpensesFromEntry = (entry) => {
-  // ---------- Entry ---------- //
-
-  let res = readExternalExpenses(entry);
-  if (res.isExpensesTracked) return res;
-
-  // ---------- Sub-entries ---------- //
-
-  let subEntries = [];
-
-  // group by balanced group
-  subEntries = getSubEntriesByBalancedGroup(entry);
-  res = readExternalExpensesFromSubEntries(subEntries);
-  if (res.isExpensesTracked) return res;
-
-  // ---------- Error ---------- //
-
-  // if reading unsuccessfull
-  res.isExpensesTracked = false;
-  res.message = "ERROR";
-
-  return res;
-};
-
-const readExternalExpensesFromSubEntries = (subEntries) => {
-  let res = {
-    entryData: [],
-    isExpensesTracked: false,
-    message: "",
-    defaultProviders: [],
-  };
-
-  for (let subEntry of subEntries) {
-    let resSubEntry = readExternalExpenses(subEntry);
-
-    if (resSubEntry.isExpensesTracked) {
-      res.entryData.push(...resSubEntry.entryData);
-      res.defaultProviders.push(...resSubEntry.defaultProviders);
-    } else {
-      res.isExpensesTracked = false;
-      res.message = resSubEntry.message;
-      return res;
-    }
-  }
-
-  res.isExpensesTracked = true;
-  res.message = "OK";
-  return res;
-};
-
-const readExternalExpenses = (rows) => {
-  // response
-  let res = {
-    entryData: [],
-    isExpensesTracked: false,
-    message: "",
-    defaultProviders: [],
-  };
-
-  // lignes relatives aux comptes de charges
-  let rowsExpensesAccounts = rows.filter((ligne) =>
-    /^6(0[^3]|[1-2])/.test(ligne.CompteNum)
-  );
-
-  // lignes relatives aux comtpes fournisseurs
-  let rowsProvidersAccounts = rows.filter((ligne) =>
-    /^40/.test(ligne.CompteNum)
-  );
-
-  // Empty entry -------------------------------------------------------------------------------------- //
-
-  if (rowsExpensesAccounts.length == 0) {
-    res.isExpensesTracked = true;
-    res.message = "Aucune charge externe.";
-    return res;
-  }
-
-  // Single expense account --------------------------------------------------------------------------- //
-
-  let sameExpenseAccountUsed =
-    rowsExpensesAccounts.filter(
-      (value, index, self) =>
-        index === self.findIndex((item) => item.CompteNum === value.CompteNum)
-    ).length == 1;
-
-  if (sameExpenseAccountUsed) {
-    res.isExpensesTracked = true;
-    res.message = "OK";
-
-    // ligne relative au compte fournisseur
-    let rowExpenseAccount = rowsExpensesAccounts[0];
-    let amountExpense = getSumItems(
-      rowsExpensesAccounts.map(
-        (row) => parseAmount(row.Debit) - parseAmount(row.Credit)
-      )
-    );
-    let amountProviders = getSumItems(
-      rowsProvidersAccounts.map(
-        (row) => parseAmount(row.Credit) - parseAmount(row.Debit)
-      )
-    );
-
-    // build data
-    rowsProvidersAccounts.forEach((rowProviderAccount) => {
-      // amortisation expense data
-      let amountProvider =
-        parseAmount(rowProviderAccount.Debit) -
-        parseAmount(rowProviderAccount.Credit);
-      let expenseData = {
-        label: rowsExpensesAccounts
-          .map((row) => row.EcritureLib)
-          .reduce((a, b) => a + (a.length > 0 ? ", " : "") + b, ""),
-        accountNum: rowExpenseAccount.CompteNum,
-        accountLib: rowExpenseAccount.CompteLib,
-        providerNum:
-          rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
-        providerLib:
-          rowProviderAccount.CompAuxLib ||
-          "DEPENSES " + rowProviderAccount.CompteLib,
-        isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
-        amount:
-          amountProviders > 0
-            ? roundValue((amountProvider / amountProviders) * amountExpense, 2)
-            : 0,
-        date: rowExpenseAccount.EcritureDate,
-      };
-      // push data
-      res.entryData.push(expenseData);
-      if (expenseData.isDefaultProviderAccount) {
-        res.defaultProviders.push(expenseData.providerNum);
-      }
-    });
-
-    return res;
-  }
-
-  // Single provider account -------------------------------------------------------------------------- //
-
-  // -> comptAuxNum equals + not empy
-  let sameProviderAccountUsed =
-    rowsProvidersAccounts.filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex(
-          (item) =>
-            item.CompteNum === value.CompteNum &&
-            item.CompAuxNum === value.CompAuxNum
-        )
-    ).length == 1;
-
-  if (sameProviderAccountUsed) {
-    res.isExpensesTracked = true;
-    res.message = "OK";
-
-    // ligne relative au compte fournisseur
-    let rowProviderAccount = rowsProvidersAccounts[0];
-
-    // build data
-    rowsExpensesAccounts.forEach((rowExpenseAccount) => {
-      // amortisation expense data
-      let expenseData = {
-        label: rowExpenseAccount.EcritureLib.replace(/^\"/, "").replace(
-          /\"$/,
-          ""
-        ),
-        accountNum: rowExpenseAccount.CompteNum,
-        accountLib: rowExpenseAccount.CompteLib,
-        providerNum:
-          rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
-        providerLib:
-          rowProviderAccount.CompAuxLib ||
-          "DEPENSES " + rowProviderAccount.CompteLib,
-        isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
-        amount:
-          parseAmount(rowExpenseAccount.Debit) -
-          parseAmount(rowExpenseAccount.Credit),
-        date: rowExpenseAccount.EcritureDate,
-      };
-      // push data
-      res.entryData.push(expenseData);
-      if (expenseData.isDefaultProviderAccount) {
-        res.defaultProviders.push(expenseData.providerNum);
-      }
-    });
-
-    // return
-    return res;
-  }
-
-  // Single external expense account ------------------------------------------------------------------ //
-
-  // not available now
-
-  res.isExpensesTracked = false;
-  res.message = "NOK";
-  return res;
 };
