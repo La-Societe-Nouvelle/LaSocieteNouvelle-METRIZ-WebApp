@@ -185,7 +185,7 @@ export async function buildAggregatePeriodIndicator(indic,accounts,periodKey)
       grossImpactMin+= indicatorAccount.getValueMin()*amountAccount;
       totalAmount+= amountAccount;
     } 
-    else if (!isValidNumber(amountAccount) || !indicatorAccount.isValid()) {
+    else if (!isValidNumber(amountAccount) || (isValidNumber(amountAccount) && amountAccount!=0 && !indicatorAccount.isValid())) {
       missingData = true;
     }
   }
