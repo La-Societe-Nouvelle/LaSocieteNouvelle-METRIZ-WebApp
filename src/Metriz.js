@@ -2,6 +2,7 @@
 
 // React / Next
 import React, { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
 
 // Error Handler
 import ErrorBoundary from "/src/utils/ErrorBoundary";
@@ -271,7 +272,9 @@ export const Metriz = () =>
         )}
 
         {/* Sections */}
-        {buildSectionView(step)}
+        <div className={`app-container ${step === 0 ? '' : 'container-fluid'}`}>
+          {buildSectionView(step)}
+        </div>
 
         {/* Modal */}
 

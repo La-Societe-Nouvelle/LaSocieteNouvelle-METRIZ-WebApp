@@ -41,10 +41,16 @@ const DeviationChart = ({
   for (let aggregate of aggregates) {
     let companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
     let divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
-    let value = Math.round( (companyFootprint-divisionFootprint)/divisionFootprint * 100 );
-    data.push(value);
-  }
+    
+    if (divisionFootprint !== 0) {
+      let value = Math.round((companyFootprint - divisionFootprint) / divisionFootprint * 100);
+      data.push(value);
+    } else {
 
+      data.push(0);
+    }
+  }
+  
   const maxValue = Math.max(
     Math.abs(Math.min(...data)),
     Math.abs(Math.max(...data))

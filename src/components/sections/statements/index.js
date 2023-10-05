@@ -93,7 +93,6 @@ const DirectImpacts = ({
   ];
 
   return (
-    <Container fluid>
       <section className="statement-section step">
         <h2 className="mb-3">Etape 4 - Déclaration des impacts directs </h2>
         <p>
@@ -193,7 +192,6 @@ const DirectImpacts = ({
           </Button>
         </div>
       </section>
-    </Container>
   );
 };
 

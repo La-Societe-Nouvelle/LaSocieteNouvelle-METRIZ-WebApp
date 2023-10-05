@@ -2,7 +2,6 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
 
 // Components
 import { ImportBackUpView } from "./views/ImportBackUpView";
@@ -49,7 +48,6 @@ export const InitialStatesSection = ({
   };
 
   return (
-    <Container fluid>
       <section className="step">
         <div className="section-title">
           <h2 className="mb-3"> Etape 2 - Importez vos états initiaux</h2>
@@ -94,6 +92,5 @@ export const InitialStatesSection = ({
           </button>
         </div>
       </section>
-    </Container>
   )
 }

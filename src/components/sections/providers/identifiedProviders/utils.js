@@ -253,7 +253,6 @@ export async function XLSXFileWriterFromJSON(
   return buf;
 }
 
-
 /* ------------------------------------ INVOICES --------------------------------------- */
 
 // get footrpint id (siren)
@@ -280,9 +279,7 @@ export const getDefaultFootprintId = (corporateId) =>
   }
 }
 
-
-
-/* ------------------------------------ Providers Status --------------------------------------- */
+/* ------------------------------------ PROVIDERS STATUS --------------------------------------- */
 
 
 export function getIdentifiedProviderStatus(provider) {
@@ -326,28 +323,5 @@ export function getIdentifiedProviderStatusIcon(provider) {
     title: "",
   };
 }
-export function getUnidentifiedProviderStatusIcon(provider) {
 
-    if (!provider.footprintStatus) {
-      return {
-        className: "bi bi-arrow-repeat text-success",
-        title: "Données prêtes à être synchronisées",
-      };
-    } else if (provider.footprintStatus === 200) {
-      return {
-        className: "bi bi-check2 text-success",
-        title: "Données synchronisées",
-      };
-    } else if (provider.footprintStatus === 404) {
-      return {
-        className: "bi bi-x-lg text-danger",
-        title: "Erreur lors de la synchronisation",
-      };
-    }
- 
-  return {
-    className: "",
-    title: "",
-  };
-}
 

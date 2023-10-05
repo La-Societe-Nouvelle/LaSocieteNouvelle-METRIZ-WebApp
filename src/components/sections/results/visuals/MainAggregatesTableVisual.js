@@ -11,7 +11,7 @@ export const MainAggregatesTableVisual = ({
 }) => {
 
   return (
-    <div id="rapport" className="box p-4">
+    <div id="rapport" className="box">
       <h4>Rapport - Analyse extra-financière</h4>
       <Tabs
         defaultActiveKey="mainAggregates"

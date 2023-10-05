@@ -370,10 +370,10 @@ export const buildSummaryReportContributionIndic = async ({
         style: "h2",
       },
       {
-        margin: [0, 10, 0, 10],
         columns: [
           {
             width: "25%",
+            margin: [0, 10, 0, 10],
             stack: [
               {
                 text:
@@ -394,11 +394,12 @@ export const buildSummaryReportContributionIndic = async ({
             ],
           },
           {
+            margin: [0, 5, 0, 10],
             stack: [
               {
                 image: doughtnutICImage,
                 alignment: "center",
-                width: 120,
+                width: 60,
               },
               {
                 text: "Consommations",
@@ -420,7 +421,7 @@ export const buildSummaryReportContributionIndic = async ({
               {
                 image: doughtnutCCFImage,
                 alignment: "center",
-                width: 120,
+                width: 60,
               },
               {
                 text: "Consommations",
@@ -441,7 +442,7 @@ export const buildSummaryReportContributionIndic = async ({
             stack: [
               {
                 image: doughtnutNVAImage,
-                width: 120,
+                width: 60,
                 alignment: "center",
               },
               {
@@ -480,13 +481,13 @@ export const buildSummaryReportContributionIndic = async ({
               },
               {
                 image: prodChartImage,
-                width: 200,
+                width: 180,
                 alignment: "center",
               },
               {
                 text: "\tEmpreinte de vos achats\t",
                 style: "h3",
-                margin: [0, 20, 0, 10],
+                margin: [0, 25, 0, 10],
                 alignment: "center",
                 background: "#FFFFFF",
               },

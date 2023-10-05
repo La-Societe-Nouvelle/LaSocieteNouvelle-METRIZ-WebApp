@@ -84,3 +84,28 @@ const getSignificativeUnidentifiedProvidersByIndic = async (indic,identifiedProv
   let significativeProviders = index>0 ? unidentifiedProviders.slice(index-1).map(provider => provider.providerNum) : [];
   return significativeProviders;
 }
+
+export function getUnidentifiedProviderStatusIcon(provider) {
+
+  if (!provider.footprintStatus) {
+    return {
+      className: "bi bi-arrow-repeat text-success",
+      title: "Données prêtes à être synchronisées",
+    };
+  } else if (provider.footprintStatus === 200) {
+    return {
+      className: "bi bi-check2 text-success",
+      title: "Données synchronisées",
+    };
+  } else if (provider.footprintStatus === 404) {
+    return {
+      className: "bi bi-x-lg text-danger",
+      title: "Erreur lors de la synchronisation",
+    };
+  }
+
+return {
+  className: "",
+  title: "",
+};
+}

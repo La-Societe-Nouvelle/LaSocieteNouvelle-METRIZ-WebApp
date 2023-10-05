@@ -2,7 +2,6 @@
 
 // React
 import React, { useState } from "react";
-import { Container } from "react-bootstrap";
 
 // Views
 import { FinancialDataForm } from "./views/FinancialDataForm";
@@ -27,29 +26,27 @@ export const AccountingImportSection = ({
   const [view, setView] = useState(period.periodKey && session.financialData.status[period.periodKey].isLoaded ? 1 : 0);
   
   return (
-    <Container fluid>
-      <section className="step">
-        <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
+    <section className="step">
+      <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
 
-        {/* Financial data form */}
-        {view === 0 && (
-          <FinancialDataForm
-            session={session}
-            onSelectPeriod={onSelectPeriod}
-            submit={() => setView(1)}
-          />
-        )}
+      {/* Financial data form */}
+      {view === 0 && (
+        <FinancialDataForm
+          session={session}
+          onSelectPeriod={onSelectPeriod}
+          submit={() => setView(1)}
+        />
+      )}
 
-        {/* Financial data views */}
-        {view === 1 && (
-          <FinancialDataViews
-            session={session}
-            period={period}
-            onSubmit={submit}
-            onGoBack={() => setView(0)}
-          />
-        )}
-      </section>
-    </Container>
+      {/* Financial data views */}
+      {view === 1 && (
+        <FinancialDataViews
+          session={session}
+          period={period}
+          onSubmit={submit}
+          onGoBack={() => setView(0)}
+        />
+      )}
+    </section>
   );
 }

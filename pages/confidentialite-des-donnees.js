@@ -6,14 +6,11 @@ import {HeaderPage} from "/src/components/pageComponents/HeaderPage";
 export default function Page() {
   return (
     <>
-      <div className="wrapper" id="wrapper">
         <HeaderPage></HeaderPage>
         <Container>
           <section className="step">
-            <h1>Politiques de Confidentialités des Données</h1>
-
-            <h2 className="mb-4">Introduction</h2>
-
+            <h2>Politiques de Confidentialités des Données</h2>
+            <h3 className="mb-4">Introduction</h3>
             <p>
               Les calculs se font dans votre navigateur web, les informations
               saisies et téléversées restent chez vous, nous n’en collectons
@@ -48,18 +45,15 @@ export default function Page() {
               intermédiaire n’est transmis. La demande est volontaire via la
               complétion du formulaire de demande.{" "}
             </p>
-
-            <h2 className="mb-4">
+            <h3 className="mb-4">
               Traitement des données à caractère personnel traitées
-            </h2>
-
+            </h3>
             <p>
               La présente application est à l’initiative de La Société Nouvelle,
               responsable du traitement des données à caractère personnel.{" "}
             </p>
-
-            <h2 className="mb-4">Données à caractère personnel traitées</h2>
-            <h3>Données relatives à la mesure et résultats</h3>
+            <h3 className="mb-4">Données à caractère personnel traitées</h3>
+            <h4>Données relatives à la mesure et résultats</h4>
             <p>
               Les données qui sont saisies lors de la simulation sont stockées
               en local dans le navigateur de l’utilisateur de l’application.
@@ -72,8 +66,19 @@ export default function Page() {
               traitement n’est pas considéré comme un traitement de données à
               caractère personnel.
             </p>
+            <h4>Suivi de Progression</h4>
+            <p>
+              L'application utilise un système de suivi de progression à des
+              fins statistiques. Ce suivi de progression est entièrement anonyme
+              et ne collecte aucune information personnelle identifiable.
+            </p>
+            <p>
+              Les données collectées comprennent la progression de l'utilisateur
+              au sein de l'application, la date du traitement, les étapes
+              atteintes, ainsi que les indicateurs déclarés.
 
-            <h3>Données relatives à une demande de publication </h3>
+            </p>
+            <h4>Données relatives à une demande de publication </h4>
             <p>Les données personnelles concernent:</p>
             <ul>
               <li>Le nom et le prénom du déclarant </li>
@@ -88,12 +93,12 @@ export default function Page() {
               de publication et de son suivi. Elles sont recueillies par La
               Société Nouvelle en France.
             </p>
-            <h3>Durée de conservation des données </h3>
+            <h4>Durée de conservation des données </h4>
             <p>
               Données conservées pendant toute la durée nécessaire, jusqu’à
               opposition.{" "}
             </p>
-            <h3>Destinataires des données </h3>
+            <h4>Destinataires des données </h4>
             <p>
               Les données relatives au déclarant (nom, prénom, adresse mail)
               restent confidentielles. Elles sont nécessaires pour assurer le
@@ -115,7 +120,7 @@ export default function Page() {
               de données ouverte regroupant les empreintes sociétales des
               entreprises françaises).
             </p>
-            <h2 className="mb-4">Hébergeur de l’application web </h2>
+            <h3 className="mb-4">Hébergeur de l’application web </h3>
             <p>L’application est hébergée par Vercel Inc. </p>
             <p>
               Vercel Inc. <br />
@@ -134,7 +139,6 @@ export default function Page() {
             </p>
           </section>
         </Container>
-      </div>
       <Footer />
     </>
   );

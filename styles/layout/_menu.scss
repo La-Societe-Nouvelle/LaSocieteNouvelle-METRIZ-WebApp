@@ -27,6 +27,8 @@ header {
 
 #progression {
   flex-grow: 1;
+  display: flex;
+  align-items: center; 
 
   .stepper-item {
     position: relative;
@@ -49,7 +51,6 @@ header {
     position: absolute;
     content: "";
     border-bottom: 15px solid #9aa2d0;
-    width: 100%;
     top: 12px;
     left: 50%;
     z-index: 2;
@@ -93,7 +94,9 @@ header {
   .stepper-item:first-child::before {
     content: none;
   }
+
   .stepper-item:last-child::after {
-    width: 65%;
+    width: 60%;
   }
+ 
 }

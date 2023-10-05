@@ -59,25 +59,26 @@ export const IndicatorView = ({
           <Nav.Item>
             <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
           </Nav.Item>
-          {showAnalysis && 
+          {showAnalysis && (
             <Nav.Item>
               <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-            </Nav.Item>}
+            </Nav.Item>
+          )}
         </Nav>
       </div>
 
       {/* SIG and external expenses table */}
       <Row>
         <Col>
-          <MainAggregatesTableVisual
-            session={session}
-            period={period}
-            indic={indic}
-          />
+            <MainAggregatesTableVisual
+              session={session}
+              period={period}
+              indic={indic}
+            />
         </Col>
 
         {/* ----------Gross Impact Chart ----------  */}
-        {(metaIndic.type === "intensité") && (
+        {metaIndic.type === "intensité" && (
           <Col lg={4}>
             <GrossImpactDistributionVisual
               session={session}
@@ -89,7 +90,7 @@ export const IndicatorView = ({
       </Row>
 
       {/* ---------Comparative data charts & Table ----------  */}
-      {(metaIndic.type === "proportion") && (
+      {metaIndic.type === "proportion" && (
         <MainAggregatesFootprintsVisual
           session={session}
           period={period}
@@ -98,25 +99,13 @@ export const IndicatorView = ({
       )}
 
       {/* ---------Comparative data charts & Table ----------  */}
-      <ComparisonsVisual
-        session={session}
-        period={period}
-        indic={indic}
-      />
+      <ComparisonsVisual session={session} period={period} indic={indic} />
 
       {/* ---------- Evolution Curves Chart ----------  */}
-      <EvolutionCurvesVisual
-        session={session}
-        period={period}
-        indic={indic}
-      />
+      <EvolutionCurvesVisual session={session} period={period} indic={indic} />
 
       {/* ---------- Analysis Note Text  ----------  */}
-      <AnalysisNoteVisual
-        session={session}
-        period={period}
-        indic={indic}
-      />
+      <AnalysisNoteVisual session={session} period={period} indic={indic} />
     </>
   );
 }
