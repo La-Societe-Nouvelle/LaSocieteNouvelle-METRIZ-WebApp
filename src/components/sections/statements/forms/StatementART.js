@@ -29,7 +29,7 @@ const StatementART = ({
 }) => {
 
   const [isValueAddedCrafted, setIsValueAddedCrafted] = useState(impactsData.isValueAddedCrafted);
-  const [craftedProduction, setCraftedProduction] = useState(impactsData.craftedProduction || "");
+  const [craftedProduction, setCraftedProduction] = useState(impactsData.craftedProduction);
   const [info, setInfo] = useState(impactsData.comments.art || "");
 
   // update impacts data when state update
