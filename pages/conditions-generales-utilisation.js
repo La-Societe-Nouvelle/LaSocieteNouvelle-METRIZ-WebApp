@@ -59,6 +59,7 @@ export default function Page() {
             et à la libre circulation de ces données détermine les finalités et
             les moyens des traitements de données à caractère personnel.
           </p>
+
           <h3 className="mb-4">Article 4 – Fonctionnalités </h3>
           <h4>4.1 Mesure de l'empreinte </h4>
           <p>
@@ -66,7 +67,8 @@ export default function Page() {
             « Reprendre une session».
           </p>
           <p>Le calcul des indicateurs est décomposé en 4 étapes:</p>
-          <h4>Etape n°1 – Import comptable </h4>
+
+          <h5>Etape n°1 – Import comptable </h5>
           <p>
             Importation du FEC (Fichier d'Ecritures Comptables) et validation de
             la lecture (identification du journal des A-Nouveaux, Association
@@ -75,18 +77,19 @@ export default function Page() {
             gestion, etc.)
           </p>
 
-          <h4>
+          <h5>
             Etape n°2 – Impacts des comptes de stocks et d'immobilisations
-          </h4>
+          </h5>
           <p>
             Téléversement du fichier de sauvegarde relatif à l'exercice
             précédent ou initialisation des données à partir de données par
             défaut (dès que possible les empreintes des comptes sont estimées à
             partir de l'exercice courant).
           </p>
-          <h4>
+
+          <h5>
             Etape n°3 – Récupération des données relatives aux fournisseurs
-          </h4>
+          </h5>
           <p>
             Récupération des empreintes de la production des fournisseurs
             (achats et immobilisations) à partir des numéros de siren.
@@ -99,44 +102,36 @@ export default function Page() {
             supplémentaire permet d'associer à ces comptes des facteurs par
             défaut selon l'origine et le type de produits.
           </p>
-          <h4>Etape n°4 – Déclaration des impacts directs </h4>
+
+          <h5>Etape n°4 – Déclaration des impacts directs </h5>
           <p>
             Déclaration des impacts directs de l'entreprise sur son périmètre
             opérationnel. Les déclarations se font par indicateur.
           </p>
           <p>Pour certains indicateurs, un outil de calcul est proposé.</p>
-          <h4>Etape n°5 - Affichage et téléchargement des résultats </h4>
+
+          <h5>Etape n°5 - Affichage et téléchargement des résultats </h5>
           <p>
             Une interface permet d'obtenir une vue détaillée des résultats pour
             chaque indicateur.
           </p>
           <p>
+            Pour chaque indicateur, une note d'analyse est générée par une 
+            plateforme d'intelligence articielle (actuellement OpenAI - 
+            service ChatGPT), à partir des résultats obtenus.
+            Aucune information personnelle ou confidentielle n'est
+            partagée avec la plateforme, conformément à notre politique de
+            confidentialité des données.
+          </p>
+          <p>
             Des livrables sont également disponibles pour obtenir sous format
             .pdf les résultats par indicateurs, ainsi qu'un tableau
-            récapitulatif.
+            récapitulatif. Aucune information personnelle ou confidentielle n'est
+            partagée avec la plateforme, les requêtes envoyées ne reprennent que
+            les résultats intermédiaires, et les données relatives à la branche d'activité.
           </p>
-          <h5>Utilisation de l'API OpenAI</h5>
 
-          <p>
-            Metriz utilise OpenAI, une plateforme d'intelligence artificielle,
-            pour générer des notes d'analyses à partir des données fournies lors
-            de l'analyse.
-          </p>
-          <p>
-            <b>Responsabilité : </b> L'éditeur n'est pas responsables de la note
-            générée par l'API OpenAI. Bien que ces notes soient générées
-            automatiquement en fonction des données disponibles, elles peuvent
-            contenir des inexactitudes ou des erreurs. Par conséquent, elles ne
-            doivent pas être utilisées comme source d'information fiable et
-            doivent être prises avec réserve.
-          </p>
-          <p>
-            <b>Confidentialité des Données :</b> Les donnéesde l'utilisateur
-            sont traitées conformément à notre politique de confidentialité, et
-            aucune information personnelle identifiable n'est partagée avec
-            OpenAI.
-          </p>
-          <h4>Etape n°6 - Publication </h4>
+          <h4>4.2 Publication</h4>
           <p>
             L'accès à la publication est accessible dès qu'au moins un
             indicateur est calculé. Elle est volontaire.
