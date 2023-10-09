@@ -16,6 +16,7 @@ import { SyncInitialStatesView } from "./views/SyncInitialStatesView";
 
 export const InitialStatesSection = ({
   session,
+  sessionDidUpdate,
   period,
   onReturn,
   submit
@@ -38,6 +39,7 @@ export const InitialStatesSection = ({
       ...session.financialData.immobilisations,
       ...session.financialData.stocks
     ]);
+    sessionDidUpdate();
   }
 
   // ----------------------------------------------------------------------------------------------------

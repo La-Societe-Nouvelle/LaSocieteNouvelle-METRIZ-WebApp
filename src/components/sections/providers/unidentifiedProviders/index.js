@@ -20,6 +20,7 @@ const UnidentifiedProviders = ({
   prevStep,
   submit,
   synchronizeProviders,
+  sessionDidUpdate
 }) => {
   // State management
 
@@ -148,6 +149,8 @@ const UnidentifiedProviders = ({
       return provider;
     });
     setProviders(updatedProviders);
+
+    sessionDidUpdate();
   };
 
   // Pagination

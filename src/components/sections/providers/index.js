@@ -32,6 +32,7 @@ import { ErrorAPIModal } from "../../modals/userInfoModals";
 
 const ProvidersSection = ({
   session,
+  sessionDidUpdate,
   period,
   submit
 }) => {
@@ -79,14 +80,15 @@ const ProvidersSection = ({
   };
 
   useEffect(() => {
+    
     const fetchData = async () => {
       let minFpt = await fetchMinFootprint();
       let maxFpt = await fetchMaxFootprint();
-
+      
       setMinFpt(minFpt);
       setMaxFpt(maxFpt);
     };
-
+    
     fetchData();
   }, []);
 
@@ -115,6 +117,7 @@ const ProvidersSection = ({
           maxFpt={maxFpt}
           submit={submit}
           synchronizeProviders={synchronizeProviders}
+          sessionDidUpdate={sessionDidUpdate}
         />
       </>
     );
@@ -133,6 +136,7 @@ const ProvidersSection = ({
           prevStep={() => setStep(1)}
           submit={submit}
           synchronizeProviders={synchronizeProviders}
+          sessionDidUpdate={sessionDidUpdate}
         />
       </>
     );

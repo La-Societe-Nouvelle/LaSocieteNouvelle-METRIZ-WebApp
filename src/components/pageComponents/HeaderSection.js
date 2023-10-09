@@ -25,18 +25,13 @@ const stepNames = [
 
 export const HeaderSection = ({
   step,
+  stepMax,
   setStep,
   session,
   period,
   onSelectPeriod,
 }) => {
   const refresh = () => location.reload(true);
-
-  const [stepMax, setStepMax] = useState(0);
-  useEffect(async () => {
-    let progression = await getProgression(session, period);
-    setStepMax(progression);
-  }, [step]);
 
   return (
     <header className="overflow-hidden">
@@ -64,8 +59,8 @@ export const HeaderSection = ({
             {[...Array(5)].map((_, index) => {
               const stepNumber = index + 1;
               const stepName = stepNames[index];
-              const isCompleted = stepMax > stepNumber || stepMax === 5;
-              const isCurrentStep = step === stepNumber;
+              const isCompleted = stepMax > stepNumber || stepMax === 5; // background & line after
+              const isCurrentStep = index < stepMax; // (before) step === stepNumber;
               return (
                 <StepperItem
                   key={stepNumber}
@@ -103,7 +98,7 @@ const StepperItem = ({
     <div className={`stepper-item ${isCompleted ? "completed" : ""}`}>
       <button
         className={`step-counter ${isCurrentStep ? "current" : ""}`}
-        disabled={!isCompleted}
+        disabled={!isCompleted && !isCurrentStep}
         onClick={handleClick}
       >
         {stepNumber}

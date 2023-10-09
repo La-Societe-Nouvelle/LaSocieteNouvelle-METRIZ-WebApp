@@ -221,7 +221,6 @@ export class Session
         this.updateNetValueAddedIndicator(indic, period.periodKey)
       )
     );
-    console.log(this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey]);
   }
 
   updateNetValueAddedIndicator = (indic, periodKey) => 
@@ -232,5 +231,17 @@ export class Session
       : new Indicator({ indic });
     
     this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].footprint.indicators[indic] = indicator;
+  }
+
+  initNetValueAddedFootprint = (period) => {
+    Object.entries(metaIndics)
+      .filter(([_,metaIndic]) => metaIndic.isAvailable)
+      .forEach(([indic,_]) =>
+        this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[indic] = new Indicator(indic)
+    );
+  }
+  
+  initNetValueAddedIndicator = (indic,period) => {
+    this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[indic] = new Indicator(indic)
   }
 }

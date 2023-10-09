@@ -47,12 +47,12 @@ const IdentifiedProviders = (props) => {
 
     fetchData();
 
-    
   }, [providers]);
 
   const updateProviders = (updatedProviders) => {
     financialData.providers = updatedProviders;
     setProviders(updatedProviders);
+    props.sessionDidUpdate();
   };
 
   const handleSynchronize = async () => {
