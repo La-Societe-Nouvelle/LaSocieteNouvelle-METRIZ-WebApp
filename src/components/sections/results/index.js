@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Dropdown, DropdownButton, Image } from "react-bootstrap";
 
 // Views
@@ -57,6 +57,13 @@ const Results = ({ session, period, publish, goBack }) => {
     setIsGenerating(false);
   };
 
+  useEffect(() => {
+    const validations = session.validations[period.periodKey];
+    if (validations.length == 1) {
+      setShowedView(validations[0]);
+    }
+  }, []);
+
   return (
     <div className="results">
       <div className="box">
@@ -76,9 +83,7 @@ const Results = ({ session, period, publish, goBack }) => {
         />
 
         <div className="indic-result-menu mt-4">
-        <h4 className="mb-4 h5">
-          Vues disponibles : 
-        </h4>
+          <h4 className="mb-4 h5">Vues disponibles :</h4>
           <div className="d-flex align-items-center justify-content-between">
             <DropdownButton
               className="flex-grow-1 dropdown-container"
@@ -87,15 +92,14 @@ const Results = ({ session, period, publish, goBack }) => {
               key={"down-centered"}
               id="dropdown-indics-button"
               title={getViewLabel(showedView)}
-            > {
-              console.log(viewsData.views)
-            }
+            >
               {Object.entries(viewsData.views)
                 .filter(([_, view]) =>
-                  view.validations.every((indic) =>
-                    session.validations[period.periodKey].includes(indic)
-                    && indic !== showedView 
-                  ) 
+                  view.validations.every(
+                    (indic) =>
+                      session.validations[period.periodKey].includes(indic) &&
+                      indic !== showedView
+                  )
                 )
                 .map(([code, view]) => (
                   <Dropdown.Item
@@ -118,7 +122,6 @@ const Results = ({ session, period, publish, goBack }) => {
           </div>
         </div>
       </div>
-  
 
       <View viewCode={showedView} period={period} session={session} />
 
