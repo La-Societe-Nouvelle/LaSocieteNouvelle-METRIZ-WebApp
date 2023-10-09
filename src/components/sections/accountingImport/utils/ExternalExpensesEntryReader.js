@@ -127,38 +127,36 @@ const readExternalExpenses = (lignes) =>
   }
 
   // Single expense account --------------------------------------------------------------------------- //
-  // not usable (impossible to track amounts)
+  // not usable (impossible to track flows)
 
-  // Single provider account -------------------------------------------------------------------------- //
+  // Single (or no) provider account ------------------------------------------------------------------ //
 
-  // -> comptAuxNum equals + not empy
-  let sameProviderAccountUsed = 
+  let distinctProviderAccounts = 
     lignesFournisseurs.filter((value, index, self) => 
       index === self.findIndex((item) => item.CompteNum === value.CompteNum 
-                                      && item.CompAuxNum === value.CompAuxNum))
-    .length == 1;
+                                      && item.CompAuxNum === value.CompAuxNum));
 
-  if (sameProviderAccountUsed) 
+  if (distinctProviderAccounts.length<=1)
   {
     res.isExpensesTracked = true;
     res.message = "OK";
 
     // ligne relative au compte fournisseur
-    let ligneFournisseur = lignesFournisseurs[0];
+    let ligneFournisseur = lignesFournisseurs[0] || {};
 
     // build data
-    lignesComptesCharges.forEach((rowExpenseAccount) => 
+    lignesComptesCharges.forEach((ligneCompteCharges) => 
     {
       // amortisation expense data
       let expenseData = {
-        label: rowExpenseAccount.EcritureLib.replace(/^\"/, "").replace(/\"$/,""),
-        accountNum: rowExpenseAccount.CompteNum,
-        accountLib: rowExpenseAccount.CompteLib,
-        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneFournisseur.CompteNum,
-        providerLib: ligneFournisseur.CompAuxLib || "DEPENSES " + ligneFournisseur.CompteLib,
+        label: ligneCompteCharges.EcritureLib.replace(/^\"/, "").replace(/\"$/,""),
+        accountNum: ligneCompteCharges.CompteNum,
+        accountLib: ligneCompteCharges.CompteLib,
+        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCompteCharges.CompteNum,
+        providerLib: ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCompteCharges.CompteLib,
         isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
-        amount: parseAmount(rowExpenseAccount.Debit) - parseAmount(rowExpenseAccount.Credit),
-        date: rowExpenseAccount.EcritureDate,
+        amount: parseAmount(ligneCompteCharges.Debit) - parseAmount(ligneCompteCharges.Credit),
+        date: ligneCompteCharges.EcritureDate,
       };
 
       // push data
