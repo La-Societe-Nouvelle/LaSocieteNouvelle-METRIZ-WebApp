@@ -6,12 +6,12 @@ import {HeaderPage} from "/src/components/pageComponents/HeaderPage";
 export default function Home() {
   return (
     <>
-      <div className="wrapper" id="wrapper">
+     
        <HeaderPage/>
         <Container>
           <section className="step">
-            <h1>A propos</h1>
-            <h2 className="mb-4">Qu’est-ce que METRIZ ? </h2>
+            <h2>A propos</h2>
+            <h3 className="mb-4">Qu’est-ce que METRIZ ? </h3>
             <p>
               L’application web METRIZ permet d’évaluer l’empreinte sociétale de
               la production d’une entreprise. La méthodologie de mesure s’appuie
@@ -37,13 +37,13 @@ export default function Home() {
               pour participer à la construction d’une économie plus transparente
               et valoriser les ratios de performance obtenus.
             </p>
-            <h3 className="mb-3">Qui la développe? </h3>
+            <h4 className="mb-3">Qui la développe? </h4>
             <p>
               L’application web est développée par <a href="https://lasocietenouvelle.org" target="_blank">La Société Nouvelle</a>. Le code
               est libre, sous licence CeCILL. Il est accessible <a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank">ici.</a>
             </p>
 
-            <h2 className="mb-4">Vie privée </h2>
+            <h3 className="mb-4">Vie privée </h3>
             <p>
               Aucune donnée n’est collectée lors de l’utilisation de
               l’application web. Les informations pouvant être transmises se
@@ -56,7 +56,7 @@ export default function Home() {
               résultats) s’effectue en local, au sein du navigateur utilisé.
             </p>
 
-            <h2 className="mb-4">Nous contacter </h2>
+            <h3 className="mb-4">Nous contacter </h3>
 
             <p>
               Vous pouvez nous contacter par mail à l’adresse :{" "}
@@ -65,7 +65,7 @@ export default function Home() {
               </a>{" "}
             </p>
 
-            <h2 className="mb-4">Accessibilité</h2>
+            <h3 className="mb-4">Accessibilité</h3>
 
             <p>
               Si vous rencontrez un défaut d’accessibilité vous empêchant
@@ -73,9 +73,9 @@ export default function Home() {
               nous en faire part.
             </p>
 
-            <h2 className="mb-4">Mentions légales </h2>
+            <h3 className="mb-4">Mentions légales </h3>
 
-            <h3>La Société Nouvelle </h3>
+            <h4>La Société Nouvelle </h4>
 
             <p>SAS au capital de 1000 € <br />
 
@@ -83,11 +83,11 @@ export default function Home() {
 
            RCS Lille Métropole 889 182 770 </p>
 
-            <h3>Directeur de publication </h3>
+            <h4>Directeur de publication </h4>
 
             <p>Sylvain HUMILIERE </p>
 
-            <h3>Hébergement</h3>
+            <h4>Hébergement</h4>
 
             <p>VERCEL</p>
 
@@ -107,14 +107,14 @@ export default function Home() {
               aucune donnée n’est traitée par le serveur d’hébergement.
             </p>
 
-            <h2 className="mb-4">Conditions générales d’Utilisation </h2>
+            <h3 className="mb-4">Conditions générales d’Utilisation </h3>
 
             <p>
               Les conditions générales d’utilisation sont disponibles <a href="/conditions-generales-utilisation">ici</a>.
             </p>
           </section>
         </Container>
-      </div>
+
       <Footer />
     </>
   );

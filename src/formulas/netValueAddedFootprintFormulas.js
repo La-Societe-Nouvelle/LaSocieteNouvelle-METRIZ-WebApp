@@ -109,7 +109,7 @@ const buildValueGEQ = (indicator, impactsData) =>
 
 const buildValueGHG = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.ghg;
+  const { statementUnits } = metaIndics.ghg;
   const { 
     greenhouseGasEmissions, 
     greenhouseGasEmissionsUncertainty, 
@@ -122,7 +122,7 @@ const buildValueGHG = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(greenhouseGasEmissionsUnit)) 
   {
     let grossImpact = parseFloat(greenhouseGasEmissions)*statementUnits[greenhouseGasEmissionsUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(parseInt(greenhouseGasEmissionsUncertainty));
   }
@@ -132,7 +132,7 @@ const buildValueGHG = (indicator, impactsData) =>
 
 const buildValueHAZ = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.haz;
+  const { statementUnits } = metaIndics.haz;
   const { 
     hazardousSubstancesUse, 
     hazardousSubstancesUseUncertainty,
@@ -145,7 +145,7 @@ const buildValueHAZ = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(hazardousSubstancesUseUnit)) 
   {
     let grossImpact = parseFloat(hazardousSubstancesUse)*statementUnits[hazardousSubstancesUseUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(hazardousSubstancesUseUncertainty);
   }
@@ -172,7 +172,7 @@ const buildValueKNW = (indicator, impactsData) =>
 
 const buildValueMAT = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.mat;
+  const { statementUnits } = metaIndics.mat;
   const { 
     materialsExtraction, 
     materialsExtractionUncertainty,
@@ -185,7 +185,7 @@ const buildValueMAT = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(materialsExtractionUnit)) 
   {
     let grossImpact = parseFloat(materialsExtraction)*statementUnits[materialsExtractionUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(materialsExtractionUncertainty);
   }
@@ -195,7 +195,7 @@ const buildValueMAT = (indicator, impactsData) =>
 
 const buildValueNRG = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.nrg;
+  const { statementUnits } = metaIndics.nrg;
   const { 
     energyConsumption,
     energyConsumptionUncertainty,
@@ -208,7 +208,7 @@ const buildValueNRG = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(energyConsumptionUnit)) 
   {
     let grossImpact = parseFloat(energyConsumption)*statementUnits[energyConsumptionUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(energyConsumptionUncertainty);
   }
@@ -232,7 +232,7 @@ const buildValueSOC = (indicator, impactsData) =>
 
 const buildValueWAS = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.was;
+  const { statementUnits } = metaIndics.was;
   const { 
     wasteProduction, 
     wasteProductionUncertainty,
@@ -245,7 +245,7 @@ const buildValueWAS = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(wasteProductionUnit)) 
   {
     let grossImpact = parseFloat(wasteProduction)*statementUnits[wasteProductionUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(wasteProductionUncertainty);
   }
@@ -255,7 +255,7 @@ const buildValueWAS = (indicator, impactsData) =>
 
 const buildValueWAT = (indicator, impactsData) => 
 {
-  const { nbDecimals, statementUnits } = metaIndics.wat;
+  const { statementUnits } = metaIndics.wat;
   const { 
     waterConsumption, 
     waterConsumptionUncertainty,
@@ -268,7 +268,7 @@ const buildValueWAT = (indicator, impactsData) =>
    && Object.keys(statementUnits).includes(waterConsumptionUnit)) 
   {
     let grossImpact = parseFloat(waterConsumption)*statementUnits[waterConsumptionUnit].coef;
-    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
+    let value = roundValue((grossImpact/netValueAdded)*1000, 9);
     indicator.setValue(value);
     indicator.setUncertainty(waterConsumptionUncertainty);
   }

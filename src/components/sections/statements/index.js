@@ -15,6 +15,7 @@ import indicators from "/lib/indics";
 
 const DirectImpacts = ({ 
   session,
+  sessionDidUpdate,
   period,
   submit 
 }) => {
@@ -53,12 +54,14 @@ const DirectImpacts = ({
     
     // update session
     session.validations[period.periodKey] = selectedStatements;
-    //session.updateFootprints(period);
 
     // update state
     setSelectedStatements(selectedStatements);
     setInvalidStatements(invalidStatements);
     setEmptyStatements(emptyStatements);
+
+    sessionDidUpdate();
+
   }, [statementsStatus])
 
   // on submit
@@ -84,6 +87,11 @@ const DirectImpacts = ({
       ...prevStatementsStatus,
       [indic]: status
     })});
+
+    if (["error","incomplete"].includes(status.status) // re-init if unselect, error or incomplete
+     || (status.status=="ok" && statementsStatus[indic].status=="ok")) { // re-init if changes
+      session.initNetValueAddedIndicator(indic,period);
+    }
   };
 
   const categories = [
@@ -93,7 +101,6 @@ const DirectImpacts = ({
   ];
 
   return (
-    <Container fluid>
       <section className="statement-section step">
         <h2 className="mb-3">Etape 4 - Déclaration des impacts directs </h2>
         <p>
@@ -193,7 +200,6 @@ const DirectImpacts = ({
           </Button>
         </div>
       </section>
-    </Container>
   );
 };
 

@@ -3,6 +3,7 @@
 import { Tab, Tabs } from "react-bootstrap";
 import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
+import { ProvidersTable } from "../tables/ProvidersTable";
 
 export const MainAggregatesTableVisual = ({
   session,
@@ -11,7 +12,7 @@ export const MainAggregatesTableVisual = ({
 }) => {
 
   return (
-    <div id="rapport" className="box p-4">
+    <div id="rapport" className="box">
       <h4>Rapport - Analyse extra-financière</h4>
       <Tabs
         defaultActiveKey="mainAggregates"
@@ -33,6 +34,16 @@ export const MainAggregatesTableVisual = ({
           title=" Détails - Comptes de charges"
         >
           <ExpensesTable
+            session={session}
+            period={period}
+            indic={indic}
+          />
+        </Tab>
+        <Tab
+          eventKey="providers"
+          title=" Détails - Fournisseurs (charges externes)"
+        >
+          <ProvidersTable
             session={session}
             period={period}
             indic={indic}

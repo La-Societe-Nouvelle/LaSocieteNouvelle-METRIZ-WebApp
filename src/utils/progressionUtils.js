@@ -27,7 +27,7 @@ const progressionIndex = {
 export const getProgression = async (session,period) => 
 {
   // period defined
-  if (!period.periodKey) {
+  if (!period || !period.periodKey) {
     return progressionIndex.accountingImportSection;
   }
 
@@ -44,8 +44,9 @@ export const getProgression = async (session,period) =>
   }
   
   // check external footprints
+  let providerFootprintsValid = checkProviderFootprints(session,period);
   let externalFootprintsValid = checkExternalFootprints(session,period);
-  if (!externalFootprintsValid) {
+  if (!providerFootprintsValid || !externalFootprintsValid) {
     return progressionIndex.providersSection;
   }
   
@@ -76,6 +77,12 @@ export const checkInitialStates = (session,period) =>
     ...session.financialData.stocks
   ];
   return assetAccounts.every((account) => !account.isAmortisable || account.initialStateSet);
+}
+
+export const checkProviderFootprints = (session,period) => {
+  let providers = session.financialData.providers
+    .filter((provider) => provider.periodsData.hasOwnProperty(period.periodKey));
+  return providers.every((provider) => provider.footprint.isValid())
 }
 
 export const checkExternalFootprints = (session,period) => {

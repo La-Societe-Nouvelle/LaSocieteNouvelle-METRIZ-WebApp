@@ -6,7 +6,6 @@ import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
 
 // Utils
 import { valueOrDefault } from "/src/utils/Utils";
-import { isValidNumber } from "/src/utils/Utils";
 import { checkStatementKNW } from "./utils";
 
 // Modals

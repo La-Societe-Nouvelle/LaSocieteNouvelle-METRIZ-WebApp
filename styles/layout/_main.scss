@@ -1,5 +1,10 @@
-.wrapper {
-  min-height: calc(100vh - 74px);
+
+h3 {
+  color : $secondary;
+}
+
+.app-container {
+  min-height: calc(100vh - 180px);  
 }
 
 @media (min-width: 1400px) {
@@ -30,18 +35,6 @@
   padding: 0 1.5rem 1.5rem 1.5rem;
   font-size: 0.9rem;
 }
-// to do : refacto
-.container,
-.container-fluid {
-  padding-right: 1.9375rem;
-  padding-left: 1.9375rem;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.container-fluid {
-  width: 100%;
-}
 
 .vertical-lign {
   border-left: 2px solid $light;
@@ -51,40 +44,36 @@
 
 .comparative-chart-container{
   position: relative;
-  height: 20vh;
-  width: 40vh; 
-}
+  height: 180px;
+  width: 250px;
+} 
 
 .doughnut-chart-container{
   position: relative;
-  width: 40vh;
-  height: 20vh;
+  width: 200px;
+  height: 200px;
   canvas {
     margin: 0 auto;
   }
 }
 .impact-chart-container{
   position : relative;
-  height: 50vh;
-  width: 50vh; 
+  height: 500px;
+  width: 500px; 
 }
 .trend-chart-container {
   position : relative;
-  height: 50vh;
-  width: 100vh; 
+  height: 350px;
+  width: 750px; 
 }
 .deviation-chart-container {
   position : relative;
-  height: 70vh;
-  width: 150vh; 
+  height: 350px;
+  width: 700px; 
 }
 
 .sig-piechart-container {
   padding: 0 6rem 0 6rem;
 }
 
-// title
 
-h3 {
-  color : $secondary;
-}

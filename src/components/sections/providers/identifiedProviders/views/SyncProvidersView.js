@@ -13,6 +13,7 @@ import { SyncErrorModal } from "../modals/AlertModal";
 
 // Component
 import PaginationComponent from "../../PaginationComponent";
+import { sortProviders } from "../../utils";
 
 const SyncProvidersView = ({
   providers,
@@ -22,71 +23,54 @@ const SyncProvidersView = ({
   handleSynchronize,
   showSyncErrorModal,
   closeSyncErrorModal,
-  view
+  view,
 }) => {
 
-  const [currentView, setCurrentView] = useState(view);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
-  
+  const [state, setState] = useState({
+    currentView: view,
+    currentPage: 1,
+    itemsPerPage: 20,
+    sortColumn: null,
+    sortOrder: "asc",
+  });
+
+  const { currentView, currentPage, itemsPerPage, sortColumn, sortOrder } = state;
+
   useEffect(() => {
-    setCurrentView(view);
+    setState((prevState) => ({ ...prevState, currentView: view }));
   }, [view]);
 
-  // Filtered Providers
-  const getShowedProviders = (currentView) => {
-    let filteredProviders = providers;
-  
-    switch (currentView) {
-      case "notDefined":
-        filteredProviders = filteredProviders.filter((provider) => {      
-          return (
-            (provider.corporateId === null || !/^[0-9]{9}$/.test(provider.corporateId)) ||
-            (provider.footprintStatus === 0 && /^[0-9]{9}$/.test(provider.corporateId))
-          );
-        });
-  
-        break;
-      case "unsync":
-        filteredProviders = filteredProviders.filter(
-          (provider) => provider.footprintStatus !== 200
-        );
-        break;
-      case "error":
-        // TO DO : Improve condition 
-        filteredProviders = filteredProviders.filter(
-          (provider) => provider.footprintStatus === 404 || !/^[0-9]{9}$/.test(provider.corporateId)
-        );
-        break;
-      case "significative":
-        filteredProviders = filteredProviders.filter((provider) =>
-          significativeProviders.includes(provider.providerNum)
-        );
-        break;
-      case "significativeUnidentified":
-        filteredProviders = filteredProviders.filter(
-          (provider) =>
-            significativeProviders.includes(provider.providerNum) &&
-            provider.useDefaultFootprint
-        );
-        break;
-      default:
-        break;
-    }
+  // Handlers
 
-    return filteredProviders;
+  const handleViewChange = (e) => {
+    setState((prevState) => ({ ...prevState, currentView: e.target.value }));
   };
-  const showedProviders = getShowedProviders(currentView);
 
-  // Pagination
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const totalPages = Math.ceil(showedProviders.length / itemsPerPage);
+  const handleItemsPerPageChange = (e) => {
+    setState((prevState) => ({
+      ...prevState,
+      itemsPerPage:
+        e.target.value === "all" ? providers.length : parseInt(e.target.value),
+    }));
+  };
 
+  const handleSort = (column) => {
+    if (column === sortColumn) {
+      setState((prevState) => ({
+        ...prevState,
+        sortOrder: sortOrder === "asc" ? "desc" : "asc",
+      }));
+    } else {
+      setState((prevState) => ({
+        ...prevState,
+        sortColumn: column,
+        sortOrder: "asc",
+      }));
+    }
+  };
 
   const handleSirenProvider = async (e, providerNum) => {
-    const newSiren = e.target.value;
-    console.log(newSiren)
+    const newSiren = e.target.value.trim();
     const updatedProviders = providers.map((provider) => {
       if (provider.providerNum === providerNum) {
         provider.update({ corporateId: newSiren });
@@ -98,28 +82,41 @@ const SyncProvidersView = ({
     await updateProviders(updatedProviders);
   };
 
+  // Filter providers based on the current view
 
-
-  const isSyncButtonEnable = providers.some(
-    (provider) =>
-      (!provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())) ||
-      provider.footprintStatus === 203
+  const filteredProviders = filterProvidersByView(
+    currentView,
+    significativeProviders,
+    providers
+  );
+  
+  // Sorting for providers
+  const sortedProviders = sortProviders(
+    filteredProviders,
+    sortColumn,
+    sortOrder,
+    financialPeriod
   );
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-  };
+  // Pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalPages = Math.ceil(filteredProviders.length / itemsPerPage);
 
-  
+  // Sync button status
+  const isSyncButtonEnable = isSyncButtonEnabled(providers);
+
+  const renderSignificativeOption = hasSignificativeProvidersWithoutSiren(providers, significativeProviders);
+
   return (
-    <div className="box" >
+    <div className="box">
       <h4>Synchroniser les données de vos fournisseurs</h4>
 
       <div className="d-flex py-2 justify-content-between">
         <div className="d-flex align-items-center ">
           <Form.Select
             size="sm"
-            onChange={(e) => setCurrentView(e.target.value)}
+            onChange={handleViewChange}
             value={currentView}
             className="me-3"
           >
@@ -138,21 +135,16 @@ const SyncProvidersView = ({
             <option key="5" value="significative">
               Comptes significatifs
             </option>
-            <option key="6" value="significativeUnidentified">
+            <option key="6" value="significativeUnidentified" disabled={!renderSignificativeOption}>
               Comptes significatifs non identifiés
             </option>
           </Form.Select>
 
           <Form.Select
             size="sm"
-            onChange={(e) =>
-              setItemsPerPage(
-                e.target.value === "all"
-                  ? providers.length
-                  : parseInt(e.target.value)
-              )
-            }
+            onChange={handleItemsPerPageChange}
             value={itemsPerPage}
+            disabled={providers.length < 20}
           >
             <option key="1" value="20">
               20 fournisseurs par page
@@ -179,26 +171,32 @@ const SyncProvidersView = ({
           <tr>
             <th width={10}></th>
             <th className="siren">Siren</th>
-            <th>
+            <th
+              onClick={() => handleSort("libelle")}
+            >
               <i className="bi bi-arrow-down-up me-1"></i>
               Libellé du compte fournisseur
             </th>
             <th>Compte fournisseur</th>
 
-            <th className="text-end">
+            <th className="text-end" onClick={() => handleSort("montant")}>
               <i className="bi bi-arrow-down-up me-1"></i>
               Montant
             </th>
           </tr>
         </thead>
         <tbody>
-          {showedProviders
+          {sortedProviders
             .slice(startIndex, endIndex)
             .map((provider, index) => (
               <tr key={index}>
                 <td>
-                 <i className={ getIdentifiedProviderStatusIcon(provider).className}
-                  title={ getIdentifiedProviderStatusIcon(provider).title}></i>
+                  <i
+                    className={
+                      getIdentifiedProviderStatusIcon(provider).className
+                    }
+                    title={getIdentifiedProviderStatusIcon(provider).title}
+                  ></i>
                 </td>
                 <td className="siren-input">
                   <Form.Control
@@ -227,16 +225,69 @@ const SyncProvidersView = ({
       <PaginationComponent
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={handlePageChange}
+        onPageChange={(newPage) =>
+          setState((prevState) => ({ ...prevState, currentPage: newPage }))
+        }
       />
 
       <SyncErrorModal
         showModal={showSyncErrorModal}
         onClose={closeSyncErrorModal}
-        changeView={() => setCurrentView("error")}
+        changeView={() =>
+          setState((prevState) => ({ ...prevState, currentView: "error" }))
+        }
       />
     </div>
   );
 };
+
+function filterProvidersByView(currentView, significativeProviders, providers) {
+  const filterConfig = {
+    notDefined: (provider) =>
+      provider.corporateId === null ||
+      !/^[0-9]{9}$/.test(provider.corporateId) ||
+      (provider.footprintStatus === 0 &&
+        /^[0-9]{9}$/.test(provider.corporateId)),
+    unsync: (provider) => provider.footprintStatus !== 200,
+    error: (provider) =>
+      provider.footprintStatus === 404 ||
+      !/^[0-9]{9}$/.test(provider.corporateId),
+    significative: (provider) =>
+      significativeProviders.includes(provider.providerNum),
+    significativeUnidentified: (provider) =>
+      (significativeProviders.includes(provider.providerNum) &&
+        provider.useDefaultFootprint &&
+        provider.corporateId === null) ||
+      !/^[0-9]{9}$/.test(provider.corporateId) ||
+      (provider.footprintStatus === 0 &&
+        /^[0-9]{9}$/.test(provider.corporateId)),
+  };
+
+  return filterConfig[currentView]
+    ? providers.filter(filterConfig[currentView])
+    : providers;
+}
+
+function isSyncButtonEnabled(providers) {
+  return providers.some(
+    (provider) =>
+      (!provider.useDefaultFootprint &&
+        (provider.footprintStatus !== 200 ||
+          !provider.footprint.isValid())) ||
+      provider.footprintStatus === 203
+  );
+}
+
+function hasSignificativeProvidersWithoutSiren(
+  providers,
+  significativeProviders
+) {
+  return providers.some(
+    (provider) =>
+      provider.corporateId === null &&
+      significativeProviders.includes(provider.providerNum)
+  );
+}
+
 
 export default SyncProvidersView;

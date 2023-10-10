@@ -86,6 +86,7 @@ export const AssessmentKNW = ({
 
           {Object.entries(knwItems).map(([itemKey,itemProps]) =>
             <RowAssessmentKNW
+              key={itemKey}
               itemKey={itemKey}
               itemProps={itemProps}
               itemValue={knwDetails[itemKey]}

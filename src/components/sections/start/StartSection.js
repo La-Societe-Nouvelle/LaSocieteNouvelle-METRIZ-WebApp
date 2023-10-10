@@ -13,6 +13,8 @@ import { Session } from "/src/Session";
 
 // Updater
 import { updateVersion } from "/src/version/updateVersion";
+import FloatingActionButton from "../../pageComponents/FloatingActionButton";
+import CarouselModal from "../../modals/CarouselModal";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
@@ -26,14 +28,11 @@ import { updateVersion } from "/src/version/updateVersion";
  *    submit : return session to Metriz (new session or loaded session from backupfile)
  */
 
-export const StartSection = ({ 
-  initSession,
-  resumeSession
-}) => {
+export const StartSection = ({ initSession, resumeSession }) => {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDataUpdater, setShowDataUpdater] = useState(false);
-
+  const [showCarousel, setShowCarousel] = useState(false);
   // Start new session
 
   const startNewSession = () => {
@@ -104,9 +103,17 @@ export const StartSection = ({
     console.log(updatedSession);
   };
 
+  const handleFloatingButtonClick = () => {
+    setShowCarousel(true);
+  };
+
+  const handleCloseCarousel = () => {
+    setShowCarousel(false);
+  };
+
   return (
     <div className="bg-white">
-      <header className="px-5 py-2 ">
+      <header className="px-5 py-4 ">
         <Container fluid>
           <p className="text-end small">Intiative OpenData - OpenSource</p>
         </Container>
@@ -196,7 +203,8 @@ export const StartSection = ({
             </Row>
           </Container>
         </div>
-        <div className="px-5">
+
+        <div className="px-5 mt-5">
           <Container fluid>
             <Row>
               <Col>
@@ -258,6 +266,8 @@ export const StartSection = ({
               </Col>
             </Row>
           </Container>
+          <FloatingActionButton onClick={handleFloatingButtonClick} />
+          <CarouselModal show={showCarousel} onHide={handleCloseCarousel} />
         </div>
       </div>
     </div>

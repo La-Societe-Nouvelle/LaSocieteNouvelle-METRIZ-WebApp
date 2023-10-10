@@ -114,7 +114,7 @@ export const ImportBackUpView = ({
   // ----------------------------------------------------------------------------------------------------
 
   return (
-    <div className="step p-4">
+    <div className="box">
       <h3 className="mb-3"> Reprise sur l'exercice précédent</h3>
       <p className="small">
         En cas d'analyse réalisée pour l'exercice précédent,{" "}

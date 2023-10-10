@@ -47,12 +47,12 @@ const IdentifiedProviders = (props) => {
 
     fetchData();
 
-    
   }, [providers]);
 
   const updateProviders = (updatedProviders) => {
     financialData.providers = updatedProviders;
     setProviders(updatedProviders);
+    props.sessionDidUpdate();
   };
 
   const handleSynchronize = async () => {
@@ -108,7 +108,6 @@ const IdentifiedProviders = (props) => {
   const isNextStepAvailable = (nbSirenSynchronised === nbSiren && nbSiren !== 0);
 
   return (
-    <Container fluid id="siren-section">
       <section className="step">
         <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
         <h3 className=" my-4">
@@ -202,7 +201,6 @@ const IdentifiedProviders = (props) => {
           )}
         </div>
       </section>
-    </Container>
   );
 };
 

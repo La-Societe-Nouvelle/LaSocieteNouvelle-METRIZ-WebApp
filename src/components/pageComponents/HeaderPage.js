@@ -16,8 +16,8 @@ import {
 export const HeaderPage = () => 
 {
  return (
-    <Navbar expand="lg">
-    <Container >
+    <Navbar expand="lg" >
+    <Container>
       <Navbar.Brand href="/">
         <Image
           className="d-inline-block align-center"
@@ -26,8 +26,7 @@ export const HeaderPage = () =>
           alt="logo"
         />
       </Navbar.Brand>
-      <Navbar>
-        <Nav className="me-auto">
+        <Nav>
           <Nav.Link href="/">
             <i className="bi bi-house-door-fill"></i> Accueil
           </Nav.Link>
@@ -45,7 +44,6 @@ export const HeaderPage = () =>
             La société nouvelle
           </Nav.Link>
         </Nav>
-      </Navbar>
     </Container>
   </Navbar>
  )

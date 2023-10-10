@@ -2,6 +2,7 @@
 
 // React / Next
 import React, { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
 
 // Error Handler
 import ErrorBoundary from "/src/utils/ErrorBoundary";
@@ -45,6 +46,7 @@ export const Metriz = () =>
   const [session, setSession] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
+  const [stepMax, setStepMax] = useState(0);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false); 
 
@@ -55,7 +57,9 @@ export const Metriz = () =>
       top: 0,
       left: 0,
       behavior: "instant",
-    })  }, [step]); 
+    });
+    sessionDidUpdate();
+  }, [step]); 
 
 
   // Update state -------------------------------------
@@ -72,6 +76,11 @@ export const Metriz = () =>
   const handleSessionSaved = () => {
     setSessionSaved(true);
   };
+
+  const sessionDidUpdate = async () => {
+    let progression = await getProgression(session,selectedPeriod);
+    setStepMax(progression);
+  }
 
   // Init session -------------------------------------
 
@@ -218,17 +227,20 @@ export const Metriz = () =>
       />,
       <InitialStatesSection
         session={session}
+        sessionDidUpdate={sessionDidUpdate}
         period={selectedPeriod}
         submit={validInitialStates}
         onReturn={() => setStep(1)}
       />,
       <ProvidersSection
         session={session}
+        sessionDidUpdate={sessionDidUpdate}
         period={selectedPeriod}
         submit={validProviders}
       />,
       <DirectImpacts
         session={session}
+        sessionDidUpdate={sessionDidUpdate}
         period={selectedPeriod}
         submit={validStatements}
       />,
@@ -254,6 +266,7 @@ export const Metriz = () =>
         {step > 0 && step < 6 && (
           <HeaderSection
             step={step}
+            stepMax={stepMax}
             setStep={updateStep}
             session={session}
             period={selectedPeriod}
@@ -271,7 +284,9 @@ export const Metriz = () =>
         )}
 
         {/* Sections */}
-        {buildSectionView(step)}
+        <div className={`app-container ${step === 0 ? '' : 'container-fluid'}`}>
+          {buildSectionView(step)}
+        </div>
 
         {/* Modal */}
 
