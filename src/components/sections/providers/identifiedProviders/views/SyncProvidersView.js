@@ -70,7 +70,7 @@ const SyncProvidersView = ({
   };
 
   const handleSirenProvider = async (e, providerNum) => {
-    const newSiren = e.target.value;
+    const newSiren = e.target.value.trim();
     const updatedProviders = providers.map((provider) => {
       if (provider.providerNum === providerNum) {
         provider.update({ corporateId: newSiren });

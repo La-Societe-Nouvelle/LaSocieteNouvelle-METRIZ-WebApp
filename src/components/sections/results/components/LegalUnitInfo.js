@@ -109,7 +109,7 @@ export const LegalUnitInfo = ({ session, period, setIsLoading }) => {
                         size="sm"
                         type="text"
                         value={newSiren}
-                        onChange={(e) => setNewSiren(e.target.value)}
+                        onChange={(e) => setNewSiren(e.target.value.trim())}
                         pattern="[0-9]{9}"
                         isInvalid={newSiren === ""}
                         required

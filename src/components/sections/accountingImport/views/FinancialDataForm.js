@@ -106,7 +106,7 @@ export const FinancialDataForm = ({
 
   // on change - siren
   const handleSirenChange = async (event) => {
-    let nextSiren = event.target.value;
+    let nextSiren = event.target.value.trim();
     setSiren(nextSiren);
   };
 
