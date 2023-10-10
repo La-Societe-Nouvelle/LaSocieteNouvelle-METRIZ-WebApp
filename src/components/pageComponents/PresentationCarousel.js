@@ -157,7 +157,7 @@ function PresentationCarousel() {
             <p>
               Vos données sont traitées "côté client" par votre navigateur web
               sur votre ordinateur. Vos données ne transitent pas au sein de nos
-              serveurs et ne font l'objet d'une collecte.
+              serveurs et ne font pas l'objet d'une collecte.
             </p>
             <p>
               Un fichier de sauvegarde peut être enregistré sur votre ordinateur
