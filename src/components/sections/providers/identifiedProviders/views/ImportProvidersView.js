@@ -112,7 +112,7 @@ const ImportProvidersView = ({
       .map((provider) => {
         return {
           accountNum: provider.providerNum,
-          denomination: provider.corporateName,
+          denomination: provider.providerLib,
           siren: provider.corporateId,
         };
       });
