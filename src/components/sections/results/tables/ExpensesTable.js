@@ -147,7 +147,9 @@ export const  ExpensesTable = ({
           </tr>
         </thead>
         <tbody>
-          {externalExpensesAccounts.map(
+          {externalExpensesAccounts
+            .filter(({ periodsData }) => periodsData.hasOwnProperty(period.periodKey))
+            .map(
             ({ accountNum, accountLib, periodsData }) => {
               return (
                 <tr key={accountNum}>
@@ -193,32 +195,35 @@ export const  ExpensesTable = ({
                   {prevPeriod && (
                     <>
                       <td className="text-end border-left">
-                        {printValue(
+                        {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
+                          printValue(
                           periodsData[
                             prevPeriod.periodKey
                           ].footprint.indicators[indic].getValue(),
                           nbDecimals
-                        )}
+                        ) : " - "}
                       </td>
                       <td className="text-end">
                         <u>+</u>
-                        {printValue(
+                        {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
+                          printValue(
                           periodsData[
                             prevPeriod.periodKey
                           ].footprint.indicators[indic].getUncertainty(),
                           0
-                        )}
+                        ) : " - "}
                       </td>
                       {showGrossImpact && (
                         <td className="text-end">
-                          {printValue(
+                          {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
+                            printValue(
                             periodsData[
                               prevPeriod.periodKey
                             ].footprint.indicators[indic].getGrossImpact(
                               periodsData[prevPeriod.periodKey].amount
                             ),
                             nbDecimals
-                          )}
+                          ) : " - "}
                         </td>
                       )}
                     </>
