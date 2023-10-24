@@ -86,6 +86,20 @@ export const ComparativeChart = ({
     labels: ["France", "Exercice", "Branche"],
     datasets: [
       {
+        label: "Valeur N-1",
+        data: dataset_prevFootprints,
+        skipNull: true,
+        backgroundColor: [
+          "RGBA(215,220,251,1)",
+          "RGBA(250,89,95,1)",
+          "rgb(255 220 141)",
+        ],
+        borderWidth: 0,
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+        minBarLength: 2,
+      },
+      {
         label: "Empreinte",
         data: dataset_currentFootprints,
         skipNull: true,
@@ -96,20 +110,6 @@ export const ComparativeChart = ({
         ],
         borderWidth: 0,
         type: "bar",
-        barPercentage: 0.6,
-        categoryPercentage: 0.6,
-        minBarLength: 2,
-      },
-      {
-        label: "Valeur N-1",
-        data: dataset_prevFootprints,
-        skipNull: true,
-        backgroundColor: [
-          "RGBA(215,220,251,1)",
-          "RGBA(250,89,95,1)",
-          "rgb(255 220 141)",
-        ],
-        borderWidth: 0,
         barPercentage: 0.6,
         categoryPercentage: 0.6,
         minBarLength: 2,
