@@ -124,7 +124,9 @@ const buildMainAggratesTable = ({
   const data = 
       "| Agrégat | Montant | "+metaIndics[indic].libelle+" | Moyenne branche |"+"\n"
     + "|---------|---------|-------------------------------|-----------------|"+"\n"
-    + Object.keys(metaMainAggregates).map((aggregateKey) => {
+    + Object.keys(metaMainAggregates)
+            .filter((aggregateKey) => mainAggregates[aggregateKey].periodsData.hasOwnProperty(period.periodKey))
+            .map((aggregateKey) => {
         return( "|"
           +" "+metaMainAggregates[aggregateKey].label+" |"
           +" "+mainAggregates[aggregateKey].periodsData[period.periodKey].amount+" € |"
@@ -152,7 +154,9 @@ const buildExpensesTable = ({
   const data = 
       "| Numéro de compte | Libellé | Montant | "+metaIndics[indic].libelle+" |"+"\n"
     + "|------------------|---------|---------|-------------------------------|"+"\n"
-    + externalExpensesAccounts.map(({ accountNum, accountLib, periodsData }) => 
+    + externalExpensesAccounts
+        .filter(({ periodsData }) => periodsData.hasOwnProperty(period.periodKey))
+        .map(({ accountNum, accountLib, periodsData }) => 
           "| "+accountNum
         +" | "+accountLib
         +" | "+periodsData[period.periodKey].amount+" €"
