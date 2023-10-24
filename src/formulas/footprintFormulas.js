@@ -71,7 +71,7 @@ export async function buildAggregateIndicator(indic,items)
       grossImpactMin+= indicatorItem.getValueMin()*amount;
       totalAmount+= amount;
     }
-    else if (!isValidNumber(amount) || !indicatorItem.isValid()) {
+    else if (!isValidNumber(amount) || !indicatorItem.isValid() && amount!=0) {
       missingData = true;
     }
   };
