@@ -9,7 +9,7 @@ import ProvidersTable from "./ProvidersTable";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
-import { getSignificativeUnidentifiedProviders } from "./utils";
+import { getMappingFromChatGPT, getSignificativeUnidentifiedProviders } from "./utils";
 import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 
 const UnidentifiedProviders = ({
@@ -69,6 +69,23 @@ const UnidentifiedProviders = ({
 
     setIsNextStepAvailable(isProvidersSync);
   }, []);
+
+  // Pré-selection economic division
+  useEffect(async () => {
+    if (providers.every(provider => provider.defaultFootprintParams.code == "00")) {
+      // call chat GPT
+      let res = await getMappingFromChatGPT(providers);
+      if (res.isAvailable) {
+        res.mapping.forEach(({providerNum,defaultCode}) => {
+          let provider = providers.find(provider => provider.providerNum == providerNum);
+          if (provider) {
+            provider.defaultFootprintParams.code = defaultCode;
+            setProviderDefaultFootprintParams(providerNum,"code",defaultCode);
+          }
+        })
+      }
+    }
+  }, [])
 
   // Filter providers based on the current view
   useEffect(() => {
