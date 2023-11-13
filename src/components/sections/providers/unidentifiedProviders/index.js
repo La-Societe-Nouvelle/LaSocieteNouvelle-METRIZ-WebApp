@@ -70,23 +70,6 @@ const UnidentifiedProviders = ({
     setIsNextStepAvailable(isProvidersSync);
   }, []);
 
-  // Pré-selection economic division
-  useEffect(async () => {
-    if (providers.every(provider => provider.defaultFootprintParams.code == "00")) {
-      // call chat GPT
-      let res = await getMappingFromChatGPT(providers);
-      if (res.isAvailable) {
-        res.mapping.forEach(({providerNum,defaultCode}) => {
-          let provider = providers.find(provider => provider.providerNum == providerNum);
-          if (provider) {
-            provider.defaultFootprintParams.code = defaultCode;
-            setProviderDefaultFootprintParams(providerNum,"code",defaultCode);
-          }
-        })
-      }
-    }
-  }, [])
-
   // Filter providers based on the current view
   useEffect(() => {
     const filteredProviders = filterProvidersByView(
@@ -146,6 +129,25 @@ const UnidentifiedProviders = ({
     setIsNextStepAvailable(stepAvailable);
     setShowSyncSuccessModal(stepAvailable);
     setSignificativeProviders(updatedSignificativeProviders);
+  };
+
+  // Pré-selection economic division
+  const setDefaultMapping = async () => 
+  {
+    let providersToMap = providers.filter(provider => provider.defaultFootprintParams.code == "00");
+    if (providersToMap.length>0) {
+      // call chat GPT
+      let res = await getMappingFromChatGPT(providersToMap);
+      if (res.isAvailable) {
+        res.mapping.forEach(({providerNum,defaultCode}) => {
+          let provider = providers.find(provider => provider.providerNum == providerNum);
+          if (provider) {
+            provider.defaultFootprintParams.code = defaultCode;
+            setProviderDefaultFootprintParams(providerNum,"code",defaultCode);
+          }
+        })
+      }
+    }
   };
 
   // Update Providers
@@ -234,6 +236,12 @@ const UnidentifiedProviders = ({
           </Form.Select>
         </div>
 
+        <Button
+          className="btn btn-primary me-2"
+          onClick={setDefaultMapping}
+        >
+          <i className="bi bi-shuffle"></i> Association automatique
+        </Button>
         <Button
           onClick={handleSynchronize}
           className="btn btn-secondary"
