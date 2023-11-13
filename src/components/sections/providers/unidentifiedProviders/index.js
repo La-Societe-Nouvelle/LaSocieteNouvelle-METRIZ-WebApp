@@ -6,6 +6,7 @@ import { Button, Form } from "react-bootstrap";
 
 // Components
 import ProvidersTable from "./ProvidersTable";
+import ExpenseAccountsTable from "./ExpenseAccountsTable";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
@@ -32,7 +33,20 @@ const UnidentifiedProviders = ({
     )
   );
 
+  const [accounts, setAccounts] = useState([]);
+  useEffect(() => {
+    let providerNums = providers.map((provider) => provider.providerNum);
+    let accountNums = financialData.externalExpenses
+      //.concat(financialData.investments)
+      .filter((expense) => providerNums.includes(expense.providerNum) && financialPeriod.regex.test(expense.date))
+      .map((expense) => expense.accountNum)
+      .filter((value, index, self) => index === self.findIndex(item => item === value));
+    let accounts = financialData.externalExpensesAccounts.filter((account) => accountNums.includes(account.accountNum));
+    setAccounts(accounts);
+  }, [])
+
   const [significativeProviders, setSignificativeProviders] = useState([]);
+  const [treatmentByExpenseAccount, setTreatmentByExpenseAccount] = useState(false);
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
   const [showSyncWarningModal, setShowWarningModal] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState(providers);
@@ -131,6 +145,10 @@ const UnidentifiedProviders = ({
     setSignificativeProviders(updatedSignificativeProviders);
   };
 
+  const switchView = (event) => {
+    setTreatmentByExpenseAccount(event.target.checked);
+  }
+
   // Update Providers
   const setProviderDefaultFootprintParams = (providerNum, paramName, paramValue) => {
 
@@ -217,6 +235,14 @@ const UnidentifiedProviders = ({
           </Form.Select>
         </div>
 
+
+        <Form.Check
+          type="checkbox"
+          value={treatmentByExpenseAccount}
+          checked={treatmentByExpenseAccount}
+          onChange={switchView}
+          label="Traitement par compte de charges"
+        />
         <Button
           onClick={handleSynchronize}
           className="btn btn-secondary"
@@ -225,14 +251,27 @@ const UnidentifiedProviders = ({
           <i className="bi bi-arrow-repeat"></i> Synchroniser les données
         </Button>
       </div>
-      <ProvidersTable
-        providers={filteredProviders}
-        significativeProviders={significativeProviders}
-        financialPeriod={financialPeriod}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        setProviderDefaultFootprintParams={setProviderDefaultFootprintParams}
-      />
+
+      {!treatmentByExpenseAccount && 
+        <ProvidersTable
+          providers={filteredProviders}
+          significativeProviders={significativeProviders}
+          financialPeriod={financialPeriod}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          setProviderDefaultFootprintParams={setProviderDefaultFootprintParams}
+        />}
+
+      {treatmentByExpenseAccount && 
+        <ExpenseAccountsTable
+          providers={filteredProviders}
+          accounts={accounts}
+          significativeProviders={significativeProviders}
+          financialPeriod={financialPeriod}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          setProviderDefaultFootprintParams={setProviderDefaultFootprintParams}
+        />}
 
       <PaginationComponent
         currentPage={currentPage}
