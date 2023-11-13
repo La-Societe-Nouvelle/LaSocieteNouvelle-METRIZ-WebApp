@@ -176,11 +176,11 @@ export const getMappingFromChatGPT = async (providers) =>
 const buildMappingQuery = (providers) => 
 {
   const query = 
-      "Compléter le tableau avec le code de la division de la NACE Rév.2 le plus pertinent "
-    + "pour chaque compte de charges (division des fournisseurs) "+"\n"
+      "Compléter le tableau avec le code de la division de la NACE Rév.2 décrivant le mieux les activités financées (division des fournisseurs) "
+    + "à partir du libellé du compte de charges. "+"\n"
     + "\n"
-    + "| Id | Libellé du compte de charges | Code de la division économique (2 chiffres) |"+"\n"
-    + "|----|------------------------------|---------------------------------------------|"+"\n"
+    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) |"+"\n"
+    + "|----|------------------------------|---------------------------------------------------------------------|"+"\n"
     + providers.map((provider) => {
         return( "|"
           +" "+provider.providerNum+" |"
