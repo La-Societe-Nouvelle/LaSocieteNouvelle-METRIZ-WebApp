@@ -108,7 +108,7 @@ export const ComparativeChart = ({
         skipNull: true,
         backgroundColor: [
           comparativeChartColors.targetarea,
-          comparativeChartColors.legalunit,
+          comparativeChartColors.previous,
           comparativeChartColors.targetbranch,
         ],
         borderWidth: 0,
