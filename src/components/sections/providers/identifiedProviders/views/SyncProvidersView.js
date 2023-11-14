@@ -249,9 +249,7 @@ function filterProvidersByView(currentView, significativeProviders, providers) {
       (provider.footprintStatus === 0 &&
         /^[0-9]{9}$/.test(provider.corporateId)),
     unsync: (provider) => provider.footprintStatus !== 200,
-    error: (provider) =>
-      provider.footprintStatus === 404 ||
-      !/^[0-9]{9}$/.test(provider.corporateId),
+    error: (provider) => provider.footprintStatus === 404,
     significative: (provider) =>
       significativeProviders.includes(provider.providerNum),
     significativeUnidentified: (provider) =>
