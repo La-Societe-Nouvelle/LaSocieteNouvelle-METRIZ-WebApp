@@ -9,6 +9,10 @@ import "chartjs-adapter-moment";
 // Utils
 import { getSuggestedMax } from "./chartsUtils";
 
+// Colors
+import { trendChartColors } from "./chartColors";
+import { colors } from "./chartColors"
+
 function TrendChart({
   historical,
   trend,
@@ -73,8 +77,8 @@ function TrendChart({
       {
         label: "Historique",
         data: filteredHistorical.map((data) => ({ x: data.year, y: data.value })),
-        borderColor: "rgb(255, 182, 66)",
-        backgroundColor: "rgb(255, 182, 66)",
+        borderColor: trendChartColors.trend,
+        backgroundColor: trendChartColors.trend,
         order: 2,
         borderWidth: 4,
         tension: 0.3,
@@ -82,8 +86,8 @@ function TrendChart({
       {
         label: "Tendance", 
         data: updatedTrend.map((data) => ({ x: data.year, y: data.value })),
-            borderColor: "rgb(255, 182, 66)",
-        backgroundColor: "rgb(255, 182, 66)",
+        borderColor: trendChartColors.trend,
+        backgroundColor: trendChartColors.trend,
         borderWidth: 4,
         borderDash: [12, 6],
         order: 3,
@@ -93,8 +97,8 @@ function TrendChart({
         label: "Objectif",
         data: updatedTarget.map((data) => ({ x: data.year, y: data.value })),
         skipNull: true,
-        borderColor: "rgb(255, 238, 200)",
-        backgroundColor: "rgb(255, 238, 200)",
+        borderColor: trendChartColors.target,
+        backgroundColor:  trendChartColors.target,
         borderWidth: 4,
         order: 4,
         tension: 0.3,
@@ -103,8 +107,8 @@ function TrendChart({
         label: "Situation",
         type: "bubble",
         data: legalUnitData,
-        backgroundColor: "rgb(250,89,95)",
-        borderColor: "rgb(250,89,95)",
+        backgroundColor: trendChartColors.legalunit,
+        borderColor:  trendChartColors.legalunit,
         borderWidth: 4,
         order: 1,
         tooltip: {
@@ -114,7 +118,7 @@ function TrendChart({
       {
         data: legalUnitData,
         type: "line",
-        borderColor: "rgb(250,89,95)",
+        borderColor:  trendChartColors.legalunit,
         fill: false,
         tooltip: {
           enabled: false,
@@ -137,26 +141,26 @@ function TrendChart({
           display: false,
         },
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 11,
             family: "Roboto",
           },
         },
         grid: {
-          color: "#ececff",
+          color: colors.gridColor,
           lineWidth : 2,
         },
       },
       x: {
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 11,
           },
         },
         grid: {
-          color: "#ececff",
+          color: colors.gridColor,
           lineWidth : 2,
         },
         type: "time",
@@ -175,7 +179,7 @@ function TrendChart({
         labels: {
           usePointStyle: true,
           fullsize: true,
-          color: "#191558",
+          color: colors.textColor,
           padding: 20,
           font: {
             size: 12,
@@ -232,13 +236,13 @@ function TrendChart({
         },
         align: "start",
         text: unit,
-        color: "#191558",
+        color: colors.textColor,
         font: {
           size: 12,
         },
       },
       tooltip: {
-        backgroundColor: "rgba(25,21,88,0.9)",
+        backgroundColor: trendChartColors.tooltipBackground,
         padding: 15,
         cornerRadius: 3,
         usePointStyle: true,

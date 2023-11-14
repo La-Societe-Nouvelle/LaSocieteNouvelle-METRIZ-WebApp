@@ -6,6 +6,10 @@ import ChartAnnotation from "chartjs-plugin-annotation";
 Chart.register(ChartDataLabels, ChartAnnotation);
 import { Doughnut } from "react-chartjs-2";
 
+// Colors
+import { sigPieChartColors } from "./chartColors";
+import { colors } from "./chartColors"
+
 function SigPieChart({ value, title, id,isPrinting }) {
   const chartData = [value, 100 - value];
   const filteredData = chartData.filter((d) => d !== 0);
@@ -21,7 +25,7 @@ function SigPieChart({ value, title, id,isPrinting }) {
 
         borderAlign: "inner",
         borderWidth: 0,
-        backgroundColor: ["RGB(25, 21, 88)", "RGB(215,220,251,1)"],
+        backgroundColor: [sigPieChartColors.valueBackgroundColor, sigPieChartColors.backgroundColor],
       },
     ],
   };
@@ -48,11 +52,11 @@ function SigPieChart({ value, title, id,isPrinting }) {
         annotations: [
           {
             type: "label",
-            xScaleID: "x-axis-0", // Modifier cette ligne
+            xScaleID: "x-axis-0", 
             x: "50%",
             y: "50%",
             content: value + "%",
-            color: "#191558",
+            color: colors.textColor,
             font: {
               size: 20,
               family: "Raleway",
