@@ -112,7 +112,7 @@ const StatementWAS = ({
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
             <Form.Label column lg={7}>
-              Productiont totale de déchets (y compris DAOM<sup>1</sup>)
+              Production totale de déchets (y compris DAOM<sup>1</sup>)
               <p className="small mb-0 mt-1">
                 <sup>1</sup> Déchets assimilés aux ordures ménagères
               </p>
