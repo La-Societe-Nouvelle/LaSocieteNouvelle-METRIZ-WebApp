@@ -13,6 +13,9 @@ import { printValue } from "/src/utils/formatters";
 import { getSuggestedMax } from "./chartsUtils";
 import { getPrevDate } from "../../../../utils/periodsUtils";
 
+// Colors
+import { comparativeChartColors } from "./chartColors";
+import { colors } from "./chartColors"
 
 
 /* ---------- COMPARATIVE CHART ---------- */
@@ -86,30 +89,29 @@ export const ComparativeChart = ({
     labels: ["France", "Exercice", "Branche"],
     datasets: [
       {
-        label: "Valeur N-1",
-        data: dataset_prevFootprints,
+        label: "Empreinte",
+        data: dataset_currentFootprints,
         skipNull: true,
         backgroundColor: [
-          "RGBA(215,220,251,1)",
-          "RGBA(250,89,95,1)",
-          "rgb(255 220 141)",
-        ],
+          comparativeChartColors.area,
+          comparativeChartColors.legalunit,
+          comparativeChartColors.branch        ],
         borderWidth: 0,
+        type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
         minBarLength: 2,
       },
       {
-        label: "Empreinte",
-        data: dataset_currentFootprints,
+        label: "Valeur N-1",
+        data: dataset_prevFootprints,
         skipNull: true,
         backgroundColor: [
-          "RGBA(176,185,247,1)",
-          "RGBA(250,89,95,1)",
-          "rgb(255, 182, 66)",
+          comparativeChartColors.targetarea,
+          comparativeChartColors.previous,
+          comparativeChartColors.targetbranch,
         ],
         borderWidth: 0,
-        type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
         minBarLength: 2,
@@ -119,9 +121,9 @@ export const ComparativeChart = ({
         data: dataset_target,
         skipNull: true,
         backgroundColor: [
-          "RGBA(215,220,251,1)",
-          "RGBA(250,89,95,1)",
-          "rgb(255 220 141)",
+          comparativeChartColors.targetarea,
+          comparativeChartColors.legalunit,
+          comparativeChartColors.targetbranch,
         ],
         borderWidth: 0,
         barPercentage: 0.6,
@@ -142,26 +144,26 @@ export const ComparativeChart = ({
         min: 0,
         max: suggestedMax,
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 10,
           },
         },
         grid: {
-          color: "#ececff",
+          color: colors.gridColor,
           lineWidth : 1,
         },
       },
       x: {
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 12,
           },
         },
         grid: {
           lineWidth : 1,
-          color: "#ececff",
+          color: colors.gridColor,
         },
       },
     },
@@ -177,7 +179,7 @@ export const ComparativeChart = ({
             return printValue(value, nbDecimals);
           }
         },
-        color: "#191558",
+        color: colors.textColor,
         font: {
           size: 9,
           family: "Roboto",
@@ -191,13 +193,13 @@ export const ComparativeChart = ({
         },
         align: "start",
         text: unit,
-        color: "#191558",
+        color: colors.textColor,
         font: {
           size: 11,
         },
       },
       tooltip: {
-        backgroundColor: "#191558",
+        backgroundColor: colors.primaryBackgroundColor,
         padding: 10,
         cornerRadius: 2,
         callbacks: {

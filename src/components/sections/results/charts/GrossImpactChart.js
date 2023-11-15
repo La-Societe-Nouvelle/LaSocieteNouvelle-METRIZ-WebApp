@@ -7,6 +7,9 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
+// Colors
+import { grossImpactChartColors } from "./chartColors";
+
 export const GrossImpactChart = ({
   id,
   session,
@@ -48,9 +51,9 @@ export const GrossImpactChart = ({
         ],
         skipNull: true,
         backgroundColor: [
-          "rgb(25, 21, 88)",
-          "rgba(25, 21, 88, 0.5)",
-          "RGB(251, 122, 127)",
+         grossImpactChartColors.intermediateConsumptions,
+        grossImpactChartColors.fixedCapitalConsumptions,
+        grossImpactChartColors.netValueAdded
         ],
         borderWidth: 1,
       },
@@ -81,7 +84,7 @@ export const GrossImpactChart = ({
         },
       },
       tooltip: {
-        backgroundColor: "rgba(25,21,88,0.9)",
+        backgroundColor: grossImpactChartColors.tooltipBackground,
         padding: 15,
         cornerRadius: 3,
         usePointStyle: true,
