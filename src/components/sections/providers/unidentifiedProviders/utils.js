@@ -135,6 +135,7 @@ export const getMappingFromChatGPT = async (providers) =>
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
+      timeout: 10000,
     });
 
     const mappingChatGPT = response.data.choices[0].message;
