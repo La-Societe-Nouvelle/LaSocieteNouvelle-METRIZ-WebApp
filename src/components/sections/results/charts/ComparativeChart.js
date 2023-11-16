@@ -89,29 +89,30 @@ export const ComparativeChart = ({
     labels: ["France", "Exercice", "Branche"],
     datasets: [
       {
+        label: "Valeur N-1",
+        data: dataset_prevFootprints,
+        skipNull: true,
+        backgroundColor: [
+          comparativeChartColors.targetarea,
+          comparativeChartColors.legalunit,
+          comparativeChartColors.targetbranch,
+        ],
+        borderWidth: 0,
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+        minBarLength: 2,
+      },
+      {
         label: "Empreinte",
         data: dataset_currentFootprints,
         skipNull: true,
         backgroundColor: [
           comparativeChartColors.area,
           comparativeChartColors.legalunit,
-          comparativeChartColors.branch        ],
-        borderWidth: 0,
-        type: "bar",
-        barPercentage: 0.6,
-        categoryPercentage: 0.6,
-        minBarLength: 2,
-      },
-      {
-        label: "Valeur N-1",
-        data: dataset_prevFootprints,
-        skipNull: true,
-        backgroundColor: [
-          comparativeChartColors.targetarea,
-          comparativeChartColors.previous,
-          comparativeChartColors.targetbranch,
+          comparativeChartColors.branch        
         ],
         borderWidth: 0,
+        type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
         minBarLength: 2,
