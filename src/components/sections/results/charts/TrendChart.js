@@ -107,9 +107,9 @@ function TrendChart({
         label: "Situation",
         type: "bubble",
         data: legalUnitData,
-        backgroundColor:[ trendChartColors.legalunit,  trendChartColors.previous],
+        backgroundColor: trendChartColors.legalunit,
         borderColor: trendChartColors.legalunit,
-        borderWidth: 1,
+        borderWidth: 4, 
         order: 1,
         tooltip: {
           enabled: true,
