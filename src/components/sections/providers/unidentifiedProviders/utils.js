@@ -140,6 +140,7 @@ export const getMappingFromChatGPT = async (providers) =>
     const mappingChatGPT = response.data.choices[0].message;
 
     const mapping = [];
+    
     if (mappingChatGPT.content) {
       const rows = mappingChatGPT.content.split("\n");
       rows.forEach(row => {
@@ -158,6 +159,7 @@ export const getMappingFromChatGPT = async (providers) =>
         }
       }); 
     }
+
     return ({
       mapping,
       isAvailable: true
@@ -165,9 +167,8 @@ export const getMappingFromChatGPT = async (providers) =>
   } 
   catch (error) {
     console.log(error);
-    console.error('Error generating code:', error.message);
+    console.error('Error generating code:', error.message); 
     return ({
-      mapping,
       isAvailable: false
     });
   }
