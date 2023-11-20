@@ -93,17 +93,12 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
 
           <tr>
             <td></td>
-            <td className="text-end">Montant </td>
-            <td className="text-end">Empreinte</td>
-            <td className="text-end">Incertitude</td>
-            {includeGrossImpact && <td className="text-end">Impact</td>}
+            {TableHeaderRow(includeGrossImpact)}
+
           </tr>
           <tr className="small fw-normal">
             <td></td>
-            <td className="text-end">&euro; </td>
-            <td className="text-end">{unit}</td>
-            <td className="text-end uncertainty">%</td>
-            {includeGrossImpact && <td className="text-end"> {unitAbsolute}</td>}
+            {TableHeaderRowUnits(includeGrossImpact,unit,unitAbsolute)}
           </tr>
         </thead>
         <tbody>
@@ -173,20 +168,12 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
                 Année N-1
               </th>
             </tr>
-
             <tr>
-              <th className="text-end">Montant </th>
+              {TableHeaderRow(includeGrossImpact,unit,unitAbsolute)}
 
-              <th className="text-end">Empreinte</th>
-              <th className="text-end">Incertitude</th>
-              {includeGrossImpact && <th className="text-end">Impact</th>}
             </tr>
             <tr className="small fw-normal">
-              <th className="text-end">&euro; </th>
-
-              <th className="text-end">{unit}</th>
-              <th className="text-end uncertainty">%</th>
-              {includeGrossImpact && <th className="text-end">{unitAbsolute}</th>}
+            {TableHeaderRowUnits(includeGrossImpact,unit,unitAbsolute)}
             </tr>
           </thead>
           <tbody>
@@ -251,6 +238,30 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
 };
 
 
+// Table Rows
+
+const TableHeaderRow = (includeGrossImpact) => {
+  return (
+    <>
+      <th className="text-end">Montant</th>
+      <th className="text-end">Empreinte</th>
+      <th className="text-end">Incertitude</th>
+      {includeGrossImpact && <th className="text-end">Impact</th>}
+    </>
+  );
+};
+
+const TableHeaderRowUnits = (includeGrossImpact, unit, unitAbsolute) => {
+  return (
+    <>
+      <th className="text-end">&euro;</th>
+      <th className="text-end">{unit}</th>
+      <th className="text-end uncertainty">%</th>
+      {includeGrossImpact && <th className="text-end">{unitAbsolute}</th>}
+    </>
+  );
+};
+
 const renderDataRow = (data, period, indic, nbDecimals, includeGrossImpact) => {
   return (
     <>
@@ -283,5 +294,3 @@ const renderDataRow = (data, period, indic, nbDecimals, includeGrossImpact) => {
     </>
   );
 };
-
-
