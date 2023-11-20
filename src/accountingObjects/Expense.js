@@ -25,6 +25,7 @@ export class Expense {
                isDefaultProviderAccount,
                amount,
                footprint,
+               footprintOrigin,
                date}) 
   {
   // ---------------------------------------------------------------------------------------------------- //    
@@ -37,6 +38,7 @@ export class Expense {
 
     this.amount = amount;
     this.footprint = new SocialFootprint(footprint);
+    this.footprintOrigin = footprintOrigin ?? "provider";
 
     this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
