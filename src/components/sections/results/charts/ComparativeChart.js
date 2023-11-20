@@ -58,17 +58,6 @@ export const ComparativeChart = ({
     comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value
   ];
 
-  // prev footprints
-
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod = session.availablePeriods
-    .find((period) => period.dateEnd == prevDateEnd);
-
-  const dataset_prevFootprints = [
-    null,
-    prevPeriod ? mainAggregates[aggregate].periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : null,
-    null
-  ];
 
   // targets
 
@@ -88,20 +77,6 @@ export const ComparativeChart = ({
   const chartData = {
     labels: ["France", "Exercice", "Branche"],
     datasets: [
-      {
-        label: "Valeur N-1",
-        data: dataset_prevFootprints,
-        skipNull: true,
-        backgroundColor: [
-          comparativeChartColors.targetarea,
-          comparativeChartColors.legalunit,
-          comparativeChartColors.targetbranch,
-        ],
-        borderWidth: 0,
-        barPercentage: 0.6,
-        categoryPercentage: 0.6,
-        minBarLength: 2,
-      },
       {
         label: "Empreinte",
         data: dataset_currentFootprints,
