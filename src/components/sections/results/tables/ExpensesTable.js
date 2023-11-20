@@ -170,7 +170,7 @@ export const  ExpensesTable = ({
                       nbDecimals
                     )}
                   </td>
-                  <td className="text-end">
+                  <td className="text-end uncertainty">
                     <u>+</u>
                     {printValue(
                       periodsData[period.periodKey].footprint.indicators[
@@ -203,7 +203,7 @@ export const  ExpensesTable = ({
                           nbDecimals
                         ) : " - "}
                       </td>
-                      <td className="text-end">
+                      <td className="text-end uncertainty">
                         <u>+</u>
                         {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
                           printValue(

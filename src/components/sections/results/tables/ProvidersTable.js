@@ -147,7 +147,7 @@ export const ProvidersTable = ({ session, period, indic }) => {
                   )}
                 </td>
                 <td className="text-end">{footprint.indicators[indic].flag}</td>
-                <td className="text-end">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
                 </td>

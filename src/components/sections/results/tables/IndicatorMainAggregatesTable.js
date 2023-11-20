@@ -103,13 +103,13 @@ export const IndicatorMainAggregatesTable = ({
             <td></td>
             <td className="text-end">Montant </td>
             <td className="text-end">Empreinte</td>
-            <td className="text-end pe-3">Incertitude</td>
+            <td className="text-end">Incertitude</td>
             {printGrossImpact && <td className="text-end">Impact</td>}
             {prevPeriod && (
               <>
                 <td className="text-end border-left ">Empreinte</td>
-                <td className="text-end  pe-3">Incertitude</td>
-                {printGrossImpact && <td className="text-end  pe-3">Impact</td>}
+                <td className="text-end uncertainty">Incertitude</td>
+                {printGrossImpact && <td className="text-end uncertainty">Impact</td>}
               </>
             )}
           </tr>
@@ -117,13 +117,13 @@ export const IndicatorMainAggregatesTable = ({
             <td></td>
             <td className="text-end">&euro; </td>
             <td className="text-end">{unit}</td>
-            <td className="text-end  pe-3">%</td>
+            <td className="text-end uncertainty">%</td>
             {printGrossImpact && <td className="text-end"> {unitAbsolute}</td> }
             {prevPeriod && (
               <>
                 <td className="text-end border-left">{unit}</td>
-                <td className="text-end  pe-3">%</td>
-                {printGrossImpact && <td className="text-end  pe-3"> {unitAbsolute}</td>}
+                <td className="text-end uncertainty">%</td>
+                {printGrossImpact && <td className="text-end uncertainty"> {unitAbsolute}</td>}
               </>
             )}
           </tr>
@@ -143,7 +143,7 @@ export const IndicatorMainAggregatesTable = ({
                 nbDecimals
               )}
             </td>
-            <td className="text-end  pe-3">
+            <td className="text-end uncertainty">
               <u>+</u>
               {printValue(
                 production.periodsData[period.periodKey].footprint.indicators[
@@ -176,7 +176,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(
                     production.periodsData[
@@ -217,7 +217,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            <td className="text-end  pe-3">
+            <td className="text-end uncertainty">
               <u>+</u>
               {printValue(
                 revenue.periodsData[period.periodKey].footprint.indicators[
@@ -251,7 +251,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(
                     revenue.periodsData[
@@ -296,7 +296,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-              <td className="text-end  pe-3">
+              <td className="text-end uncertainty">
                 <u>+</u>
                 {printValue(
                   storedProduction.periodsData[
@@ -331,7 +331,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
   
                   </td>
-                  <td className="text-end  pe-3">
+                  <td className="text-end uncertainty">
                     <u>+</u>
                     {printValue(
                       storedProduction.periodsData[
@@ -376,7 +376,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-              <td className="text-end  pe-3">
+              <td className="text-end uncertainty">
                 <u>+</u>
                 {printValue(
                   immobilisedProduction.periodsData[
@@ -412,7 +412,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
   
                   </td>
-                  <td className="text-end  pe-3">
+                  <td className="text-end uncertainty">
                     <u>+</u>
                     {printValue(
                       immobilisedProduction.periodsData[
@@ -460,7 +460,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            <td className="text-end  pe-3">
+            <td className="text-end uncertainty">
               <u>+</u>
               {printValue(
                 intermediateConsumptions.periodsData[
@@ -496,7 +496,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(
                     intermediateConsumptions.periodsData[
@@ -537,7 +537,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
@@ -562,7 +562,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}
       
                       </td>
-                      <td className="text-end  pe-3">
+                      <td className="text-end uncertainty">
                         <u>+</u>
                         {printValue(
                           intermediateConsumptionsAggregates[
@@ -610,7 +610,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            <td className="text-end  pe-3">
+            <td className="text-end uncertainty">
               <u>+</u>
               {printValue(
                 fixedCapitalConsumptions.periodsData[
@@ -645,7 +645,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(
                     fixedCapitalConsumptions.periodsData[
@@ -687,7 +687,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   <span className="unit">  </span>
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
@@ -712,7 +712,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}
                         <span className="unit">  </span>
                       </td>
-                      <td className="text-end  pe-3">
+                      <td className="text-end uncertainty">
                         <u>+</u>
                         {printValue(
                           fixedCapitalConsumptionsAggregates[
@@ -760,7 +760,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            <td className="text-end  pe-3">
+            <td className="text-end uncertainty">
               <u>+</u>
               {printValue(
                 netValueAdded.periodsData[
@@ -794,7 +794,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
 
                 </td>
-                <td className="text-end  pe-3">
+                <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(
                     netValueAdded.periodsData[
