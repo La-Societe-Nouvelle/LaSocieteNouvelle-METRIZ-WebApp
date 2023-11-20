@@ -9,7 +9,6 @@ import metaIndics from "/lib/indics";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
-import { getPrevDate } from "../../../../utils/periodsUtils";
 
 const aggregates = [
   "production",
@@ -24,7 +23,6 @@ export const ComparativeTable = ({
   indic,
   showAreaFootprint,
   showTarget,
-  showPreviousData,
   showDivisionData
 }) => {
 
@@ -33,9 +31,7 @@ export const ComparativeTable = ({
     comparativeData
   } = session;
 
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd);
+
 
   const { unit, nbDecimals } = metaIndics[indic];
   
@@ -62,7 +58,6 @@ export const ComparativeTable = ({
     }
   }
 
-  const showPrevData = showPreviousData && prevPeriod;
 
   return (
     <Row>
@@ -81,12 +76,7 @@ export const ComparativeTable = ({
                 Exercice en cours
                 <span className="tw-normal small d-block"> {unit}</span>
               </td>
-              {showPrevData && (
-                <td colSpan={2} className="border-left text-center">
-                  Exercice précédent
-                  <span className="tw-normal small d-block"> {unit}</span>
-                </td>
-              )}
+  
               {showDivisionData && (
                 <td colSpan={showTarget ? 3 : 1} className="border-left text-center">
                   Branche
@@ -106,12 +96,7 @@ export const ComparativeTable = ({
                 <td className="text-center">Objectif 2030</td>
               )}
               <td className="border-left text-center">Empreinte</td>
-              {(showPrevData) && (
-                <>
-                  <td className="border-left text-center">Empreinte</td>
-                  <td className="border-left text-center">Evolution</td>
-                </>
-              )}
+   
               {(showDivisionData) && (
                 <td className="border-left text-center">Empreinte</td>
               )}
@@ -136,19 +121,7 @@ export const ComparativeTable = ({
                 <td className="border-left text-end">
                   {printCompanyFootprint(aggregate,period.periodKey)}
                 </td>
-                {(showPrevData) && (
-                  <>
-                    <td className="border-left text-end">
-                      {printCompanyFootprint(aggregate,prevPeriod.periodKey)}
-                    </td> 
-                    <td className="text-end">
-                      {getPercentageGap(
-                        financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value,
-                        financialData.mainAggregates[aggregate].periodsData[prevPeriod.periodKey].footprint.indicators[indic].value
-                      )+"%"}
-                    </td> 
-                  </>
-                )}
+
                 {(showDivisionData) && (
                   <td className="border-left text-end">
                     {printComparativeFootprint(aggregate,"division","history")}
