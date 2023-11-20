@@ -70,15 +70,17 @@ export const IndicatorView = ({
       {/* SIG and external expenses table */}
       <Row>
         <Col>
-            <MainAggregatesTableVisual
-              session={session}
-              period={period}
-              indic={indic}
-            />
+          <MainAggregatesTableVisual
+            session={session}
+            period={period}
+            indic={indic}
+          />
         </Col>
+      </Row>
 
-        {/* ----------Gross Impact Chart ----------  */}
-        {metaIndic.type === "intensité" && (
+      {/* ----------Gross Impact Chart ----------  */}
+      {metaIndic.type === "intensité" && (
+        <Row>
           <Col lg={4}>
             <GrossImpactDistributionVisual
               session={session}
@@ -86,8 +88,8 @@ export const IndicatorView = ({
               indic={indic}
             />
           </Col>
-        )}
-      </Row>
+        </Row>
+      )}
 
       {/* ---------Comparative data charts & Table ----------  */}
       {metaIndic.type === "proportion" && (
