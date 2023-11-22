@@ -13,6 +13,7 @@ import {buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAgg
 
 // Lib
 import metaIndics from "/lib/indics";
+import { TableHeaderRow, TableHeaderRowUnits } from "./utils";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -77,7 +78,7 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
 
    // Show Gross Impact column
   const indicsWithGrossImpact = new Set(["ghg", "haz", "mat", "nrg", "was", "wat"]);
-  const includeGrossImpact = indicsWithGrossImpact.has(indic);
+  const showGrossImpact = indicsWithGrossImpact.has(indic);
 
 
   return (
@@ -86,65 +87,65 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
         <thead>
           <tr>
             <th>Agrégat</th>
-            <th colSpan={includeGrossImpact ? "4" : "3"} className="text-center">
+            <th colSpan={showGrossImpact ? "4" : "3"} className="text-center">
               Année N
             </th>
           </tr>
 
           <tr>
             <td></td>
-            {TableHeaderRow(includeGrossImpact)}
+            {TableHeaderRow(showGrossImpact)}
 
           </tr>
           <tr className="small fw-normal">
             <td></td>
-            {TableHeaderRowUnits(includeGrossImpact,unit,unitAbsolute)}
+            {TableHeaderRowUnits(showGrossImpact,unit,unitAbsolute)}
           </tr>
         </thead>
         <tbody>
           <tr className="fw-bold">
           <td>&emsp;Production</td>
-            {renderDataRow(production, period, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(production, period, indic, nbDecimals, showGrossImpact)}
           </tr>
           <tr>
             <td>&emsp;Production vendue</td>
-            {renderDataRow(revenue, period, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(revenue, period, indic, nbDecimals, showGrossImpact)}
           </tr>
           {storedProduction != 0 && (
             <tr>
               <td>&emsp;Production stockée</td>
-              {renderDataRow(storedProduction, period, indic, nbDecimals, includeGrossImpact)}
+              {renderDataRow(storedProduction, period, indic, nbDecimals, showGrossImpact)}
             </tr>
           )}
           {immobilisedProduction.periodsData[period.periodKey].amount > 0 && (
             <tr>
               <td>&emsp;Production immobilisée</td>
-              {renderDataRow(immobilisedProduction, period, indic, nbDecimals, includeGrossImpact)}
+              {renderDataRow(immobilisedProduction, period, indic, nbDecimals, showGrossImpact)}
             </tr>
           )}
           <tr className=" fw-bold">
             <td>Consommations intermédiaires</td>
-            {renderDataRow(intermediateConsumptions, period, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(intermediateConsumptions, period, indic, nbDecimals, showGrossImpact)}
           </tr>
           {intermediateConsumptionsAggregates.map(
             (aggregate, index) => (
               <tr key={index}>
                 <td>&emsp;{aggregate.label}</td>
-                {renderDataRow(aggregate, period, indic, nbDecimals, includeGrossImpact)}
+                {renderDataRow(aggregate, period, indic, nbDecimals, showGrossImpact)}
               </tr>
             )
           )}
 
           <tr className="fw-bold">
             <td>Consommations de capital fixe</td>
-            {renderDataRow(fixedCapitalConsumptions, period, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(fixedCapitalConsumptions, period, indic, nbDecimals, showGrossImpact)}
           </tr>
 
           {fixedCapitalConsumptionsAggregates.map(
             (aggregate, index) => (
               <tr key={index}>
                 <td>&emsp;{aggregate.label}</td>
-                {renderDataRow(aggregate, period, indic, nbDecimals, includeGrossImpact)}
+                {renderDataRow(aggregate, period, indic, nbDecimals, showGrossImpact)}
 
               </tr>
             )
@@ -152,7 +153,7 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
 
           <tr className="fw-bold">
             <td>Valeur ajoutée nette</td>
-            {renderDataRow(netValueAdded, period, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(netValueAdded, period, indic, nbDecimals, showGrossImpact)}
 
           </tr>
         </tbody>
@@ -162,61 +163,62 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
           <thead>
             <tr>
               <th
-                colSpan={includeGrossImpact ? "4" : "3"}
+                colSpan={showGrossImpact ? "4" : "3"}
                 className="text-center"
               >
                 Année N-1
               </th>
             </tr>
             <tr>
-              {TableHeaderRow(includeGrossImpact,unit,unitAbsolute)}
+              {TableHeaderRow(showGrossImpact,unit,unitAbsolute)}
 
             </tr>
             <tr className="small fw-normal">
-            {TableHeaderRowUnits(includeGrossImpact,unit,unitAbsolute)}
+            {TableHeaderRowUnits(showGrossImpact,unit,unitAbsolute)}
             </tr>
+
           </thead>
           <tbody>
             <tr className="fw-bold">
-              {renderDataRow(production, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+              {renderDataRow(production, prevPeriod, indic, nbDecimals, showGrossImpact)}
             </tr>
             <tr>
-              {renderDataRow(revenue, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+              {renderDataRow(revenue, prevPeriod, indic, nbDecimals, showGrossImpact)}
             </tr>
             {storedProduction != 0 && (
               <tr>
-                {renderDataRow(storedProduction, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+                {renderDataRow(storedProduction, prevPeriod, indic, nbDecimals, showGrossImpact)}
             </tr>
             )}
             {immobilisedProduction.periodsData[prevPeriod.periodKey].amount > 0 && (
                <tr>
-                 {renderDataRow(immobilisedProduction, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+                 {renderDataRow(immobilisedProduction, prevPeriod, indic, nbDecimals, showGrossImpact)}
               </tr>
             )}
           <tr className=" fw-bold">
-            {renderDataRow(intermediateConsumptions, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(intermediateConsumptions, prevPeriod, indic, nbDecimals, showGrossImpact)}
           </tr>
           {intermediateConsumptionsAggregates.map(
             (aggregate, index) => (
               <tr key={index}>
-                {renderDataRow(aggregate, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+                {renderDataRow(aggregate, prevPeriod, indic, nbDecimals, showGrossImpact)}
               </tr>
             )
           )}
            <tr className="fw-bold">
-            {renderDataRow(fixedCapitalConsumptions, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(fixedCapitalConsumptions, prevPeriod, indic, nbDecimals, showGrossImpact)}
           </tr>
   
           {fixedCapitalConsumptionsAggregates.map(
             (aggregate, index) => (
               <tr key={index}>
-                {renderDataRow(aggregate, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+                {renderDataRow(aggregate, prevPeriod, indic, nbDecimals, showGrossImpact)}
               </tr>
             )
           )}
 
           <tr className="fw-bold">
-            {renderDataRow(netValueAdded, prevPeriod, indic, nbDecimals, includeGrossImpact)}
+            {renderDataRow(netValueAdded, prevPeriod, indic, nbDecimals, showGrossImpact)}
           </tr>
             
           </tbody>
@@ -238,31 +240,7 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
 };
 
 
-// Table Rows
-
-const TableHeaderRow = (includeGrossImpact) => {
-  return (
-    <>
-      <th className="text-end">Montant</th>
-      <th className="text-end">Empreinte</th>
-      <th className="text-end">Incertitude</th>
-      {includeGrossImpact && <th className="text-end">Impact</th>}
-    </>
-  );
-};
-
-const TableHeaderRowUnits = (includeGrossImpact, unit, unitAbsolute) => {
-  return (
-    <>
-      <th className="text-end">&euro;</th>
-      <th className="text-end">{unit}</th>
-      <th className="text-end uncertainty">%</th>
-      {includeGrossImpact && <th className="text-end">{unitAbsolute}</th>}
-    </>
-  );
-};
-
-const renderDataRow = (data, period, indic, nbDecimals, includeGrossImpact) => {
+const renderDataRow = (data, period, indic, nbDecimals, showGrossImpact) => {
   return (
     <>
       <td className="text-end">
@@ -281,7 +259,7 @@ const renderDataRow = (data, period, indic, nbDecimals, includeGrossImpact) => {
           0
         )}
       </td>
-      {includeGrossImpact && (
+      {showGrossImpact && (
         <td className="text-end">
           {printValue(
             data.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(

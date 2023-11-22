@@ -2,7 +2,7 @@
 
 // React
 import React, { useState } from "react";
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
@@ -10,31 +10,33 @@ import { printValue } from "/src/utils/formatters";
 // Lib
 import metaIndics from "/lib/indics";
 import { getPrevDate } from "../../../../utils/periodsUtils";
+import { TableHeaderRow, TableHeaderRowUnits } from "./utils";
 
 /** EXPENSES TABLE
- *  
+ *
  *  Show footprints of external expenses accounts
- * 
+ *
  */
 
-const indicsWithGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"];
+export const ExpensesTable = ({ session, period, indic }) => {
+  const { financialData } = session;
 
-export const  ExpensesTable = ({
-  session,
-  period,
-  indic
-}) => {
-
-  const {
-    financialData
-  } = session;
   const externalExpensesAccounts = financialData.externalExpensesAccounts;
 
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod = session.availablePeriods
-    .find((period) => period.dateEnd == prevDateEnd);
+  const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
 
-  const { unit, nbDecimals, unitAbsolute} = metaIndics[indic];
+  // Prev period
+
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
+  const [showColumn, setShowColumn] = useState(false);
+
+  const toggleColumn = () => {
+    setShowColumn(!showColumn);
+  };
 
   // sorting
   const [columnSorted, setColumnSorted] = useState("amount");
@@ -55,17 +57,21 @@ export const  ExpensesTable = ({
         accounts.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
         break;
       case "amount":
-        accounts.sort(
-          (a, b) => {
-            if (a.periodsData[period.periodKey] && b.periodsData[period.periodKey]) {
-              return b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount;
-            } else if (a.periodsData[period.periodKey]) {
-              return -1;
-            } else {
-              return 1;
-            }
+        accounts.sort((a, b) => {
+          if (
+            a.periodsData[period.periodKey] &&
+            b.periodsData[period.periodKey]
+          ) {
+            return (
+              b.periodsData[period.periodKey].amount -
+              a.periodsData[period.periodKey].amount
+            );
+          } else if (a.periodsData[period.periodKey]) {
+            return -1;
+          } else {
+            return 1;
           }
-        );
+        });
         break;
       default:
         break;
@@ -75,10 +81,21 @@ export const  ExpensesTable = ({
 
   sortAccounts(externalExpensesAccounts, columnSorted);
 
-  const showGrossImpact = indicsWithGrossImpact.includes(indic);
+  // Show Gross Impact column
+
+  const indicsWithGrossImpact = new Set([
+    "ghg",
+    "haz",
+    "mat",
+    "nrg",
+    "was",
+    "wat",
+  ]);
+  const showGrossImpact = indicsWithGrossImpact.has(indic);
 
   return (
-      <Table id="indicatorExpenses">
+    <div className="d-flex">
+      <Table id="expensesTable" className="mb-0">
         <thead>
           <tr>
             <th></th>
@@ -86,76 +103,40 @@ export const  ExpensesTable = ({
             <th colSpan={showGrossImpact ? "4" : "3"} className="text-center">
               Année N
             </th>
-            {prevPeriod && (
-              <th
-                colSpan={showGrossImpact ? "3" : "2"}
-                className="text-center border-left"
-              >
-                N-1
-              </th>
-            )}
           </tr>
           <tr className="align-top">
-            <td onClick={() => changeColumnSorted("account")}>
+            <th onClick={() => changeColumnSorted("account")}>
               {" "}
               <i className="bi bi-arrow-down-up me-1"></i>Compte
-            </td>
-            <td onClick={() => changeColumnSorted("label")}>
+            </th>
+            <th onClick={() => changeColumnSorted("label")}>
               {" "}
               <i className="bi bi-arrow-down-up me-1"></i>Libellé
-            </td>
-            <td
+            </th>
+            <th
               className="text-end"
               onClick={() => changeColumnSorted("amount")}
             >
-              {" "}
               <i className="bi bi-arrow-down-up me-1"></i>Montant
-              <span className="tw-normal small d-block">&euro;</span>
-            </td>
-            <td className="text-end">
-              Empreinte <span className="tw-normal small d-block">{unit}</span>
-            </td>
-            <td className="text-end">
-              Incertitude <span className="tw-normal small d-block">%</span>
-            </td>
-            {showGrossImpact && (
-              <td className="text-end">
-                Impact{" "}
-                <span className="tw-normal small d-block">{unitAbsolute}</span>
-              </td>
-            )}
-
-            {prevPeriod && (
-              <>
-                <td className="text-end border-left">
-                  Empreinte{" "}
-                  <span className="tw-normal small d-block">{unit}</span>
-                </td>
-                <td className="text-end">
-                  Incertitude <span className="tw-normal small d-block">%</span>
-                </td>
-                {showGrossImpact && (
-                  <td className="text-end">
-                    Impact{" "}
-                    <span className="tw-normal small d-block">
-                      {unitAbsolute}
-                    </span>
-                  </td>
-                )}
-              </>
-            )}
+            </th>
+            {TableHeaderRow(showGrossImpact, unit, unitAbsolute)}
+          </tr>
+          <tr className="small fw-normal">
+            <th></th>
+            <th></th>
+            {TableHeaderRowUnits(showGrossImpact, unit, unitAbsolute)}
           </tr>
         </thead>
         <tbody>
           {externalExpensesAccounts
-            .filter(({ periodsData }) => periodsData.hasOwnProperty(period.periodKey))
-            .map(
-            ({ accountNum, accountLib, periodsData }) => {
+            .filter(({ periodsData }) =>
+              periodsData.hasOwnProperty(period.periodKey)
+            )
+            .map(({ accountNum, accountLib, periodsData }) => {
               return (
                 <tr key={accountNum}>
                   <td> {accountNum}</td>
                   <td>
-                    {" "}
                     {accountLib.charAt(0).toUpperCase() +
                       accountLib.slice(1).toLowerCase()}
                   </td>
@@ -184,55 +165,104 @@ export const  ExpensesTable = ({
                       {printValue(
                         periodsData[period.periodKey].footprint.indicators[
                           indic
-                        ].getGrossImpact(
-                          periodsData[period.periodKey].amount
-                        ),
+                        ].getGrossImpact(periodsData[period.periodKey].amount),
                         nbDecimals
                       )}
                     </td>
                   )}
-
-                  {prevPeriod && (
-                    <>
-                      <td className="text-end border-left">
-                        {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
-                          printValue(
-                          periodsData[
-                            prevPeriod.periodKey
-                          ].footprint.indicators[indic].getValue(),
-                          nbDecimals
-                        ) : " - "}
-                      </td>
-                      <td className="text-end uncertainty">
-                        <u>+</u>
-                        {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
-                          printValue(
-                          periodsData[
-                            prevPeriod.periodKey
-                          ].footprint.indicators[indic].getUncertainty(),
-                          0
-                        ) : " - "}
-                      </td>
-                      {showGrossImpact && (
-                        <td className="text-end">
-                          {periodsData.hasOwnProperty(prevPeriod.periodKey) ? 
-                            printValue(
-                            periodsData[
-                              prevPeriod.periodKey
-                            ].footprint.indicators[indic].getGrossImpact(
-                              periodsData[prevPeriod.periodKey].amount
-                            ),
-                            nbDecimals
-                          ) : " - "}
-                        </td>
-                      )}
-                    </>
-                  )}
                 </tr>
               );
-            }
-          )}
+            })}
         </tbody>
       </Table>
+      {prevPeriod && showColumn && (
+        <Table className="prevTable">
+          <thead>
+            <tr>
+              <th
+                colSpan={showGrossImpact ? "4" : "3"}
+                className="text-center "
+              >
+                N-1
+              </th>
+            </tr>
+            <tr>
+              <td
+                className="text-end "
+                onClick={() => changeColumnSorted("amount")}
+              >
+                <i className="bi bi-arrow-down-up me-1"></i>Montant
+              </td>
+              {TableHeaderRow(showGrossImpact, unit, unitAbsolute)}
+            </tr>
+            <tr className="small fw-normal">
+              {TableHeaderRowUnits(showGrossImpact, unit, unitAbsolute)}
+            </tr>
+          </thead>
+          <tbody>
+            {externalExpensesAccounts
+              .filter(({ periodsData }) =>
+                periodsData.hasOwnProperty(period.periodKey)
+              )
+              .map(({ accountNum, accountLib, periodsData }) => {
+                return (
+                  <tr key={accountNum}>
+                    <td className="text-end">
+                      {printValue(periodsData[prevPeriod.periodKey]?.amount, 0)}
+                    </td>
+                    <td className="text-end ">
+                      {periodsData.hasOwnProperty(prevPeriod.periodKey)
+                        ? printValue(
+                            periodsData[
+                              prevPeriod.periodKey
+                            ].footprint.indicators[indic].getValue(),
+                            nbDecimals
+                          )
+                        : " - "}
+                    </td>
+                    <td className="text-end uncertainty">
+                      <u>+</u>
+                      {periodsData.hasOwnProperty(prevPeriod.periodKey)
+                        ? printValue(
+                            periodsData[
+                              prevPeriod.periodKey
+                            ].footprint.indicators[indic].getUncertainty(),
+                            0
+                          )
+                        : " - "}
+                    </td>
+                    {showGrossImpact && (
+                      <td className="text-end">
+                        {periodsData.hasOwnProperty(prevPeriod.periodKey)
+                          ? printValue(
+                              periodsData[
+                                prevPeriod.periodKey
+                              ].footprint.indicators[indic].getGrossImpact(
+                                periodsData[prevPeriod.periodKey].amount
+                              ),
+                              nbDecimals
+                            )
+                          : " - "}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+          </tbody>
+        </Table>
+      )}
+      <Button onClick={toggleColumn} className="vertical-button">
+        {showColumn ? (
+          <>
+            <i className="bi bi-dash-circle me-2"></i> Masquer N-1
+          </>
+        ) : (
+          <>
+            <i className="bi bi-plus-circle me-2"></i> Afficher N-1
+          </>
+        )}
+      </Button>
+    </div>
   );
-}
+};
+
