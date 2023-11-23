@@ -9,6 +9,10 @@ p.toChecked {
   margin: 1rem 0;
 }
 
+.uncertainty {
+  font-size: 0.7rem;
+}
+
 table {
 
   tbody {
@@ -242,10 +246,13 @@ table {
 }
 
 #mainAggregates,
+#expensesTable,
 #indicatorExpenses {
   .border-left {
     border-left: 2px solid darken($light, 1%);
   }
+  flex: 2;
+  
 }
 
 .comparative-table {
@@ -275,5 +282,36 @@ table {
     th {
       color: $primary !important;
     }
+  }
+}
+
+
+// --- Buttons  --- //
+
+.vertical-button {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transition: all 0.5s ease;
+  background-color: $bg-light;
+  border-radius: 0;
+  border: 2px solid $light;
+  border-left: 0;
+  border-right: 1px solid $light;
+  border-top : 1px solid $light;
+  padding: 0 0.5rem;
+  color: $primary;
+}
+
+.prevTable {
+  flex: 1 1;
+  margin-bottom: 0;
+  thead {
+    background-color: lighten($primary, 5%);
+    tr:nth-child(2), tr:nth-child(3) {
+      background-color: lighten($primary, 10%);
+    }
+  }
+  th:first-child {
+    border-left: 2px solid $bg-light;
   }
 }

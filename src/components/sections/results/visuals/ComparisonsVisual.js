@@ -25,7 +25,6 @@ const isTargetDataAvailable  = hasComparativeData(session,'division','target',in
         period={period}
         showAreaFootprint={true}
         showTarget={isTargetDataAvailable}
-        showPreviousData={true}
         showDivisionData={true}
       />
     </div>
