@@ -93,7 +93,8 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
           </tr>
 
           <tr>
-            <td></td>
+            <th></th>
+            <th className="text-end">Montant</th>
             {TableHeaderRow(showGrossImpact)}
 
           </tr>
@@ -170,8 +171,8 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
               </th>
             </tr>
             <tr>
+            <th className="text-end">Montant</th>
               {TableHeaderRow(showGrossImpact,unit,unitAbsolute)}
-
             </tr>
             <tr className="small fw-normal">
             {TableHeaderRowUnits(showGrossImpact,unit,unitAbsolute)}
