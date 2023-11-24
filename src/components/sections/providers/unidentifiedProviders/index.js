@@ -237,8 +237,6 @@ const UnidentifiedProviders = ({
       setLoading(true);
       // call chat GPT
       let res = await getMappingFromChatGPT(accountsToMap, legalUnitActivityCode);
-      console.log(res);
-      console.log(res.isAvailable);
       // Waiting
       if (res.isAvailable) 
       {
@@ -317,9 +315,6 @@ const UnidentifiedProviders = ({
 
   // Options
   const renderSignificativeOption = hasSignificativeProvidersWithoutActivity(providers, significativeProviders);
-
-  console.log(isNextStepAvailable);
-  console.log(checkSynchronisation());
 
   return (
     <section className="step">
