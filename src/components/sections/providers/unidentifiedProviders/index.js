@@ -121,28 +121,45 @@ const UnidentifiedProviders = ({
 
     setShowWarningModal(false);
 
-    const providersToSynchronise = providers.filter(
-      (provider) =>
-        provider.useDefaultFootprint &&
-        (provider.footprintStatus !== 200 || !provider.footprint.isValid())
-    );
-
-    await synchronizeProviders(providersToSynchronise);
-
-    const updatedSignificativeProviders =
-      await getSignificativeUnidentifiedProviders(
-        financialData.providers,
-        minFpt,
-        maxFpt,
-        financialPeriod
+    // treatment by provider account
+    if (!treatmentByExpenseAccount) 
+    {
+      const providersToSynchronise = providers.filter((provider) =>
+        provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())
+      );
+  
+      await synchronizeProviders(providersToSynchronise);
+  
+      const updatedSignificativeProviders =
+        await getSignificativeUnidentifiedProviders(
+          financialData.providers,
+          minFpt,
+          maxFpt,
+          financialPeriod
+        );
+  
+      const stepAvailable = !providersToSynchronise.some(
+        (provider) => provider.footprintStatus !== 200
       );
 
-    const stepAvailable = !providersToSynchronise.some(
-      (provider) => provider.footprintStatus !== 200
-    );
-    setIsNextStepAvailable(stepAvailable);
-    setShowSyncSuccessModal(stepAvailable);
-    setSignificativeProviders(updatedSignificativeProviders);
+      setShowSyncSuccessModal(stepAvailable);
+      setSignificativeProviders(updatedSignificativeProviders);
+    }
+
+    // treatment by expenses account
+    else if (treatmentByExpenseAccount) 
+    {
+      const accountsToSynchronise = accounts.filter(
+        (account) => (account.footprintStatus !== 200 || !account.footprint.isValid())
+      );
+  
+      await synchronizeProviders(accountsToSynchronise);
+  
+      const stepAvailable = !accountsToSynchronise.some(
+        (account) => account.footprintStatus !== 200
+      );
+      setIsNextStepAvailable(stepAvailable);
+    }
   };
 
   const switchView = (event) => {
@@ -167,6 +184,28 @@ const UnidentifiedProviders = ({
       return provider;
     });
     setProviders(updatedProviders);
+
+    sessionDidUpdate();
+  };
+
+  // Update Providers
+  const setAccountDefaultFootprintParams = (accountNum, paramName, paramValue) => {
+
+    // Disable next step to force user to re-synchronize
+    setIsNextStepAvailable(false);
+
+    const updatedAccounts = accounts.map((account) => {
+      if (account.accountNum === accountNum) {
+        const updatedParams = {
+          ...account.defaultFootprintParams,
+          [paramName]: paramValue,
+        };
+        account.update({ defaultFootprintParams: updatedParams });
+        return account;
+      }
+      return account;
+    });
+    setAccounts(updatedAccounts);
 
     sessionDidUpdate();
   };
@@ -270,7 +309,7 @@ const UnidentifiedProviders = ({
           financialPeriod={financialPeriod}
           startIndex={startIndex}
           endIndex={endIndex}
-          setProviderDefaultFootprintParams={setProviderDefaultFootprintParams}
+          setAccountDefaultFootprintParams={setAccountDefaultFootprintParams}
         />}
 
       <PaginationComponent

@@ -26,7 +26,7 @@ const ExpenseAccountsTable = ({
   endIndex,
   significativeProviders,
   financialPeriod,
-  setProviderDefaultFootprintParams,
+  setAccountDefaultFootprintParams
 }) => {
   // Sorting for providers
   const [sorting, setSorting] = useState({
@@ -70,10 +70,10 @@ const ExpenseAccountsTable = ({
   );
 
   // Check if significant providers are unassigned
-  const hasWarning = (provider) => {
+  const hasWarning = (account) => {
     return (
-      significativeProviders.includes(provider.providerNum) &&
-      provider.defaultFootprintParams.code == "00"
+      significativeProviders.includes(account.accountNum) &&
+      account.defaultFootprintParams.code == "00"
     );
   };
 
@@ -106,7 +106,7 @@ const ExpenseAccountsTable = ({
               <tr key={account.accountNum}>
                 <td>
                   <div className="d-flex">
-                    {/* <i
+                    <i
                       className={
                         getUnidentifiedProviderStatusIcon(account).className
                       }
@@ -117,13 +117,13 @@ const ExpenseAccountsTable = ({
                         className="bi bi-exclamation-triangle text-warning"
                         title="Grand risque d'imprécision"
                       ></i>
-                    )} */}
+                    )}
                   </div>
                 </td>
                 <td>{account.accountLib}</td>
                 <td>{account.accountNum}</td>
                 <td>
-                  {/* <Select
+                  <Select
                     styles={customSelectStyles("150px")}
                     value={{
                       label: areas[account.defaultFootprintParams.area],
@@ -138,16 +138,16 @@ const ExpenseAccountsTable = ({
                     }
                     options={areasOptions}
                     onChange={(e) =>
-                      setProviderDefaultFootprintParams(
-                        account.providerNum,
+                      setAccountDefaultFootprintParams(
+                        account.accountNum,
                         "area",
                         e.value
                       )
                     }
-                  /> */}
+                  />
                 </td>
                 <td>
-                  {/* <Select
+                  <Select
                     styles={customSelectStyles(
                       "500px",
                       account.footprintStatus,
@@ -169,13 +169,13 @@ const ExpenseAccountsTable = ({
                     }
                     options={divisionsOptions}
                     onChange={(e) =>
-                      setProviderDefaultFootprintParams(
-                        account.providerNum,
+                      setAccountDefaultFootprintParams(
+                        account.accountNum,
                         "code",
                         e.value
                       )
                     }
-                  /> */}
+                  />
                 </td>
                 <td className="text-end">
                   {printValue(

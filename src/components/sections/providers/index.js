@@ -50,27 +50,30 @@ const ProvidersSection = ({
   const [progression, setProgression] = useState(0);
   const [apiError, setApiError] = useState(false);
 
-  const synchronizeProviderData = async (provider) => {
+  // account -> Provider or Account
+  const synchronizeProviderData = async (account) => {
     try {
-      await provider.updateFromRemote();
+      await account.updateFromRemote();
       financialData.externalExpenses
         .concat(financialData.investments)
-        .filter((expense) => expense.providerNum === provider.providerNum)
+        .filter((expense) => (expense.footprintOrigin=="provider" && expense.providerNum === account.providerNum)
+                          || (expense.footprintOrigin=="acount" && expense.accountNum === account.accountNum))
         .forEach((expense) => {
-          expense.footprint = provider.footprint;
+          expense.footprint = account.footprint;
         });
     } catch (error) {
       setApiError(true);
     }
   };
 
-  const synchronizeProviders = async (providersToSynchronise) => {
+  const synchronizeProviders = async (accountsToSynchronise) => 
+  {
     setFetching(true);
     setProgression(0);
     let i = 0;
-    const n = providersToSynchronise.length;
-    for (const provider of providersToSynchronise) {
-      await synchronizeProviderData(provider);
+    const n = accountsToSynchronise.length;
+    for (const account of accountsToSynchronise) {
+      await synchronizeProviderData(account);
       i++;
       setProgression(Math.round((i / n) * 100));
     }
