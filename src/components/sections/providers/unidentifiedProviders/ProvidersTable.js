@@ -18,6 +18,7 @@ import { customSelectStyles } from "/config/customStyles";
 // Libs
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
+import { isValidNumber } from "../../../../utils/Utils";
 
 const ProvidersTable = ({
   providers,
@@ -76,6 +77,18 @@ const ProvidersTable = ({
     );
   };
 
+  const getTagClass = (accuracy) => 
+  {
+    if (!isValidNumber(accuracy,0,100)) {
+      return("")
+    } else if (isValidNumber(accuracy,0,60)) {
+      return("warning")
+    } else if (isValidNumber(accuracy,60,80)) {
+      return("primary")
+    } else {
+      return("success")
+    }
+  }
 
   return (
     <>
@@ -92,6 +105,7 @@ const ProvidersTable = ({
             <th>Compte fournisseur</th>
             <th>Espace économique</th>
             <th>Secteur d'activité</th>
+            <th>Confiance</th>
             <th className="text-end" onClick={() => handleSort("montant")}>
               <i className="bi bi-arrow-down-up me-1"></i>
               Montant
@@ -175,6 +189,13 @@ const ProvidersTable = ({
                       )
                     }
                   />
+                </td>
+                <td>
+                  <div key={index} className="text-center flex-grow-1">
+                    <span className={"badge rounded-pill bg-" + getTagClass(provider.defaultFootprintParams.accuracyMapping)}>
+                      {(provider.defaultFootprintParams.accuracyMapping || " -")+" %"}
+                    </span>
+                  </div>
                 </td>
                 <td className="text-end">
                   {printValue(

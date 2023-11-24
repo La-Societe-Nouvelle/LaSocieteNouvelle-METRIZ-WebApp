@@ -39,6 +39,8 @@ const ProvidersSection = ({
 
   const { 
     financialData, 
+    comparativeData,
+    legalUnit
   } = session;
 
   const [step, setStep] = useState(1);
@@ -57,7 +59,7 @@ const ProvidersSection = ({
       financialData.externalExpenses
         .concat(financialData.investments)
         .filter((expense) => (expense.footprintOrigin=="provider" && expense.providerNum === account.providerNum)
-                          || (expense.footprintOrigin=="acount" && expense.accountNum === account.accountNum))
+                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum))
         .forEach((expense) => {
           expense.footprint = account.footprint;
         });
@@ -140,6 +142,7 @@ const ProvidersSection = ({
           submit={submit}
           synchronizeProviders={synchronizeProviders}
           sessionDidUpdate={sessionDidUpdate}
+          legalUnitActivityCode={legalUnit.activityCode || comparativeData.comparativeDivision}
         />
       </>
     );

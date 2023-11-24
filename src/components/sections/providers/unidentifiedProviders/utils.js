@@ -110,18 +110,74 @@ export function getUnidentifiedProviderStatusIcon(provider) {
   };
 }
 
+export async function getSignificativeAccounts(accounts,minFpt,maxFpt,period)
+{
+  // if no data -> return list of all account with default footprint
+  if (minFpt==null || maxFpt==null) {
+    return accounts.map(account => account.accountNum);
+  }
+
+  let significativeAccounts = [];
+  for (let indic of Object.keys(metaIndics)) 
+  {
+    // significative accounts for indic
+    let significativeAccountsForIndic = await getSignificativeAccountsByIndic(indic,accounts,minFpt,maxFpt,limit,period); // return list accounts
+    significativeAccounts.push(...significativeAccountsForIndic);
+  }
+
+  // Remove duplicates & return
+  return significativeAccounts.filter((value, index, self) => index === self.findIndex(item => item === value));
+}
+
+// iteration until provider under limit are significative
+const getSignificativeAccountsByIndic = async (indic,accounts,minFpt,maxFpt,limit,period) =>
+{
+  let isSignificative = false;
+  
+  accounts.sort((a,b) => Math.abs(a.periodsData[period.periodKey].amount) - Math.abs(b.periodsData[period.periodKey].amount));
+  let index = 0; // under -> account not significative
+
+  while (!isSignificative && index <= accounts.length)
+  {    
+    // build impact for upper limit accounts (mininum footprint case) -> use activity footprint if defined otherwise use min footprint
+    let upperLimitAccounts = accounts.slice(index);
+    let impactOfUpperLimitAccounts = getSumItems(upperLimitAccounts.map(account => 
+      (account.defaultFootprintParams.code=="00" || account.footprintStatus!=200) ?
+        minFpt.indicators[indic].value*account.periodsData[period.periodKey].amount :               //  if no activity set or footprint unfetched
+        account.footprint.indicators[indic].value*account.periodsData[period.periodKey].amount));   //  if activity set & fpt fetched
+    
+    // build impact for under limit accounts (maximum footprint case) -> use activity footprint if defined otherwise use max footprint
+    let underLimitAccounts = accounts.slice(0,index);
+    let impactOfUnderLimitAccounts = getSumItems(underLimitAccounts.map(account => 
+      (account.defaultFootprintParams.code=="00" || account.footprintStatus!=200) ? 
+        maxFpt.indicators[indic].value*account.periodsData[period.periodKey].amount : 
+        account.footprint.indicators[indic].value*account.periodsData[period.periodKey].amount));
+
+    // check if impact of under limit accounts represent more than [limit] % of upper limit accounts impacts
+    if (Math.abs(impactOfUnderLimitAccounts) >= Math.abs(impactOfUpperLimitAccounts)*limit) isSignificative = true;
+
+    if (!isSignificative) index++;
+  }
+
+  // Retrieve list of accounts
+  let significativeAccounts = index>0 ? accounts.slice(index-1).map(account => account.accountNum) : [];
+  return significativeAccounts;
+}
+
 /* ------------------------------------- DEFAULT MAPPING BY CHAT-GPT -------------------------------------------- */
 
 import axios from 'axios';
 import divisions from '/lib/divisions';
+import { isValidNumber } from '../../../../utils/Utils';
 
 const apiUrl = 'https://api.openai.com/v1/chat/completions';
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
-export const getMappingFromChatGPT = async (providers) => 
+export const getMappingFromChatGPT = async (providers, legalUnitActivityCode) => 
 {
   // build request
-  const request = buildMappingQuery(providers);
+  const request = buildMappingQuery(providers, legalUnitActivityCode);
+  console.log(request);
 
   // open ai
   try 
@@ -129,13 +185,14 @@ export const getMappingFromChatGPT = async (providers) =>
     const response = await axios.post(apiUrl, {
       model: "gpt-3.5-turbo-0301",
       messages: [{"role": "user", "content": request}],
-      max_tokens: 500,
+      max_tokens: 1000,
+      temperature: 0.1
     }, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
-      timeout: 10000,
+      timeout: 500000,
     });
 
     const mappingChatGPT = response.data.choices[0].message;
@@ -144,21 +201,22 @@ export const getMappingFromChatGPT = async (providers) =>
     
     if (mappingChatGPT.content) {
       const rows = mappingChatGPT.content.split("\n");
-      rows.forEach(row => {
-        if (/^\|.*\| [0-9]{2} \|$/.test(row)) {
+      for (let row of rows) 
+      {
+        if (/^\|.*\| [0-9]{2} \|.*\|$/.test(row)) {
           let rowData = row.split("|");
-          let providerNum = rowData[1].trim();
-          //let providerLib = rowData[2].trim();
+          let accountId = rowData[1].trim();
           let activityCode = rowData[3].trim();
-          let provider = providers.find((provider) => provider.providerNum == providerNum);
-          if (provider && Object.keys(divisions).includes(activityCode)) {
+          let accuracyValue = rowData[4].trim()?.match(/^([0-9]{1,2})/)?.[0];
+          if (accountId && Object.keys(divisions).includes(activityCode)) {
             mapping.push({
-              providerNum: providerNum,
-              defaultCode: activityCode
+              accountId,
+              defaultCode: activityCode,
+              accuracy: !isNaN(accuracyValue) && isValidNumber(accuracyValue,0,100) ? parseInt(accuracyValue) : null
             })
           }
         }
-      }); 
+      }; 
     }
 
     return ({
@@ -167,7 +225,6 @@ export const getMappingFromChatGPT = async (providers) =>
     });
   } 
   catch (error) {
-    console.log(error);
     console.error('Error generating code:', error.message); 
     return ({
       isAvailable: false
@@ -175,18 +232,21 @@ export const getMappingFromChatGPT = async (providers) =>
   }
 }
 
-const buildMappingQuery = (providers) => 
+const buildMappingQuery = (accounts,legalUnitActivityCode) => 
 {
   const query = 
       "Compléter le tableau avec le code de la division de la NACE Rév.2 décrivant le mieux les activités financées (division des fournisseurs) "
-    + "à partir du libellé du compte de charges. "+"\n"
+    + "à partir du libellé du compte de charges"
+    + (legalUnitActivityCode ? ", en s'appuyant sur le fait que l'entreprise appartient à la division "+legalUnitActivityCode : "")
+    +". "+"\n"
     + "\n"
-    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) |"+"\n"
-    + "|----|------------------------------|---------------------------------------------------------------------|"+"\n"
-    + providers.map((provider) => {
+    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) | Intervalle de confiance (valeur en %) | "+"\n"
+    + "|----|------------------------------|---------------------------------------------------------------------|---------------------------------------|"+"\n"
+    + accounts.map((account) => {
         return( "|"
-          +" "+provider.providerNum+" |"
-          +" "+provider.providerLib+" |"
+          +" "+(account.providerNum || account.accountNum)+" |"
+          +" "+(account.providerLib || account.accountLib)+" |"
+          +" "+" |"
           +" "+" |"
         )}).join("\n")
     + "\n"

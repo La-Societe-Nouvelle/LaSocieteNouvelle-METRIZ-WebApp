@@ -118,7 +118,8 @@ export class Provider
       this.defaultFootprintParams = {
         area: "FRA",
         code: "00",
-        aggregate: "PRD"
+        aggregate: "PRD",
+        accuracyDefaultMapping: 0
       };
       this.dataFetched = false;
       this.footprintStatus = 0;
@@ -134,7 +135,8 @@ export class Provider
       this.defaultFootprintParams = {
         area: "FRA",
         code: "00",
-        aggregate: "PRD"
+        aggregate: "PRD",
+        accuracyDefaultMapping: 0
       };
       this.dataFetched = false;
       this.footprintStatus = 0;
