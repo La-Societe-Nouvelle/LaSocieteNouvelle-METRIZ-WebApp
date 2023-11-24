@@ -1,5 +1,8 @@
 // La Société Nouvelle
 
+// API
+import api from "/config/api";
+
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -28,7 +31,11 @@ export class Account {
 
   constructor({accountNum,
                accountLib,
-               periodsData}) 
+               periodsData,
+               footprint,
+               defaultFootprintParams,
+               dataFetched,
+               footprintStatus}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = accountNum;                                           // id
