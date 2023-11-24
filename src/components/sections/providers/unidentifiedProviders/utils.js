@@ -104,8 +104,94 @@ export function getUnidentifiedProviderStatusIcon(provider) {
     };
   }
 
-return {
-  className: "",
-  title: "",
-};
+  return {
+    className: "",
+    title: "",
+  };
+}
+
+/* ------------------------------------- DEFAULT MAPPING BY CHAT-GPT -------------------------------------------- */
+
+import axios from 'axios';
+import divisions from '/lib/divisions';
+
+const apiUrl = 'https://api.openai.com/v1/chat/completions';
+const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+
+export const getMappingFromChatGPT = async (providers) => 
+{
+  // build request
+  const request = buildMappingQuery(providers);
+
+  // open ai
+  try 
+  {
+    const response = await axios.post(apiUrl, {
+      model: "gpt-3.5-turbo-0301",
+      messages: [{"role": "user", "content": request}],
+      max_tokens: 500,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      timeout: 10000,
+    });
+
+    const mappingChatGPT = response.data.choices[0].message;
+
+    const mapping = [];
+    
+    if (mappingChatGPT.content) {
+      const rows = mappingChatGPT.content.split("\n");
+      rows.forEach(row => {
+        if (/^\|.*\| [0-9]{2} \|$/.test(row)) {
+          let rowData = row.split("|");
+          let providerNum = rowData[1].trim();
+          //let providerLib = rowData[2].trim();
+          let activityCode = rowData[3].trim();
+          let provider = providers.find((provider) => provider.providerNum == providerNum);
+          if (provider && Object.keys(divisions).includes(activityCode)) {
+            mapping.push({
+              providerNum: providerNum,
+              defaultCode: activityCode
+            })
+          }
+        }
+      }); 
+    }
+
+    return ({
+      mapping,
+      isAvailable: true
+    });
+  } 
+  catch (error) {
+    console.log(error);
+    console.error('Error generating code:', error.message); 
+    return ({
+      isAvailable: false
+    });
+  }
+}
+
+const buildMappingQuery = (providers) => 
+{
+  const query = 
+      "Compléter le tableau avec le code de la division de la NACE Rév.2 décrivant le mieux les activités financées (division des fournisseurs) "
+    + "à partir du libellé du compte de charges. "+"\n"
+    + "\n"
+    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) |"+"\n"
+    + "|----|------------------------------|---------------------------------------------------------------------|"+"\n"
+    + providers.map((provider) => {
+        return( "|"
+          +" "+provider.providerNum+" |"
+          +" "+provider.providerLib+" |"
+          +" "+" |"
+        )}).join("\n")
+    + "\n"
+    + "\n"
+    + "(Ne retourner que le tableau)";
+
+  return query;
 }

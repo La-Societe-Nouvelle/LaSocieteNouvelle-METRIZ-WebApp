@@ -10,8 +10,12 @@ import ExpenseAccountsTable from "./ExpenseAccountsTable";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
-import { getSignificativeUnidentifiedProviders } from "./utils";
+import { getMappingFromChatGPT, getSignificativeUnidentifiedProviders } from "./utils";
 import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
+
+// Modals
+import { Loader } from "/src/components/modals/Loader";
+import { ErrorAPIModal } from "/src/components/modals/userInfoModals";
 
 const UnidentifiedProviders = ({
   financialData,
@@ -21,7 +25,7 @@ const UnidentifiedProviders = ({
   prevStep,
   submit,
   synchronizeProviders,
-  sessionDidUpdate
+  sessionDidUpdate,
 }) => {
   // State management
 
@@ -51,6 +55,8 @@ const UnidentifiedProviders = ({
   const [showSyncWarningModal, setShowWarningModal] = useState(false);
   const [filteredProviders, setFilteredProviders] = useState(providers);
   const [isNextStepAvailable, setIsNextStepAvailable] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const [state, setState] = useState({
     currentView: "all",
@@ -59,7 +65,6 @@ const UnidentifiedProviders = ({
   });
 
   const { currentView, currentPage, itemsPerPage } = state;
-
 
   // Fetch data and check if providers are synchronized
   useEffect(() => {
@@ -118,7 +123,6 @@ const UnidentifiedProviders = ({
   };
 
   const handleSynchronize = async () => {
-
     setShowWarningModal(false);
 
     // treatment by provider account
@@ -165,6 +169,34 @@ const UnidentifiedProviders = ({
   const switchView = (event) => {
     setTreatmentByExpenseAccount(event.target.checked);
   }
+
+
+  // Pré-selection economic division
+  const setDefaultMapping = async () => {
+    let providersToMap = providers.filter((provider) => provider.defaultFootprintParams.code == "00");
+
+    if (providersToMap.length > 0) {
+      setLoading(true);
+      // call chat GPT
+      let res = await getMappingFromChatGPT(providersToMap);
+      // Waiting
+      if (res.isAvailable) {
+        res.mapping.forEach(({ providerNum, defaultCode }) => {
+
+          let provider = providers.find((provider) => provider.providerNum == providerNum);
+
+          if (provider) {
+            provider.defaultFootprintParams.code = defaultCode;
+            setProviderDefaultFootprintParams(providerNum, "code", defaultCode);
+          }
+
+        });
+      } else {
+        setError(true);
+      }
+      setLoading(false);
+    }
+  };
 
   // Update Providers
   const setProviderDefaultFootprintParams = (providerNum, paramName, paramValue) => {
@@ -229,6 +261,7 @@ const UnidentifiedProviders = ({
           Synchronisation des données grâce au secteur d'activité
         </h3>
       </div>
+
       <div className="d-flex py-2 justify-content-between">
         <div className="d-flex align-items-center ">
           <Form.Select
@@ -252,9 +285,13 @@ const UnidentifiedProviders = ({
             <option key="5" value="defaultActivity">
               Comptes tiers non rattachés à un secteur d'activité
             </option>
-              <option key="6" value="significativeWithoutActivity" disabled={!renderSignificativeOption}>
-                Comptes significatifs non rattachés à un secteur d'activité
-              </option>
+            <option
+              key="6"
+              value="significativeWithoutActivity"
+              disabled={!renderSignificativeOption}
+            >
+              Comptes significatifs non rattachés à un secteur d'activité
+            </option>
           </Form.Select>
           <Form.Select
             size="sm"
@@ -274,7 +311,6 @@ const UnidentifiedProviders = ({
           </Form.Select>
         </div>
 
-
         <Form.Check
           type="checkbox"
           value={treatmentByExpenseAccount}
@@ -282,13 +318,19 @@ const UnidentifiedProviders = ({
           onChange={switchView}
           label="Traitement par compte de charges"
         />
-        <Button
-          onClick={handleSynchronize}
-          className="btn btn-secondary"
-          disabled={!isSyncButtonEnable}
-        >
-          <i className="bi bi-arrow-repeat"></i> Synchroniser les données
-        </Button>
+
+        <div>
+          <Button className="btn btn-primary me-2" onClick={setDefaultMapping}>
+            <i className="bi bi-shuffle"></i> Association automatique
+          </Button>
+          <Button
+            onClick={handleSynchronize}
+            className="btn btn-secondary"
+            disabled={!isSyncButtonEnable}
+          >
+            <i className="bi bi-arrow-repeat"></i> Synchroniser les données
+          </Button>
+        </div>
       </div>
 
       {!treatmentByExpenseAccount && 
@@ -331,6 +373,11 @@ const UnidentifiedProviders = ({
         onClose={() => setShowWarningModal(false)}
         onSubmit={() => submit()}
       />
+
+      {loading && <Loader title={"Association automatique en cours ..."} />}
+
+      {/* Error Modal for API Errors */}
+      <ErrorAPIModal hasError={error} onClose={() => setError(false)} />
 
       {/* Actions ---------------------------------------------------------*/}
       <div className="d-flex justify-content-end ">
@@ -397,18 +444,19 @@ function isSyncButtonEnabled(providers) {
   return providers.some(
     (provider) =>
       (provider.useDefaultFootprint &&
-        (provider.footprintStatus !== 200 ||
-          !provider.footprint.isValid())) ||
+        (provider.footprintStatus !== 200 || !provider.footprint.isValid())) ||
       provider.footprintStatus === 203
   );
 }
-function hasSignificativeProvidersWithoutActivity(providers, significativeProviders) {
+function hasSignificativeProvidersWithoutActivity(
+  providers,
+  significativeProviders
+) {
   return providers.some(
     (provider) =>
       provider.defaultFootprintParams.code === "00" &&
       significativeProviders.includes(provider.providerNum)
   );
 }
-
 
 export default UnidentifiedProviders;
