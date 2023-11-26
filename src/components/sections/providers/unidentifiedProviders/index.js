@@ -41,14 +41,25 @@ const UnidentifiedProviders = ({
 
   const [accounts, setAccounts] = useState([]);
   useEffect(() => {
+
     let providerNums = providers.map((provider) => provider.providerNum);
+
+    // expense accounts
     let accountNums = financialData.externalExpenses
-      //.concat(financialData.investments)
       .filter((expense) => providerNums.includes(expense.providerNum) && financialPeriod.regex.test(expense.date))
       .map((expense) => expense.accountNum)
       .filter((value, index, self) => index === self.findIndex(item => item === value));
-    let accounts = financialData.externalExpensesAccounts.filter((account) => accountNums.includes(account.accountNum));
-    setAccounts(accounts);
+    let accounts = financialData.externalExpensesAccounts
+      .filter((account) => accountNums.includes(account.accountNum));
+    
+    // immobilisation providers
+    let immobilisationProviderNums = financialData.investments
+      .filter((investment) => providerNums.includes(investment.providerNum) && financialPeriod.regex.test(investment.date))
+      .map((investment) => investment.providerNum);
+    let immobilisationProviders = providers
+      .filter((provider) => immobilisationProviderNums.includes(provider.providerNum));
+
+    setAccounts([...accounts,...immobilisationProviders]);
   }, [])
 
   const [significativeProviders, setSignificativeProviders] = useState([]);
@@ -311,7 +322,7 @@ const UnidentifiedProviders = ({
   const totalPages = Math.ceil((treatmentByExpenseAccount ? accountsToSync.length : filteredProviders.length) / itemsPerPage);
 
   // Sync button status
-  const isSyncButtonEnable = isSyncButtonEnabled(providers);
+  const isSyncButtonEnable = isSyncButtonEnabled(treatmentByExpenseAccount ? accounts : providers);
 
   // Options
   const renderSignificativeOption = hasSignificativeProvidersWithoutActivity(providers, significativeProviders);
@@ -324,6 +335,16 @@ const UnidentifiedProviders = ({
           Synchronisation des données grâce au secteur d'activité
         </h3>
       </div>
+
+      <div className="d-flex align-items-center ">
+          <Form.Check
+            type="checkbox"
+            value={treatmentByExpenseAccount}
+            checked={treatmentByExpenseAccount}
+            onChange={switchView}
+            label="Traitement par compte de charges"
+          />
+        </div>
 
       <div className="d-flex py-2 justify-content-between">
         <div className="d-flex align-items-center ">
@@ -374,16 +395,8 @@ const UnidentifiedProviders = ({
           </Form.Select>
         </div>
 
-        <Form.Check
-          type="checkbox"
-          value={treatmentByExpenseAccount}
-          checked={treatmentByExpenseAccount}
-          onChange={switchView}
-          label="Traitement par compte de charges"
-        />
-
         <div>
-          <Button className="btn btn-primary me-2" onClick={setDefaultMapping} disabled={!treatmentByExpenseAccount}>
+          <Button className="btn btn-primary me-2" onClick={setDefaultMapping}>
             <i className="bi bi-shuffle"></i> Association automatique
           </Button>
           <Button
@@ -506,9 +519,8 @@ function filterProvidersByView(currentView, providers, significativeProviders) {
 function isSyncButtonEnabled(providers) {
   return providers.some(
     (provider) =>
-      (provider.useDefaultFootprint &&
-        (provider.footprintStatus !== 200 || !provider.footprint.isValid())) ||
-      provider.footprintStatus === 203
+        (provider.footprintStatus !== 200 || !provider.footprint.isValid()) 
+      || provider.footprintStatus === 203
   );
 }
 function hasSignificativeProvidersWithoutActivity(

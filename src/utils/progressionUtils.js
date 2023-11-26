@@ -95,9 +95,12 @@ export const checkProviderFootprints = (session,period) => {
 }
 
 export const checkExternalFootprints = (session,period) => {
-  let externalExpenses = session.financialData.externalExpenses
+  let externalFlows = [
+    ...session.financialData.externalExpenses,
+    ...session.financialData.investments
+    ]
     .filter((expense) => period.regex.test(expense.date));
-  return externalExpenses.every((expense) => expense.footprint.isValid())
+  return externalFlows.every((expense) => expense.footprint.isValid())
 }
 
 /** Vérification si l'ensemble des déclarations sont complètes

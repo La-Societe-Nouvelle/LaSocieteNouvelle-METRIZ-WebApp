@@ -31,8 +31,8 @@ const ExpenseAccountsTable = ({
 }) => {
   // Sorting for providers
   const [sorting, setSorting] = useState({
-    sortColumn: null,
-    sortOrder: "asc",
+    sortColumn: "montant",
+    sortOrder: "desc",
   });
 
   const { sortColumn, sortOrder } = sorting;
@@ -82,9 +82,9 @@ const ExpenseAccountsTable = ({
   {
     if (!isValidNumber(accuracy,0,100)) {
       return("")
-    } else if (isValidNumber(accuracy,0,60)) {
+    } else if (isValidNumber(accuracy,0,49)) {
       return("warning")
-    } else if (isValidNumber(accuracy,60,80)) {
+    } else if (isValidNumber(accuracy,50,79)) {
       return("primary")
     } else {
       return("success")
@@ -115,7 +115,7 @@ const ExpenseAccountsTable = ({
           {sortedAccounts
             .slice(startIndex, endIndex)
             .map((account, index) => (
-              <tr key={account.accountNum}>
+              <tr key={account.accountNum || account.providerNum}>
                 <td>
                   <div className="d-flex">
                     <i
@@ -132,8 +132,8 @@ const ExpenseAccountsTable = ({
                     )}
                   </div>
                 </td>
-                <td>{account.accountLib}</td>
-                <td>{account.accountNum}</td>
+                <td>{account.accountLib || account.providerLib}</td>
+                <td>{account.accountNum || account.providerNum}</td>
                 <td>
                   <Select
                     styles={customSelectStyles("150px")}

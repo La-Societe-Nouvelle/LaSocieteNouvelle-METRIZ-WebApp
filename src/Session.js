@@ -24,6 +24,7 @@ import {
 // Utils
 import { buildRegexFinancialPeriod } from "./utils/periodsUtils";
 import { getAnalysisFromChatGPT } from "./writers/analysis/analysis";
+import { SocialFootprint } from "./footprintObjects/SocialFootprint";
 
 // ################################################## SESSION OBJECT ##################################################
 
@@ -206,6 +207,18 @@ export class Session
       this.analysis[period.periodKey][indic] = analysis;
       })
     );
+  }
+
+  /* -------------------- RESET FOOTPRINT -------------------- */
+
+  resetAggregatesFootprints = (period) => 
+  {
+    // reset production footprint
+    this.financialData.mainAggregates.production.periodsData[period.periodKey].footprint = new SocialFootprint();
+
+    // reset production aggregates footprint
+    Object.values(this.financialData.productionAggregates)
+      .forEach((aggregate) => aggregate.periodsData[period.periodKey] = new SocialFootprint());
   }
 
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */

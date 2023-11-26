@@ -105,7 +105,7 @@ const IdentifiedProviders = (props) => {
     (provider) => !provider.useDefaultFootprint
   ).length;
 
-  const isNextStepAvailable = (nbSirenSynchronised === nbSiren && nbSiren !== 0);
+  const isNextStepAvailable = (nbSirenSynchronised === nbSiren);
 
   return (
       <section className="step">

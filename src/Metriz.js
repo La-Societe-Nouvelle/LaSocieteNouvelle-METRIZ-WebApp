@@ -79,6 +79,9 @@ export const Metriz = () =>
 
   const sessionDidUpdate = async () => {
     let progression = await getProgression(session,selectedPeriod);
+    if (selectedPeriod.periodKey && progression<5) {
+      session.initNetValueAddedFootprint(selectedPeriod);
+    }
     setStepMax(progression);
   }
 

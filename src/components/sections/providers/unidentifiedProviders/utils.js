@@ -177,7 +177,6 @@ export const getMappingFromChatGPT = async (providers, legalUnitActivityCode) =>
 {
   // build request
   const request = buildMappingQuery(providers, legalUnitActivityCode);
-  console.log(request);
 
   // open ai
   try 
@@ -207,12 +206,12 @@ export const getMappingFromChatGPT = async (providers, legalUnitActivityCode) =>
           let rowData = row.split("|");
           let accountId = rowData[1].trim();
           let activityCode = rowData[3].trim();
-          let accuracyValue = rowData[4].trim()?.match(/^([0-9]{1,2})/)?.[0];
+          let accuracyValue = rowData[4].trim()?.match(/^(100|[0-9]{1,2})/)?.[0];
           if (accountId && Object.keys(divisions).includes(activityCode)) {
             mapping.push({
               accountId,
               defaultCode: activityCode,
-              accuracy: !isNaN(accuracyValue) && isValidNumber(accuracyValue,0,100) ? parseInt(accuracyValue) : null
+              accuracy: !isNaN(accuracyValue) && isValidNumber(accuracyValue,0,100) ? Math.min(parseInt(accuracyValue), 90) : null
             })
           }
         }
@@ -240,8 +239,8 @@ const buildMappingQuery = (accounts,legalUnitActivityCode) =>
     + (legalUnitActivityCode ? ", en s'appuyant sur le fait que l'entreprise appartient à la division "+legalUnitActivityCode : "")
     +". "+"\n"
     + "\n"
-    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) | Intervalle de confiance (valeur en %) | "+"\n"
-    + "|----|------------------------------|---------------------------------------------------------------------|---------------------------------------|"+"\n"
+    + "| Id | Libellé du compte de charges | Code de la division économique des activités financées (2 chiffres) | Niveau de pertinence du lien (valeur en %) | "+"\n"
+    + "|----|------------------------------|---------------------------------------------------------------------|--------------------------------------------|"+"\n"
     + accounts.map((account) => {
         return( "|"
           +" "+(account.providerNum || account.accountNum)+" |"

@@ -30,8 +30,8 @@ const ProvidersTable = ({
 }) => {
   // Sorting for providers
   const [sorting, setSorting] = useState({
-    sortColumn: null,
-    sortOrder: "asc",
+    sortColumn: "montant",
+    sortOrder: "desc",
   });
 
   const { sortColumn, sortOrder } = sorting;
@@ -81,9 +81,9 @@ const ProvidersTable = ({
   {
     if (!isValidNumber(accuracy,0,100)) {
       return("")
-    } else if (isValidNumber(accuracy,0,60)) {
+    } else if (isValidNumber(accuracy,0,49)) {
       return("warning")
-    } else if (isValidNumber(accuracy,60,80)) {
+    } else if (isValidNumber(accuracy,50,79)) {
       return("primary")
     } else {
       return("success")
