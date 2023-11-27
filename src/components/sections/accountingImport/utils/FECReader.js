@@ -620,72 +620,60 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
 
   // Immobilisation ----------------------------------------------------------------------------------- //
 
-  if (/^2[0-7]/.test(ligneCourante.CompteNum)) {
+  if (/^2[0-7]/.test(ligneCourante.CompteNum)) 
+  {
     // Immobilisation --------------------------------------------------- //
 
     // Retrieve immobilisation item
     let immobilisation = data.immobilisations[ligneCourante.CompteNum];
-    if (immobilisation == undefined)
-      throw (
-        "Erreur de lecture pour le compte d'immobilisation " +
-        ligneCourante.CompteNum +
-        "."
-      );
+    if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+ligneCourante.CompteNum+".");
 
     // update data
-    immobilisation.lastAmount =
-      immobilisation.lastAmount +
-      parseAmount(ligneCourante.Debit) -
-      parseAmount(ligneCourante.Credit);
+    immobilisation.lastAmount = immobilisation.lastAmount 
+      + parseAmount(ligneCourante.Debit)
+      - parseAmount(ligneCourante.Credit);
     immobilisation.entries.push({
       entryNum: ligneCourante.EcritureNum,
-      amount:
-        parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+      amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
       date: ligneCourante.EcritureDate,
     });
 
     // Acquisition ------------------------------------------------------ //
 
     // lecture du compte auxiliaire (cas acquisition)
-    let ligneFournisseur = journal.filter(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^40/.test(ligne.CompteNum)
-    )[0];
+    let ligneFournisseur = journal.filter((ligne) =>
+         ligne.EcritureNum == ligneCourante.EcritureNum
+      && /^40/.test(ligne.CompteNum))[0];
 
-    if (ligneFournisseur != undefined) {
+    if (ligneFournisseur != undefined) 
+    {
       // investment data
       let investmentData = {
         entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        providerNum:
-          ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
-        providerLib:
-          ligneFournisseur.CompAuxLib ||
-          "ACQUISTIONS " + ligneCourante.CompteLib,
+        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
+        providerLib: ligneFournisseur.CompAuxLib || "ACQUISTIONS " + ligneCourante.CompteLib,
         isDefaultProvider: ligneFournisseur.CompAuxNum ? false : true,
-        amount:
-          parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
       // push data
       data.investments.push(investmentData);
-      if (!ligneFournisseur.CompAuxNum)
-        data.defaultProviders.push(investmentData.providerNum);
+      if (!ligneFournisseur.CompAuxNum) data.defaultProviders.push(investmentData.providerNum);
     }
 
     // Immobilisation en cours (avances / acomptes) --------------------- //
 
     // lecture du compte auxiliaire
-    let ligneImmobilisationEnCours = journal.filter(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^23(7|8)/.test(ligne.CompteNum) &&
-        ligne.CompteNum != ligneCourante.CompteNum
-    )[0];
-    if (ligneImmobilisationEnCours != undefined) {
+    let ligneImmobilisationEnCours = journal.filter((ligne) =>
+         ligne.EcritureNum == ligneCourante.EcritureNum
+      && /^23(7|8)/.test(ligne.CompteNum)
+      && ligne.CompteNum != ligneCourante.CompteNum)[0];
+    
+    if (ligneImmobilisationEnCours != undefined) 
+    {
       // investment data
       let immobilisationEnCoursData = {
         entryNum: ligneCourante.EcritureNum,
@@ -694,11 +682,10 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
         accountLib: ligneCourante.CompteLib,
         accountAux: ligneImmobilisationEnCours.CompteNum, // param name
         accountAuxLib: ligneImmobilisationEnCours.CompteLib, // param name
-        amount:
-          parseAmount(ligneImmobilisationEnCours.Credit) -
-          parseAmount(ligneImmobilisationEnCours.Debit),
+        amount: parseAmount(ligneImmobilisationEnCours.Credit) - parseAmount(ligneImmobilisationEnCours.Debit),
         date: ligneCourante.EcritureDate,
       };
+
       // push data
       // data.investments.push(immobilisationEnCoursData);
     }
@@ -706,12 +693,12 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
     // Production immobilisée ------------------------------------------- //
 
     // lecture du compte auxiliaire (cas production immobilisée)
-    let ligneProduction = journal.filter(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^72/.test(ligne.CompteNum)
-    )[0];
-    if (ligneProduction != undefined) {
+    let ligneProduction = journal.filter((ligne) =>
+         ligne.EcritureNum == ligneCourante.EcritureNum
+      && /^72/.test(ligne.CompteNum))[0];
+    
+    if (ligneProduction != undefined) 
+    {
       // investment data
       let immobilisedProductionData = {
         entryNum: ligneCourante.EcritureNum,
@@ -720,11 +707,10 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
         accountLib: ligneCourante.CompteLib,
         productionAccountNum: ligneProduction.CompteNum,
         productionAccountLib: ligneProduction.CompteLib,
-        amount:
-          parseAmount(ligneProduction.Credit) -
-          parseAmount(ligneCourante.Debit),
+        amount: parseAmount(ligneProduction.Credit) - parseAmount(ligneCourante.Debit),
         date: ligneCourante.EcritureDate,
       };
+
       // push data
       data.immobilisedProductions.push(immobilisedProductionData);
     }
@@ -732,13 +718,13 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
     // Immobilisation en cours (production immobilisée) ----------------- //
 
     // lecture du compte auxiliaire
-    let ligneProductionEnCours = journal.filter(
-      (ligne) =>
-        ligne.EcritureNum == ligneCourante.EcritureNum &&
-        /^23(1|2)/.test(ligne.CompteNum) &&
-        ligne.CompteNum != ligneCourante.CompteNum
-    )[0];
-    if (ligneImmobilisationEnCours != undefined) {
+    let ligneProductionEnCours = journal.filter((ligne) => 
+         ligne.EcritureNum == ligneCourante.EcritureNum 
+      && /^23(1|2)/.test(ligne.CompteNum) 
+      && ligne.CompteNum != ligneCourante.CompteNum)[0];
+    
+    if (ligneProductionEnCours != undefined) 
+    {
       // immobilised production data
       let immobilisationProductionData = {
         entryNum: ligneCourante.EcritureNum,
@@ -747,14 +733,40 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
         accountLib: ligneCourante.CompteLib,
         accountAux: ligneProductionEnCours.CompteNum,
         accountAuxLib: ligneProductionEnCours.CompteLib,
-        amount:
-          parseAmount(ligneProductionEnCours.Credit) -
-          parseAmount(ligneProductionEnCours.Debit),
+        amount: parseAmount(ligneProductionEnCours.Credit) - parseAmount(ligneProductionEnCours.Debit),
         date: ligneCourante.EcritureDate,
       };
+
       // push data
       // data.immobilisationProductions.push(immobilisationProductionData);
     }
+
+    // Other case ------------------------------------------------------- //
+
+    if (!ligneFournisseur
+     && !ligneImmobilisationEnCours
+     && !ligneProduction
+     && !ligneProductionEnCours
+     && (parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit))>0) // immobilisation increase
+    {
+      // investment data
+      let investmentData = {
+        entryNum: ligneCourante.EcritureNum,
+        label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        providerNum: "_" + ligneCourante.CompteNum,
+        providerLib: "ACQUISTIONS " + ligneCourante.CompteLib,
+        isDefaultProvider: true,
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+      };
+
+      // push data
+      data.investments.push(investmentData);
+      data.defaultProviders.push(investmentData.providerNum);
+    }
+
   }
 
   // Amortissement ------------------------------------------------------------------------------------ //
