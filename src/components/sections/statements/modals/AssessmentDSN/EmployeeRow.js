@@ -39,11 +39,11 @@ const EmployeeRow = ({
     individualData.name = name;
     individualData.sex = sex;
     individualData.workingHours = workingHours;
+    individualData.wage = wage;
     individualData.hourlyRate = hourlyRate;
     individualData.apprenticeshipHours = apprenticeshipHours;
     individualData.apprenticeshipContract = apprenticeshipContract;
-    
-    //updateSocialData();
+
     onUpdate();
   }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours, apprenticeshipContract]);
 
