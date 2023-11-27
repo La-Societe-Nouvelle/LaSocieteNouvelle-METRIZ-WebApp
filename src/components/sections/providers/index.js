@@ -59,7 +59,8 @@ const ProvidersSection = ({
       financialData.externalExpenses
         .concat(financialData.investments)
         .filter((expense) => (expense.footprintOrigin=="provider" && expense.providerNum === account.providerNum)
-                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum))
+                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum)
+                          || (/^2/.test(expense.accountNum) && expense.providerNum == account.providerNum))
         .forEach((expense) => {
           expense.footprint = account.footprint;
         });

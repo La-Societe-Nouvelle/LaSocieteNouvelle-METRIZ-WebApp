@@ -125,6 +125,7 @@ export const ProvidersTable = ({ session, period, indic }) => {
       <tbody>
         {providers
           .filter((provider) => !provider.isDefaultProviderAccount)
+          .filter((provider) => provider.footprintStatus == 200 && provider.footprint.isValid())
           .filter((provider) =>
             provider.periodsData.hasOwnProperty(period.periodKey)
           )

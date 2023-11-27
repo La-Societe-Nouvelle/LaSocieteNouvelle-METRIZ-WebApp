@@ -151,7 +151,7 @@ const ExpenseAccountsTable = ({
                     options={areasOptions}
                     onChange={(e) =>
                       setAccountDefaultFootprintParams(
-                        account.accountNum,
+                        account.providerNum || account.accountNum,
                         "area",
                         e.value
                       )
@@ -182,7 +182,7 @@ const ExpenseAccountsTable = ({
                     options={divisionsOptions}
                     onChange={(e) =>
                       setAccountDefaultFootprintParams(
-                        account.accountNum,
+                        account.providerNum || account.accountNum,
                         "code",
                         e.value
                       )

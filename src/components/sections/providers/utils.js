@@ -3,8 +3,8 @@ export function sortProviders(providers,sortColumn,sortOrder,financialPeriod) {
 
     return [...providers].sort((a, b) => {
       if (sortColumn === "libelle") {
-        const aValue = a.providerLib.toLowerCase();
-        const bValue = b.providerLib.toLowerCase();
+        const aValue = (a.providerLib || a.accountLib).toLowerCase();
+        const bValue = (b.providerLib || b.accountLib).toLowerCase();
         return sortOrder === "asc"
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);

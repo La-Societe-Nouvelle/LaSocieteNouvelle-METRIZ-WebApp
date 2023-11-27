@@ -40,6 +40,7 @@ const UnidentifiedProviders = ({
   );
 
   const [accounts, setAccounts] = useState([]);
+
   useEffect(() => {
 
     let providerNums = providers.map((provider) => provider.providerNum);
@@ -121,9 +122,9 @@ const UnidentifiedProviders = ({
   ].filter((flow) => financialPeriod.regex.test(flow.date));
 
   const providersToSync = providers
-      .filter((provider) => externalFlowsOnPeriod.some((flow) => flow.footprintOrigin=="provider" && flow.providerNum==provider.providerNum));
+    .filter((provider) => externalFlowsOnPeriod.some((flow) => (flow.footprintOrigin=="provider" || /^2/.test(flow.accountNum)) && flow.providerNum==provider.providerNum));
   const accountsToSync = accounts
-    .filter((account) => externalFlowsOnPeriod.some((flow) => flow.footprintOrigin=="account" && flow.accountNum==account.accountNum));
+    .filter((account) => externalFlowsOnPeriod.some((flow) => (flow.footprintOrigin=="account" && flow.accountNum==account.accountNum) || account.providerNum));
 
   // --------------------------------------------------
 
@@ -210,11 +211,11 @@ const UnidentifiedProviders = ({
 
     // treatment by expenses account
     else if (treatmentByExpenseAccount) 
-    {
-      const accountsToSynchronise = accountsToSync.filter((account) => 
-        (account.footprintStatus !== 200 || !account.footprint.isValid())
-      );
-  
+    { 
+      const accountsToSynchronise = accountsToSync
+        .concat(providersToSync)
+        .filter((account) => (account.footprintStatus !== 200 || !account.footprint.isValid()));
+      console.log(accountsToSynchronise);
       await synchronizeProviders(accountsToSynchronise);
   
       updateSignificativeAccounts();
@@ -253,12 +254,14 @@ const UnidentifiedProviders = ({
       {
         res.mapping.forEach(({ accountId, defaultCode, accuracy }) => 
         {
-          if (treatmentByExpenseAccount) {
-            let account = accounts.find((account) => account.accountNum == accountId);
+          let account = accounts.find((account) => account.accountNum == accountId);
+          if (account) {
             account.defaultFootprintParams.code = defaultCode;
             account.defaultFootprintParams.accuracyMapping = accuracy;
-          } else {
-            let provider = providers.find((provider) => provider.providerNum == accountId);
+          } 
+          
+          let provider = providers.find((provider) => provider.providerNum == accountId);
+          if (provider) {
             provider.defaultFootprintParams.code = defaultCode;
             provider.defaultFootprintParams.accuracyMapping = accuracy;
           }
@@ -300,7 +303,7 @@ const UnidentifiedProviders = ({
     setIsNextStepAvailable(false);
 
     const updatedAccounts = accounts.map((account) => {
-      if (account.accountNum === accountNum) {
+      if (account.accountNum === accountNum || account.providerNum === accountNum) {
         const updatedParams = {
           ...account.defaultFootprintParams,
           [paramName]: paramValue,
