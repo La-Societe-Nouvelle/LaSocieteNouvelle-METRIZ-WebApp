@@ -10,7 +10,7 @@ import {
 } from "/src/utils/metaUtils";
 import { printValue } from "/src/utils/formatters";
 import { getUnidentifiedProviderStatusIcon } from "./utils";
-import { sortProviders } from "../utils";
+import { sortProviders as sortAccounts } from "../utils";
 
 // Select Style
 import { customSelectStyles } from "/config/customStyles";
@@ -20,13 +20,14 @@ import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import { isValidNumber } from "../../../../utils/Utils";
 
-const ProvidersTable = ({
+const ExpenseAccountsTable = ({
   providers,
+  accounts,
   startIndex,
   endIndex,
   significativeProviders,
   financialPeriod,
-  setProviderDefaultFootprintParams,
+  setAccountDefaultFootprintParams
 }) => {
   // Sorting for providers
   const [sorting, setSorting] = useState({
@@ -51,8 +52,8 @@ const ProvidersTable = ({
     }
   };
 
-  const sortedProviders = sortProviders(
-    providers,
+  const sortedAccounts = sortAccounts(
+    accounts,
     sortColumn,
     sortOrder,
     financialPeriod
@@ -70,10 +71,10 @@ const ProvidersTable = ({
   );
 
   // Check if significant providers are unassigned
-  const hasWarning = (provider) => {
+  const hasWarning = (account) => {
     return (
-      significativeProviders.includes(provider.providerNum) &&
-      provider.defaultFootprintParams.code == "00"
+      significativeProviders.includes(account.accountNum) &&
+      account.defaultFootprintParams.code == "00"
     );
   };
 
@@ -96,9 +97,7 @@ const ProvidersTable = ({
         <thead>
           <tr>
             <th width={10}></th>
-            <th
-              onClick={() => handleSort("libelle")}
-            >
+            <th onClick={() => handleSort("libelle")}>
               <i className="bi bi-arrow-down-up me-1"></i>
               Libellé du compte fournisseur
             </th>
@@ -113,19 +112,19 @@ const ProvidersTable = ({
           </tr>
         </thead>
         <tbody>
-          {sortedProviders
+          {sortedAccounts
             .slice(startIndex, endIndex)
-            .map((provider, index) => (
-              <tr key={provider.providerNum}>
+            .map((account, index) => (
+              <tr key={account.accountNum || account.providerNum}>
                 <td>
                   <div className="d-flex">
                     <i
                       className={
-                        getUnidentifiedProviderStatusIcon(provider).className
+                        getUnidentifiedProviderStatusIcon(account).className
                       }
-                      title={getUnidentifiedProviderStatusIcon(provider).title}
+                      title={getUnidentifiedProviderStatusIcon(account).title}
                     ></i>
-                    {hasWarning(provider) && (
+                    {hasWarning(account) && (
                       <i
                         className="bi bi-exclamation-triangle text-warning"
                         title="Grand risque d'imprécision"
@@ -133,26 +132,26 @@ const ProvidersTable = ({
                     )}
                   </div>
                 </td>
-                <td>{provider.providerLib}</td>
-                <td>{provider.providerNum}</td>
+                <td>{account.accountLib || account.providerLib}</td>
+                <td>{account.accountNum || account.providerNum}</td>
                 <td>
                   <Select
                     styles={customSelectStyles("150px")}
                     value={{
-                      label: areas[provider.defaultFootprintParams.area],
-                      value: provider.defaultFootprintParams.area,
+                      label: areas[account.defaultFootprintParams.area],
+                      value: account.defaultFootprintParams.area,
                     }}
                     placeholder={"Choisissez un espace économique"}
                     className={
-                      provider.footprintStatus == 200 &&
-                      provider.footprint.isValid()
+                      account.footprintStatus == 200 &&
+                      account.footprint.isValid()
                         ? "success"
                         : ""
                     }
                     options={areasOptions}
                     onChange={(e) =>
-                      setProviderDefaultFootprintParams(
-                        provider.providerNum,
+                      setAccountDefaultFootprintParams(
+                        account.providerNum || account.accountNum,
                         "area",
                         e.value
                       )
@@ -163,27 +162,27 @@ const ProvidersTable = ({
                   <Select
                     styles={customSelectStyles(
                       "500px",
-                      provider.footprintStatus,
-                      hasWarning(provider)
+                      account.footprintStatus,
+                      hasWarning(account)
                     )}
                     value={{
                       label:
-                        provider.defaultFootprintParams.code +
+                        account.defaultFootprintParams.code +
                         " - " +
-                        divisions[provider.defaultFootprintParams.code],
-                      value: provider.defaultFootprintParams.code,
+                        divisions[account.defaultFootprintParams.code],
+                      value: account.defaultFootprintParams.code,
                     }}
                     placeholder={"Choisissez un secteur d'activité"}
                     className={
-                      provider.footprintStatus == 200 &&
-                      provider.footprint.isValid()
+                      account.footprintStatus == 200 &&
+                      account.footprint.isValid()
                         ? "success"
                         : ""
                     }
                     options={divisionsOptions}
                     onChange={(e) =>
-                      setProviderDefaultFootprintParams(
-                        provider.providerNum,
+                      setAccountDefaultFootprintParams(
+                        account.providerNum || account.accountNum,
                         "code",
                         e.value
                       )
@@ -192,14 +191,14 @@ const ProvidersTable = ({
                 </td>
                 <td>
                   <div key={index} className="text-center flex-grow-1">
-                    <span className={"badge rounded-pill bg-" + getTagClass(provider.defaultFootprintParams.accuracyMapping)}>
-                      {(provider.defaultFootprintParams.accuracyMapping || " -")+" %"}
+                    <span className={"badge rounded-pill bg-" + getTagClass(account.defaultFootprintParams.accuracyMapping)}>
+                      {(account.defaultFootprintParams.accuracyMapping || " -")+" %"}
                     </span>
                   </div>
                 </td>
                 <td className="text-end">
                   {printValue(
-                    provider.periodsData[financialPeriod.periodKey].amount,
+                    account.periodsData[financialPeriod.periodKey].amount,
                     0
                   )}{" "}
                   &euro;
@@ -221,8 +220,4 @@ const ProvidersTable = ({
   );
 };
 
-
-
-
-export default ProvidersTable;
-
+export default ExpenseAccountsTable;

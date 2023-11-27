@@ -1,5 +1,8 @@
 // La Société Nouvelle
 
+// API
+import api from "/config/api";
+
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -28,7 +31,11 @@ export class Account {
 
   constructor({accountNum,
                accountLib,
-               periodsData}) 
+               periodsData,
+               footprint,
+               defaultFootprintParams,
+               dataFetched,
+               footprintStatus}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = accountNum;                                           // id
@@ -47,6 +54,20 @@ export class Account {
         }
       })
     }
+
+    // Footprint - used for expenses footprint estimation
+    this.footprint = new SocialFootprint(footprint);                // social footprint
+    this.defaultFootprintParams = defaultFootprintParams || {       // paramètres (empreinte par défaut)
+      area: "FRA",
+      code: "00",
+      aggregate: "PRD",
+      accuracyMapping: 0
+    };
+
+    // Updates
+    this.dataFetched = dataFetched || false;                        // response received
+    this.footprintStatus = footprintStatus || 0;                    // status response api
+
   // ---------------------------------------------------------------------------------------------------- //
   }
 
@@ -62,5 +83,47 @@ export class Account {
         footprint: new SocialFootprint()
       }
     })
+  }
+
+  /* ---------- Update ---------- */
+
+  async update(nextProps) 
+  {
+    // update default footprint params ------------------ //
+    // update params, remove footprint & update dataFetched
+    if (nextProps.defaultFootprintParams != undefined ||
+        nextProps.defaultFootprintParams !== this.defaultFootprintParams) 
+    {
+      this.defaultFootprintParams = {...this.defaultFootprintParams, ...nextProps.defaultFootprintParams}; // update only params in next props
+      this.dataFetched = false;
+      this.footprintStatus = 0;
+      this.footprint = new SocialFootprint();
+    }
+  }
+
+  /* ---------- Remote ---------- */
+
+  async updateFromRemote() 
+  {    
+    // Fetch default data --------------------------------------------------------------------------------- //
+    let defaultFptParams = Object.entries(this.defaultFootprintParams).map(([key,value]) => key+"="+value).join("&");
+    await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
+    {
+      let status = res.data.header.code;
+      this.footprintStatus = status;
+      if (status == 200) {
+        // footprint ---------------------------------------- //
+        this.footprint.updateAll(res.data.footprint);
+        this.dataFetched = true;
+      } else {
+        this.footprint = new SocialFootprint();
+        this.dataFetched = false;
+      }
+    }).catch((err)=>{
+      console.log("error 2 "+err.message);
+      throw err;
+    });
+    // ---------------------------------------------------------------------------------------------------- //
+    return;
   }
 }

@@ -111,6 +111,7 @@ export function getKeySuppliers(companies, indic, unit, precision) {
   const keySuppliers = [];
   companies
     .filter((company) => !company.isDefaultAccount)
+    .filter((company) => company.footprintStatus == 200 && company.footprint.isValid())
     .map((company) =>
       keySuppliers.push({
         stack: [
@@ -149,6 +150,7 @@ export function getIntensKeyProviders(
   const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
   providers
     .filter((provider) => !provider.isDefaultAccount)
+    .filter((provider) => provider.footprintStatus==200 && provider.footprint.isValid())
     .map((provider) =>
       keySuppliers.push({
         stack: [

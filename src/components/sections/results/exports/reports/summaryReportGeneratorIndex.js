@@ -87,7 +87,7 @@ export const buildSummaryReportIndexIndic = async({
     return Object.keys(provider.periodsData).some(
       (key) => key === period.periodKey
     );
-  });
+  }).filter((provider) => provider.footprintStatus == 200 && provider.footprint.isValid());
 
   const firstMostImpactfulCompanies = sortProvidersByImpact(
     providers,
@@ -476,7 +476,7 @@ export const buildSummaryReportIndexIndic = async({
         background: "#FFFFFF",
       },
       {
-        margin: [0, 10, 0, 0],
+        margin: [0, 10, 0, firstMostImpactfulCompanies.length>0 ? 0 : 25],
         columns: [
           {
             columnGap: 20,
@@ -492,7 +492,7 @@ export const buildSummaryReportIndexIndic = async({
         ],
       },
       {
-        margin: [0, 10, 0, 0],
+        margin: [0, 10, 0, scdMostImpactfulCompanies.length>0 ? 0 : 25],
         columns: [
           {
             columnGap: 20,
