@@ -2,7 +2,7 @@
 
 // React
 import React, { useState,useEffect } from "react";
-import { Alert, Button, Container } from "react-bootstrap";
+import { Alert, Button, Image } from "react-bootstrap";
 
 // Components
 import StatementFormContainer from "./StatementFormContainer";
@@ -103,10 +103,17 @@ const DirectImpacts = ({
   return (
       <section className="statement-section step">
         <h2 className="mb-3">Etape 4 - Déclaration des impacts directs </h2>
-        <p>
+        <div className="alert-info ">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <p>
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
-        </p>
+          </p>
+        </div>
+
+   
 
         {categories.map((category) => 
           <div key={category}>
