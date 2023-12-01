@@ -107,10 +107,22 @@ const DirectImpacts = ({
           <div className="info-icon">
             <Image src="/info-circle.svg" alt="icon info" />
           </div>
-          <p>
-          Identifiez et déclarez les impacts directs et obtenez des éléments
-          d'analyse pour chaque indicateur clé.
-          </p>
+          <div>
+            <p>
+              Les <b>déclarations d'impacts directs s'effectuent par indicateur</b>.
+              Des outils de calcul sont mis à disposition pour certains indicateurs
+              (lecture des DSN, outil d'évaluation des émissions directes de gaz à 
+              effet de serre, etc.).
+            </p>
+            <p className="mt-1">
+              Il est possible de choisir les indicateurs sur lesquels on souhaite une
+              évaluation, en les cochant. En cas d'hypothèses faites, merci de les 
+              renseigner dans les <i>Informations complémentaires</i>.
+            </p>
+            <p className="mt-1">
+              Le périmètre à retenir est le <b>périmètre opérationnel</b> de l'entreprise.
+            </p>
+          </div>
         </div>
 
    

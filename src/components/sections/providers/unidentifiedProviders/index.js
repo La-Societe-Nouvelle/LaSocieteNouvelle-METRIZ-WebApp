@@ -340,12 +340,23 @@ const UnidentifiedProviders = ({
         <div className="info-icon">
           <Image src="/info-circle.svg" alt="icon info" />
         </div>
-        <p>
-          Le traitement par compte de charges permet de simplifier la démarche
-          d'identification des activités économiques correspondantes aux
-          dépenses non rattachées à un fournisseur identifié (via son numéro
-          SIREN).
-        </p>
+        <div>
+          <p>
+            Le <b>traitement par compte de charges</b> permet de simplifier la démarche
+            d'identification des activités économiques correspondantes aux
+            dépenses non rattachées à un fournisseur identifié (via son numéro
+            SIREN).
+            Il permet de traiter les empreintes des dépenses par compte de charges plutôt que
+            par compte fournisseur.
+          </p>
+          <p className="mt-1">
+            L'<b>association automatique est réalisée via ChatGPT</b> à partir du libellé
+            du compte et de la division à laquelle appartient l'entreprise.
+            Un indice de confiance (en pourcentage) est fourni pour exprimer le dégré
+            de confiance dans l'association proposée. Elle est de 100% lorsque l'association
+            est manuelle.
+          </p>
+        </div>
       </div>
 
       <div className="d-flex py-2 justify-content-between">

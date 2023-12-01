@@ -115,7 +115,7 @@ export const ImportBackUpView = ({
 
   return (
     <div className="box">
-      <h3 className="mb-3 text-secondary"> Reprise sur l'exercice précédent</h3>
+      <h3 className="mb-3 text-secondary"> Import de la sauvegarde de l'exercice précédent</h3>
 
       <label>Importer votre fichier de sauvegarde (.json)</label>
       <Dropzone onDrop={onDrop} maxFiles={1} multiple={false}>

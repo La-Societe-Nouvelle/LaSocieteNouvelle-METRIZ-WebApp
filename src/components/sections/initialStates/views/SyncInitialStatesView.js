@@ -82,10 +82,7 @@ export const SyncInitialStatesView = ({
   return (
     <>
       <div className="step p-4 my-3">
-        <h3 className="mb-3"> Initialiser les états initiaux </h3>
-
-   
-        
+        <h3 className="mb-3"> Initialisation des états initiaux </h3>
 
         {isSyncButtonEnable ? (
           <div className="alert alert-warning">
@@ -132,15 +129,15 @@ export const SyncInitialStatesView = ({
           </Table>
           <div className="small d-flex">
         
-          <p>
-            <b>Valeur par défaut :</b> Les valeurs par défaut correspondent aux
-            données disponibles pour la branche économique la plus proche.
-            </p>
+          <div> 
             <p>
-            <b>Estimée sur exercice courant : </b>Empreinte
-            du compte initialisée en début d'exercice à partir des opérations réalisées sur
-            l'exercice courant.
-          </p>
+              <b>Valeur par défaut :</b> Les valeurs par défaut correspondent aux
+              données disponibles pour la branche économique la plus proche.<br/>
+              <b>Estimée sur exercice courant : </b>Empreinte
+              du compte initialisée en début d'exercice à partir des opérations réalisées sur
+              l'exercice courant.
+            </p>
+          </div>
         </div>
         </div>
 

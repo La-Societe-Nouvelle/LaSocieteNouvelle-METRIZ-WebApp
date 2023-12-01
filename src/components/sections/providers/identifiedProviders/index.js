@@ -120,29 +120,38 @@ const IdentifiedProviders = (props) => {
           <Image src="/info-circle.svg" alt="icon info" />
         </div>
         <div className="ms-2">
-          <p>
-          La mesure de l'empreinte des consommations s'effectue à partir des empreintes de la production des fournisseurs, 
-          accessibles via leur numéro SIREN. 
-          Lors de la lecture du FEC, les dépenses ont été groupées par compte fournisseur auxiliaire. 
-          En l'absence de compte auxiliaire au sein de de l'écriture comptable, la dépense est rattachée à un compte auxiliaire par défaut lié au compte de charges.
+          <p className="mb-1">
+            La mesure de l'empreinte des consommations s'effectue à partir des <b>empreintes de la production des fournisseurs</b>, 
+            accessibles via <b>leur numéro SIREN</b>. 
           </p>
-         <p className="mt-1">Pour établir la correspondance entre les
-            numéros de compte auxiliaire dans vos écritures comptables et les
-            numéros de SIREN, vous avez trois options : <br></br>
+          <p className="mb-1">
+            Lors de la lecture du FEC, les dépenses sont groupées par compte fournisseur auxiliaire. 
+            En l'absence de compte auxiliaire au sein de de l'écriture comptable, la dépense est rattachée à un compte auxiliaire par défaut lié au compte de charges.
           </p>
-          <ul className="small mb-0 mt-1 ms-1 p-1">
+          <p className="mt-1">Pour établir la correspondance entre les
+              numéros de compte auxiliaire dans vos écritures comptables et les
+              numéros SIREN, trois approches sont possibles : <br></br>
+          </p>
+          <ul className="small mb-1 mt-1 ms-1 p-1">
             <li>
-              <strong>Importer </strong> les numéros SIREN de vos fournisseurs
-              via un fichier au format Excel ou CSV
+              <strong>Import </strong> des numéros SIREN de vos fournisseurs
+              via un fichier au format Excel (.xlsx) ou CSV (.csv). Le fichier vide
+              est exportable pour être complété.
             </li>
             <li>
-              <strong>Associer </strong> les comptes fournisseurs à partir des
-              factures
+              <strong>Dépôt </strong> des factures au format PDF (.pdf) pour 
+              permettre une reconnaissance des numéros SIREN et une association automatique
+              via les montants et dates présents au sein des factures.
             </li>
             <li>
-              <strong>Compléter </strong> manuellement le tableau
+              <strong>Complétion </strong> manuelle du tableau
             </li>
           </ul>
+          <p>
+            Pour les comptes qui ne seront pas rattachés à un numéro SIREN, l'empreinte associée 
+            sera celle de la production de la division économique associée. 
+            La traitement intervient dans une seconde partie.
+          </p>
         </div>
       </div>
 

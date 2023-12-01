@@ -49,15 +49,14 @@ export const FinancialDataViews = ({ session, period, onSubmit, onGoBack }) => {
 
   return (
     <>
-      <h3 className=" ">Vérifiez les agrégats financiers</h3>
+      <h3 className=" ">Validation des données importées</h3>
       <div className="alert-info">
         <div className="info-icon">
           <Image src="/info-circle.svg" alt="icon info" />
         </div>
         <p>
-          Par mesure de précaution, vérifiez l'exactitude des agrégats
-          financiers. Des erreurs de lecture peuvent intervenir en cas
-          d'écriture unique regroupant plusieurs opérations.
+          Par mesure de précaution, veuillez vérifier l'exactitude des agrégats
+          financiers. En cas d'écart, merci de nous le signaler.
         </p>
       </div>
 

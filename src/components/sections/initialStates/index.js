@@ -60,15 +60,24 @@ export const InitialStatesSection = ({
         <div className="info-icon">
           <Image src="/info-circle.svg" alt="icon info" />
         </div>
-        <p>
-          Les états initiaux correspondent aux{" "}
-          <b>
-            empreintes des comptes de stocks et d'immobilisations en début
-            d'exercice
-          </b>
-        . Ils peuvent être établis à partir de l'exercice précédent, pour assurer une continuité avec l'exercice en cours,  ou estimés selon des valeurs par défaut.
-          La sauvegarde de l'exercice précédent contient également les valeurs des indicateurs associés aux comptes de stocks, d'immobilisations et d'amortissements en fin d'exercice.
-        </p>
+        <div>
+          <p>
+            Les états initiaux correspondent aux{" "}
+            <b>
+              empreintes des comptes de stocks et d'immobilisations en début
+              d'exercice
+            </b>
+          .
+          </p>
+          <p className="mt-1">
+            Ils peuvent être directement <b>repris de l'analyse sur l'exercice précédent</b>, pour assurer une continuité avec l'exercice en cours, 
+            ou être <b>initialisés à partir d'empreintes génériques</b>.
+          </p>
+          <p className="mt-1">
+            L'import de la sauvegarde de l'exercice précédent permet également de récupérer 
+            les résultats obtenus sur les année antérieures afin de suivre l'évolution de son empreinte sociétale.
+          </p>
+        </div>
       </div>
 
       
