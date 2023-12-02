@@ -6,15 +6,24 @@ import {HeaderPage} from "/src/components/pageComponents/HeaderPage";
 export default function Page() {
   return (
     <>
-        <HeaderPage></HeaderPage>
+        <HeaderPage/>
         <Container>
           <section className="step">
             <h2>Politiques de Confidentialités des Données</h2>
-            <h3 className="mb-4">Introduction</h3>
+
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">Introduction</h3>
             <p>
-              Les calculs se font dans votre navigateur web, les informations
-              saisies et téléversées restent chez vous, nous n’en collectons
-              aucune.
+              Metriz est une application web monopage ("<i>single-page application</i>") 
+              pour laquelle les traitements s'exécutent uniquement en <i>local</i> par le 
+              navigateur web utilisé, et les données sont stockées localement (<i>local storage</i>)
+              de manière temporaire : un rafraîchissement de la page entraîne la suppression
+              des celles-ci.
+            </p>
+            <p>
+              Les seuls éléments tranmis concernent un suivi de la progression au sein de 
+              l'application (étapes validées) afin de nous permettre de suivre son utilisation, 
+              et la récupération des erreurs rencontrées. Dans les deux cas, les données
+              téléversées par l'utilisateur n'interviennent pas, et les messages sont anonymes.
             </p>
             <p>
               Les requêtes envoyées pour la récupération des données (impacts de
@@ -28,6 +37,9 @@ export default function Page() {
               aucune donnée permettant d'identifier l'entreprise n'est transmise.
               La requête contient uniquement des résultats intermédiaires et les
               données relatives à la branche à titre de comparaison.
+              Pour les associations automatiques, par ChatGPT, entre compte de
+              charges et division économique, seule le code d'activité de l'entreprise
+              et les libellés des comptes sont présents dans la requête.
               Conformément à la politique de traitement des données par OpenAI,
               les données anonymes transmises ne servent pas à l'amélioration
               du modèle et ne sont pas sauvegardées.
@@ -55,7 +67,8 @@ export default function Page() {
               ni aucun résultat intermédiaire n’est transmis. La demande est volontaire via la
               complétion du formulaire de demande.{" "}
             </p>
-            <h3 className="mb-4">
+
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">
               Traitement des données à caractère personnel
             </h3>
             <p>
@@ -71,7 +84,7 @@ export default function Page() {
               traitement n’est pas considéré comme un traitement de données à
               caractère personnel par La Société Nouvelle.
             </p>
-            <h4>Données transmises lors d'une demande de publication </h4>
+            <h4 className="mb-3">Données transmises lors d'une demande de publication </h4>
             <p>Les données personnelles concernent:</p>
             <ul>
               <li>Le nom et le prénom du déclarant </li>
@@ -95,21 +108,26 @@ export default function Page() {
               Les données sont conservées pendant toute la durée nécessaire, jusqu’à
               opposition.{" "}
             </p>
-            <h4>Données transmises lors de l'envoi d'un rapport d'erreur</h4>
-            <p>Les données personnelles concernent:</p>
+            <h4 className="mb-3">Données transmises lors de l'envoi d'un rapport d'erreur</h4>
+            <p>
+              Par défaut les messages d'erreur sont anonymes. L'utilisateur peut néanmoins
+              renseigner son nom et son adresse mail pour être tenu informé des actions
+              réalisées pour corriger l'erreur recontrée.
+            </p>
+            <p>Les données personnelles concernent alors :</p>
             <ul>
               <li>Le nom et le prénom de l'utilisateur </li>
               <li>L’adresse mail de l'utilisateur</li>
             </ul>
             <p>
-              Les données sont recueillies afin d'assurer un suivi du traitement de l'erreur
-              auprès de l'utilisateur.
-              Elles restent confidentielles et ne sont communiquées à aucun tiers.
+              Les données sont recueillies uniquement afin d'assurer le suivi du traitement de l'erreur
+              auprès de l'utilisateur. Elles restent confidentielles et ne sont communiquées à aucun tiers.
             </p>
             <p>
               Les données sont conservées jusqu'à la clôture de l'incident ou sur un délai maximum d'un an.{" "}
             </p>
-            <h3 className="mb-4">
+
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">
               Données publiées au sein de la base de données ouverte
             </h3>
             <p>
@@ -127,8 +145,9 @@ export default function Page() {
               de données ouverte regroupant les empreintes sociétales des
               entreprises françaises).
             </p>
-            <h3 className="mb-4">Autres traitements des données</h3>
-            <h4>Suivi de Progression</h4>
+
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">Autres traitements des données</h3>
+            <h4 className="mb-3">Suivi de la progression</h4>
             <p>
               L'application utilise un système de suivi de progression à des
               fins statistiques de suivi de l'utilisation de l'application. 
@@ -140,7 +159,7 @@ export default function Page() {
               au sein de l'application, la date du traitement, les étapes
               atteintes, ainsi que les indicateurs déclarés.
             </p>
-            <h4>Utilisation de l'API OpenAI</h4>
+            <h4 className="mb-3">Utilisation de l'API OpenAI</h4>
             <p>
               Metriz utilise OpenAI, une plateforme d'intelligence artificielle,
               pour générer des notes d'analyses à partir des données fournies lors
@@ -170,8 +189,19 @@ export default function Page() {
               doivent pas être utilisées comme source d'information fiable et
               doivent être prises avec réserve.
             </p>
+            <p>
+              L'API OpenAI peut également être sollicitée afin d'obtenir une association automatique
+              entre les comptes de charges et les divisions économiques (selon la nomenclature des
+              activités françaises), permettant ainsi d'obtenir l'empreinte des dépenses pour lesquelles
+              le fournisseur n'est pas identifié via un numéro SIREN. Cette sollicitation est accessible
+              à l'Etape 4 "<i>Traitement des fournisseurs</i>".
+            </p>
+            <p>
+              Il est possible de refuser l'utilisation de ChatGPT, en décochant l'option
+              lors de la première étape "<i>Import des données comptables</i>".
+            </p>
 
-            <h3 className="mb-4">Hébergeur de l’application web </h3>
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">Hébergeur de l’application web </h3>
             <p>L’application est hébergée par Vercel Inc. </p>
             <p>
               Vercel Inc. <br />
@@ -184,10 +214,19 @@ export default function Page() {
               </a>
             </p>
             <p>
-              L'éxécutionde l'application se fait cependant au sein de votre navigateur, et
+              L'exécution de l'application se fait cependant au sein de votre navigateur, et
               les données transmises via le formulaire sont stockées et traitées
               en France.
             </p>
+            <p>
+              Il est également possible de récupérer le code source de l'application, disponible
+              via GitHub (<a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp"
+              target="_blank">lien vers le répertoire</a>) et d'héberger soi-même l'application, y
+              compris en y apportant des modifications.
+            </p>
+
+            <h3 className="mb-4 mt-4 pb-1 border-bottom border-secondary">Contact </h3>
+            <p>Pour toute question, n'hésitez pas à nous contacter par mail à l'adresse : contact@lasocietenouvelle.org</p>
           </section>
         </Container>
       <Footer />
