@@ -89,8 +89,13 @@ export const Metriz = () =>
 
   const initSession = (session) => 
   {
+    // console logs
+    console.log("--------------------------------------------------");
+    console.log("Initialisation d'une nouvelle session");
+    console.log(session);
+
     setSession(session);
-    setStep(1);
+    setStep(1); 
   };
 
   const resumeSession = async (session) => 

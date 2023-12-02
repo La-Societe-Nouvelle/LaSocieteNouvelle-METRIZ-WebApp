@@ -76,7 +76,9 @@ const DirectImpacts = ({
     await session.comparativeData.fetchComparativeData(selectedStatements);
 
     // fetch analysis
-    await session.buildAnalysis(period);
+    if (session.useChatGPT) {
+      await session.buildAnalysis(period);
+    }
 
     setIsLoading(false);
     submit();

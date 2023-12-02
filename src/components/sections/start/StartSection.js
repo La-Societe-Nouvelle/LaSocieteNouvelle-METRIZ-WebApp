@@ -16,9 +16,9 @@ import { updateVersion } from "/src/version/updateVersion";
 import FloatingActionButton from "../../pageComponents/FloatingActionButton";
 import CarouselModal from "../../modals/CarouselModal";
 
-/* ------------------------------------------------------- */
-/* -------------------- START SECTION -------------------- */
-/* ------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- START SECTION -------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------- */
 
 /** 2 options :
  *    -> Start : create new object session
@@ -28,21 +28,19 @@ import CarouselModal from "../../modals/CarouselModal";
  *    submit : return session to Metriz (new session or loaded session from backupfile)
  */
 
-export const StartSection = ({ initSession, resumeSession }) => {
+export const StartSection = ({ initSession, resumeSession }) => 
+{
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDataUpdater, setShowDataUpdater] = useState(false);
   const [showCarousel, setShowCarousel] = useState(false);
+  
   // Start new session
-
+  
   const startNewSession = () => {
     const session = new Session();
+    setSession(session);
     initSession(session);
-
-    // Public logs
-    console.log("--------------------------------------------------");
-    console.log("Initialisation d'une nouvelle session");
-    console.log(session);
   };
 
   // Import session

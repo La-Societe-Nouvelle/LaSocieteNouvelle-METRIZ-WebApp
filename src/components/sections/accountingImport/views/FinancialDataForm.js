@@ -60,6 +60,9 @@ export const FinancialDataForm = ({
   const [fileName, setFileName] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  // session options
+  const [useChatGPT, setUseChatGPT] = useState(session.useChatGPT);
+  
   // Accounting import
   const [FECData, setFECData] = useState(null);
   const [showViewsModals, setShowViewsModals] = useState(false);
@@ -101,6 +104,10 @@ export const FinancialDataForm = ({
     session.comparativeData.comparativeDivision = division;
   }, [division]);
 
+  useEffect(() => {
+    session.useChatGPT = useChatGPT;
+  }, [useChatGPT]);
+
   // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
@@ -129,6 +136,12 @@ export const FinancialDataForm = ({
     setModal(1);
     setShowViewsModals(true);
   };
+
+  // on change - useChatGPT
+  const handleUseChatGPT = (event) => {
+    const useChatGPT = event.target.checked;
+    setUseChatGPT(useChatGPT);
+  }
 
   // ----------------------------------------------------------------------------------------------------
 
@@ -314,7 +327,6 @@ export const FinancialDataForm = ({
                 setImportedData={handleFECData}
                 setFileName={setFileName}
               />
-              <p className="small fst-italic mb-0">*Champs obligatoires</p>
               <p className="small fst-italic">
                 ¹ Le fichier doit respecter les normes relatives à la structure
                 du fichier (libellés des colonnes, séparateur tabulation ou
@@ -336,6 +348,40 @@ export const FinancialDataForm = ({
              
               </div>
             )}
+
+            <Form.Group>
+              <Form.Label column sm={4}>
+                Options
+              </Form.Label>
+              <Form.Check
+                className="fw"
+                type="switch"
+                value={useChatGPT}
+                checked={useChatGPT}
+                onChange={handleUseChatGPT}
+                id="Utilisation de ChatGPT"
+                label="Utilisation de ChatGPT (OpenAI)"
+              />
+              <div className="form-text">
+                <p className="mt-2">
+                  L'usage de ChatGPT permet d'obtenir une association automatique
+                  entre les comptes de charges et les divisions économiques, pour
+                  estimer les empreintes des dépenses dont le fournisseur n'est pas
+                  identifié ; et de disposer d'une analyse des résultats obtenus
+                  en fin de session. <b>Aucune donnée nominative n'est présente au
+                  sein des requêtes, et ces dernières ne servent pas à l'amélioration
+                  du modèle</b> ( 
+                  <a href="https://openai.com/enterprise-privacy" 
+                     target="_blank"><u>Politique de confidentialité des données</u> </a>
+                   d'OpenAI).
+                </p>
+              </div>
+            </Form.Group>
+
+            <div>              
+              <p className="small fst-italic mb-3 mt-3 text-end">*Champs obligatoires</p>
+            </div>
+
             {showViewsModals && (
               <>
                 <ImportModal show={modal === 1} onHide={cancelImport} title={fileName}>
