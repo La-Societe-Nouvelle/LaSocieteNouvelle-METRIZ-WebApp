@@ -20,7 +20,7 @@ export default function Page() {
               des celles-ci.
             </p>
             <p>
-              Les seuls éléments tranmis concernent un suivi de la progression au sein de 
+              Les informations collectées concernent le suivi de la progression au sein de 
               l'application (étapes validées) afin de nous permettre de suivre son utilisation, 
               et la récupération des erreurs rencontrées. Dans les deux cas, les données
               téléversées par l'utilisateur n'interviennent pas, et les messages sont anonymes.
@@ -32,7 +32,14 @@ export default function Page() {
               ouverte sont anonymes et ne font l’objet d’aucune traçabilité.
             </p>
             <p>
-              De même dans le cadre de la génération des notes d'analyse via 
+              Il est possible de contribuer à l'amélioration des données statistiques mises à 
+              disposition par La Société Nouvelle en acceptant d'envoyer un rapport statistique
+              anonyme. La description des informations contenues au sein des rapports est disponible
+              ci-dessous. Pour participer, l'option doit être cochée lors de la première étape
+              "<i>Import des données comptables</i>".
+            </p>
+            <p>
+              Dans le cadre de la génération des notes d'analyse via 
               l'utilisation de l'API OpenAI, aucune donnée personnelle et 
               aucune donnée permettant d'identifier l'entreprise n'est transmise.
               La requête contient uniquement des résultats intermédiaires et les
@@ -42,26 +49,27 @@ export default function Page() {
               et les libellés des comptes sont présents dans la requête.
               Conformément à la politique de traitement des données par OpenAI,
               les données anonymes transmises ne servent pas à l'amélioration
-              du modèle et ne sont pas sauvegardées.
+              du modèle et ne sont pas sauvegardées. Il est possible de refuser l'utilisation
+              de ChatGPT en décochant l'option lors de la première étape.
             </p>
             <p>
               Seulement en cas de demande de publication, des informations nominatives
               nous sont transmises. Elles concernent:{" "}
+              <ul className="mt-1">
+                <li>Le numéro de siren de l’unité légale</li>
+                <li>Le nom et prénom du déclarant</li>
+                <li>L’adresse mail du déclarant </li>
+                <li>
+                  La structure du déclarant s’il n’appartient pas à l’unité légale
+                  concernée
+                </li>
+                <li>
+                  Les valeurs, incertitudes et informations complémentaires des
+                  indicateurs sélectionnées, relatifs à la production vendue de
+                  l’entreprise.
+                </li>
+              </ul>
             </p>
-            <ul>
-              <li>Le numéro de siren de l’unité légale</li>
-              <li>Le nom et prénom du déclarant</li>
-              <li>L’adresse mail du déclarant </li>
-              <li>
-                La structure du déclarant s’il n’appartient pas à l’unité légale
-                concernée
-              </li>
-              <li>
-                Les valeurs, incertitudes et informations complémentaires des
-                indicateurs sélectionnées, relatifs à la production vendue de
-                l’entreprise.
-              </li>
-            </ul>
             <p>
               Au sein de la publication, aucune donnée financière, aucune déclaration, 
               ni aucun résultat intermédiaire n’est transmis. La demande est volontaire via la
@@ -85,15 +93,17 @@ export default function Page() {
               caractère personnel par La Société Nouvelle.
             </p>
             <h4 className="mb-3">Données transmises lors d'une demande de publication </h4>
-            <p>Les données personnelles concernent:</p>
-            <ul>
-              <li>Le nom et le prénom du déclarant </li>
-              <li>L’adresse mail du déclarant</li>
-              <li>
-                L’unité légale au sein de laquelle évolue le déclarant (via son
-                numéro de siren ou sa dénomination)
-              </li>
-            </ul>
+            <p>
+              Les données personnelles concernent :
+              <ul className="mt-1">
+                <li>Le nom et le prénom du déclarant </li>
+                <li>L’adresse mail du déclarant</li>
+                <li>
+                  L’unité légale au sein de laquelle évolue le déclarant (via son
+                  numéro de siren ou sa dénomination)
+                </li>
+              </ul>
+            </p>
             <p>
               Les données sont collectées aux fins de traitement de la demande
               de publication et de son suivi. Elles sont recueillies par La
@@ -114,11 +124,13 @@ export default function Page() {
               renseigner son nom et son adresse mail pour être tenu informé des actions
               réalisées pour corriger l'erreur recontrée.
             </p>
-            <p>Les données personnelles concernent alors :</p>
-            <ul>
-              <li>Le nom et le prénom de l'utilisateur </li>
-              <li>L’adresse mail de l'utilisateur</li>
-            </ul>
+            <p>
+              Les données personnelles concernent alors :
+              <ul className="mt-1">
+                <li>Le nom et le prénom de l'utilisateur </li>
+                <li>L’adresse mail de l'utilisateur</li>
+              </ul>
+            </p>
             <p>
               Les données sont recueillies uniquement afin d'assurer le suivi du traitement de l'erreur
               auprès de l'utilisateur. Elles restent confidentielles et ne sont communiquées à aucun tiers.
@@ -159,6 +171,27 @@ export default function Page() {
               au sein de l'application, la date du traitement, les étapes
               atteintes, ainsi que les indicateurs déclarés.
             </p>
+            <h4 className="mb-3">Rapport statistique anonyme</h4>
+            <p>
+              Les rapports statistiques recueillis sont utilisés pour des travaux
+              internes à des fins statistiques (amélioration des données mises à
+              disposition, ajustement des incertitudes, etc.). Seuls des résultats 
+              agrégés sont rendus publics. Les données collectées ne contiennent
+              pas de données personnelles.
+            </p>
+            <p>
+              Les rapports statistiques contiennent les éléments suivants :
+              <ul className="mt-1">
+                <li>Profil de l'entreprise : code d'activité, tranche d'effectifs, code postale ;</li>
+                <li>Répartition des consommations par activité ;</li>
+                <li>Répartition des investissements par activité ;</li>
+                <li>Ratios des soldes intermédiaires de gestion (taux de valeur ajoutée, taux des consommations intermédiaires, etc.) ; et,</li>
+                <li>Empreintes des soldes intermédiaires de gestion</li>
+              </ul>
+            </p>
+            <p>
+              Pour contribuer, il est nécessaire de cocher l'option lors de la première étape "<i>Import des données comptables</i>".
+            </p>
             <h4 className="mb-3">Utilisation de l'API OpenAI</h4>
             <p>
               Metriz utilise OpenAI, une plateforme d'intelligence artificielle,
@@ -167,7 +200,7 @@ export default function Page() {
             </p>
             <p>
               Les données transmises à l'API OpenAI contiennent :
-              <ul>
+              <ul className="mt-1">
                 <li>Les résultats intermédiaires obtenus</li>
                 <li>Les valeurs relatives à la branche (moyenne, etc.)</li>
                 <li>Des éléments déclarés (consommation d'énergie, etc.)</li>
