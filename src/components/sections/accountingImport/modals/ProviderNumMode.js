@@ -25,7 +25,7 @@ export const ProviderNumMode = ({
 
   const changeProviderNumRef = (event) => {
     let radioValue = event.target.value;
-    setUseAccountAux(radioValue);
+    setUseAccountAux(radioValue == "true");
   };
 
   const submit = () => {

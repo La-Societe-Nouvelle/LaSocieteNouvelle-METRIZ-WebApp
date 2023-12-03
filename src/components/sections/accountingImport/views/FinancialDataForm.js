@@ -145,7 +145,7 @@ export const FinancialDataForm = ({
     } else if (modal<3 && hasStockAccounts) {
       setModal(3);
     } else {
-      loadAccountingData();
+      setModal(4);
     }
   };
 

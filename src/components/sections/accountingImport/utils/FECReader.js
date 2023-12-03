@@ -303,6 +303,7 @@ export async function FECDataReader(FECData) {
   data.ignoreStockVariationsEntries = [];
   data.ignoreExternalExpensesEntries = [];
   data.errors = [];
+  data.useAccountAux = FECData.meta.useAccountAux;
 
   // Production / Incomes ------------------------------------------------------------------------------- //
   data.revenue = []; // 70
@@ -663,15 +664,22 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
 
     if (ligneFournisseur != undefined) 
     {
+      let providerNum = data.useAccountAux ?
+        (ligneFournisseur.CompAuxNum ? ligneFournisseur.CompAuxNum : "_"+ligneCourante.CompteNum) // if use account aux
+      : ligneFournisseur.CompteNum; // if use account
+      let isDefaultProviderAccount = providerNum.charAt(0)=='_';
+      let providerLib = isDefaultProviderAccount ?
+        "FOURNISSEUR "+ligneCourante.CompteLib // build provider lib from immobilisation account lib
+      : data.useAccountAux ? data.accountsAux[providerNum].accountLib : data.accounts[providerNum].accountLib; // get lib if not default provider account
       // investment data
       let investmentData = {
         entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
-        providerLib: ligneFournisseur.CompAuxLib || "ACQUISTIONS " + ligneCourante.CompteLib,
-        isDefaultProvider: ligneFournisseur.CompAuxNum ? false : true,
+        providerNum: providerNum,
+        providerLib: providerLib,
+        isDefaultProvider: isDefaultProviderAccount,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
@@ -772,7 +780,7 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         providerNum: "_" + ligneCourante.CompteNum,
-        providerLib: "ACQUISTIONS " + ligneCourante.CompteLib,
+        providerLib: "FOURNISSEUR " + ligneCourante.CompteLib,
         isDefaultProvider: true,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
@@ -965,7 +973,7 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         providerNum: "_" + ligneCourante.CompteNum,
-        providerLib: "DEPENSES " + ligneCourante.CompteLib,
+        providerLib: "FOURNISSEUR " + ligneCourante.CompteLib,
         isDefaultProviderAccount: true,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
@@ -997,18 +1005,23 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
     else 
     {
       let ligneFournisseur = lignesFournisseur[0] || {};
+      // get provider account data
+      let providerNum = data.useAccountAux ? 
+        (ligneFournisseur.CompAuxNum ? ligneFournisseur.CompAuxNum : "_"+ligneCourante.CompteNum) // if use account aux
+        : ligneFournisseur.CompteNum; // if use account
+      let isDefaultProviderAccount = providerNum.charAt(0)=='_';
+      let providerLib = isDefaultProviderAccount ?
+        "FOURNISSEUR "+ligneCourante.CompteLib // build provider lib from expense account lib
+        : data.useAccountAux ? data.accountsAux[providerNum].accountLib : data.accounts[providerNum].accountLib; // get lib if not default provider account
       // expense data
       let expenseData = {
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        providerNum:
-          ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
-        providerLib:
-          ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
-        isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
-        amount:
-          parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        providerNum: providerNum,
+        providerLib: providerLib,
+        isDefaultProviderAccount: isDefaultProviderAccount,
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
       // push data

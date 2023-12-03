@@ -147,13 +147,21 @@ const readExternalExpenses = (lignes) =>
     // build data
     lignesComptesCharges.forEach((ligneCompteCharges) => 
     {
+      // provider data
+      let providerNum = data.useAccountAux ? 
+        (ligneFournisseur.CompAuxNum ? ligneFournisseur.CompAuxNum : "_"+ligneCompteCharges.CompteNum) // if use account aux
+        : ligneFournisseur.CompteNum; // if use account
+      let isDefaultProviderAccount = providerNum.charAt(0)=='_';
+      let providerLib = isDefaultProviderAccount ?
+        "FOURNISSEUR "+ligneCompteCharges.CompteLib // build provider lib from expense account lib
+        : data.useAccountAux ? data.accountsAux[providerNum].accountLib : data.accounts[providerNum].accountLib; // get lib if not default provider account
       // amortisation expense data
       let expenseData = {
         label: ligneCompteCharges.EcritureLib.replace(/^\"/, "").replace(/\"$/,""),
         accountNum: ligneCompteCharges.CompteNum,
         accountLib: ligneCompteCharges.CompteLib,
-        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCompteCharges.CompteNum,
-        providerLib: ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCompteCharges.CompteLib,
+        providerNum: providerNum,
+        providerLib: providerLib,
         isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
         amount: parseAmount(ligneCompteCharges.Debit) - parseAmount(ligneCompteCharges.Credit),
         date: ligneCompteCharges.EcritureDate,
