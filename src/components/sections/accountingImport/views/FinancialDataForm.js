@@ -15,6 +15,7 @@ import divisions from "/lib/divisions";
 import { BalanceForwardBookSelection } from "../modals/BalanceForwardBookSelection";
 import { DepreciationAssetsMapping } from "../modals/DepreciationAssetsMapping";
 import { StockPurchasesMapping } from "../modals/StockPurchasesMapping";
+import { ProviderNumMode } from "../modals/ProviderNumMode";
 import { ErrorReportModal } from "../modals/ErrorReportModal";
 import { ImportModal } from "../modals/ImportModal";
 import { ErrorAPIModal } from "../../../modals/userInfoModals";
@@ -355,8 +356,15 @@ export const FinancialDataForm = ({
                 <ImportModal show={modal === 3} onHide={cancelImport} title={fileName}>
                   <StockPurchasesMapping
                     meta={FECData.meta}
-                    onSubmit={() => loadAccountingData(FECData)}
+                    onSubmit={() => setModal(4)}
                     onGoBack={() => setModal(2)}
+                  />
+                </ImportModal>
+                <ImportModal show={modal === 4} onHide={cancelImport} title={fileName}>
+                  <ProviderNumMode
+                    meta={FECData.meta}
+                    onSubmit={() => loadAccountingData(FECData)}
+                    onGoBack={() => setModal(3)}
                   />
                 </ImportModal>
               </>

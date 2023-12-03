@@ -165,13 +165,9 @@ export const StockPurchasesMapping = ({
         <button className="btn btn-primary me-2" onClick={() => onGoBack()}>
           <i className="bi bi-chevron-left"></i> Retour
         </button>
-        <button
-          className="btn btn-secondary"
-          onClick={submit}
-          disabled={!isMappingValid}
-        >
-          Valider mes données
-          <i className="bi bi-chevron-right"></i>
+        <button className="btn btn-secondary" onClick={() => submit()} disabled={!isMappingValid}>
+          Suivant
+          <i className="bi bi-chevron-right" />
         </button>
       </div>
     </div>

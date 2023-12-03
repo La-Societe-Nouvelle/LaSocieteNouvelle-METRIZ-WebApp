@@ -135,7 +135,7 @@ export const BalanceForwardBookSelection = ({
           Annuler
         </button>
         <button className="btn btn-secondary" onClick={() => submit()}>
-          Etape suivante
+          Suivant
           <i className="bi bi-chevron-right" />
         </button>
       </div>

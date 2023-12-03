@@ -102,6 +102,8 @@ export async function FECFileReader(content) {
       books: {}, // key : accountNum / values : { label, type }
       accounts: {}, // key : accountNum / value : accountLib
       accountsAux: {}, // key : accountNum / value : accountLib
+      accountsProviders: {}, // key : accountNum / value : accountLib
+      accountsAuxProviders: {}, // key : accountNum / value : accountLib
       firstDate: null,
       lastDate: null,
     },
@@ -179,6 +181,20 @@ export async function FECFileReader(content) {
           accountNum: rowData.CompAuxNum,
           accountLib: rowData.CompAuxLib,
         };
+      }
+
+      // Mise à jour des métadonnées relatives aux comptes fournisseurs
+      if (!Object.keys(dataFEC.meta.accountsProviders).includes(rowData.CompteNum) && /^40/.test(rowData.CompteNum)) {
+        dataFEC.meta.accountsProviders[rowData.CompteNum] = {
+          accountNum: rowData.CompteNum,
+          accountLib: rowData.CompteLib
+        }
+      }
+      if (rowData.CompAuxNum && !Object.keys(dataFEC.meta.accountsAuxProviders).includes(rowData.CompteNum) && /^40/.test(rowData.CompteNum)) {
+        dataFEC.meta.accountsAuxProviders[rowData.CompAuxNum] = {
+          accountNum: rowData.CompteNum,
+          accountLib: rowData.CompAuxLib
+        }
       }
 
       // Date
