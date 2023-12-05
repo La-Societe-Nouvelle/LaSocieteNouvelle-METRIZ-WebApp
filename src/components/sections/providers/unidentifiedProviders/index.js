@@ -166,7 +166,7 @@ const UnidentifiedProviders = ({
   // Event handlers
 
   const handleViewChange = (e) => {
-    setState((prevState) => ({ ...prevState, currentView: e.target.value }));
+    setState((prevState) => ({ ...prevState, currentView: e.target.value , currentPage : 1}));
   };
 
   const handleItemsPerPageChange = (e) => {
