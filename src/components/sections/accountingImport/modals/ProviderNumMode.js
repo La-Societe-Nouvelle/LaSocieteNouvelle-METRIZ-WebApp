@@ -2,7 +2,7 @@
 
 // React
 import React, { useEffect, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Col, Form, Row, Table } from 'react-bootstrap';
 
 /* ####################################################################################################  */
 
@@ -18,6 +18,7 @@ export const ProviderNumMode = ({
   } = meta;
 
   const [useAccountAux, setUseAccountAux] = useState(true);
+  const [selectedTab, setSelectedTab] = useState("account");
 
   useEffect(() => {
     setUseAccountAux(true);
@@ -26,6 +27,11 @@ export const ProviderNumMode = ({
   const changeProviderNumRef = (event) => {
     let radioValue = event.target.value;
     setUseAccountAux(radioValue == "true");
+  };
+
+  const switchTab = (event) => {
+    const table = event.target.value;
+    setSelectedTab(table);
   };
 
   const submit = () => {
@@ -58,6 +64,82 @@ export const ProviderNumMode = ({
           />
         </Row>
       </Form.Group>
+      <div>
+      <div className="table-menu mx-auto">
+        <button
+          key={1}
+          value="account"
+          onClick={switchTab}
+          className={selectedTab == "account" || "" ? "active" : ""}
+        >
+          Comptes fournisseurs
+        </button>
+        <button
+          key={2}
+          value="accountAux"
+          onClick={switchTab}
+          className={selectedTab == "accountAux" || "" ? "active" : ""}
+        >
+          Comptes fournisseurs auxiliaires
+        </button>
+      </div>
+      <div>
+        {(selectedTab=="account") &&
+          <Table size="sm" className="mt-4" striped>
+          <thead>
+            <tr>
+              <th className="px-1">Numéro de compte</th>
+              <th>Libellé</th>
+              <th className="text-end">Compte générique</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Object.values(meta.accountsProviders).map(({ accountNum, accountLib }) => (
+              <tr key={accountNum}>
+                <td className="px-1">{accountNum}</td>
+                <td>{accountLib}</td>
+                <td className="px-4 text-end">
+                  <Form.Check
+                    type="checkbox"
+                    value={accountNum}
+                    //onChange={handleInputChange}
+                    checked={false}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>}
+        {(selectedTab=="accountAux") &&
+          <Table size="sm" className="mt-4" striped>
+          <thead>
+            <tr>
+              <th className="px-1">Numéro de compte</th>
+              <th>Libellé</th>
+              <th className="text-end">Compte générique</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {Object.values(meta.accountsAuxProviders).map(({ accountNum, accountLib }) => (
+              <tr key={accountNum}>
+                <td className="px-1">{accountNum}</td>
+                <td>{accountLib}</td>
+                <td className="px-4 text-end">
+                  <Form.Check
+                    type="checkbox"
+                    value={accountNum}
+                    //onChange={handleInputChange}
+                    checked={false}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>}
+      </div>
+      </div>
       <div className="text-end">
         <button className="btn btn-primary me-2" onClick={() => onGoBack()}>
           <i className="bi bi-chevron-left"></i> Retour
