@@ -113,7 +113,12 @@ const ProvidersTable = ({
           </tr>
         </thead>
         <tbody>
-          {sortedProviders
+        {sortedProviders.length === 0 ? (
+            <tr>
+              <td colSpan="5">Aucun compte</td>
+            </tr>
+          ) : (
+          sortedProviders
             .slice(startIndex, endIndex)
             .map((provider, index) => (
               <tr key={provider.providerNum}>
@@ -196,7 +201,10 @@ const ProvidersTable = ({
                   &euro;
                 </td>
               </tr>
-            ))}
+            ))
+          )
+          }
+
         </tbody>
       </Table>
       {showSignificativeNote && (
