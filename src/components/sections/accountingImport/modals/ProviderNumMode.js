@@ -11,6 +11,7 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
   const { accountsProviders, accountsAuxProviders } = meta;
 
   const [useAccountAux, setUseAccountAux] = useState(true);
+  const [activeKey, setActiveKey] = useState("accountAux");
 
   useEffect(() => {
     setUseAccountAux(true);
@@ -19,6 +20,8 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
   const changeProviderNumRef = (event) => {
     let radioValue = event.target.value;
     setUseAccountAux(radioValue == "true");
+
+    setActiveKey(radioValue === "true" ? "accountAux" : "account");
   };
 
   const submit = () => {
@@ -26,30 +29,18 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
     onSubmit();
   };
 
-  const handleInputChange = (event) => {
-  }
+  const handleInputChange = (event) => {};
 
   const generateAccountString = (accountsObj) => {
     const numberOfAccounts = Object.entries(accountsObj).length;
     const plural = numberOfAccounts > 1 ? "s" : "";
     return `${numberOfAccounts} compte${plural}`;
-  }
-  
+  };
+
   return (
-    <div>
+    <div id="provider-num-mode">
       <h5>Gestion des comptes fournisseurs</h5>
       <Form.Group className="my-3">
-        <Row className="ms-1">
-          <Form.Check
-            inline
-            type="radio"
-            label="Gestion par compte fournisseur"
-            id="Gestion par commpte fournisseur"
-            value="false"
-            checked={useAccountAux === false}
-            onChange={changeProviderNumRef}
-          />
-        </Row>
         <Row className="ms-1 mt-1">
           <Form.Check
             inline
@@ -61,14 +52,37 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
             onChange={changeProviderNumRef}
           />
         </Row>
+        <Row className="ms-1">
+          <Form.Check
+            inline
+            type="radio"
+            label="Gestion par compte fournisseur"
+            id="Gestion par commpte fournisseur"
+            value="false"
+            checked={useAccountAux === false}
+            onChange={changeProviderNumRef}
+          />
+        </Row>
       </Form.Group>
-
-      <Tabs defaultActiveKey="account" id="selectionTab">
-        <Tab eventKey="account" title={"Comptes fournisseurs (" + generateAccountString(accountsProviders) + ")"}>
-          <PaginatedTable data={Object.values(meta.accountsProviders)} onUpdate={handleInputChange} />
+      <Tabs activeKey={activeKey}  onSelect={(key) => setActiveKey(key)} id="selectionTab">
+        <Tab
+          eventKey="accountAux"
+          title={"Comptes fournisseurs auxiliaires (" +generateAccountString(accountsAuxProviders) +")"}
+        >
+          <PaginatedTable
+            data={Object.values(meta.accountsAuxProviders)}
+            onUpdate={handleInputChange}
+          />
         </Tab>
-        <Tab eventKey="accountAux" title={"Comptes fournisseurs (" + generateAccountString(accountsAuxProviders) + ")"}>
-          <PaginatedTable data={Object.values(meta.accountsAuxProviders)} onUpdate={handleInputChange} />
+        <Tab
+          eventKey="account"
+          title={"Comptes fournisseurs (" +generateAccountString(accountsProviders) +")"
+          }
+        >
+          <PaginatedTable
+            data={Object.values(meta.accountsProviders)}
+            onUpdate={handleInputChange}
+          />
         </Tab>
       </Tabs>
 
@@ -81,7 +95,6 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
           <i className="bi bi-chevron-right"></i>
         </button>
       </div>
-
     </div>
   );
 };
@@ -89,7 +102,6 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
 const PaginatedTable = ({ data, onUpdate }) => {
   const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
-
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
