@@ -25,7 +25,6 @@ const SyncProvidersView = ({
   closeSyncErrorModal,
   view,
 }) => {
-
   const [state, setState] = useState({
     currentView: view,
     currentPage: 1,
@@ -43,7 +42,7 @@ const SyncProvidersView = ({
   // Handlers
 
   const handleViewChange = (e) => {
-    setState((prevState) => ({ ...prevState, currentView: e.target.value }));
+    setState((prevState) => ({ ...prevState, currentView: e.target.value, currentPage : 1 }));
   };
 
   const handleItemsPerPageChange = (e) => {
@@ -89,7 +88,7 @@ const SyncProvidersView = ({
     significativeProviders,
     providers
   );
-  
+
   // Sorting for providers
   const sortedProviders = sortProviders(
     filteredProviders,
@@ -106,7 +105,10 @@ const SyncProvidersView = ({
   // Sync button status
   const isSyncButtonEnable = isSyncButtonEnabled(providers);
 
-  const renderSignificativeOption = hasSignificativeProvidersWithoutSiren(providers, significativeProviders);
+  const renderSignificativeOption = hasSignificativeProvidersWithoutSiren(
+    providers,
+    significativeProviders
+  );
 
   return (
     <div className="box">
@@ -171,9 +173,7 @@ const SyncProvidersView = ({
           <tr>
             <th width={10}></th>
             <th className="siren">Siren</th>
-            <th
-              onClick={() => handleSort("libelle")}
-            >
+            <th onClick={() => handleSort("libelle")}>
               <i className="bi bi-arrow-down-up me-1"></i>
               Libellé du compte fournisseur
             </th>
@@ -186,39 +186,46 @@ const SyncProvidersView = ({
           </tr>
         </thead>
         <tbody>
-          {sortedProviders
-            .slice(startIndex, endIndex)
-            .map((provider, index) => (
-              <tr key={index}>
-                <td>
-                  <i
-                    className={
-                      getIdentifiedProviderStatusIcon(provider).className
-                    }
-                    title={getIdentifiedProviderStatusIcon(provider).title}
-                  ></i>
-                </td>
-                <td className="siren-input">
-                  <Form.Control
-                    type="text"
-                    value={provider.corporateId || ""}
-                    className={getIdentifiedProviderStatus(provider)}
-                    onChange={(e) =>
-                      handleSirenProvider(e, provider.providerNum)
-                    }
-                  />
-                </td>
-                <td>{provider.providerLib}</td>
-                <td>{provider.providerNum}</td>
-                <td className="text-end">
-                  {printValue(
-                    provider.periodsData[financialPeriod.periodKey].amount,
-                    0
-                  )}{" "}
-                  &euro;
-                </td>
-              </tr>
-            ))}
+        
+          {sortedProviders.length === 0 ? (
+            <tr>
+              <td colSpan="5">Aucun compte</td>
+            </tr>
+          ) : (
+            sortedProviders
+              .slice(startIndex, endIndex)
+              .map((provider, index) => (
+                <tr key={index}>
+                  <td>
+                    <i
+                      className={
+                        getIdentifiedProviderStatusIcon(provider).className
+                      }
+                      title={getIdentifiedProviderStatusIcon(provider).title}
+                    ></i>
+                  </td>
+                  <td className="siren-input">
+                    <Form.Control
+                      type="text"
+                      value={provider.corporateId || ""}
+                      className={getIdentifiedProviderStatus(provider)}
+                      onChange={(e) =>
+                        handleSirenProvider(e, provider.providerNum)
+                      }
+                    />
+                  </td>
+                  <td>{provider.providerLib}</td>
+                  <td>{provider.providerNum}</td>
+                  <td className="text-end">
+                    {printValue(
+                      provider.periodsData[financialPeriod.periodKey].amount,
+                      0
+                    )}{" "}
+                    &euro;
+                  </td>
+                </tr>
+              ))
+          )}
         </tbody>
       </Table>
 
@@ -286,6 +293,5 @@ function hasSignificativeProvidersWithoutSiren(
       significativeProviders.includes(provider.providerNum)
   );
 }
-
 
 export default SyncProvidersView;
