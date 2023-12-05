@@ -5,13 +5,23 @@ import React, { useEffect, useState } from "react";
 import { Form, Row, Tab, Table, Tabs } from "react-bootstrap";
 import PaginationComponent from "../../providers/PaginationComponent";
 
-/* ####################################################################################################  */
+/* ---------- PROVIDER READING SELECTION  ---------- */
 
-export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
+/** Modal to select the property used for provider num (ComptNum or ComptAuxNum)
+ *  
+ */
+
+export const ProviderNumMode = ({ 
+  meta, 
+  onSubmit, 
+  onGoBack 
+}) => {
+  
   const { accountsProviders, accountsAuxProviders } = meta;
 
   const [useAccountAux, setUseAccountAux] = useState(true);
   const [activeKey, setActiveKey] = useState("accountAux");
+  // const [miscellaneousAccounts, setMiscellaneousAccounts] = useState([]);
 
   useEffect(() => {
     setUseAccountAux(true);
@@ -37,7 +47,18 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
     onSubmit();
   };
 
-  const handleInputChange = (event) => {};
+  // const handleInputChange = (event) => {
+  //   const { value, checked } = event.target;
+  //   if (checked) {
+  //     setMiscellaneousAccounts([
+  //       ...miscellaneousAccounts, value
+  //     ])
+  //   } else {
+  //     setMiscellaneousAccounts(
+  //       miscellaneousAccounts.filter(accountNum => accountNum != value)
+  //     )
+  //   }
+  // };
 
   const generateAccountString = (accountsObj) => {
     const numberOfAccounts = Object.entries(accountsObj).length;
@@ -79,7 +100,8 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
         >
           <PaginatedTable
             data={Object.values(meta.accountsAuxProviders)}
-            onUpdate={handleInputChange}
+            // miscellaneousAccounts={miscellaneousAccounts}
+            // onUpdate={handleInputChange}
           />
         </Tab>
         <Tab
@@ -89,7 +111,8 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
         >
           <PaginatedTable
             data={Object.values(meta.accountsProviders)}
-            onUpdate={handleInputChange}
+            // miscellaneousAccounts={miscellaneousAccounts}
+            // onUpdate={handleInputChange}
           />
         </Tab>
       </Tabs>
@@ -107,9 +130,15 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
   );
 };
 
-const PaginatedTable = ({ data, onUpdate }) => {
-  const itemsPerPage = 15;
+const PaginatedTable = ({ 
+  data,
+  miscellaneousAccounts,
+  onUpdate 
+}) => {
+
+  const itemsPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
+
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -122,7 +151,7 @@ const PaginatedTable = ({ data, onUpdate }) => {
           <tr>
             <th className="col-2">Numéro de compte</th>
             <th className="col-8">Libellé</th>
-            <th className="text-center col-2">Compte générique</th>
+            {/* <th className="text-center col-2">Compte générique</th> */}
           </tr>
         </thead>
         <tbody>
@@ -132,14 +161,14 @@ const PaginatedTable = ({ data, onUpdate }) => {
               <tr key={accountNum + accountLib}>
                 <td>{accountNum}</td>
                 <td>{accountLib}</td>
-                <td className="text-center">
+                {/* <td className="text-center">
                   <Form.Check
                     type="checkbox"
                     value={accountNum}
                     onChange={onUpdate}
-                    checked={false}
+                    checked={miscellaneousAccounts.includes(accountNum)}
                   />
-                </td>
+                </td> */}
               </tr>
             ))}
         </tbody>

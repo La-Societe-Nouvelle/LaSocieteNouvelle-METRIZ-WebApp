@@ -3,14 +3,43 @@
 // Utils
 import { roundValue } from "../../../../utils/Utils";
 
+/* -------------------- PARSER -------------------- */
+
 const parseAmount = (stringAmount) =>
   roundValue(parseFloat(stringAmount.replace(",", ".")), 2)
+
+/* -------------------- BALANCE CHECKER -------------------- */
 
 const checkBalance = (lines) => {
   let amount = lines
     .map((line) => parseAmount(line.Debit) - parseAmount(line.Credit))
     .reduce((a, b) => a + b, 0);
   return Math.round(amount) == 0;
+}
+
+/* -------------------- PROVIDER DATA -------------------- */
+
+const getProviderData = (ligneCourante,ligneFournisseur,data) => 
+{
+  if (data.useAccountAux && ligneFournisseur.CompAuxNum) {
+    return ({
+      providerNum: ligneFournisseur.CompAuxNum,
+      providerLib: ligneFournisseur.CompAuxLib,
+      isDefaultProviderAccount: false
+    });
+  } else if (data.useAccountAux) {
+    return ({
+      providerNum: "_"+ligneCourante.CompteNum,
+      providerLib: "FOURNISSEUR "+ligneFournisseur.CompteLib,
+      isDefaultProviderAccount: true
+    });
+  } else {
+    return ({
+      providerNum: ligneFournisseur.CompteNum,
+      providerLib: ligneFournisseur.CompteLib,
+      isDefaultProviderAccount: false
+    });
+  }
 }
 
 /* ------------------------------------------------------------------------------------ */
@@ -148,21 +177,15 @@ const readExternalExpenses = (lignes) =>
     lignesComptesCharges.forEach((ligneCompteCharges) => 
     {
       // provider data
-      let providerNum = data.useAccountAux ? 
-        (ligneFournisseur.CompAuxNum ? ligneFournisseur.CompAuxNum : "_"+ligneCompteCharges.CompteNum) // if use account aux
-        : ligneFournisseur.CompteNum; // if use account
-      let isDefaultProviderAccount = providerNum.charAt(0)=='_';
-      let providerLib = isDefaultProviderAccount ?
-        "FOURNISSEUR "+ligneCompteCharges.CompteLib // build provider lib from expense account lib
-        : data.useAccountAux ? data.accountsAux[providerNum].accountLib : data.accounts[providerNum].accountLib; // get lib if not default provider account
+      let providerData = getProviderData(ligneCompteCharges,ligneFournisseur,data);      
       // amortisation expense data
       let expenseData = {
         label: ligneCompteCharges.EcritureLib.replace(/^\"/, "").replace(/\"$/,""),
         accountNum: ligneCompteCharges.CompteNum,
         accountLib: ligneCompteCharges.CompteLib,
-        providerNum: providerNum,
-        providerLib: providerLib,
-        isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
+        providerNum: providerData.providerNum,
+        providerLib: providerData.providerLib,
+        isDefaultProviderAccount: providerData.isDefaultProviderAccount,
         amount: parseAmount(ligneCompteCharges.Debit) - parseAmount(ligneCompteCharges.Credit),
         date: ligneCompteCharges.EcritureDate,
       };
