@@ -17,6 +17,14 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
     setUseAccountAux(true);
   }, []);
 
+  useEffect(() => {
+    if (activeKey=="accountAux") {
+      setUseAccountAux(true);
+    } else {
+      setUseAccountAux(false);
+    }
+  }, [activeKey]);
+
   const changeProviderNumRef = (event) => {
     let radioValue = event.target.value;
     setUseAccountAux(radioValue == "true");
@@ -100,7 +108,7 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
 };
 
 const PaginatedTable = ({ data, onUpdate }) => {
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
   const [currentPage, setCurrentPage] = useState(1);
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -112,9 +120,9 @@ const PaginatedTable = ({ data, onUpdate }) => {
       <Table striped>
         <thead>
           <tr>
-            <th>Numéro de compte</th>
-            <th>Libellé</th>
-            <th className="text-end">Compte générique</th>
+            <th className="col-2">Numéro de compte</th>
+            <th className="col-8">Libellé</th>
+            <th className="text-center col-2">Compte générique</th>
           </tr>
         </thead>
         <tbody>
@@ -124,7 +132,7 @@ const PaginatedTable = ({ data, onUpdate }) => {
               <tr key={accountNum + accountLib}>
                 <td>{accountNum}</td>
                 <td>{accountLib}</td>
-                <td className="px-4 text-end">
+                <td className="text-center">
                   <Form.Check
                     type="checkbox"
                     value={accountNum}

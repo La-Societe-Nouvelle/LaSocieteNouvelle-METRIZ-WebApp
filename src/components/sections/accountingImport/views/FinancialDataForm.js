@@ -133,19 +133,35 @@ export const FinancialDataForm = ({
 
   // ----------------------------------------------------------------------------------------------------
 
+  /** Modals
+   *    1 - A-Nouveaux
+   *    2 - Associations comptes immobilisations
+   *    3 - Associations comptes stocks
+   *    4 - Comptes fournisseurs
+   */
+
+  const hasAssetAccounts = Object.keys(FECData?.meta?.accounts ?? []).some((accountNum) => /^(28|29|39)/.test(accountNum));
+  const hasStockAccounts = Object.keys(FECData?.meta?.accounts ?? []).some((accountNum) => /^3(1|2|7)/.test(accountNum));
+  
   const nextModal = () => 
   {
-    let hasAssetAccounts = Object.keys(FECData.meta.accounts)
-      .some((accountNum) => /^(28|29|39)/.test(accountNum));
-    let hasStockAccounts = Object.keys(FECData.meta.accounts)
-      .some((accountNum) => /^3(1|2|7)/.test(accountNum));
-
-    if (modal<2 && hasAssetAccounts) {
-      setModal(2);
-    } else if (modal<3 && hasStockAccounts) {
+    if (modal==1 && hasAssetAccounts) {
+      setModal(2)
+    } else if (modal<=2 && hasStockAccounts) {
       setModal(3);
     } else {
       setModal(4);
+    }
+  };
+
+  const prevModal = () => 
+  {
+    if (modal==4 && hasStockAccounts) {
+      setModal(3)
+    } else if (modal>=3 && hasAssetAccounts) {
+      setModal(2);
+    } else {
+      setModal(1);
     }
   };
 
@@ -339,32 +355,32 @@ export const FinancialDataForm = ({
             )}
             {showViewsModals && (
               <>
-                <ImportModal show={modal === 1} onHide={cancelImport} title={"Identifiez les A-Nouveaux"} fileName={fileName}>
+                <ImportModal show={modal === 1} onHide={cancelImport} title={"Identification du journal des A-Nouveaux"} fileName={fileName}>
                   <BalanceForwardBookSelection
                     FECData={FECData}
-                    onSubmit={() => nextModal(1)}
+                    onSubmit={() => nextModal()}
                     onCancel={cancelImport}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 2} onHide={cancelImport} title={"Associez les comptes d'amortissements et de dépréciations"}  fileName={fileName}>
+                <ImportModal show={modal === 2} onHide={cancelImport} title={"Associations entre comptes d'amortissements et comptes d'immobilisations"}  fileName={fileName}>
                   <DepreciationAssetsMapping
                     meta={FECData.meta}
-                    onSubmit={() => nextModal(2)}
-                    onGoBack={() => setModal(1)}
+                    onSubmit={() => nextModal()}
+                    onGoBack={() => prevModal()}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 3} onHide={cancelImport} title={"Associez les comptes de stocks et les comptes de charges"}  fileName={fileName}>
+                <ImportModal show={modal === 3} onHide={cancelImport} title={"Associations entre comptes de stocks et comptes de charges"}  fileName={fileName}>
                   <StockPurchasesMapping
                     meta={FECData.meta}
-                    onSubmit={() => setModal(4)}
-                    onGoBack={() => setModal(2)}
+                    onSubmit={() => setModal()}
+                    onGoBack={() => prevModal()}
                   />
                 </ImportModal>
                 <ImportModal show={modal === 4} onHide={cancelImport} title={"Gestion des comptes fournisseurs"}  fileName={fileName}>
                   <ProviderNumMode
                     meta={FECData.meta}
                     onSubmit={() => loadAccountingData(FECData)}
-                    onGoBack={() => setModal(3)}
+                    onGoBack={() => prevModal()}
                   />
                 </ImportModal>
               </>
