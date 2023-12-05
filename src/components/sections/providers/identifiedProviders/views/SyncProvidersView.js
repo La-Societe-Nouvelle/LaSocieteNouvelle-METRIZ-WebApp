@@ -111,7 +111,6 @@ const SyncProvidersView = ({
   return (
     <div className="box">
       <h4>Synchroniser les données de vos fournisseurs</h4>
-
       <div className="d-flex py-2 justify-content-between">
         <div className="d-flex align-items-center ">
           <Form.Select
@@ -171,9 +170,7 @@ const SyncProvidersView = ({
           <tr>
             <th width={10}></th>
             <th className="siren">Siren</th>
-            <th
-              onClick={() => handleSort("libelle")}
-            >
+            <th onClick={() => handleSort("libelle")}>
               <i className="bi bi-arrow-down-up me-1"></i>
               Libellé du compte fournisseur
             </th>
