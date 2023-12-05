@@ -1,5 +1,12 @@
 /* ---------- TABLE ---------- */
-
+.nav-tabs .nav-link {
+  margin-bottom: 0;
+  border: 1px solid $bg-light;
+}
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  border-color: $light;
+  border-width: 2px 2px 0 2px;
+}
 .toChecked {
   border-right: 2px solid $warning;
 }
@@ -154,8 +161,6 @@ table {
 
 .table {
   font-size: 0.8rem;
-
-
 }
 
 .table-navigation {
@@ -313,5 +318,16 @@ table {
   }
   th:first-child {
     border-left: 2px solid $bg-light;
+  }
+}
+
+// --- Provider Num Mode Table --- //
+
+.table.table-striped {
+  .form-check-input {
+    width: 1.2em;
+  height: 1.2em;
+  border-width: 2px;
+
   }
 }
