@@ -39,8 +39,8 @@ export const ProviderNumMode = ({ meta, onSubmit, onGoBack }) => {
 
   return (
     <div id="provider-num-mode">
-      <h5>Gestion des comptes fournisseurs</h5>
-      <Form.Group className="my-3">
+     
+      <Form.Group className="mb-3">
         <Row className="ms-1 mt-1">
           <Form.Check
             inline

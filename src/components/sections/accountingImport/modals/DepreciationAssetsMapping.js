@@ -113,8 +113,7 @@ export const DepreciationAssetsMapping = ({
   const isAssociationValid = accountsToMap.every((accountNum) => accounts[accountNum].assetAccountNum);
 
   return (
-    <div>
-      <h4>Associez les comptes d'amortissements et de dépréciations</h4>
+    <>
       <Table>
         {/* Header */}
         <thead>
@@ -170,6 +169,6 @@ export const DepreciationAssetsMapping = ({
           <i className="bi bi-chevron-right"/>
         </button>
       </div>
-    </div>
+    </>
   )
 }

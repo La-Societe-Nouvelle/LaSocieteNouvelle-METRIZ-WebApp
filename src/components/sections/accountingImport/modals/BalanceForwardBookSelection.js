@@ -84,7 +84,6 @@ export const BalanceForwardBookSelection = ({
 
   return (
     <>
-      <h4>Identifiez les A-Nouveaux</h4>
       <div className="small mb-3">
         <p>
           L'identification du journal des A-Nouveaux est nécessaire à la bonne

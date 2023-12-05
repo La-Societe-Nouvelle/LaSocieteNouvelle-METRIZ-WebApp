@@ -339,28 +339,28 @@ export const FinancialDataForm = ({
             )}
             {showViewsModals && (
               <>
-                <ImportModal show={modal === 1} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 1} onHide={cancelImport} title={"Identifiez les A-Nouveaux"} fileName={fileName}>
                   <BalanceForwardBookSelection
                     FECData={FECData}
                     onSubmit={() => nextModal(1)}
                     onCancel={cancelImport}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 2} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 2} onHide={cancelImport} title={"Associez les comptes d'amortissements et de dépréciations"}  fileName={fileName}>
                   <DepreciationAssetsMapping
                     meta={FECData.meta}
                     onSubmit={() => nextModal(2)}
                     onGoBack={() => setModal(1)}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 3} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 3} onHide={cancelImport} title={"Associez les comptes de stocks et les comptes de charges"}  fileName={fileName}>
                   <StockPurchasesMapping
                     meta={FECData.meta}
                     onSubmit={() => setModal(4)}
                     onGoBack={() => setModal(2)}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 4} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 4} onHide={cancelImport} title={"Gestion des comptes fournisseurs"}  fileName={fileName}>
                   <ProviderNumMode
                     meta={FECData.meta}
                     onSubmit={() => loadAccountingData(FECData)}

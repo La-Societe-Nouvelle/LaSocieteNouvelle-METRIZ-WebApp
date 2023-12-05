@@ -87,8 +87,7 @@ export const StockPurchasesMapping = ({
   const isMappingValid = stocksAccounts.every((accountNum) => accounts[accountNum].purchasesAccounts?.length>0);
 
   return (
-    <div>
-      <h5>Associez les comptes de stocks et les comptes de charges</h5>
+    <>
       <Form>
         <Table size="lg" hover className="mt-3">
           <thead>
@@ -170,6 +169,6 @@ export const StockPurchasesMapping = ({
           <i className="bi bi-chevron-right" />
         </button>
       </div>
-    </div>
+    </>
   );
 }
