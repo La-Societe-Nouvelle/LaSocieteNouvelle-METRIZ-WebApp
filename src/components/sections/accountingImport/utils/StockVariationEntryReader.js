@@ -8,6 +8,18 @@ import { roundValue } from "../../../../utils/Utils";
 const parseAmount = (stringAmount) =>
   roundValue(parseFloat(stringAmount.replace(",", ".")), 2)
 
+/* -------------------- BALANCE CHECKER -------------------- */
+
+const checkBalanceTwoLists = (lignesA, lignesB) => {
+  let amountA = lignesA
+    .map((ligne) => parseAmount(ligne.Debit) - parseAmount(ligne.Credit))
+    .reduce((a, b) => a + b, 0);
+  let amountB = lignesB
+    .map((ligne) => parseAmount(ligne.Credit) - parseAmount(ligne.Debit))
+    .reduce((a, b) => a + b, 0);
+  return Math.round(amountA * 100) == Math.round(amountB * 100);
+};
+
 /* ------------------------------------------------------------------------------------ */
 /* ------------------------- ENTRY READER - EXTERNAL EXPENSES ------------------------- */
 

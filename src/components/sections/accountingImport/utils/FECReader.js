@@ -58,24 +58,6 @@ const columnsFEC = [
 const parseAmount = (stringAmount) =>
   roundValue(parseFloat(stringAmount.replace(",", ".")), 2);
 
-/* -------------------- BALANCE CHECKER -------------------- */
-
-const checkBalanceTwoLists = (lignesA, lignesB) => {
-  let amountA = lignesA
-    .map((ligne) => parseAmount(ligne.Debit) - parseAmount(ligne.Credit))
-    .reduce((a, b) => a + b, 0);
-  let amountB = lignesB
-    .map((ligne) => parseAmount(ligne.Credit) - parseAmount(ligne.Debit))
-    .reduce((a, b) => a + b, 0);
-  return Math.round(amountA * 100) == Math.round(amountB * 100);
-};
-
-const checkBalance = (rows) => {
-  let amount = rows
-    .map((row) => parseAmount(row.Debit) - parseAmount(row.Credit))
-    .reduce((a, b) => a + b, 0);
-  return Math.round(amount * 100) == 0;
-};
 /* -------------------- FEC ID BUIDER -------------------- */
 
 const buildId = (amount) => {

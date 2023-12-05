@@ -2,7 +2,7 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Form, Row, Tab, Table, Tabs } from "react-bootstrap";
+import { Form, Image, Row, Tab, Table, Tabs } from "react-bootstrap";
 import PaginationComponent from "../../providers/PaginationComponent";
 
 /* ---------- PROVIDER READING SELECTION  ---------- */
@@ -68,6 +68,22 @@ export const ProviderNumMode = ({
 
   return (
     <div id="provider-num-mode">
+
+      <div className="small mb-3">
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <div>
+            <p>
+              Pour la mesure des empreintes des consommations, les dépenses doivent
+              être groupées par fournisseur. Cette étape d'import permet de confirmer
+              le mode de lecture des comptes fournisseurs : par numéro de compte ou par
+              compte auxiliaire.
+            </p>
+          </div>
+        </div>
+      </div>
      
       <Form.Group className="mb-3">
         <Row className="ms-1 mt-1">

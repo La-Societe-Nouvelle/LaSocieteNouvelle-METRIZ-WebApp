@@ -85,7 +85,7 @@ export const BalanceForwardBookSelection = ({
   return (
     <>
       <div className="small mb-3">
-        <div className="alert-info">
+        <div className="alert-info mt-0">
           <div className="info-icon">
             <Image src="/info-circle.svg" alt="icon info" />
           </div>

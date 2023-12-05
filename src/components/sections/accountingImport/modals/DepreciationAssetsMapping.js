@@ -2,7 +2,7 @@
 
 // React
 import React, { useState } from "react";
-import { Table } from "react-bootstrap";
+import { Image, Table } from "react-bootstrap";
 
 /* -------------------- AMORTISATION/DEPRECIATION-ASSET MAPPING -------------------- */
 
@@ -114,6 +114,22 @@ export const DepreciationAssetsMapping = ({
 
   return (
     <>
+      <div className="small mb-3">
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <div>
+            <p>
+              Les associations entre les comptes d'amortissements et les comptes d'immobilisations
+              sont nécessaires à la bonne mesure des empreintes des consommations de capital fixe.
+            </p>
+            <p className="mt-1">
+              Il est possible d'ajuster les associations via les menus déroulants.
+            </p>
+          </div>
+        </div>
+      </div>
       <Table>
         {/* Header */}
         <thead>

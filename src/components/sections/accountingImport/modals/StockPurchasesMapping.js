@@ -2,7 +2,7 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Form, Image, Table } from "react-bootstrap";
 
 /* -------------------- STOCKS-EXPENSES MAPPING -------------------- */
 
@@ -88,6 +88,24 @@ export const StockPurchasesMapping = ({
 
   return (
     <>
+      <div className="small mb-3">
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <div>
+            <p>
+              Les associations entre les comptes de stocks et les comptes de charges
+              sont nécessaires à la bonne mesure des empreintes des variations de stocks,
+              et ainsi de l'empreinte des consommations intermédiaires.
+            </p>
+            <p className="mt-1">
+              Il est possible pour chaque compte de stock d'ajouter ou de retirer des comptes
+              de charges. Un compte de stock doit être lié à au moins un compte de charges.
+            </p>
+          </div>
+        </div>
+      </div>
       <Form>
         <Table size="lg" hover className="mt-3">
           <thead>

@@ -372,7 +372,7 @@ export const FinancialDataForm = ({
                 <ImportModal show={modal === 3} onHide={cancelImport} title={"Associations entre comptes de stocks et comptes de charges"}  fileName={fileName}>
                   <StockPurchasesMapping
                     meta={FECData.meta}
-                    onSubmit={() => setModal()}
+                    onSubmit={() => nextModal()}
                     onGoBack={() => prevModal()}
                   />
                 </ImportModal>
