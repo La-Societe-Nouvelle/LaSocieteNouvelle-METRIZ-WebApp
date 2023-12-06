@@ -63,11 +63,10 @@ const ImportProvidersView = ({
           ? updatedProviders.find((p) => p.providerNum === providerNum)
           : updatedProviders.find((p) => p.providerLib === corporateName);
 
-        if (provider) {
-          provider.corporateId = corporateId;
-          provider.legalUnitData.denomination = denomination;
-          provider.useDefaultFootprint = false;
-          provider.footprintStatus = 0; // Check if changes or use update()
+        if (provider && provider.corporateId!=corporateId) {
+          provider.update({
+            corporateId: corporateId
+          })
         }
       }
 
@@ -83,7 +82,6 @@ const ImportProvidersView = ({
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
       let updatedProviders = [...providers];
-
       XLSXData.forEach(
         ({ accountNum, accountLib, denomination, siren, account }) => {
           if (account && !accountNum) accountNum = account;
@@ -91,10 +89,9 @@ const ImportProvidersView = ({
             (p) => p.providerNum === accountNum || p.providerLib === accountLib
           );
           if (provider) {
-            provider.corporateId = siren;
-            provider.legalUnitData.denomination = denomination;
-            provider.useDefaultFootprint = false;
-            provider.footprintStatus = 0; // Check if changes or use update()
+            provider.update({
+              corporateId: siren
+            })
           }
         }
       );

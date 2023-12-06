@@ -145,7 +145,7 @@ export class Provider
 
     // update default footprint params ------------------ //
     // update params, remove footprint & update dataFetched
-    else if (nextProps.defaultFootprintParams != undefined ||
+    else if (nextProps.defaultFootprintParams != undefined &&
              nextProps.defaultFootprintParams !== this.defaultFootprintParams) 
     {
       this.defaultFootprintParams = {...this.defaultFootprintParams, ...nextProps.defaultFootprintParams}; // update only params in next props
