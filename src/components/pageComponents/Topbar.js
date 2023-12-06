@@ -22,15 +22,13 @@ import { getLabelPeriod } from "../../utils/periodsUtils";
 export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
   
   const [selectedPeriod, setSelectedPeriod] = useState(period.periodKey);
+
   const handlePeriodChange = (newSelectedPeriodKey) => {
     const newPeriodKey = newSelectedPeriodKey.value;
-
     setSelectedPeriod(newPeriodKey);
-
     let newSelectedPeriod = session.availablePeriods.find(period => period.periodKey == newPeriodKey);
     onSelectPeriod(newSelectedPeriod);
   };
-
 
   useEffect(() => {
     if (period.periodKey != selectedPeriod) {
@@ -38,7 +36,7 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
     }
   }, [period]);
 
-  const showInfo = (progression > 1) || (selectedPeriod && session?.financialData?.status[selectedPeriod].isLoaded);
+  const showInfo = (progression > 1) || (selectedPeriod && session?.financialData?.status?.[selectedPeriod]?.isLoaded);
 
   return (
     <div className="top-bar">
