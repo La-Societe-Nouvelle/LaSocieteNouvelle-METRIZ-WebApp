@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { saveErrorLog } from '../src/services/StatsService';
+import { saveErrorLog } from '../src/statReportService/StatReportService';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
