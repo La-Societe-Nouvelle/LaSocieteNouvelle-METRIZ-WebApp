@@ -298,7 +298,7 @@ const FirstRowAssessmentItem = ({
       </td>
       <td colSpan="2">{assessmentItems[assessmentItem].label}</td>
       <td>
-        {printValue(getNrgConsumptionByType(nrgDetails, assessmentItem), 0)}
+        {printValue(getNrgConsumptionByType(nrgDetails, assessmentItem), 0)}{" "}
         MJ
       </td>
       <td>
