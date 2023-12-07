@@ -124,18 +124,19 @@ export async function FECFileReader(content) {
     .slice(0, content.indexOf("\n"))
     .replace("\r", "")
     .split(separator);
-  header = header.slice(0, 18);
 
   // Vérification des colonnes
-  header.forEach((column) => {
-    if (!columnsFEC.includes(column))
-      throw "Fichier erroné (libellé(s) incorrect(s))";
-  });
+
+  const missingColumns = columnsFEC.filter(column => !header.includes(column));
+  
+  if (missingColumns.length > 0) {
+    throw `Fichier erroné (libellé(s) manquant(s)) : ${missingColumns.join(', ')}`;
+  }
+
 
   // Construction de l'index des colonnes
   let indexColumns = {};
   header.forEach((column) => (indexColumns[column] = header.indexOf(column)));
-
   // Rows ----------------------------------------------------------------------------------------------- //
 
   // Segmentation des lignes
@@ -146,9 +147,9 @@ export async function FECFileReader(content) {
     // Segmentation des colonnes (String -> JSON)
     let row = rowString.replace("\r", "").split(separator);
 
-    let rowArray = row.slice(0, 18);
+    let rowArray = row.slice(0, header.length);
 
-    if (rowArray.length == 18) {
+    if (rowArray.length == header.length) {
       // Construction du JSON
       // -------------------------------------------------- //
 
