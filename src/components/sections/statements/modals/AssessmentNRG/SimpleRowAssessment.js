@@ -101,7 +101,7 @@ export const SimpleRowAssessment = ({
         </Row>
       </td>
       <td>
-        {printValue(nrgConsumption, 0)} 
+        {printValue(nrgConsumption, 0)}{" "}
         MJ
       </td>
       <td>
