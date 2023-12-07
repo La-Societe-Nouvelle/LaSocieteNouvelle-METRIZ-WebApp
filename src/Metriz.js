@@ -211,13 +211,16 @@ export const Metriz = () =>
     }
 
     // Anonymous stats report
-    try {
-      sendAnonymousStatReport(
-        session,
-        selectedPeriod
-      );
-    } catch (error) {
-      console.log(error);
+    if (session.sendStatReport) 
+    {
+      try {
+        sendAnonymousStatReport(
+          session,
+          selectedPeriod
+        );
+      } catch (error) {
+        console.log(error);
+      }
     }
     
     // next step
