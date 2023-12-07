@@ -1171,7 +1171,7 @@ const getProviderData = (ligneCourante,ligneFournisseur,data) =>
   } else if (data.useAccountAux) {
     return ({
       providerNum: "_"+ligneCourante.CompteNum,
-      providerLib: "FOURNISSEUR "+ligneFournisseur.CompteLib,
+      providerLib: "FOURNISSEUR "+ligneCourante.CompteLib,
       isDefaultProviderAccount: true
     });
   } else {
