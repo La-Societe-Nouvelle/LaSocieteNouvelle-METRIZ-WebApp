@@ -60,7 +60,8 @@ export class Provider
     this.defaultFootprintParams = defaultFootprintParams || {       // paramètres (empreinte par défaut)
       area: "FRA",
       code: "00",
-      aggregate: "PRD"
+      aggregate: "PRD",
+      accuracyMapping: 0
     };
 
     // Updates

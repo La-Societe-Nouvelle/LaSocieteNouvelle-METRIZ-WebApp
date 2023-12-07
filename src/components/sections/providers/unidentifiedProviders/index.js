@@ -256,14 +256,22 @@ const UnidentifiedProviders = ({
         {
           let account = accounts.find((account) => account.accountNum == accountId);
           if (account) {
-            account.defaultFootprintParams.code = defaultCode;
-            account.defaultFootprintParams.accuracyMapping = accuracy;
+            account.update({
+              defaultFootprintParams: {
+                code: defaultCode,
+                accuracyMapping: accuracy
+              }
+            });
           } 
           
           let provider = providers.find((provider) => provider.providerNum == accountId);
           if (provider) {
-            provider.defaultFootprintParams.code = defaultCode;
-            provider.defaultFootprintParams.accuracyMapping = accuracy;
+            provider.update({
+              defaultFootprintParams: {
+                code: defaultCode,
+                accuracyMapping: accuracy
+              }
+            });
           }
         });
       } else {
