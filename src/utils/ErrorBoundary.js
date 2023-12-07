@@ -1,9 +1,17 @@
-import React from "react";
+// La Société Nouvelle
 
+// React
+import React from "react";
 import { Button, Container, Image } from "react-bootstrap";
+
+// utils
 import { downloadSession } from "./Utils";
-import { saveErrorLog } from "../services/StatsService";
+
+// Components
 import { Topbar } from "../components/pageComponents/Topbar";
+
+// Logs
+import { saveErrorLog } from "../statReportService/StatReportService";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
