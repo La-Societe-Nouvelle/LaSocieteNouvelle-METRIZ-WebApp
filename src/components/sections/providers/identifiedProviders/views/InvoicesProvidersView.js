@@ -229,13 +229,16 @@ const InvoicesProvidersView = ({
 
   return (
     <div className="box flex-grow-1 ms-2">
-        <div className="mb-4">
-          <h4 className="">Déposer des factures</h4> 
-        </div>
-      <p className="small">
-        Importez vos factures au format PDF dans la zone de dépôt et associez ensuite les
-        comptes fournisseurs correspondants.
-      </p>
+      <div className="mb-4">
+        <h4>Déposer des factures</h4>
+      </div>
+
+        <p className="small">
+          Importez vos factures au format PDF dans la zone de dépôt et associez
+          ensuite les comptes fournisseurs correspondants.
+        </p>
+
+
       <Dropzone onDrop={onInvoicesDrop} accept={[".pdf"]}>
         {({ getRootProps, getInputProps }) => (
           <div className="dropzone-section">

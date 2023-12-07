@@ -3,6 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border: none;
   svg {
     height: 10px;
   }
@@ -12,7 +13,28 @@
 }
 
 .alert-info {
-  border-left: 6px solid #8994d1;
+  border-left: 6px solid $primary;
+  color : $body-color;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: top;
+  margin: 1.5rem 0;
+  border-radius: 0.5rem;
+  p{
+    margin: 0;
+    font-size: 0.8rem;
+  }
+  .info-icon {
+    background-color: $primary;
+  }
+  
+}
+
+.info-icon {
+  height: 45px;
+  padding: 0.60rem;
+  margin-right: 0.75rem;
+  border-radius: 39% 61% 42% 58% / 50% 51% 49% 50%;
 }
 
 .alert-success {
@@ -29,3 +51,6 @@
 .alert-danger {
   border-left: 6px solid $error;
 }
+
+
+

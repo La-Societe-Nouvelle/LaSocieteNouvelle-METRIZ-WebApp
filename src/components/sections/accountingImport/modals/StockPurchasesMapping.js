@@ -2,7 +2,7 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Form, Image, Table } from "react-bootstrap";
 
 /* -------------------- STOCKS-EXPENSES MAPPING -------------------- */
 
@@ -87,8 +87,25 @@ export const StockPurchasesMapping = ({
   const isMappingValid = stocksAccounts.every((accountNum) => accounts[accountNum].purchasesAccounts?.length>0);
 
   return (
-    <div>
-      <h5>Associez les comptes de stocks et les comptes de charges</h5>
+    <>
+      <div className="small mb-3">
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <div>
+            <p>
+              Les associations entre les comptes de stocks et les comptes de charges
+              sont nécessaires à la bonne mesure des empreintes des variations de stocks,
+              et ainsi de l'empreinte des consommations intermédiaires.
+            </p>
+            <p className="mt-1">
+              Il est possible pour chaque compte de stock d'ajouter ou de retirer des comptes
+              de charges. Un compte de stock doit être lié à au moins un compte de charges.
+            </p>
+          </div>
+        </div>
+      </div>
       <Form>
         <Table size="lg" hover className="mt-3">
           <thead>
@@ -165,15 +182,11 @@ export const StockPurchasesMapping = ({
         <button className="btn btn-primary me-2" onClick={() => onGoBack()}>
           <i className="bi bi-chevron-left"></i> Retour
         </button>
-        <button
-          className="btn btn-secondary"
-          onClick={submit}
-          disabled={!isMappingValid}
-        >
-          Valider mes données
-          <i className="bi bi-chevron-right"></i>
+        <button className="btn btn-secondary" onClick={() => submit()} disabled={!isMappingValid}>
+          Suivant
+          <i className="bi bi-chevron-right" />
         </button>
       </div>
-    </div>
+    </>
   );
 }

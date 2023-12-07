@@ -40,7 +40,8 @@ const ProvidersSection = ({
   const { 
     financialData, 
     comparativeData,
-    legalUnit
+    legalUnit,
+    useChatGPT
   } = session;
 
   const [step, setStep] = useState(1);
@@ -144,6 +145,7 @@ const ProvidersSection = ({
           synchronizeProviders={synchronizeProviders}
           sessionDidUpdate={sessionDidUpdate}
           legalUnitActivityCode={legalUnit.activityCode || comparativeData.comparativeDivision}
+          useChatGPT={useChatGPT}
         />
       </>
     );

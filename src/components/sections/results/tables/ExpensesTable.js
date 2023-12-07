@@ -251,17 +251,19 @@ export const ExpensesTable = ({ session, period, indic }) => {
           </tbody>
         </Table>
       )}
-      <Button onClick={toggleColumn} className="vertical-button">
-        {showColumn ? (
-          <>
-            <i className="bi bi-dash-circle me-2"></i> Masquer N-1
-          </>
-        ) : (
-          <>
-            <i className="bi bi-plus-circle me-2"></i> Afficher N-1
-          </>
-        )}
-      </Button>
+      {prevPeriod && (
+        <Button onClick={toggleColumn} className="vertical-button">
+          {showColumn ? (
+            <>
+              <i className="bi bi-dash-circle me-2"></i> Masquer N-1
+            </>
+          ) : (
+            <>
+              <i className="bi bi-plus-circle me-2"></i> Afficher N-1
+            </>
+          )}
+        </Button>
+      )}
     </div>
   );
 };

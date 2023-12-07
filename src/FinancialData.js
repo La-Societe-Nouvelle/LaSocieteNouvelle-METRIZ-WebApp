@@ -12,7 +12,7 @@ import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
 import { ImmobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
 
 // Utils
-import { getAmountItems, mergePeriodsData } from "./utils/Utils";
+import { getAmountItems } from "./utils/Utils";
 import { buildMainAggregates, buildProductionAggregates, mergeAggregatesPeriodsData } from "./formulas/aggregatesBuilder";
 
 // Libraries
@@ -50,7 +50,7 @@ export class FinancialData
       // data loaded state
       this.metaAccounts = data.accounts;
       this.isFinancialDataLoaded = data.isFinancialDataLoaded; // to follow progression
-      this.status = data.status;
+      this.status = data.status || {};
 
       // Production items ------------------------ //
 
@@ -199,12 +199,12 @@ export class FinancialData
     // Status ---------------------------------- //
     
     this.status = {};
-    periods.forEach(({ periodKey }) => {
+    for (let {periodKey} of periods) {
       this.status[periodKey] = {
         isLoaded: true,
         isValidated: false
       }
-    });
+    };
 
     this.isFinancialDataLoaded = true;
 

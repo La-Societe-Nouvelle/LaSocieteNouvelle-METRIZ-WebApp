@@ -60,7 +60,8 @@ export class Provider
     this.defaultFootprintParams = defaultFootprintParams || {       // paramètres (empreinte par défaut)
       area: "FRA",
       code: "00",
-      aggregate: "PRD"
+      aggregate: "PRD",
+      accuracyMapping: 0
     };
 
     // Updates
@@ -145,7 +146,7 @@ export class Provider
 
     // update default footprint params ------------------ //
     // update params, remove footprint & update dataFetched
-    else if (nextProps.defaultFootprintParams != undefined ||
+    else if (nextProps.defaultFootprintParams != undefined &&
              nextProps.defaultFootprintParams !== this.defaultFootprintParams) 
     {
       this.defaultFootprintParams = {...this.defaultFootprintParams, ...nextProps.defaultFootprintParams}; // update only params in next props

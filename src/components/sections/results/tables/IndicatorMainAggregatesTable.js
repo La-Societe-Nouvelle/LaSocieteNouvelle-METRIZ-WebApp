@@ -30,7 +30,6 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
     netValueAdded,
   } = financialData.mainAggregates;
 
-
   // Meta data ----------------------------------------
 
   const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
@@ -47,7 +46,6 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
     setFixedCapitalConsumptionsAggregates,
   ] = useState([]);
 
-
   // build aggregates
   useEffect(async () => {
     const intermediateConsumptionsAggregates =
@@ -59,8 +57,7 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
   }, [period]);
 
-
-  // Prev period 
+  // Prev period
 
   const prevDateEnd = getPrevDate(period.dateStart);
   const prevPeriod = session.availablePeriods.find(
@@ -80,7 +77,6 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
   const indicsWithGrossImpact = new Set(["ghg", "haz", "mat", "nrg", "was", "wat"]);
   const showGrossImpact = indicsWithGrossImpact.has(indic);
 
-
   return (
     <div className="d-flex">
       <Table id="mainAggregates" className="mb-0">
@@ -96,11 +92,10 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
             <th></th>
             <th className="text-end">Montant</th>
             {TableHeaderRow(showGrossImpact)}
-
           </tr>
           <tr className="small fw-normal">
             <td></td>
-            {TableHeaderRowUnits(showGrossImpact,unit,unitAbsolute)}
+            {TableHeaderRowUnits(showGrossImpact, unit, unitAbsolute)}
           </tr>
         </thead>
         <tbody>
@@ -177,7 +172,6 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
             <tr className="small fw-normal">
             {TableHeaderRowUnits(showGrossImpact,unit,unitAbsolute)}
             </tr>
-
           </thead>
           <tbody>
             <tr className="fw-bold">
@@ -215,8 +209,7 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
               <tr key={index}>
                 {renderDataRow(aggregate, prevPeriod, indic, nbDecimals, showGrossImpact)}
               </tr>
-            )
-          )}
+            ))}
 
           <tr className="fw-bold">
             {renderDataRow(netValueAdded, prevPeriod, indic, nbDecimals, showGrossImpact)}
@@ -225,21 +218,22 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
           </tbody>
         </Table>
       )}
-      <Button onClick={toggleColumn} className="vertical-button">
-        {showColumn ? (
-          <>
-            <i className="bi bi-dash-circle me-2"></i> Masquer N-1
-          </>
-        ) : (
-          <>
-            <i className="bi bi-plus-circle me-2"></i> Afficher N-1
-          </>
-        )}
-      </Button>
+      {prevPeriod && (
+        <Button onClick={toggleColumn} className="vertical-button">
+          {showColumn ? (
+            <>
+              <i className="bi bi-dash-circle me-2"></i> Masquer N-1
+            </>
+          ) : (
+            <>
+              <i className="bi bi-plus-circle me-2"></i> Afficher N-1
+            </>
+          )}
+        </Button>
+      )}
     </div>
   );
 };
-
 
 const renderDataRow = (data, period, indic, nbDecimals, showGrossImpact) => {
   return (
@@ -249,23 +243,27 @@ const renderDataRow = (data, period, indic, nbDecimals, showGrossImpact) => {
       </td>
       <td className="text-end">
         {printValue(
-          data.periodsData[period.periodKey].footprint.indicators[indic].getValue(),
+          data.periodsData[period.periodKey].footprint.indicators[
+            indic
+          ].getValue(),
           nbDecimals
         )}
       </td>
       <td className="text-end uncertainty">
         <u>+</u>
         {printValue(
-          data.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
+          data.periodsData[period.periodKey].footprint.indicators[
+            indic
+          ].getUncertainty(),
           0
         )}
       </td>
       {showGrossImpact && (
         <td className="text-end">
           {printValue(
-            data.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
-              data.periodsData[period.periodKey].amount
-            ),
+            data.periodsData[period.periodKey].footprint.indicators[
+              indic
+            ].getGrossImpact(data.periodsData[period.periodKey].amount),
             nbDecimals
           )}
         </td>

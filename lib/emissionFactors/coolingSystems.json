@@ -350,5 +350,60 @@
     "unit": "U",
     "annualLeak": 5,
     "annualLeakUncertainty": 50
+  },
+  "coolSys33": {
+    "label": "Climatisation résidentielle - mobile",
+    "group": "Climatisation résidentielle",
+    "fluidQty": 0.5,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.01, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 2,
+    "annualLeakUncertainty": 50
+  },
+  "coolSys34": {
+    "label": "Climatisation résidentielle - split",
+    "group": "Climatisation résidentielle",
+    "fluidQty": 1,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.05, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 5,
+    "annualLeakUncertainty": 50
+  },
+  "coolSys35": {
+    "label": "Climatisation résidentielle - splits et multiplits",
+    "group": "Climatisation résidentielle",
+    "fluidQty": 5,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.30, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 6,
+    "annualLeakUncertainty": 50
+  },
+  "coolSys36": {
+    "label": "Climatisation résidentielle - window",
+    "group": "Climatisation résidentielle",
+    "fluidQty": 0.6,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.012, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 2,
+    "annualLeakUncertainty": 50
+  },
+  "coolSys37": {
+    "label": "Climatisation résidentielle - multisplits",
+    "group": "Climatisation résidentielle",
+    "fluidQty": 1.5,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.09, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 6,
+    "annualLeakUncertainty": 50
   }
 }

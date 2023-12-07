@@ -117,16 +117,19 @@ export async function getSignificativeAccounts(accounts,minFpt,maxFpt,period)
     return accounts.map(account => account.accountNum);
   }
 
+  let providerAccount = accounts.filter((account) => account.providerNum).map((provider) => provider.providerNum);
+  let filteredAccounts = accounts.filter((account) => account.accountNum);
+
   let significativeAccounts = [];
   for (let indic of Object.keys(metaIndics)) 
   {
     // significative accounts for indic
-    let significativeAccountsForIndic = await getSignificativeAccountsByIndic(indic,accounts,minFpt,maxFpt,limit,period); // return list accounts
+    let significativeAccountsForIndic = await getSignificativeAccountsByIndic(indic,filteredAccounts,minFpt,maxFpt,limit,period); // return list accounts
     significativeAccounts.push(...significativeAccountsForIndic);
   }
 
   // Remove duplicates & return
-  return significativeAccounts.filter((value, index, self) => index === self.findIndex(item => item === value));
+  return [...significativeAccounts, ...providerAccount].filter((value, index, self) => index === self.findIndex(item => item === value));
 }
 
 // iteration until provider under limit are significative

@@ -2,7 +2,7 @@
 
 // React
 import React, { useState, useEffect } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Col, Form, Image, Row } from "react-bootstrap";
 
 // Components
 import ProvidersTable from "./ProvidersTable";
@@ -26,11 +26,11 @@ const UnidentifiedProviders = ({
   submit,
   synchronizeProviders,
   sessionDidUpdate,
-  legalUnitActivityCode
+  legalUnitActivityCode,
+  useChatGPT
 }) => {
 
   // State management
-
   const [providers, setProviders] = useState(
     financialData.providers.filter(
       (provider) =>
@@ -38,11 +38,9 @@ const UnidentifiedProviders = ({
         provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
     )
   );
-
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
-
     let providerNums = providers.map((provider) => provider.providerNum);
 
     // expense accounts
@@ -65,7 +63,7 @@ const UnidentifiedProviders = ({
 
   const [significativeProviders, setSignificativeProviders] = useState([]);
   const [significativeAccounts, setSignificativeAccounts] = useState([]);
-  
+
   const [treatmentByExpenseAccount, setTreatmentByExpenseAccount] = useState(
     financialData.externalExpenses
       .filter((expense) => financialPeriod.regex.test(expense.date))
@@ -89,11 +87,10 @@ const UnidentifiedProviders = ({
   // --------------------------------------------------
 
   // initi significative providers
-  useEffect(() => 
-  {
+  useEffect(() => {
     updateSignificativeProviders();
     updateSignificativeAccounts();
-    
+
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
   }, []);
@@ -111,14 +108,14 @@ const UnidentifiedProviders = ({
   useEffect(() => {
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
-  }, [treatmentByExpenseAccount])
+  }, [treatmentByExpenseAccount]);
 
   // --------------------------------------------------
   // derivated arrays
 
   const externalFlowsOnPeriod = [
     ...financialData.externalExpenses,
-    ...financialData.investments
+    ...financialData.investments,
   ].filter((flow) => financialPeriod.regex.test(flow.date));
 
   const providersToSync = providers
@@ -138,7 +135,7 @@ const UnidentifiedProviders = ({
         maxFpt,
         financialPeriod
       );
-
+    
     setSignificativeProviders(significativeProviders);
   };
 
@@ -152,7 +149,7 @@ const UnidentifiedProviders = ({
         maxFpt,
         financialPeriod
       );
-
+    
     setSignificativeAccounts(significativeAccounts);
   };
 
@@ -199,9 +196,9 @@ const UnidentifiedProviders = ({
       const providersToSynchronise = providersToSync.filter((provider) =>
         provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())
       );
-  
+
       await synchronizeProviders(providersToSynchronise);
-  
+
       updateSignificativeProviders();
 
       const isNextStepAvailable = checkSynchronisation();
@@ -215,7 +212,6 @@ const UnidentifiedProviders = ({
       const accountsToSynchronise = accountsToSync
         .concat(providersToSync)
         .filter((account) => (account.footprintStatus !== 200 || !account.footprint.isValid()));
-      console.log(accountsToSynchronise);
       await synchronizeProviders(accountsToSynchronise);
   
       updateSignificativeAccounts();
@@ -235,6 +231,12 @@ const UnidentifiedProviders = ({
       .filter((flow) => providerNums.includes(flow.providerNum))
       .forEach((flow) => flow.footprintOrigin = treatmentByExpenseAccount ? "account" : "provider");
     setTreatmentByExpenseAccount(treatmentByExpenseAccount);
+
+    if (treatmentByExpenseAccount) {
+      updateSignificativeAccounts();
+    } else {
+      updateSignificativeProviders();
+    }
   }
 
 
@@ -256,14 +258,22 @@ const UnidentifiedProviders = ({
         {
           let account = accounts.find((account) => account.accountNum == accountId);
           if (account) {
-            account.defaultFootprintParams.code = defaultCode;
-            account.defaultFootprintParams.accuracyMapping = accuracy;
+            account.update({
+              defaultFootprintParams: {
+                code: defaultCode,
+                accuracyMapping: accuracy
+              }
+            });
           } 
           
           let provider = providers.find((provider) => provider.providerNum == accountId);
           if (provider) {
-            provider.defaultFootprintParams.code = defaultCode;
-            provider.defaultFootprintParams.accuracyMapping = accuracy;
+            provider.update({
+              defaultFootprintParams: {
+                code: defaultCode,
+                accuracyMapping: accuracy
+              }
+            });
           }
         });
       } else {
@@ -284,7 +294,7 @@ const UnidentifiedProviders = ({
         const updatedParams = {
           ...provider.defaultFootprintParams,
           [paramName]: paramValue,
-          accuracyMapping: 100
+          accuracyMapping: 100,
         };
         provider.update({ defaultFootprintParams: updatedParams });
         return provider;
@@ -339,69 +349,101 @@ const UnidentifiedProviders = ({
         </h3>
       </div>
 
-      <div className="d-flex align-items-center ">
-          <Form.Check
-            type="checkbox"
-            value={treatmentByExpenseAccount}
-            checked={treatmentByExpenseAccount}
-            onChange={switchView}
-            label="Traitement par compte de charges"
-          />
+      <div className="alert-info ">
+        <div className="info-icon">
+          <Image src="/info-circle.svg" alt="icon info" />
         </div>
+        <div>
+          <p>
+            Le <b>traitement par compte de charges</b> permet de simplifier la démarche
+            d'identification des activités économiques correspondantes aux
+            dépenses non rattachées à un fournisseur identifié (via son numéro
+            SIREN).
+            Il permet de traiter les empreintes des dépenses par compte de charges plutôt que
+            par compte fournisseur.
+          </p>
+          {useChatGPT && <p className="mt-1">
+            L'<b>association automatique est réalisée via ChatGPT</b> à partir du libellé
+            du compte et de la division à laquelle appartient l'entreprise.
+            Un indice de confiance (en pourcentage) est fourni pour exprimer le dégré
+            de confiance dans l'association proposée. Elle est de 100% lorsque l'association
+            est manuelle.
+          </p>}
+        </div>
+      </div>
 
       <div className="d-flex py-2 justify-content-between">
-        <div className="d-flex align-items-center ">
-          <Form.Select
-            size="sm"
-            onChange={handleViewChange}
-            value={currentView}
-            className="me-3"
-          >
-            <option key="1" value="">
-              Tous les comptes (sans siren)
-            </option>
-            <option key="2" value="aux">
-              Comptes fournisseurs uniquement
-            </option>
-            <option key="3" value="expenses">
-              Autres comptes tiers
-            </option>
-            <option key="4" value="significative">
-              Comptes significatifs
-            </option>
-            <option key="5" value="defaultActivity">
-              Comptes tiers non rattachés à un secteur d'activité
-            </option>
-            <option
-              key="6"
-              value="significativeWithoutActivity"
-              disabled={!renderSignificativeOption}
-            >
-              Comptes significatifs non rattachés à un secteur d'activité
-            </option>
-          </Form.Select>
-          <Form.Select
-            size="sm"
-            onChange={handleItemsPerPageChange}
-            value={itemsPerPage}
-            disabled={providers.length < 20}
-          >
-            <option key="1" value="20">
-              20 fournisseurs par page
-            </option>
-            <option key="2" value="50">
-              50 fournisseurs par page
-            </option>
-            <option key="3" value="all">
-              Tous
-            </option>
-          </Form.Select>
-        </div>
+        <Row className="align-items-center">
+          <Col>
+            <div className="d-flex">
+              <Form.Select
+                size="sm"
+                onChange={handleViewChange}
+                value={currentView}
+                className="me-3"
+              >
+                <option key="1" value="">
+                  Tous les comptes (sans siren)
+                </option>
+                <option key="2" value="aux">
+                  Comptes fournisseurs uniquement
+                </option>
+                <option key="3" value="expenses">
+                  Autres comptes tiers
+                </option>
+                <option key="4" value="significative">
+                  Comptes significatifs
+                </option>
+                <option key="5" value="defaultActivity">
+                  Comptes tiers non rattachés à un secteur d'activité
+                </option>
+                <option
+                  key="6"
+                  value="significativeWithoutActivity"
+                  disabled={!renderSignificativeOption}
+                >
+                  Comptes significatifs non rattachés à un secteur d'activité
+                </option>
+              </Form.Select>
+              <Form.Select
+                size="sm"
+                onChange={handleItemsPerPageChange}
+                value={itemsPerPage}
+                disabled={providers.length < 20}
+              >
+                <option key="1" value="20">
+                  20 fournisseurs par page
+                </option>
+                <option key="2" value="50">
+                  50 fournisseurs par page
+                </option>
+                <option key="3" value="all">
+                  Tous
+                </option>
+              </Form.Select>
+            </div>
+          </Col>
+
+          <Col>
+            <Form.Check
+              className="fw-bold"
+              type="switch"
+              value={treatmentByExpenseAccount}
+              checked={treatmentByExpenseAccount}
+              onChange={switchView}
+              id="Traitement par compte de charges"
+              label="Traitement par compte de charges"
+            />
+          </Col>
+        </Row>
 
         <div>
-          <Button className="btn btn-primary me-2" onClick={setDefaultMapping}>
+          <Button className="btn btn-primary me-2" 
+                  onClick={setDefaultMapping}
+                  disabled={!useChatGPT}>
             <i className="bi bi-shuffle"></i> Association automatique
           </Button>
+
           <Button
             onClick={handleSynchronize}
             className="btn btn-secondary"
@@ -412,7 +454,7 @@ const UnidentifiedProviders = ({
         </div>
       </div>
 
-      {!treatmentByExpenseAccount && 
+      {!treatmentByExpenseAccount && (
         <ProvidersTable
           providers={filteredProviders}
           significativeProviders={significativeProviders}
@@ -420,18 +462,19 @@ const UnidentifiedProviders = ({
           startIndex={startIndex}
           endIndex={endIndex}
           setProviderDefaultFootprintParams={setProviderDefaultFootprintParams}
-        />}
+        />
+      )}
 
-      {treatmentByExpenseAccount && 
+      {treatmentByExpenseAccount && (
         <ExpenseAccountsTable
-          providers={filteredProviders}
           accounts={accounts}
-          significativeProviders={significativeProviders}
+          significativeAccounts={significativeAccounts}
           financialPeriod={financialPeriod}
           startIndex={startIndex}
           endIndex={endIndex}
           setAccountDefaultFootprintParams={setAccountDefaultFootprintParams}
-        />}
+        />
+      )}
 
       <PaginationComponent
         currentPage={currentPage}

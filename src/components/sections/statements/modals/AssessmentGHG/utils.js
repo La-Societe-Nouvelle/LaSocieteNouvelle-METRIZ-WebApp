@@ -25,7 +25,7 @@ export const initGhgItem = (id,assessmentItem) =>
     assessmentItem: assessmentItem,
     label: null,
     factorId: null,
-    gas: assessmentItem == "4" ? "R14" : "co2e",
+    gas: assessmentItem == "4" ? "R410a" : "co2e",
     consumption: null,
     consumptionUnit: null,
     consumptionUncertainty: null,

@@ -337,7 +337,7 @@ const FirstRowAssessmentItem = ({
         {assessmentItems[assessmentItem].label}
         </td>
       <td>
-        {printValue(getTotalByAssessmentItem(ghgDetails, assessmentItem), 0)}
+        {printValue(getTotalByAssessmentItem(ghgDetails, assessmentItem), 0)}{" "}
         kgCO2e
       </td>
       <td>

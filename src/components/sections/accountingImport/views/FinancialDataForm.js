@@ -15,6 +15,7 @@ import divisions from "/lib/divisions";
 import { BalanceForwardBookSelection } from "../modals/BalanceForwardBookSelection";
 import { DepreciationAssetsMapping } from "../modals/DepreciationAssetsMapping";
 import { StockPurchasesMapping } from "../modals/StockPurchasesMapping";
+import { ProviderNumMode } from "../modals/ProviderNumMode";
 import { ErrorReportModal } from "../modals/ErrorReportModal";
 import { ImportModal } from "../modals/ImportModal";
 import { ErrorAPIModal } from "../../../modals/userInfoModals";
@@ -60,6 +61,10 @@ export const FinancialDataForm = ({
   const [fileName, setFileName] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  // session options
+  const [useChatGPT, setUseChatGPT] = useState(session.useChatGPT);
+  const [sendStatReport, setSendStatReport] = useState(session.sendStatReport);
+  
   // Accounting import
   const [FECData, setFECData] = useState(null);
   const [showViewsModals, setShowViewsModals] = useState(false);
@@ -101,6 +106,14 @@ export const FinancialDataForm = ({
     session.comparativeData.comparativeDivision = division;
   }, [division]);
 
+  useEffect(() => {
+    session.useChatGPT = useChatGPT;
+  }, [useChatGPT]);
+
+  useEffect(() => {
+    session.sendStatReport = sendStatReport;
+  }, [sendStatReport]);
+
   // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
@@ -130,21 +143,49 @@ export const FinancialDataForm = ({
     setShowViewsModals(true);
   };
 
+  // on change - useChatGPT
+  const handleUseChatGPT = (event) => {
+    const useChatGPT = event.target.checked;
+    setUseChatGPT(useChatGPT);
+  }
+
+  // on change - sendStatReport
+  const handleSendStatReport = (event) => {
+    const sendStatReport = event.target.checked;
+    setSendStatReport(sendStatReport);
+  }
+
   // ----------------------------------------------------------------------------------------------------
 
+  /** Modals
+   *    1 - A-Nouveaux
+   *    2 - Associations comptes immobilisations
+   *    3 - Associations comptes stocks
+   *    4 - Comptes fournisseurs
+   */
+
+  const hasAssetAccounts = Object.keys(FECData?.meta?.accounts ?? []).some((accountNum) => /^(28|29|39)/.test(accountNum));
+  const hasStockAccounts = Object.keys(FECData?.meta?.accounts ?? []).some((accountNum) => /^3(1|2|7)/.test(accountNum));
+  
   const nextModal = () => 
   {
-    let hasAssetAccounts = Object.keys(FECData.meta.accounts)
-      .some((accountNum) => /^(28|29|39)/.test(accountNum));
-    let hasStockAccounts = Object.keys(FECData.meta.accounts)
-      .some((accountNum) => /^3(1|2|7)/.test(accountNum));
-
-    if (modal<2 && hasAssetAccounts) {
-      setModal(2);
-    } else if (modal<3 && hasStockAccounts) {
+    if (modal==1 && hasAssetAccounts) {
+      setModal(2)
+    } else if (modal<=2 && hasStockAccounts) {
       setModal(3);
     } else {
-      loadAccountingData();
+      setModal(4);
+    }
+  };
+
+  const prevModal = () => 
+  {
+    if (modal==4 && hasStockAccounts) {
+      setModal(3)
+    } else if (modal>=3 && hasAssetAccounts) {
+      setModal(2);
+    } else {
+      setModal(1);
     }
   };
 
@@ -314,7 +355,6 @@ export const FinancialDataForm = ({
                 setImportedData={handleFECData}
                 setFileName={setFileName}
               />
-              <p className="small fst-italic mb-0">*Champs obligatoires</p>
               <p className="small fst-italic">
                 ¹ Le fichier doit respecter les normes relatives à la structure
                 du fichier (libellés des colonnes, séparateur tabulation ou
@@ -336,27 +376,89 @@ export const FinancialDataForm = ({
              
               </div>
             )}
+
+            <Form.Group>
+              <Form.Label column sm={4}>
+                Options
+              </Form.Label>
+              <Form.Check
+                className="fw"
+                type="switch"
+                value={useChatGPT}
+                checked={useChatGPT}
+                onChange={handleUseChatGPT}
+                id="Utilisation de ChatGPT"
+                label="Utilisation de ChatGPT (OpenAI)"
+              />
+              <div className="form-text">
+                <p className="mt-2">
+                  L'usage de ChatGPT permet d'obtenir une association automatique
+                  entre les comptes de charges et les divisions économiques, pour
+                  estimer les empreintes des dépenses dont le fournisseur n'est pas
+                  identifié ; et de disposer d'une analyse des résultats obtenus
+                  en fin de session. <b>Aucune donnée nominative n'est présente au
+                  sein des requêtes, et ces dernières ne servent pas à l'amélioration
+                  du modèle</b> ( 
+                  <a href="https://openai.com/enterprise-privacy" 
+                     target="_blank"><u>Politique de confidentialité des données</u> </a>
+                   d'OpenAI).
+                </p>
+              </div>
+              <Form.Check
+                className="fw"
+                type="switch"
+                value={sendStatReport}
+                checked={sendStatReport}
+                onChange={handleSendStatReport}
+                id="Contribution aux travaux statistiques"
+                label="Contribution aux travaux statistiques"
+              />
+              <div className="form-text">
+                <p className="mt-2">
+                  La contribution aux travaux statistiques correspond à l'<b>envoi d'un
+                  rapport statistique anonyme contenant des résultats intermédiaires</b>.
+                  Une description du contenu du rapport est disponible au sein de la politique de confidentialité
+                  des données. Aucune donnée nominative, ni aucune donnée personnelle n'est présente au
+                  sein du rapport envoyé. ( 
+                  <a href="https://metriz.lasocietenouvelle.org/confidentialite-des-donnees" 
+                     target="_blank"><u>Politique de confidentialité des données</u> </a>
+                   de Metriz).
+                </p>
+              </div>
+            </Form.Group>
+
+            <div>              
+              <p className="small fst-italic mb-3 mt-3 text-end">*Champs obligatoires</p>
+            </div>
+
             {showViewsModals && (
               <>
-                <ImportModal show={modal === 1} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 1} onHide={cancelImport} title={"Identification du journal des A-Nouveaux"} fileName={fileName}>
                   <BalanceForwardBookSelection
                     FECData={FECData}
-                    onSubmit={() => nextModal(1)}
+                    onSubmit={() => nextModal()}
                     onCancel={cancelImport}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 2} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 2} onHide={cancelImport} title={"Associations entre comptes d'amortissements et comptes d'immobilisations"}  fileName={fileName}>
                   <DepreciationAssetsMapping
                     meta={FECData.meta}
-                    onSubmit={() => nextModal(2)}
-                    onGoBack={() => setModal(1)}
+                    onSubmit={() => nextModal()}
+                    onGoBack={() => prevModal()}
                   />
                 </ImportModal>
-                <ImportModal show={modal === 3} onHide={cancelImport} title={fileName}>
+                <ImportModal show={modal === 3} onHide={cancelImport} title={"Associations entre comptes de stocks et comptes de charges"}  fileName={fileName}>
                   <StockPurchasesMapping
                     meta={FECData.meta}
+                    onSubmit={() => nextModal()}
+                    onGoBack={() => prevModal()}
+                  />
+                </ImportModal>
+                <ImportModal show={modal === 4} onHide={cancelImport} title={"Gestion des comptes fournisseurs"}  fileName={fileName}>
+                  <ProviderNumMode
+                    meta={FECData.meta}
                     onSubmit={() => loadAccountingData(FECData)}
-                    onGoBack={() => setModal(2)}
+                    onGoBack={() => prevModal()}
                   />
                 </ImportModal>
               </>

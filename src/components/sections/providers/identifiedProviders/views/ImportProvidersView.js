@@ -63,11 +63,10 @@ const ImportProvidersView = ({
           ? updatedProviders.find((p) => p.providerNum === providerNum)
           : updatedProviders.find((p) => p.providerLib === corporateName);
 
-        if (provider) {
-          provider.corporateId = corporateId;
-          provider.legalUnitData.denomination = denomination;
-          provider.useDefaultFootprint = false;
-          provider.footprintStatus = 0; // Check if changes or use update()
+        if (provider && provider.corporateId!=corporateId) {
+          provider.update({
+            corporateId: corporateId
+          })
         }
       }
 
@@ -83,7 +82,6 @@ const ImportProvidersView = ({
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
       let updatedProviders = [...providers];
-
       XLSXData.forEach(
         ({ accountNum, accountLib, denomination, siren, account }) => {
           if (account && !accountNum) accountNum = account;
@@ -91,10 +89,9 @@ const ImportProvidersView = ({
             (p) => p.providerNum === accountNum || p.providerLib === accountLib
           );
           if (provider) {
-            provider.corporateId = siren;
-            provider.legalUnitData.denomination = denomination;
-            provider.useDefaultFootprint = false;
-            provider.footprintStatus = 0; // Check if changes or use update()
+            provider.update({
+              corporateId: siren
+            })
           }
         }
       );
@@ -137,19 +134,21 @@ const ImportProvidersView = ({
   return (
     <>
       <div className="box me-2 flex-grow-1">
-       
-        
         <div className="d-flex justify-content-between mb-4 align-items-center">
-        <h4 className="mb-0">Importer les fournisseurs</h4>
-            <Button variant="light-secondary" onClick={() => exportXLSXFile(providers)} size="sm">
-              <i className="bi bi-download"></i> Exporter les fournisseurs
-            </Button>
+          <h4 className="mb-0">Importer les fournisseurs</h4>
+          <Button
+            variant="light-secondary"
+            onClick={() => exportXLSXFile(providers)}
+            size="sm"
+          >
+            <i className="bi bi-download"></i> Exporter les fournisseurs
+          </Button>
         </div>
-      
+
         <p className="small">
-            Téléchargez la liste des comptes fournisseurs auxiliaires, complétez
-            les numéros SIREN et réimportez ensuite le fichier.
-          </p>
+          Téléchargez la liste des comptes fournisseurs auxiliaires, complétez
+          les numéros SIREN et réimportez ensuite le fichier.
+        </p>
 
         <Dropzone onDrop={onDrop} accept={[".xlsx", ".csv"]} maxFiles={1}>
           {({ getRootProps, getInputProps }) => (

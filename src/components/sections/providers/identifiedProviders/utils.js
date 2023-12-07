@@ -47,7 +47,7 @@ export async function getSignificativeProviders(
       .map((provider) => provider.providerNum);
   }
 
-  // significative companies
+  // significative companies (low -> high)
   let providersSorted = providers
     .filter((provider) => provider.periodsData.hasOwnProperty(period.periodKey))
     .sort(

@@ -21,11 +21,10 @@ import areas from "/lib/areas";
 import { isValidNumber } from "../../../../utils/Utils";
 
 const ExpenseAccountsTable = ({
-  providers,
   accounts,
   startIndex,
   endIndex,
-  significativeProviders,
+  significativeAccounts,
   financialPeriod,
   setAccountDefaultFootprintParams
 }) => {
@@ -64,16 +63,15 @@ const ExpenseAccountsTable = ({
   const areasOptions = getAreasOptions(areas);
 
   // show note
-  const showSignificativeNote = providers.some(
-    (provider) =>
-      significativeProviders.includes(provider.providerNum) &&
-      provider.defaultFootprintParams.code === "00"
+  const showSignificativeNote = accounts.some((account) =>
+      significativeAccounts.includes(account.accountNum) &&
+      account.defaultFootprintParams.code === "00"
   );
 
   // Check if significant providers are unassigned
   const hasWarning = (account) => {
     return (
-      significativeProviders.includes(account.accountNum) &&
+      significativeAccounts.includes(account.accountNum) &&
       account.defaultFootprintParams.code == "00"
     );
   };
