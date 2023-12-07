@@ -126,13 +126,10 @@ export async function FECFileReader(content) {
     .split(separator);
 
   // Vérification des colonnes
-
   const missingColumns = columnsFEC.filter(column => !header.includes(column));
-  
   if (missingColumns.length > 0) {
-    throw `Fichier erroné (libellé(s) manquant(s)) : ${missingColumns.join(', ')}`;
+    throw `Fichier erroné (libellé(s) manquant(s) : ${missingColumns.join(', ')})`;
   }
-
 
   // Construction de l'index des colonnes
   let indexColumns = {};
@@ -147,14 +144,12 @@ export async function FECFileReader(content) {
     // Segmentation des colonnes (String -> JSON)
     let row = rowString.replace("\r", "").split(separator);
 
-    let rowArray = row.slice(0, header.length);
-
-    if (rowArray.length == header.length) {
+    if (row.length == header.length) {
       // Construction du JSON
       // -------------------------------------------------- //
 
       // Construction du JSON pour la ligne
-      let rowData = await readFECFileRow(indexColumns, rowArray);
+      let rowData = await readFECFileRow(indexColumns, row);
 
       // Construction du journal (si absent) et mise à jour des métadonnées relatives aux journaux
       if (!(rowData.JournalCode in dataFEC.meta.books)) {
@@ -226,10 +221,10 @@ function getSeparator(line) {
 }
 
 // Read line (Array -> JSON)
-async function readFECFileRow(indexColumns, rowArray) {
+async function readFECFileRow(indexColumns, row) {
   let rowData = {};
   Object.entries(indexColumns).forEach(([column, index]) => {
-    rowData[column] = rowArray[index]
+    rowData[column] = row[index]
       .replace(/^\"/, "") // remove quote at the beginning
       .replace(/\"$/, "") // remove quote at the end
       .replace(/^\s+|\s+$/, ""); // remove spaces before and after string
