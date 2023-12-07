@@ -30,8 +30,8 @@ const SyncProvidersView = ({
     currentView: view,
     currentPage: 1,
     itemsPerPage: 20,
-    sortColumn: null,
-    sortOrder: "asc",
+    sortColumn: "montant",
+    sortOrder: "desc",
   });
 
   const { currentView, currentPage, itemsPerPage, sortColumn, sortOrder } = state;
