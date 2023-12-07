@@ -45,6 +45,10 @@ export class Session
     // Identifier
     this.id = props.id || "";
 
+    // Options
+    this.useChatGPT = props.useChatGPT ?? true ;
+    this.sendStatReport = props.sendStatReport ?? false ;
+
     // Periods
     this.availablePeriods = props.availablePeriods || [];
     this.availablePeriods.forEach((period) => {

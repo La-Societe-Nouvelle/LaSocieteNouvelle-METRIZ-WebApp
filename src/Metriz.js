@@ -22,7 +22,7 @@ import { HeaderPublish } from "/src/components/pageComponents/HeaderPublish";
 import { Footer } from "/src/components/pageComponents/Footer";
 
 // Logs
-import { logUserProgress } from "/src/services/StatsService";
+import { logUserProgress, sendAnonymousStatReport } from "./statReportService/StatReportService";
 
 // Utils
 import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
@@ -89,8 +89,13 @@ export const Metriz = () =>
 
   const initSession = (session) => 
   {
+    // console logs
+    console.log("--------------------------------------------------");
+    console.log("Initialisation d'une nouvelle session");
+    console.log(session);
+
     setSession(session);
-    setStep(1);
+    setStep(1); 
   };
 
   const resumeSession = async (session) => 
@@ -203,6 +208,16 @@ export const Metriz = () =>
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 4, currentDate, 
         session.validations[selectedPeriod.periodKey]);
+    }
+
+    // Anonymous stats report
+    try {
+      sendAnonymousStatReport(
+        session,
+        selectedPeriod
+      );
+    } catch (error) {
+      console.log(error);
     }
     
     // next step

@@ -28,7 +28,7 @@ export const HeaderPage = () =>
       </Navbar.Brand>
         <Nav>
           <Nav.Link href="/">
-            <i className="bi bi-house-door-fill"></i> Accueil
+            <i className="bi bi-house-door-fill me-1"></i> Accueil
           </Nav.Link>
           <Nav.Link href="/a-propos">
             A propos

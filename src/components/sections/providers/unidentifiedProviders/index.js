@@ -26,7 +26,8 @@ const UnidentifiedProviders = ({
   submit,
   synchronizeProviders,
   sessionDidUpdate,
-  legalUnitActivityCode
+  legalUnitActivityCode,
+  useChatGPT
 }) => {
 
   // State management
@@ -407,7 +408,9 @@ const UnidentifiedProviders = ({
         </div>
 
         <div>
-          <Button className="btn btn-primary me-2" onClick={setDefaultMapping}>
+          <Button className="btn btn-primary me-2" 
+                  onClick={setDefaultMapping}
+                  disabled={!useChatGPT}>
             <i className="bi bi-shuffle"></i> Association automatique
           </Button>
           <Button
