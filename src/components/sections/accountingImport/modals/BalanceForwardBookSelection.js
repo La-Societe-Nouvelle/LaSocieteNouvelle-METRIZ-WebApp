@@ -2,7 +2,7 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
+import { Image, Table } from "react-bootstrap";
 
 // Librairies
 import booksProps from "/lib/books.json";
@@ -84,13 +84,17 @@ export const BalanceForwardBookSelection = ({
 
   return (
     <>
-      <h4>Identifiez les A-Nouveaux</h4>
       <div className="small mb-3">
-        <p>
-          L'identification du journal des A-Nouveaux est nécessaire à la bonne
-          lecture du fichier d'écritures comptables. En cas de premier exercice,
-          validez la sélection sans cocher de case.
-        </p>
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <p>
+            L'identification du journal des A-Nouveaux est nécessaire à la bonne
+            lecture du fichier d'écritures comptables. En cas de premier exercice,
+            validez la sélection sans cocher de case.
+          </p>
+        </div>
       </div>
       <Table bordered hover>
         <thead>
@@ -135,7 +139,7 @@ export const BalanceForwardBookSelection = ({
           Annuler
         </button>
         <button className="btn btn-secondary" onClick={() => submit()}>
-          Etape suivante
+          Suivant
           <i className="bi bi-chevron-right" />
         </button>
       </div>

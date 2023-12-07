@@ -2,6 +2,7 @@
 
 // React
 import React, { useEffect, useState } from "react";
+import { Image } from "react-bootstrap";
 
 // Tables
 import { ImmobilisationsTable } from "../tables/ImmobilisationsTable";
@@ -19,16 +20,10 @@ import { MainAggregatesTable } from "../tables/MainAggregatesTable";
  *    - external expenses
  *    - immobilisations
  *    - stocks
- * 
+ *
  */
 
-export const FinancialDataViews = ({
-  session,
-  period,
-  onSubmit,
-  onGoBack
-}) => {
-
+export const FinancialDataViews = ({ session, period, onSubmit, onGoBack }) => {
   const [selectedTab, setSelectedTab] = useState("incomeStatement");
 
   useEffect(() => {
@@ -44,23 +39,27 @@ export const FinancialDataViews = ({
 
   // ----------------------------------------------------------------------------------------------------
 
-  const validFinancialData = () => 
-  {
+  const validFinancialData = () => {
     // valid period in financial data
     session.financialData.status[period.periodKey].isValidated = true;
     onSubmit();
-  }
+  };
 
   // ----------------------------------------------------------------------------------------------------
 
   return (
     <>
-      <h3 className=" ">Vérifiez les agrégats financiers</h3>
-      <p className="form-text">
-        Par mesure de précaution, vérifiez l’exactitude des agrégats
-        financiers. Des erreurs de lecture peuvent intervenir en cas
-        d'écriture unique regroupant plusieurs opérations.
-      </p>
+      <h3 className=" ">Validation des données importées</h3>
+      <div className="alert-info">
+        <div className="info-icon">
+          <Image src="/info-circle.svg" alt="icon info" />
+        </div>
+        <p>
+          Par mesure de précaution, veuillez vérifier l'exactitude des agrégats
+          financiers. En cas d'écart, merci de nous le signaler.
+        </p>
+      </div>
+
       <div className="table-menu">
         <button
           key={1}
@@ -105,79 +104,51 @@ export const FinancialDataViews = ({
       </div>
 
       <div className="table-data">
-        {buildTab(session.financialData,selectedTab,period)}
+        {buildTab(session.financialData, selectedTab, period)}
       </div>
 
       <div className="text-end">
-        <button
-          className="btn btn-primary me-2"
-          onClick={() => onGoBack()}
-        >
+        <button className="btn btn-primary me-2" onClick={() => onGoBack()}>
           <i className="bi bi-chevron-left"></i> Retour
         </button>
-        <button 
-          className={"btn btn-secondary"} 
-          onClick={validFinancialData}
-        >
-        {session.financialData.status[period.periodKey].isValidated ?  "Reprendre mon analyse" : "Valider l'import" }
+        <button className={"btn btn-secondary"} onClick={validFinancialData}>
+          {session.financialData.status[period.periodKey].isValidated
+            ? "Reprendre mon analyse"
+            : "Valider l'import"}
           <i className="bi bi-chevron-right"></i>
         </button>
       </div>
     </>
   );
-}
+};
 
 /* ---------- TABLES ---------- */
 
-const buildTab = (financialData,tab,period) => 
-{
-  switch (tab) 
-  {
+const buildTab = (financialData, tab, period) => {
+  switch (tab) {
     // Soldes intermediaires de gestion
     case "mainAggregates":
       return (
-        <MainAggregatesTable
-          financialData={financialData}
-          period={period}
-        />
-      ); 
+        <MainAggregatesTable financialData={financialData} period={period} />
+      );
     // Compte de résultats
     case "incomeStatement":
       return (
-        <IncomeStatementTable
-          financialData={financialData}
-          period={period}
-        />
-      ); 
+        <IncomeStatementTable financialData={financialData} period={period} />
+      );
     // Immobilisations
     case "immobilisations":
       return (
         <>
-          <ImmobilisationsTable
-            financialData={financialData}
-            period={period}
-          />
-          <AmortisationsTable
-            financialData={financialData}
-            period={period}
-          />
+          <ImmobilisationsTable financialData={financialData} period={period} />
+          <AmortisationsTable financialData={financialData} period={period} />
         </>
-      ); 
+      );
     // Stocks
     case "stocks":
-      return (
-        <StocksTable 
-          financialData={financialData} 
-          period={period}
-        />
-      ); 
+      return <StocksTable financialData={financialData} period={period} />;
     // Charges externes
     case "expenses":
-      return (
-        <ExpensesTable 
-          financialData={financialData} 
-          period={period}
-        />
-      );
+      return <ExpensesTable financialData={financialData} period={period} />;
   }
-}
+};

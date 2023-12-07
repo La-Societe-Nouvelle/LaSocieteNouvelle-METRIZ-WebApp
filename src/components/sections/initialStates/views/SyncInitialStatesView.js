@@ -2,7 +2,7 @@
 
 // React
 import { useState } from "react";
-import { Table } from "react-bootstrap";
+import { Image, Table } from "react-bootstrap";
 
 // Components
 import { RowTableImmobilisation } from "./RowTableImmobilisation";
@@ -82,24 +82,10 @@ export const SyncInitialStatesView = ({
   return (
     <>
       <div className="step p-4 my-3">
-        <h3 className="mb-3"> Initialiser les états initiaux </h3>
-
-        <div className="small">
-          <p>
-            <i className="bi bi-info-circle"></i> <b>Valeur par défaut :</b>{" "}
-            Les valeurs par défaut correspondent aux données disponibles
-            pour la branche économique la plus proche.
-          </p>
-          <p>
-            <i className="bi  bi-info-circle"></i>{" "}
-            <b>Estimée sur exercice courant : </b>Nous initialisons
-            l'empreinte du compte en début d'exercice. à partir des
-            opérations réalisées sur l'exercice courant.
-          </p>
-        </div>
+        <h3 className="mb-3"> Initialisation des états initiaux </h3>
 
         {isSyncButtonEnable ? (
-          <div className="alert alert-info">
+          <div className="alert alert-warning">
             <p>
               <i className="bi bi-exclamation-circle"></i> Les empreintes de
               certains comptes doivent être synchronisées.
@@ -108,8 +94,7 @@ export const SyncInitialStatesView = ({
               onClick={() => synchroniseAll()}
               className="btn btn-secondary"
             >
-              <i className="bi bi-arrow-repeat"></i> Synchroniser les
-              données
+              <i className="bi bi-arrow-repeat"></i> Synchroniser les données
             </button>
           </div>
         ) : (
@@ -120,7 +105,7 @@ export const SyncInitialStatesView = ({
             </p>
           </div>
         )}
-        
+
         <div className="table-data mt-2">
           <Table>
             <thead>
@@ -132,32 +117,42 @@ export const SyncInitialStatesView = ({
               </tr>
             </thead>
             <tbody>
-              {assets
-                .map((account) => (
-                  <Row
-                    key={account.accountNum}
-                    account={account}
-                    period={period}
-                    onUpdate={rowDidUpdate}
-                  />
-                ))}
+              {assets.map((account) => (
+                <Row
+                  key={account.accountNum}
+                  account={account}
+                  period={period}
+                  onUpdate={rowDidUpdate}
+                />
+              ))}
             </tbody>
-          </Table> 
+          </Table>
+          <div className="small d-flex">
+        
+          <div> 
+            <p>
+              <b>Valeur par défaut :</b> Les valeurs par défaut correspondent aux
+              données disponibles pour la branche économique la plus proche.<br/>
+              <b>Estimée sur exercice courant : </b>Empreinte
+              du compte initialisée en début d'exercice à partir des opérations réalisées sur
+              l'exercice courant.
+            </p>
+          </div>
         </div>
+        </div>
+
+
         {fetching && (
-            <ProgressBarModal
-              message="Récupération des données par défaut..."
-              progression={syncProgression}
-            />
-          )}
+          <ProgressBarModal
+            message="Récupération des données par défaut..."
+            progression={syncProgression}
+          />
+        )}
       </div>
 
-      <ErrorAPIModal
-        hasError={errorAPI}
-        onClose={() => setErrorAPI(false)}
-      />      
+      <ErrorAPIModal hasError={errorAPI} onClose={() => setErrorAPI(false)} />
     </>
-  )
+  );
 }
 
 /* ---------- ROWS ---------- */

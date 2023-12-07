@@ -1,4 +1,14 @@
 /* ---------- TABLE ---------- */
+.nav-tabs .nav-link {
+  margin-bottom: 0;
+  border: 1px solid $bg-light;
+}
+
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  border-color: $light;
+  border-width: 2px 2px 0 2px;
+}
 
 .toChecked {
   border-right: 2px solid $warning;
@@ -35,7 +45,7 @@ table {
 
   .form-control.success {
     border-color: lighten($success, 25%);
-      background-color: lighten($success, 45%);
+    background-color: lighten($success, 45%);
   }
 
   tr.warning td,
@@ -154,8 +164,6 @@ table {
 
 .table {
   font-size: 0.8rem;
-
-
 }
 
 .table-navigation {
@@ -251,8 +259,9 @@ table {
   .border-left {
     border-left: 2px solid darken($light, 1%);
   }
+
   flex: 2;
-  
+
 }
 
 .comparative-table {
@@ -297,7 +306,7 @@ table {
   border: 2px solid $light;
   border-left: 0;
   border-right: 1px solid $light;
-  border-top : 1px solid $light;
+  border-top: 1px solid $light;
   padding: 0 0.5rem;
   color: $primary;
 }
@@ -305,13 +314,37 @@ table {
 .prevTable {
   flex: 1 1;
   margin-bottom: 0;
+
   thead {
     background-color: lighten($primary, 5%);
-    tr:nth-child(2), tr:nth-child(3) {
+
+    tr:nth-child(2),
+    tr:nth-child(3) {
       background-color: lighten($primary, 10%);
     }
   }
+
   th:first-child {
     border-left: 2px solid $bg-light;
   }
+}
+
+// --- Provider Num Mode Table --- //
+
+
+
+#provider-num-mode {
+  .table.table-striped {
+    .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      border-width: 2px;
+
+    }
+  }
+
+  .tab-content {
+    min-height: 389px;
+  }
+
 }

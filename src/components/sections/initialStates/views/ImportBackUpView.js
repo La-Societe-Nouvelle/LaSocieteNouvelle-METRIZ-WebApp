@@ -115,15 +115,7 @@ export const ImportBackUpView = ({
 
   return (
     <div className="box">
-      <h3 className="mb-3"> Reprise sur l'exercice précédent</h3>
-      <p className="small">
-        En cas d'analyse réalisée pour l'exercice précédent,{" "}
-        <b>importez le fichier</b> de l'analyse de l'exercice précédent.
-        L'ajout de la sauvegarde permet d'assurer une continuité vis-à-vis
-        de l'exercice en cours. La sauvegarde contient les valeurs des
-        indicateurs associés aux comptes de stocks, d'immobilisations et
-        d'amortissements en fin d'exercice.
-      </p>
+      <h3 className="mb-3 text-secondary"> Import de la sauvegarde de l'exercice précédent</h3>
 
       <label>Importer votre fichier de sauvegarde (.json)</label>
       <Dropzone onDrop={onDrop} maxFiles={1} multiple={false}>
