@@ -125,7 +125,6 @@ const ProvidersSection = ({
           submit={submit}
           synchronizeProviders={synchronizeProviders}
           sessionDidUpdate={sessionDidUpdate}
-          useChatGPT={useChatGPT}
         />
       </>
     );
@@ -146,6 +145,7 @@ const ProvidersSection = ({
           synchronizeProviders={synchronizeProviders}
           sessionDidUpdate={sessionDidUpdate}
           legalUnitActivityCode={legalUnit.activityCode || comparativeData.comparativeDivision}
+          useChatGPT={useChatGPT}
         />
       </>
     );

@@ -29,8 +29,8 @@ const UnidentifiedProviders = ({
   legalUnitActivityCode,
   useChatGPT
 }) => {
-  // State management
 
+  // State management
   const [providers, setProviders] = useState(
     financialData.providers.filter(
       (provider) =>
@@ -38,7 +38,6 @@ const UnidentifiedProviders = ({
         provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
     )
   );
-
   const [accounts, setAccounts] = useState([]);
 
   useEffect(() => {
@@ -136,7 +135,7 @@ const UnidentifiedProviders = ({
         maxFpt,
         financialPeriod
       );
-
+    
     setSignificativeProviders(significativeProviders);
   };
 
@@ -150,7 +149,7 @@ const UnidentifiedProviders = ({
         maxFpt,
         financialPeriod
       );
-
+    
     setSignificativeAccounts(significativeAccounts);
   };
 
@@ -213,7 +212,6 @@ const UnidentifiedProviders = ({
       const accountsToSynchronise = accountsToSync
         .concat(providersToSync)
         .filter((account) => (account.footprintStatus !== 200 || !account.footprint.isValid()));
-      console.log(accountsToSynchronise);
       await synchronizeProviders(accountsToSynchronise);
   
       updateSignificativeAccounts();
@@ -233,6 +231,12 @@ const UnidentifiedProviders = ({
       .filter((flow) => providerNums.includes(flow.providerNum))
       .forEach((flow) => flow.footprintOrigin = treatmentByExpenseAccount ? "account" : "provider");
     setTreatmentByExpenseAccount(treatmentByExpenseAccount);
+
+    if (treatmentByExpenseAccount) {
+      updateSignificativeAccounts();
+    } else {
+      updateSignificativeProviders();
+    }
   }
 
 
@@ -358,13 +362,13 @@ const UnidentifiedProviders = ({
             Il permet de traiter les empreintes des dépenses par compte de charges plutôt que
             par compte fournisseur.
           </p>
-          <p className="mt-1">
+          {useChatGPT && <p className="mt-1">
             L'<b>association automatique est réalisée via ChatGPT</b> à partir du libellé
             du compte et de la division à laquelle appartient l'entreprise.
             Un indice de confiance (en pourcentage) est fourni pour exprimer le dégré
             de confiance dans l'association proposée. Elle est de 100% lorsque l'association
             est manuelle.
-          </p>
+          </p>}
         </div>
       </div>
 

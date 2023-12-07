@@ -63,9 +63,8 @@ const ExpenseAccountsTable = ({
   const areasOptions = getAreasOptions(areas);
 
   // show note
-  const showSignificativeNote = accounts.some(
-    (account) =>
-      significativeAccounts.includes(account.providerNum) &&
+  const showSignificativeNote = accounts.some((account) =>
+      significativeAccounts.includes(account.accountNum) &&
       account.defaultFootprintParams.code === "00"
   );
 
