@@ -62,6 +62,7 @@ export const FinancialDataForm = ({
 
   // session options
   const [useChatGPT, setUseChatGPT] = useState(session.useChatGPT);
+  const [sendStatReport, setSendStatReport] = useState(session.sendStatReport);
   
   // Accounting import
   const [FECData, setFECData] = useState(null);
@@ -108,6 +109,10 @@ export const FinancialDataForm = ({
     session.useChatGPT = useChatGPT;
   }, [useChatGPT]);
 
+  useEffect(() => {
+    session.sendStatReport = sendStatReport;
+  }, [sendStatReport]);
+
   // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
@@ -141,6 +146,12 @@ export const FinancialDataForm = ({
   const handleUseChatGPT = (event) => {
     const useChatGPT = event.target.checked;
     setUseChatGPT(useChatGPT);
+  }
+
+  // on change - sendStatReport
+  const handleSendStatReport = (event) => {
+    const sendStatReport = event.target.checked;
+    setSendStatReport(sendStatReport);
   }
 
   // ----------------------------------------------------------------------------------------------------
@@ -374,6 +385,27 @@ export const FinancialDataForm = ({
                   <a href="https://openai.com/enterprise-privacy" 
                      target="_blank"><u>Politique de confidentialité des données</u> </a>
                    d'OpenAI).
+                </p>
+              </div>
+              <Form.Check
+                className="fw"
+                type="switch"
+                value={sendStatReport}
+                checked={sendStatReport}
+                onChange={handleSendStatReport}
+                id="Contribution aux travaux statistiques"
+                label="Contribution aux travaux statistiques"
+              />
+              <div className="form-text">
+                <p className="mt-2">
+                  La contribution aux travaux statistiques correspond à l'<b>envoi d'un
+                  rapport statistique anonyme contenant des résultats intermédiaires</b>.
+                  Une description du contenu du rapport est disponible au sein de la politique de confidentialité
+                  des données. Aucune donnée nominative, ni aucune donnée personnelle n'est présente au
+                  sein du rapport envoyé. ( 
+                  <a href="https://metriz.lasocietenouvelle.org/confidentialite-des-donnees" 
+                     target="_blank"><u>Politique de confidentialité des données</u> </a>
+                   de Metriz).
                 </p>
               </div>
             </Form.Group>

@@ -47,6 +47,7 @@ export class Session
 
     // Options
     this.useChatGPT = props.useChatGPT ?? true ;
+    this.sendStatReport = props.sendStatReport ?? false ;
 
     // Periods
     this.availablePeriods = props.availablePeriods || [];
