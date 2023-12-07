@@ -432,9 +432,8 @@ const UnidentifiedProviders = ({
 
       {treatmentByExpenseAccount && 
         <ExpenseAccountsTable
-          providers={filteredProviders}
           accounts={accounts}
-          significativeProviders={significativeProviders}
+          significativeAccounts={significativeAccounts}
           financialPeriod={financialPeriod}
           startIndex={startIndex}
           endIndex={endIndex}
