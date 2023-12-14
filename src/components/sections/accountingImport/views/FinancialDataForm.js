@@ -26,6 +26,7 @@ import { FECDataReader } from "../utils/FECReader";
 // Utils
 import { getDivisionsOptions } from "/src/utils/metaUtils";
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "../utils";
+import { roundValue } from "../../../../utils/Utils";
 
 // Components
 import { FinancialDataDropzone } from "./FinancialDataDropzone";
@@ -242,8 +243,8 @@ export const FinancialDataForm = ({
       // impacts data
       let impactsDataOnFinancialPeriod = session.impactsData[financialPeriod.periodKey];
       impactsDataOnFinancialPeriod.netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[financialPeriod.periodKey].amount;
-      impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = accountingData.KNWData.apprenticeshipTax;
-      impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = accountingData.KNWData.vocationalTrainingTax;
+      impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = roundValue(accountingData.KNWData.apprenticeshipTax, 2);
+      impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = roundValue(accountingData.KNWData.vocationalTrainingTax, 2);
 
         // FEC id
       session.id = FECData.id; // anonymisation id
