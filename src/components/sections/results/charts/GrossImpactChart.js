@@ -12,7 +12,7 @@ import {
   prevAggregatesChartColors,
   aggregatesChartColors,
   tooltips,
-} from "./chartColors";
+} from "../../../../constants/chartColors";
 
 export const GrossImpactChart = ({
   id,

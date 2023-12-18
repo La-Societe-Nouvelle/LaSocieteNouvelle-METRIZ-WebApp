@@ -18,6 +18,7 @@ import { loadFonts } from "../../../../../utils/exportsUtils";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 import { getMostImpactfulExpensesPart, sortProvidersByImpact } from "../../utils";
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
 //  Report for Intensity Indicator
@@ -140,17 +141,6 @@ export const buildSummaryReportIntensityIndic = async ({
 
   // Document Property
 
-  const margins = {
-    top: 50,
-    bottom: 50,
-    left: 40,
-    right: 40,
-  };
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
-
   const documentTitle =
     "Fiche_" +
     indic.toUpperCase() +
@@ -162,9 +152,9 @@ export const buildSummaryReportIntensityIndic = async ({
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
-    pageSize: pageSize,
+    pageSize: pdfPageSize,
     // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
     header: {
       columns: [
         { text: corporateName, margin: [20, 15, 0, 0], bold: true },
@@ -202,8 +192,8 @@ export const buildSummaryReportIntensityIndic = async ({
           type: "rect",
           x: 20,
           y: 35,
-          w: pageSize.width - 40,
-          h: pageSize.height - 65,
+          w: pdfPageSize.width - 40,
+          h: pdfPageSize.height - 65,
           color: "#FFFFFF",
           r: 10,
         },
