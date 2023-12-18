@@ -16,13 +16,13 @@ import {
   getIndicDescription,
   getIntensKeyProviders,
   getUncertaintyDescription,
-  loadFonts,
   sortAccountsByFootprint,
   sortProvidersByContrib,
 } from "../exportsUtils";
 
 import { getClosestYearData } from "../../utils";
 
+import { loadFonts } from "../../../../../utils/exportsUtils";
 
 import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 

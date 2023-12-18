@@ -9,12 +9,12 @@ import metaIndics from "/lib/indics";
 import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
-  loadFonts,
   targetAnnualReduction,
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
 } from "../exportsUtils";
 
+import { loadFonts } from "../../../../../utils/exportsUtils";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 import { getMostImpactfulExpensesPart, sortProvidersByImpact } from "../../utils";

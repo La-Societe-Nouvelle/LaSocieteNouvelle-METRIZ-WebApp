@@ -13,11 +13,11 @@ import {
   getIndicDescription,
   getKeySuppliers,
   getUncertaintyDescription,
-  loadFonts,
   targetAnnualReduction,
 } from "../exportsUtils";
 import { printValue } from "/src/utils/formatters";
 
+import { loadFonts } from "../../../../../utils/exportsUtils";
 import { sortProvidersByImpact } from "../../utils";
 
 // --------------------------------------------------------------------------
