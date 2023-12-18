@@ -370,10 +370,10 @@ export const buildSummaryReportContributionIndic = async ({
         style: "h2",
       },
       {
+        margin: [0, 10, 0, 10],
         columns: [
           {
             width: "25%",
-            margin: [0, 10, 0, 10],
             stack: [
               {
                 text:
@@ -394,7 +394,6 @@ export const buildSummaryReportContributionIndic = async ({
             ],
           },
           {
-            margin: [0, 5, 0, 10],
             stack: [
               {
                 image: doughtnutICImage,
@@ -481,13 +480,13 @@ export const buildSummaryReportContributionIndic = async ({
               },
               {
                 image: prodChartImage,
-                width: 180,
+                width: 130,
                 alignment: "center",
               },
               {
                 text: "\tEmpreinte de vos achats\t",
                 style: "h3",
-                margin: [0, 25, 0, 10],
+                margin: [0, 18, 0, 10],
                 alignment: "center",
                 background: "#FFFFFF",
               },

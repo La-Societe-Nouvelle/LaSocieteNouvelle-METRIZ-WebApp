@@ -12,7 +12,8 @@ const RingChart = ({
   session,
   period,
   aggregate,
-  indic
+  indic,
+  cutOut
 }) => {
 
   const [width, setWidth] = useState(100);
@@ -120,7 +121,7 @@ const RingChart = ({
         },
       },
     },
-    cutout:getCutOut(width,5),
+    cutout:getCutOut(width,cutOut ?? 5),
   };
 
   return <Doughnut  data={data} options={options} />;

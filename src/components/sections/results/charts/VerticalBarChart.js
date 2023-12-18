@@ -22,22 +22,22 @@ import { changeOpacity, getSuggestedMax } from "./chartsUtils";
  *    - indic
  *    - session,
  *    - aggregate
- *    - isPrinting -> use in report
+ *    - printMode -> use in report
  * 
  */
-
 export const VerticalBarChart = ({
   id,
   session,
   period,
   aggregate,
   indic,
-  isPrinting,
+  printMode,
   showDivisionData,
   showAreaData,
   showTargetData,
   showPreviousData,
-  useIndicColors
+  useIndicColors,
+  label
 }) => {
 
   const { unit, nbDecimals } = metaIndics[indic];
@@ -49,6 +49,15 @@ export const VerticalBarChart = ({
 
   const {financialData,comparativeData} = session
   const mainAggregates = financialData.mainAggregates;
+ 
+
+    // targets
+
+    const dataset_target = [];
+
+    let areaTargetValue = comparativeData[aggregate].area.target.data[indic].length>0 ? 
+    comparativeData[aggregate].area.target.data[indic].slice(-1)[0].value : null;
+    dataset_target.push(showAreaData ? areaTargetValue : null);
 
   // current footprints
 
@@ -58,6 +67,7 @@ export const VerticalBarChart = ({
   // area
   if (showAreaData) {
     let areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0].value;
+    
     dataset_currentFootprints.push(areaValue);
     labels.push("France");
     backgroundColors.push("RGBA(176,185,247,1)");
@@ -65,7 +75,12 @@ export const VerticalBarChart = ({
   // company
   let companyValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
   dataset_currentFootprints.push(companyValue);
-  labels.push("Exercice");
+  labels.push(label);
+
+  if(showAreaData && showDivisionData) {
+    dataset_target.push(null);
+  }
+
   if(useIndicColors) {
     
     backgroundColors.push(indicColor);
@@ -75,10 +90,17 @@ export const VerticalBarChart = ({
     backgroundColors.push("RGBA(250,89,95,1)");
 
   }
+
+  let divisionTargetValue = comparativeData[aggregate].division.target.data[indic].length>0 ? 
+  comparativeData[aggregate].division.target.data[indic].slice(-1)[0].value : null;
+  dataset_target.push(showDivisionData ? divisionTargetValue : null);
+
   // division
   if (showDivisionData) {
     let divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
     dataset_currentFootprints.push(divisionValue);
+
+
     labels.push("Branche");
     if(useIndicColors) {
 
@@ -102,15 +124,7 @@ export const VerticalBarChart = ({
     null
   ];
 
-  // targets
 
-  const dataset_target = [
-    comparativeData[aggregate].area.target.data[indic].length>0 ? 
-      comparativeData[aggregate].area.target.data[indic].slice(-1)[0].value : null,
-    null,
-    comparativeData[aggregate].division.target.data[indic].length>0 ? 
-      comparativeData[aggregate].division.target.data[indic].slice(-1)[0].value : null,
-  ];
 
   const datasets = [{
     label: "Empreinte",
@@ -157,14 +171,13 @@ export const VerticalBarChart = ({
   // Options
   const commonOptions = {
     responsive: true,
-    maintainAspectRatio: isPrinting ? false : true,
     devicePixelRatio: 2,
     aspectRatio: 1,
     layout: {
       padding : {
-        left: 10,
-        right : 10,
-        top : 30
+        left: printMode ? 0 : 10,
+        right : printMode ? 0 : 10,
+        top : printMode ? 0 : 30
       },
     },
     scales: {
@@ -180,14 +193,14 @@ export const VerticalBarChart = ({
         },
         grid: {
           color: "rgba(245, 245, 245, 0.5)",
-          lineWidth : 1,
+          lineWidth : printMode ? 0 : 1,
         },
       },
       x: {
         ticks: {
           color: "#191558",
           font: {
-            size: 10,
+            size: printMode ? 12 : 9,
           },
         },
         grid: {
@@ -210,7 +223,7 @@ export const VerticalBarChart = ({
         },
         color: "#191558",
         font: {
-          size: 9,
+          size: printMode ? 12 : 9,
           family: "Roboto",
         },
       },

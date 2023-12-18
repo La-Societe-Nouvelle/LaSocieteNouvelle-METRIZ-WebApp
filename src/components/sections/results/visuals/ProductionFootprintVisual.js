@@ -60,6 +60,7 @@ export const ProductionFootprintVisual = ({
                 indic,
                 showDivisionData: true,
                 useIndicColors: true,
+                label : "Production"
               })}
               <div className="my-4">
                 {tags[indic].map((tag, index) => (

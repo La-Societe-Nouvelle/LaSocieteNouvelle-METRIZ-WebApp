@@ -14,10 +14,11 @@ import {
   getKeySuppliers,
   getUncertaintyDescription,
   loadFonts,
-  sortProvidersByImpact,
   targetAnnualReduction,
 } from "../exportsUtils";
 import { printValue } from "/src/utils/formatters";
+
+import { sortProvidersByImpact } from "../../utils";
 
 // --------------------------------------------------------------------------
 //  Report for Index Indicator
@@ -89,12 +90,14 @@ export const buildSummaryReportIndexIndic = async({
     );
   }).filter((provider) => provider.footprintStatus == 200 && provider.footprint.isValid());
 
+  console.log('providers',providers)
+
   const firstMostImpactfulCompanies = sortProvidersByImpact(
     providers,
     indic,
     "desc"
   ).slice(0, 2);
-
+  console.log('firstMostImpactfulCompanies',firstMostImpactfulCompanies)
   const scdMostImpactfulCompanies = sortProvidersByImpact(
     providers,
     indic,

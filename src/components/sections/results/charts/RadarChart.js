@@ -18,12 +18,10 @@ import metaIndics from "/lib/indics.json";
  *    - indic
  *    - session,
  *    - aggregate
- *    - isPrinting -> use in report
  * 
  */
 
 function RadarChart({ 
-  labels, 
   divisionFootprint, 
   productionFootprint 
 }) {

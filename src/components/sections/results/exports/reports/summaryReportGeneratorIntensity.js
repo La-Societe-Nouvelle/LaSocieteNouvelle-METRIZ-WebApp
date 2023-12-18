@@ -10,7 +10,6 @@ import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
   loadFonts,
-  sortProvidersByImpact,
   targetAnnualReduction,
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
@@ -18,6 +17,7 @@ import {
 
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
+import { getMostImpactfulExpensesPart, sortProvidersByImpact } from "../../utils";
 
 // --------------------------------------------------------------------------
 //  Report for Intensity Indicator
@@ -1127,16 +1127,4 @@ function createBoxIntermediateConsumptions(intermediateConsumptionsPart) {
   }
 
   return rect;
-}
-function getMostImpactfulExpensesPart(expenses, total, indic) {
-  const expensesPart = expenses.map((expense) => {
-    let expenseImpact = expense.footprint.indicators[indic].getGrossImpact(
-      expense.amount
-    );
-    let impactPercentage = Math.round((expenseImpact / total) * 100);
-    let accountLib = expense.accountLib;
-
-    return { accountLib, impactPercentage };
-  });
-  return expensesPart;
 }

@@ -7,33 +7,54 @@ Chart.register(ChartDataLabels, ChartAnnotation);
 import { Doughnut } from "react-chartjs-2";
 
 // Colors
-import { sigPieChartColors } from "./chartColors";
-import { colors } from "./chartColors"
 
-function SigPieChart({ value, title, id,isPrinting }) {
-  const chartData = [value, 100 - value];
-  const filteredData = chartData.filter((d) => d !== 0);
+import {
+  colors,
+  prevAggregatesChartColors,
+  aggregatesChartColors,
+  tooltips,
+} from "./chartColors";
+
+function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData, printMode }) {
+
+  
+  const value = aggregate.periodsData[period.periodKey].footprint.indicators[indic].value;
+
+  const prevValue = showPreviousData ? (prevPeriod ? aggregate.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : null) : null;
+
+  const datasets = [];
+
+  if (showPreviousData && prevValue !== null) {
+    datasets.push({
+      data: [prevValue, 100 - prevValue],
+      datalabels: { display: false },
+      borderWidth: 2,
+      backgroundColor: [
+        prevAggregatesChartColors[aggregate.id],
+        "rgba(215, 220, 251, 0)",
+      ],
+      weight: 0.3,
+    });
+  }
+
+  
+  datasets.push({
+    data: [value, 100 - value],
+    datalabels: { display: false },
+    borderWidth: 2,
+    backgroundColor: [
+      aggregatesChartColors[aggregate.id],
+      "rgb(247, 247, 247)",
+    ],
+  });
+
 
   const data = {
-    labels: [title, ""],
-    datasets: [
-      {
-        data: filteredData,
-        datalabels: {
-          display: false,
-        },
-
-        borderAlign: "inner",
-        borderWidth: 0,
-        backgroundColor: [sigPieChartColors.valueBackgroundColor, sigPieChartColors.backgroundColor],
-      },
-    ],
+    labels: [aggregate.label, ""],
+    datasets: datasets,
   };
+
   const options = {
-    devicePixelRatio: 2,
-    responsive: true,
-    maintainAspectRatio: isPrinting ? false : true,
-    cutout: 55,
     hover: { mode: null },
     scales: {
       x: {
@@ -44,6 +65,7 @@ function SigPieChart({ value, title, id,isPrinting }) {
       },
     },
     plugins: {
+
       legend: {
         display: false,
       },
@@ -52,13 +74,12 @@ function SigPieChart({ value, title, id,isPrinting }) {
         annotations: [
           {
             type: "label",
-            xScaleID: "x-axis-0", 
-            x: "50%",
-            y: "50%",
-            content: value + "%",
+
+            xScaleID: "x-axis-0",
+            content: value + "%", 
             color: colors.textColor,
             font: {
-              size: 20,
+              size: 10,
               family: "Raleway",
               weight: "bold",
             },
@@ -67,7 +88,22 @@ function SigPieChart({ value, title, id,isPrinting }) {
       },
 
       tooltip: {
-        enabled: false,
+        backgroundColor: tooltips.tooltipBackground,
+        cornerRadius: 2,
+        callbacks: {
+          label: function (context) {
+            const period = context.datasetIndex == 0 ? "(N-1)" : "";
+            return context.parsed + "% " + period;
+          },
+        },
+      },
+    },
+    layout: {
+      padding: {
+        left:  printMode ? 0 : 40,
+        right:  printMode ? 0 : 40,
+        top : 0,
+        bottom : 0
       },
     },
   };

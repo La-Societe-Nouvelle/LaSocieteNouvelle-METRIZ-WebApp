@@ -8,70 +8,92 @@ Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
 // Colors
-import { grossImpactChartColors } from "./chartColors";
+import {
+  prevAggregatesChartColors,
+  aggregatesChartColors,
+  tooltips,
+} from "./chartColors";
 
 export const GrossImpactChart = ({
   id,
   session,
   period,
+  prevPeriod,
   indic,
-  isPrinting
+  printMode,
 }) => {
-
-  const {
-    financialData
-  } = session;
+  const { financialData } = session;
 
   const {
     production,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    netValueAdded
   } = financialData.mainAggregates;
 
-  const productionGrossImpacts = getGrossImpact(production,period,indic);
-  const grossImpactsDistribution = {
-    intermediateConsumptions: Math.round((getGrossImpact(intermediateConsumptions,period,indic) / productionGrossImpacts) * 100),
-    fixedCapitalConsumptions: Math.round((getGrossImpact(fixedCapitalConsumptions,period,indic) / productionGrossImpacts) * 100),
-    netValueAdded:            Math.round((getGrossImpact(netValueAdded,period,indic) / productionGrossImpacts) * 100),
-  }
+  const productionGrossImpacts = getGrossImpact(production, period, indic);
+  const grossImpactsDistribution = calculateGrossImpactsDistribution(financialData.mainAggregates, period, indic, productionGrossImpacts);
 
+   
   const data = {
     labels: [
       "Consommations intermédiaires",
       "Consommations de capital fixe",
       "Valeur ajoutée nette",
     ],
-    datasets: [
-      {
-        data: [
-          grossImpactsDistribution.intermediateConsumptions,
-          grossImpactsDistribution.fixedCapitalConsumptions,
-          grossImpactsDistribution.netValueAdded,
-        ],
-        skipNull: true,
-        backgroundColor: [
-         grossImpactChartColors.intermediateConsumptions,
-        grossImpactChartColors.fixedCapitalConsumptions,
-        grossImpactChartColors.netValueAdded
-        ],
-        borderWidth: 1,
-      },
-    ],
+    datasets: [],
   };
+  
+  
+    // prev
+
+    if (prevPeriod) {
+      const prevProductionGrossImpacts = getGrossImpact(production, prevPeriod, indic);
+      const prevGrossImpactsDistribution = calculateGrossImpactsDistribution(financialData.mainAggregates, prevPeriod, indic, prevProductionGrossImpacts);
+    
+      const prevData = {
+        data: [
+          prevGrossImpactsDistribution.intermediateConsumptions,
+          prevGrossImpactsDistribution.fixedCapitalConsumptions,
+          prevGrossImpactsDistribution.netValueAdded,
+        ],
+        backgroundColor: [
+          prevAggregatesChartColors.intermediateConsumptions,
+          prevAggregatesChartColors.fixedCapitalConsumptions,
+          prevAggregatesChartColors.netValueAdded,
+        ],
+        borderWidth: 2,
+        weight: 0.4
+  
+      };
+      data.datasets.push(prevData);
+    }
+
+    const currentPeriod = {
+      data: [
+        grossImpactsDistribution.intermediateConsumptions,
+        grossImpactsDistribution.fixedCapitalConsumptions,
+        grossImpactsDistribution.netValueAdded,
+      ],
+      backgroundColor: [
+        aggregatesChartColors.intermediateConsumptions,
+        aggregatesChartColors.fixedCapitalConsumptions,
+        aggregatesChartColors.netValueAdded,
+      ],
+      borderWidth: 2,
+    };
+    data.datasets.push(currentPeriod);
+
 
   const options = {
     devicePixelRatio: 2,
-    maintainAspectRatio: isPrinting ? false : true,
+    maintainAspectRatio: printMode ? false : true,
 
     plugins: {
       legend: {
         display: false,
       },
       datalabels: {
-        color: "#FFF",
+        color: "#FFFFFF",
         font: {
-          size: 18,
+          size: 10,
           family: "Raleway",
           weight: "bold",
         },
@@ -84,25 +106,56 @@ export const GrossImpactChart = ({
         },
       },
       tooltip: {
-        backgroundColor: grossImpactChartColors.tooltipBackground,
+        backgroundColor: tooltips.tooltipBackground,
         padding: 15,
         cornerRadius: 3,
         usePointStyle: true,
         callbacks: {
           label: function (context) {
             let label = context.label;
+            if (context.datasetIndex === 0) {
+              label += " (N-1)"; 
+            }
             return label;
           },
         },
       },
+      
+    },
+    layout: {
+      padding: {
+        left: 50,
+        right: 50,
+        top : 0
+      },
     },
   };
-
   return <Doughnut id={id} data={data} options={options} />;
-}
+};
 
-const getGrossImpact = (aggregate,period,indic) => {
-  let amount =    aggregate.periodsData[period.periodKey].amount;
+const getGrossImpact = (aggregate, period, indic) => {
+  let amount = aggregate.periodsData[period.periodKey].amount;
   let footprint = aggregate.periodsData[period.periodKey].footprint;
   return footprint.indicators[indic].getGrossImpact(amount);
-}
+};
+
+const calculateGrossImpactsDistribution = (aggregate, period, indic, productionGrossImpacts) => {
+  const impactDistribution = {
+    intermediateConsumptions: Math.round(
+      (getGrossImpact(aggregate.intermediateConsumptions, period, indic) /
+        productionGrossImpacts) *
+        100
+    ),
+    fixedCapitalConsumptions: Math.round(
+      (getGrossImpact(aggregate.fixedCapitalConsumptions, period, indic) /
+        productionGrossImpacts) *
+        100
+    ),
+    netValueAdded: Math.round(
+      (getGrossImpact(aggregate.netValueAdded, period, indic) /
+        productionGrossImpacts) *
+        100
+    ),
+  };
+  return impactDistribution;
+};

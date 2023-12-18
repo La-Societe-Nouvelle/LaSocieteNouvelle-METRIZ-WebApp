@@ -86,7 +86,7 @@ export const EvolutionCurvesVisual = ({
               unit={unit}
               {...evolutionCurvesData}
               indic={indic}
-              isPrinting={false}
+              printMode={false}
             />
           </div>
         </div>

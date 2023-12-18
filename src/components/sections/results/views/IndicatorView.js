@@ -80,18 +80,14 @@ export const IndicatorView = ({
 
       {/* ----------Gross Impact Chart ----------  */}
       {metaIndic.type === "intensité" && (
-        <Row>
-          <Col lg={4}>
             <GrossImpactDistributionVisual
               session={session}
               period={period}
               indic={indic}
             />
-          </Col>
-        </Row>
       )}
 
-      {/* ---------Comparative data charts & Table ----------  */}
+      {/* --------- Comparative data charts & Table ----------  */}
       {metaIndic.type === "proportion" && (
         <MainAggregatesFootprintsVisual
           session={session}
