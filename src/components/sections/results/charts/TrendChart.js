@@ -10,8 +10,8 @@ import "chartjs-adapter-moment";
 import { getSuggestedMax } from "./chartsUtils";
 
 // Colors
-import { trendChartColors } from "./chartColors";
-import { colors } from "./chartColors"
+import { trendChartColors } from "../../../../constants/chartColors";
+import { colors } from "../../../../constants/chartColors"
 
 function TrendChart({
   historical,

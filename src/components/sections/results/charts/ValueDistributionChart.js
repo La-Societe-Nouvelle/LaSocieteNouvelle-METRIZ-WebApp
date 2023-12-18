@@ -8,13 +8,10 @@ Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
 // Colors
-import {
-  prevAggregatesChartColors,
-  aggregatesChartColors,
-  tooltips,
-} from "./chartColors";
+
 
 import { getAggregatesDistribution } from "./chartsUtils";
+import { aggregatesChartColors, prevAggregatesChartColors, tooltips } from "../../../../constants/chartColors";
 
 export const ValueDistributionChart = ({
   id,
@@ -71,7 +68,6 @@ export const ValueDistributionChart = ({
 
   data.datasets.push(currentPeriod);
 
-  console.log
   const options = {
     devicePixelRatio: 2,
     maintainAspectRatio: printMode ? false : true,

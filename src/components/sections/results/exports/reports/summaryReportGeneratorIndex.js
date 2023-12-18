@@ -19,6 +19,7 @@ import { printValue } from "/src/utils/formatters";
 
 import { loadFonts } from "../../../../../utils/exportsUtils";
 import { sortProvidersByImpact } from "../../utils";
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
 //  Report for Index Indicator
@@ -124,17 +125,6 @@ export const buildSummaryReportIndexIndic = async({
   // ---------------------------------------------------------------
   // Document Property
 
-  const margins = {
-    top: 50,
-    bottom: 50,
-    left: 40,
-    right: 40,
-  };
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
-
   const documentTitle =
     "Fiche_" +
     indic.toUpperCase() +
@@ -146,8 +136,8 @@ export const buildSummaryReportIndexIndic = async({
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
-    pageSize: pageSize,
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pageSize: pdfPageSize,
+    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
     header: {
       columns: [
         { text: corporateName, margin: [20, 15, 0, 0], bold: true },
@@ -184,10 +174,10 @@ export const buildSummaryReportIndexIndic = async({
           },
           {
             type: "rect",
-            x: margins.left - 20,
-            y: margins.top - 15,
-            w: pageSize.width - margins.left - margins.right + 40,
-            h: pageSize.height - margins.top - 15,
+            x: pdfMargins.left - 20,
+            y: pdfMargins.top - 15,
+            w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
+            h: pdfPageSize.height - pdfMargins.top - 15,
             color: "#FFFFFF",
             r: 10,
           },

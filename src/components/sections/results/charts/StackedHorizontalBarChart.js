@@ -4,11 +4,10 @@ import { Bar } from 'react-chartjs-2';
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 
-// Colors
-import { colors, aggregatesChartColors } from "./chartColors";
-
 // Lib
 import { generateFadeColors, getAggregatesDistribution } from './chartsUtils';
+// Colors
+import { tooltips, colors } from '../../../../constants/chartColors';
 
 const StackedHorizontalBarChart = ({ financialData, period, prevPeriod, indic }) => {
 
@@ -72,7 +71,7 @@ const StackedHorizontalBarChart = ({ financialData, period, prevPeriod, indic })
             },
           },
           tooltip: {
-            backgroundColor: aggregatesChartColors.tooltipBackground,
+            backgroundColor: tooltips.tooltipBackground,
             padding: 15,
             cornerRadius: 3,
             usePointStyle: true,

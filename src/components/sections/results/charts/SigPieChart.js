@@ -13,7 +13,7 @@ import {
   prevAggregatesChartColors,
   aggregatesChartColors,
   tooltips,
-} from "./chartColors";
+} from "../../../../constants/chartColors";
 
 function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData, printMode }) {
 
@@ -79,7 +79,7 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
             content: value + "%", 
             color: colors.textColor,
             font: {
-              size: 10,
+              size: 14,
               family: "Raleway",
               weight: "bold",
             },
