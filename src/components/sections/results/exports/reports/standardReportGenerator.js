@@ -8,11 +8,12 @@ import divisions from "/lib/divisions";
 
 // Utils 
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
-import { loadFonts } from "../exportsUtils";
 import { generateSIGtable } from "./generateSIGtable";
 
 import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 import { getStatementNote } from "/src/utils/Writers";
+
+import { loadFonts } from "../../../../../utils/exportsUtils";
 
 // --------------------------------------------------------------------------
 //  Indicator Report

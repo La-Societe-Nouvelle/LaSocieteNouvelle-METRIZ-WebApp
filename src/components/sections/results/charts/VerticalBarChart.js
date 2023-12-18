@@ -177,7 +177,7 @@ export const VerticalBarChart = ({
       padding : {
         left: printMode ? 0 : 10,
         right : printMode ? 0 : 10,
-        top : printMode ? 0 : 30
+        top : 30
       },
     },
     scales: {
@@ -200,7 +200,7 @@ export const VerticalBarChart = ({
         ticks: {
           color: "#191558",
           font: {
-            size: printMode ? 12 : 9,
+            size: printMode ? 12 : 10,
           },
         },
         grid: {

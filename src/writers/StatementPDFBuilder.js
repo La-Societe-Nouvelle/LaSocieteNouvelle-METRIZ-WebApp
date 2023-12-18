@@ -5,11 +5,13 @@ import { printValue } from "/src/utils/formatters";
 
 // Libraries
 import metaIndics from "/lib/indics";
-import { getDateFormatted, loadFonts } from "./deliverables/utils/utils";
 
 // PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { getShortCurrentDateString } from "../utils/periodsUtils";
+import { loadFonts } from "../utils/exportsUtils";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
@@ -152,7 +154,7 @@ export const getStatementPDF = (
 
       {
         margin: [0, 10, 0, 0],
-        text: ["Edité le : ", { text: getDateFormatted(today), bold: true }],
+        text: ["Edité le : ", { text: getShortCurrentDateString(), bold: true }],
       },
       {
         text: [
