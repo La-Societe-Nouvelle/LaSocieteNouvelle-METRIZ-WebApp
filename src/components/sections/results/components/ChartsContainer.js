@@ -8,13 +8,13 @@ import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 // Charts
-import { ComparativeChart } from "../charts/ComparativeChart";
 import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
 
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getPrevDate } from "../../../../utils/periodsUtils";
+import { VerticalBarChart } from "../charts/VerticalBarChart";
 
 /* ---------- CHARTS CONTAINER ---------- */
 
@@ -161,14 +161,25 @@ const renderComparativeCharts = ({
 }) => {
   return (
     <div key={chartId} className={"comparative-chart-container"}>
-      <ComparativeChart
-        id={chartId}
-        session={session}
-        period={period}
-        aggregate={aggregate}
-        indic={indic}
-        printMode={true}
-      />
+
+         
+<VerticalBarChart
+                id={chartId}
+                // id={`${aggregate}-${indic}`}
+                session={session}
+                period={period}
+                aggregate={aggregate}
+                indic={indic}
+                printMode={true}
+                showDivisionData={true}
+                showAreaData={false}
+                showTargetData={true}
+                showPreviousData={false}
+                useIndicColors={false}
+                label={"Production"}
+              />
+
+  
     </div>
   );
 };
@@ -187,6 +198,7 @@ const renderSigCharts = (aggregate, indic, period, prevPeriod, id) => {
             period={period}
             prevPeriod={prevPeriod}
             id={id}
+            showPreviousData={false}
             printMode={true}
           />
         </div>

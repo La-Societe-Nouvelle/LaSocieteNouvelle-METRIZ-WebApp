@@ -1,7 +1,7 @@
 // ComparativeDataCharts.js
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import { ComparativeChart } from "../charts/ComparativeChart";
+import { VerticalBarChart } from "../charts/VerticalBarChart";
 
 export const ComparativeDataContainer = ({
   session,
@@ -18,21 +18,29 @@ export const ComparativeDataContainer = ({
   };
 
   return (
-    <div className="charts-container">
+    <div>
       <h4>Comparaison par activité</h4>
-      <Row className="charts">
+      <Row>
         {Object.keys(aggregates).map((aggregate) => (
           <React.Fragment key={aggregate}>
             <Col sm={3} xl={3} lg={3} md={3}>
               <h5 className="mb-4">{aggregates[aggregate]}</h5>
-              <ComparativeChart
+              
+              <VerticalBarChart
                 id={`${aggregate}-${indic}`}
                 session={session}
                 period={period}
-                indic={indic}
                 aggregate={aggregate}
-                isPrinting={false}
+                indic={indic}
+                printMode={false}
+                showDivisionData={true}
+                showAreaData={true}
+                showTargetData={true}
+                showPreviousData={false}
+                useIndicColors={false}
+                label={"Exercice"}
               />
+
             </Col>
           </React.Fragment>
         ))}
