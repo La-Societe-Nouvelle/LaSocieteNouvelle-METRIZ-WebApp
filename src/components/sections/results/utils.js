@@ -106,3 +106,35 @@ export const hasComparativeData = (session, scale, serie,indic) =>
 
   return true;
 }
+
+// Livrables & Charts 
+
+export function getMostImpactfulExpensesPart(expenses, total, indic) {
+  const expensesPart = expenses.map((expense) => {
+    let expenseImpact = expense.footprint.indicators[indic].getGrossImpact(
+      expense.amount
+    );
+    let impactPercentage = Math.round((expenseImpact / total) * 100);
+    let accountLib = expense.accountLib;
+
+    return { accountLib, impactPercentage };
+  });
+  return expensesPart;
+}
+
+
+export function sortProvidersByImpact(expensesAccounts, indicator, order) {
+
+  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
+    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
+    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
+
+    if (order === "asc") {
+      return valueA - valueB;
+    } else {
+      return valueB - valueA;
+    }
+  });
+
+  return sortedExpensesAccounts;
+}

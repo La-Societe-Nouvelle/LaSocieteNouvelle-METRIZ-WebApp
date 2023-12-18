@@ -27,7 +27,7 @@ import { colors } from "./chartColors"
  *    - indic
  *    - session,
  *    - aggregate
- *    - isPrinting -> use in report
+ *    - printMode -> use in report
  * 
  */
 
@@ -37,7 +37,7 @@ export const ComparativeChart = ({
   period,
   aggregate,
   indic,
-  isPrinting,
+  printMode,
 }) => {
 
   const { unit, nbDecimals } = metaIndics[indic];
@@ -112,7 +112,7 @@ export const ComparativeChart = ({
   // Options
   const commonOptions = {
     responsive: true,
-    maintainAspectRatio: isPrinting ? false : true,
+    maintainAspectRatio: printMode ? false : true,
     devicePixelRatio: 2,
     scales: {
       y: {

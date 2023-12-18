@@ -21,7 +21,7 @@ function TrendChart({
   aggregate,
   indic,
   id,
-  isPrinting,
+  printMode,
 }) {
   
   const [max, setMax] = useState(null);
@@ -131,7 +131,7 @@ function TrendChart({
 
   const commonOptions = {
     devicePixelRatio: 2,
-    maintainAspectRatio: isPrinting ? false : true,
+    maintainAspectRatio: printMode ? false : true,
     pointRadius: 0,
     
     scales: {

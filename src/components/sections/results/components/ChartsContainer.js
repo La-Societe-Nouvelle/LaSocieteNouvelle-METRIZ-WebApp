@@ -13,9 +13,8 @@ import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
 
-import { printValue } from "/src/utils/formatters";
 import { GrossImpactChart } from "../charts/GrossImpactChart";
-import { getClosestYearData } from "../utils";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 /* ---------- CHARTS CONTAINER ---------- */
 
@@ -70,6 +69,14 @@ const IndicatorCharts = ({
     netValueAdded: "Valeur ajoutée nette",
   };
 
+    // Prev period
+
+    const prevDateEnd = getPrevDate(period.dateStart);
+    const prevPeriod =
+      session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
+      false;
+
+      
   return (
     <div
       className={"charts-container " + indic}
@@ -86,14 +93,11 @@ const IndicatorCharts = ({
               indic
             })}
             {renderSigCharts(
-              `sig-chart-${aggregate}-${indic}-print`,
+             mainAggregates[aggregate],
               indic,
-              printValue(
-                mainAggregates[aggregate].periodsData[period.periodKey]
-                  .footprint.indicators[indic].value,
-                indicators[indic].nbDecimals
-              ),
-              aggregates[aggregate]
+              period,
+              prevPeriod,
+              `sig-chart-${aggregate}-${indic}-print`,
             )}
           </React.Fragment>
         ))}
@@ -114,7 +118,7 @@ const IndicatorCharts = ({
             }
             aggregate={mainAggregates.production.periodsData}
             indic={indic}
-            isPrinting={true}
+            printMode={true}
           />
         </div>
       </Row>
@@ -127,7 +131,7 @@ const IndicatorCharts = ({
               session={session}
               period={period}
               indic={indic}
-              isPrinting={true}
+              printMode={true}
             />
           </div>
         </Row>
@@ -141,7 +145,7 @@ const IndicatorCharts = ({
             session={session}
             period={period}
             indic={indic}
-            isPrinting={true}/>
+            printMode={true}/>
         </div>
       )}
     </div>
@@ -163,7 +167,7 @@ const renderComparativeCharts = ({
         period={period}
         aggregate={aggregate}
         indic={indic}
-        isPrinting={false}
+        printMode={true}
       />
     </div>
   );
@@ -172,16 +176,18 @@ const renderComparativeCharts = ({
   /* --------- SIG Footprints charts ----------  */
 }
 
-const renderSigCharts = (chartId, indic, aggregateFootprint, title) => {
+const renderSigCharts = (aggregate, indic, period, prevPeriod, id) => {
   return (
     <>
       {indicators[indic].type == "proportion" && (
-        <div key={chartId} className="doughnut-chart-container">
+        <div key={id} className="doughnut-chart-container">
           <SigPieChart
-            value={aggregateFootprint}
-            title={title}
-            id={chartId}
-            isPrinting={true}
+            aggregate={aggregate}
+            indic={indic}
+            period={period}
+            prevPeriod={prevPeriod}
+            id={id}
+            printMode={true}
           />
         </div>
       )}

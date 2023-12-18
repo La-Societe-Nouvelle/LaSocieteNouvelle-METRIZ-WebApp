@@ -15,22 +15,6 @@ export function sortAccountsByFootprint(accounts, period, indicator, order) {
   return sortedAccounts;
 }
 
-export function sortProvidersByImpact(expensesAccounts, indicator, order) {
-
-  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
-    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
-
-    if (order === "asc") {
-      return valueA - valueB;
-    } else {
-      return valueB - valueA;
-    }
-  });
-
-  return sortedExpensesAccounts;
-}
-
 export function sortProvidersByContrib(periodKey,expensesAccounts, indicator, order) {
   
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {

@@ -3,20 +3,13 @@
 import React from "react";
 import { Col, Row } from "react-bootstrap";
 import SigPieChart from "../charts/SigPieChart";
-import { printValue } from "/src/utils/formatters";
 
 // Lib
-import metaIndics from "/lib/indics";
+import { ValueDistributionChart } from "../charts/ValueDistributionChart";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
-export const MainAggregatesFootprintsVisual = ({
-  session,
-  period,
-  indic
-}) => {
-
-  const {
-    financialData
-  } = session;
+export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
+  const { financialData } = session;
 
   const {
     production,
@@ -25,16 +18,27 @@ export const MainAggregatesFootprintsVisual = ({
     netValueAdded,
   } = financialData.mainAggregates;
 
-  const renderChart = (title, value, id) => {
+  // Prev period
+
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod =
+    session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
+    false;
+
+  const renderChart = (aggregate, id) => {
     return (
       <Col lg={3}>
-        <h5 className="mb-4 text-center">{title}</h5>
+        <h5 className="mb-4 text-center">{aggregate.label}</h5>
         <div className="sig-piechart-container">
+          
           <SigPieChart
-            value={printValue(value, metaIndics[indic].nbDecimals)}
-            title={title}
+            aggregate={aggregate}
+            indic={indic}
+            period={period}
+            prevPeriod={prevPeriod}
             id={id}
-            isPrinting={false}
+            showPreviousData={true}
+            printMode={false}
           />
         </div>
       </Col>
@@ -44,28 +48,25 @@ export const MainAggregatesFootprintsVisual = ({
   return (
     <div className="box">
       <Row>
-        <h4>Empreintes des Soldes Intermédiaires de Gestion</h4>
-        {renderChart(
-          "Production",
-          production.periodsData[period.periodKey].footprint.indicators[indic].value,
-          "prd-" + indic
-        )}
-        {renderChart(
-          "Consommations intermédiaires",
-          intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
-          "ic-" + indic
-        )}
-        {renderChart(
-          "Consommation de capital fixe",
-          fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
-          "ccf-" + indic
-        )}
-        {renderChart(
-          "Valeur ajoutée nette",
-          netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getValue(),
-          "nva-" + indic
-        )}
+        <Col lg="3" className="border-right border-2">
+          <h5 className="text-center mb-4">Répartition de la valeur</h5>
+          <ValueDistributionChart
+            id={"part-" + indic}
+            session={session}
+            period={period}
+            prevPeriod={prevPeriod}
+            printMode={false}
+          />
+        </Col>
+        <Col>
+          <Row className="align-items-center h-100">
+            {renderChart(production, "prd-" + indic)}
+            {renderChart(intermediateConsumptions, "ic-" + indic)}
+            {renderChart(fixedCapitalConsumptions, "ccf-" + indic)}
+            {renderChart(netValueAdded, "nva-" + indic)}
+          </Row>
+        </Col>
       </Row>
     </div>
   );
-}
+};

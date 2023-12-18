@@ -1,15 +1,19 @@
 // La Société Nouvelle
 
-import { Tab, Tabs } from "react-bootstrap";
+import { Accordion, Col, Row, Tab, Tabs } from "react-bootstrap";
 import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
 import { ProvidersTable } from "../tables/ProvidersTable";
+import { getPrevDate } from "../../../../utils/periodsUtils";
+import StackedHorizontalBarChart from "../charts/StackedHorizontalBarChart";
 
-export const MainAggregatesTableVisual = ({
-  session,
-  period,
-  indic
-}) => {
+export const MainAggregatesTableVisual = ({ session, period, indic }) => {
+  // Prev period
+
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod =
+    session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
+    false;
 
   return (
     <div id="rapport" className="box">
@@ -26,16 +30,15 @@ export const MainAggregatesTableVisual = ({
           <IndicatorMainAggregatesTable
             session={session}
             period={period}
+            prevPeriod={prevPeriod}
             indic={indic}
           />
         </Tab>
-        <Tab
-          eventKey="expensesAccounts"
-          title=" Détails - Comptes de charges"
-        >
+        <Tab eventKey="expensesAccounts" title=" Détails - Comptes de charges">
           <ExpensesTable
             session={session}
             period={period}
+            prevPeriod={prevPeriod}
             indic={indic}
           />
         </Tab>
@@ -43,13 +46,31 @@ export const MainAggregatesTableVisual = ({
           eventKey="providers"
           title=" Détails - Fournisseurs (charges externes)"
         >
-          <ProvidersTable
-            session={session}
-            period={period}
-            indic={indic}
-          />
+          <ProvidersTable session={session} period={period} indic={indic} />
         </Tab>
       </Tabs>
+
+      <Accordion className="mt-3 chart-accordion" >
+        <Accordion.Item eventKey="0">
+          <Accordion.Header as="h5">
+            <i className="bi bi-bar-chart-steps me-2"></i>
+            {/* TO DO : Change Label */}
+            Visualisation 
+          </Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Col sm="6">
+                <StackedHorizontalBarChart
+                  financialData={session.financialData}
+                  period={period}
+                  prevPeriod={prevPeriod}
+                  indic={indic}
+                />
+              </Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
     </div>
   );
 };

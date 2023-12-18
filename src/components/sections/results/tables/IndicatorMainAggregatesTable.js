@@ -6,7 +6,6 @@ import { Button, Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
-import { getPrevDate } from "/src/utils/periodsUtils";
 
 // Builder
 import {buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates} from "/src/formulas/aggregatesBuilder";
@@ -17,7 +16,7 @@ import { TableHeaderRow, TableHeaderRowUnits } from "./utils";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
+export const IndicatorMainAggregatesTable = ({ session, period, prevPeriod, indic }) => {
   // Session data -------------------------------------
   const { financialData } = session;
 
@@ -46,6 +45,11 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
     setFixedCapitalConsumptionsAggregates,
   ] = useState([]);
 
+
+    // Prev period 
+    const periods = [period];
+    if (prevPeriod) periods.push(prevPeriod);
+
   // build aggregates
   useEffect(async () => {
     const intermediateConsumptionsAggregates =
@@ -57,15 +61,6 @@ export const IndicatorMainAggregatesTable = ({ session, period, indic }) => {
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
   }, [period]);
 
-  // Prev period
-
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
-
-  const periods = [period];
-  if (prevPeriod) periods.push(prevPeriod);
 
   const [showColumn, setShowColumn] = useState(false);
 
