@@ -474,11 +474,6 @@ export const buildSummaryReportContributionIndic = async ({
                 style: "h2",
               },
               {
-                text: "Production",
-                fontSize: 9,
-                bold: true,
-              },
-              {
                 image: prodChartImage,
                 width: 130,
                 alignment: "center",
