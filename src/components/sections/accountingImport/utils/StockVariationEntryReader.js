@@ -2,6 +2,7 @@
 
 // Utils
 import { roundValue } from "../../../../utils/Utils";
+import { getSubEntriesByBalancedGroup, getSubEntriesByLabel, getSubEntriesByStockType } from "./AmortisationExpensesEntryReader";
 
 /* -------------------- PARSER -------------------- */
 

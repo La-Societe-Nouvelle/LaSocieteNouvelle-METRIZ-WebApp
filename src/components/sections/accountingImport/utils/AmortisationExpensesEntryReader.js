@@ -246,7 +246,7 @@ const readAmortisationExpenses = (rows) => {
 /* ----------------------------------------------------------------------- */
 /* ------------------------- SUB-ENTRIES SCRIPTS ------------------------- */
 
-const getSubEntriesByLabel = (entry) => {
+export const getSubEntriesByLabel = (entry) => {
   let subEntries = [];
 
   // get list labels
@@ -264,7 +264,7 @@ const getSubEntriesByLabel = (entry) => {
   return subEntries;
 };
 
-const getSubEntriesByBalancedGroup = (entry) => {
+export const getSubEntriesByBalancedGroup = (entry) => {
   let subEntries = [];
 
   // build subEntries
@@ -281,7 +281,7 @@ const getSubEntriesByBalancedGroup = (entry) => {
   return subEntries;
 };
 
-const getSubEntriesByStockType = (entry) => {
+export const getSubEntriesByStockType = (entry) => {
   let subEntries = [];
 
   // stock - raw materials
