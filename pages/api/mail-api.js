@@ -23,20 +23,20 @@ export const sendContactMail = async (objet, message, coordonnees) => {
 };
 
 export const sendStatementToAdmin = async (message, statementFile) => {
-  const recipientMail = "laura.roost@lasocietenouvelle.org";
+  const recipientMail = "admin@lasocietenouvelle.org";
   const objetMail = "Demande de publication (via formulaire)";
   const messageMail = message;
   const attachments = [
     {
       filename: "declaration.pdf",
-      path: statementFile,
+      content: statementFile,
       contentType: "application/pdf",
       encoding: "base64",
     },
   ];
 
   const contentMail = { recipientMail, objetMail, messageMail, attachments };
-
+  console.log(content)
   const request = {
     body: JSON.stringify(contentMail),
     headers: { "Content-Type": "application/json" },
@@ -62,7 +62,7 @@ export const sendStatementToDeclarant = async (
   const attachments = [
     {
       filename: "declaration.pdf",
-      path: statementFile,
+      content: statementFile,
       contentType: "application/pdf",
       encoding: "base64",
     },

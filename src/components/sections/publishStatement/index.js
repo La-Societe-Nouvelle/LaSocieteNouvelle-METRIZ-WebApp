@@ -545,11 +545,14 @@ const Summary = (props) => {
         comments
       );
       
-      const statementFile = new Promise((resolve, reject) => {
+      const statementFilePromise = new Promise((resolve, reject) => {
         statementPDF.getBase64((datauristring) => {
           resolve(datauristring);
         });
       });
+
+      const statementFile = await statementFilePromise;
+
 
       const messageToAdmin = mailToAdminWriter(
         siren,
