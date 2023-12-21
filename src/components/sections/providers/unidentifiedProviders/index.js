@@ -16,6 +16,7 @@ import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 // Modals
 import { Loader } from "/src/components/modals/Loader";
 import { ErrorAPIModal } from "/src/components/modals/userInfoModals";
+import { SyncErrorModal } from "../identifiedProviders/modals/AlertModal";
 
 const UnidentifiedProviders = ({
   financialData,
@@ -71,6 +72,8 @@ const UnidentifiedProviders = ({
   );
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
   const [showSyncWarningModal, setShowWarningModal] = useState(false);
+  const [showSyncErrorWarningModal , setShowSyncErrorWarningModal] = useState(false);
+
   const [filteredProviders, setFilteredProviders] = useState(providers);
   const [isNextStepAvailable, setIsNextStepAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -93,16 +96,27 @@ const UnidentifiedProviders = ({
 
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
+
   }, []);
 
-  // Filter providers based on the current view
+  // Filter providers or accounts based on the current view
   useEffect(() => {
-    const filteredProviders = filterProvidersByView(
-      currentView,
-      providers,
-      significativeProviders
-    );
-    setFilteredProviders(filteredProviders);
+    let filteredItems = [];
+
+    if (accounts.length > 0 && treatmentByExpenseAccount) {
+      filteredItems = filterAccountsByView(
+        currentView,
+        accounts,
+        significativeAccounts
+      );
+    } else {
+      filteredItems = filterProvidersByView(
+        currentView,
+        providers,
+        significativeProviders,
+      );
+    }
+    setFilteredProviders(filteredItems);
   }, [currentView]);
 
   useEffect(() => {
@@ -186,40 +200,50 @@ const UnidentifiedProviders = ({
     haswarnings ? setShowWarningModal(true) : submit();
   };
 
-  const handleSynchronize = async () => 
-  {
+  const handleSynchronize = async () => {
     setShowWarningModal(false);
 
-    // treatment by provider account
-    if (!treatmentByExpenseAccount) 
-    {
-      const providersToSynchronise = providersToSync.filter((provider) =>
-        provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())
+    let elementsToSynchronize = [];
+
+    // Default Treatement
+    if (!treatmentByExpenseAccount) {
+      elementsToSynchronize = providersToSync.filter(
+        (provider) =>
+          provider.useDefaultFootprint &&
+          (provider.footprintStatus !== 200 || !provider.footprint.isValid())
       );
+    } 
 
-      await synchronizeProviders(providersToSynchronise);
-
-      updateSignificativeProviders();
-
-      const isNextStepAvailable = checkSynchronisation();
-      setIsNextStepAvailable(isNextStepAvailable);
-      setShowSyncSuccessModal(isNextStepAvailable);
-    }
-
-    // treatment by expenses account
-    else if (treatmentByExpenseAccount) 
-    { 
-      const accountsToSynchronise = accountsToSync
+    // Expense Account
+    if (treatmentByExpenseAccount) {
+      elementsToSynchronize = accountsToSync
         .concat(providersToSync)
-        .filter((account) => (account.footprintStatus !== 200 || !account.footprint.isValid()));
-      await synchronizeProviders(accountsToSynchronise);
-  
-      updateSignificativeAccounts();
-
-      const isNextStepAvailable = checkSynchronisation();
-      setIsNextStepAvailable(isNextStepAvailable);
-      setShowSyncSuccessModal(isNextStepAvailable);
+        .filter(
+          (account) =>
+            account.footprintStatus !== 200 || !account.footprint.isValid()
+        );
     }
+
+    await synchronizeProviders(elementsToSynchronize);
+
+    if (!treatmentByExpenseAccount) {
+      updateSignificativeProviders();
+    } else {
+      updateSignificativeAccounts();
+    }
+
+    const isNextStepAvailable = checkSynchronisation();
+    setIsNextStepAvailable(isNextStepAvailable);
+
+    setShowSyncErrorWarningModal(!isNextStepAvailable);
+    setShowSyncSuccessModal(isNextStepAvailable);
+    setState((prevState) => ({
+      ...prevState,
+      currentView: "all",
+      currentPage: 1,
+    }));
+
+  
   };
 
   const switchView = (event) => 
@@ -234,8 +258,20 @@ const UnidentifiedProviders = ({
 
     if (treatmentByExpenseAccount) {
       updateSignificativeAccounts();
+      setFilteredProviders(accounts)
+      setState((prevState) => ({
+        ...prevState,
+        currentView: "all",
+        currentPage: 1,
+      }));
     } else {
       updateSignificativeProviders();
+      setFilteredProviders(providers);
+      setState((prevState) => ({
+        ...prevState,
+        currentView: "all",
+        currentPage: 1,
+      }));
     }
   }
 
@@ -404,6 +440,9 @@ const UnidentifiedProviders = ({
                 >
                   Comptes significatifs non rattachés à un secteur d'activité
                 </option>
+                <option key="7" value="error">
+                  Erreurs de synchronisation
+                </option>
               </Form.Select>
               <Form.Select
                 size="sm"
@@ -467,7 +506,7 @@ const UnidentifiedProviders = ({
 
       {treatmentByExpenseAccount && (
         <ExpenseAccountsTable
-          accounts={accounts}
+          accounts={filteredProviders}
           significativeAccounts={significativeAccounts}
           financialPeriod={financialPeriod}
           startIndex={startIndex}
@@ -494,6 +533,14 @@ const UnidentifiedProviders = ({
         showModal={showSyncWarningModal}
         onClose={() => setShowWarningModal(false)}
         onSubmit={() => submit()}
+      />
+
+      <SyncErrorModal
+        showModal={showSyncErrorWarningModal}
+        onClose={() => setShowSyncErrorWarningModal(false)}
+        changeView={() =>
+          setState((prevState) => ({ ...prevState, currentView: "error", currentPage: 1 }))
+        }
       />
 
       {loading && <Loader title={"Association automatique en cours ..."} />}
@@ -526,8 +573,7 @@ const UnidentifiedProviders = ({
 };
 
 function filterProvidersByView(currentView, providers, significativeProviders) {
-  let filteredProviders = providers.slice(); // Create a copy of the providers array
-
+  let filteredProviders = providers.slice();
   switch (currentView) {
     case "aux": // provider account
       filteredProviders = filteredProviders.filter(
@@ -556,12 +602,62 @@ function filterProvidersByView(currentView, providers, significativeProviders) {
         (provider) => provider.defaultFootprintParams.code === "00"
       );
       break;
+    case "error":
+      filteredProviders = filteredProviders.filter(
+        (provider) => provider.footprintStatus === 500
+      );
+      break;
     default: // default
       break;
   }
 
   return filteredProviders;
 }
+function filterAccountsByView(currentView, accounts, significativeAccounts) {
+  let filteredAccounts = [];
+  console.log('accounts', accounts);
+  console.log(significativeAccounts)
+  switch (currentView) {
+    case "aux": // provider account
+    filteredAccounts = accounts.filter(
+        (account) => !account.isDefaultProviderAccount
+      );
+      break;
+    case "expenses": // default provider account
+    filteredAccounts = accounts.filter(
+        (account) => account.isDefaultProviderAccount
+      );
+      break;
+    case "significative": // significative provider
+    filteredAccounts = accounts.filter((account) =>
+      significativeAccounts.includes(account.accountNum)
+      );
+      break;
+    case "significativeWithoutActivity": // significative provider & no activity code set
+    filteredAccounts = accounts.filter(
+        (account) =>
+        significativeAccounts.includes(account.accountNum) &&
+        account.defaultFootprintParams.code === "00"
+      );
+      break;
+    case "defaultActivity": // no activity code set
+    filteredAccounts = accounts.filter(
+        (account) => account.defaultFootprintParams.code === "00"
+      );
+      break;
+    case "error":
+      filteredAccounts = accounts.filter(
+        (account) => account.footprintStatus === 500
+      );
+      break;
+    default:
+      filteredAccounts = accounts;
+      break;
+  }
+
+  return filteredAccounts;
+}
+
 function isSyncButtonEnabled(providers) {
   return providers.some(
     (provider) =>
