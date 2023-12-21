@@ -14,6 +14,7 @@ import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAg
 import { getStatementNote } from "/src/utils/Writers";
 
 import { loadFonts } from "../../../../../utils/exportsUtils";
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
 //  Indicator Report
@@ -95,16 +96,7 @@ export const buildStandardReport = async ({
 
   // ---------------------------------------------------------------
   // Document Property
-  const margins = {
-    top: 50,
-    bottom: 50,
-    left: 40,
-    right: 40,
-  };
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
+
 
   const documentTitle =
     "Rapport_" +
@@ -117,8 +109,8 @@ export const buildStandardReport = async ({
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
-    pageSize: pageSize,
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pageSize: pdfPageSize,
+    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
     header: {
       columns: [
         { text: legalUnit.corporateName, margin: [20, 15, 0, 0], bold: true },
@@ -157,10 +149,10 @@ export const buildStandardReport = async ({
           },
           {
             type: "rect",
-            x: margins.left - 20,
-            y: margins.top - 15,
-            w: pageSize.width - margins.left - margins.right + 40,
-            h: pageSize.height - margins.top - 15,
+            x: pdfMargins.left - 20,
+            y: pdfMargins.top - 15,
+            w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
+            h: pdfPageSize.height - pdfMargins.top - 15,
             color: "#FFFFFF",
             r: 10,
           },

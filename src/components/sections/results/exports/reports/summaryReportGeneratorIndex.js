@@ -125,13 +125,6 @@ export const buildSummaryReportIndexIndic = async({
   // ---------------------------------------------------------------
   // Document Property
 
-  const documentTitle =
-    "Fiche_" +
-    indic.toUpperCase() +
-    "_" +
-    currentPeriod +
-    "-" +
-    corporateName.replaceAll(" ", "");
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
@@ -249,7 +242,7 @@ export const buildSummaryReportIndexIndic = async({
       };
     },
     info: {
-      title: documentTitle,
+      title: getDocumentTitle(indic, currentPeriod, corporateName),
       author: corporateName,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
@@ -916,4 +909,13 @@ export const buildSummaryReportIndexIndic = async({
   const summaryReport = pdfMake.createPdf(docDefinition);
 
   return summaryReport;
+}
+
+function getDocumentTitle(indic, currentPeriod, corporateName) {
+  return "Plaquette_" +
+    indic.toUpperCase() +
+    "_" +
+    currentPeriod +
+    "-" +
+    corporateName.replaceAll(" ", "");
 }
