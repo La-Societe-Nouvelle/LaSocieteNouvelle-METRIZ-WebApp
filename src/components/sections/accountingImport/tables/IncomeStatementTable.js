@@ -197,7 +197,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
 
   let filteredStockVariationsAccounts = financialData.stockVariationsAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
   // Variation des stocks de marchandises
-  accounts = filteredStockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
+  accounts = filteredStockVariationsAccounts.filter(account => /^603[^(1|2)]/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
       label: "Variation des stocks de marchandises",
@@ -255,7 +255,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
 
   // Charges sociales
   aggregates.push({
-      label: "Charges sociales",
+      label: "Salaires et charges sociales",
       amount: financialData.otherFinancialData.personnelExpenses.periodsData[periodKey].amount,
       isToBeChecked: false
   });
