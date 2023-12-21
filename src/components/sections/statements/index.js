@@ -35,7 +35,7 @@ const DirectImpacts = ({
     wat: { status: "unselect", errorMessage: null },
   })
 
-  const [selectedStatements, setSelectedStatements] = useState([]); // session.validations[period.periodKey]
+  const [selectedStatements, setSelectedStatements] = useState(session.validations[period.periodKey]); 
   const [invalidStatements, setInvalidStatements] = useState([]);
   const [emptyStatements, setEmptyStatements] = useState([]);
 
