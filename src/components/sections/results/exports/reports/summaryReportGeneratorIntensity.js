@@ -141,14 +141,6 @@ export const buildSummaryReportIntensityIndic = async ({
 
   // Document Property
 
-  const documentTitle =
-    "Fiche_" +
-    indic.toUpperCase() +
-    "_" +
-    currentPeriod +
-    "-" +
-    corporateName.replaceAll(" ", "");
-
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
@@ -294,7 +286,7 @@ export const buildSummaryReportIntensityIndic = async ({
       };
     },
     info: {
-      label: documentTitle,
+      label:  getDocumentTitle(indic, currentPeriod, corporateName),
       author: corporateName,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
@@ -1018,6 +1010,15 @@ export const buildSummaryReportIntensityIndic = async ({
 
   return summaryReport;
 };
+
+function getDocumentTitle(indic, currentPeriod, corporateName) {
+  return "Plaquette_" +
+    indic.toUpperCase() +
+    "_" +
+    currentPeriod +
+    "-" +
+    corporateName.replaceAll(" ", "");
+}
 
 function createChargesImpactContent(
   intermediateConsumptionsPart,
