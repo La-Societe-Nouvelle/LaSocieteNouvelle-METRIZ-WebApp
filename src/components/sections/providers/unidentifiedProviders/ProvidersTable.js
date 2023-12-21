@@ -11,6 +11,7 @@ import {
 import { printValue } from "/src/utils/formatters";
 import { getUnidentifiedProviderStatusIcon } from "./utils";
 import { sortProviders } from "../utils";
+import { isValidNumber } from "../../../../utils/Utils";
 
 // Select Style
 import { customSelectStyles } from "/config/customStyles";
@@ -18,7 +19,6 @@ import { customSelectStyles } from "/config/customStyles";
 // Libs
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
-import { isValidNumber } from "../../../../utils/Utils";
 
 const ProvidersTable = ({
   providers,
@@ -89,7 +89,6 @@ const ProvidersTable = ({
       return("success")
     }
   }
-
   return (
     <>
       <Table>

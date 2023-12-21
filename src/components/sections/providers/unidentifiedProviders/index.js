@@ -615,8 +615,7 @@ function filterProvidersByView(currentView, providers, significativeProviders) {
 }
 function filterAccountsByView(currentView, accounts, significativeAccounts) {
   let filteredAccounts = [];
-  console.log('accounts', accounts);
-  console.log(significativeAccounts)
+
   switch (currentView) {
     case "aux": // provider account
     filteredAccounts = accounts.filter(

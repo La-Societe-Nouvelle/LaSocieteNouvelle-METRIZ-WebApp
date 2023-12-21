@@ -11,6 +11,7 @@ import {
 import { printValue } from "/src/utils/formatters";
 import { getUnidentifiedProviderStatusIcon } from "./utils";
 import { sortProviders as sortAccounts } from "../utils";
+import { isValidNumber } from "../../../../utils/Utils";
 
 // Select Style
 import { customSelectStyles } from "/config/customStyles";
@@ -18,7 +19,6 @@ import { customSelectStyles } from "/config/customStyles";
 // Libs
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
-import { isValidNumber } from "../../../../utils/Utils";
 
 const ExpenseAccountsTable = ({
   accounts,
@@ -70,6 +70,7 @@ const ExpenseAccountsTable = ({
 
   // Check if significant providers are unassigned
   const hasWarning = (account) => {
+
     return (
       significativeAccounts.includes(account.accountNum) &&
       account.defaultFootprintParams.code == "00"
@@ -110,9 +111,12 @@ const ExpenseAccountsTable = ({
           </tr>
         </thead>
         <tbody>
-          {sortedAccounts
-            .slice(startIndex, endIndex)
-            .map((account, index) => (
+          {sortedAccounts.length === 0 ? (
+            <tr>
+              <td colSpan="5">Aucun compte</td>
+            </tr>
+          ) : (
+            sortedAccounts.slice(startIndex, endIndex).map((account, index) => (
               <tr key={account.accountNum || account.providerNum}>
                 <td>
                   <div className="d-flex">
@@ -140,12 +144,6 @@ const ExpenseAccountsTable = ({
                       value: account.defaultFootprintParams.area,
                     }}
                     placeholder={"Choisissez un espace économique"}
-                    className={
-                      account.footprintStatus == 200 &&
-                      account.footprint.isValid()
-                        ? "success"
-                        : ""
-                    }
                     options={areasOptions}
                     onChange={(e) =>
                       setAccountDefaultFootprintParams(
@@ -171,12 +169,6 @@ const ExpenseAccountsTable = ({
                       value: account.defaultFootprintParams.code,
                     }}
                     placeholder={"Choisissez un secteur d'activité"}
-                    className={
-                      account.footprintStatus == 200 &&
-                      account.footprint.isValid()
-                        ? "success"
-                        : ""
-                    }
                     options={divisionsOptions}
                     onChange={(e) =>
                       setAccountDefaultFootprintParams(
@@ -202,7 +194,8 @@ const ExpenseAccountsTable = ({
                   &euro;
                 </td>
               </tr>
-            ))}
+            ))
+          )}
         </tbody>
       </Table>
       {showSignificativeNote && (
