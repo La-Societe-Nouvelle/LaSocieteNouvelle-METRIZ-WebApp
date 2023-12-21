@@ -53,11 +53,11 @@ const getProviderData = (ligneCourante,ligneFournisseur,data) =>
  *    - message (String) : -
  */
 
-export const readExternalExpensesFromEntry = async (entry) => 
+export const readExternalExpensesFromEntry = async (entry,data) => 
 {
   // ---------- Entry ---------- //
 
-  let res = readExternalExpenses(entry);
+  let res = readExternalExpenses(entry,data);
   if (res.isExpensesTracked) return res;
 
   // ---------- Sub-entries ---------- //
@@ -67,14 +67,14 @@ export const readExternalExpensesFromEntry = async (entry) =>
   // group by balanced group
   subEntries = getSubEntriesByBalancedGroup(entry); // try to split entries with the current order
   if (subEntries.length>1) {
-    res = readExternalExpensesFromSubEntries(subEntries);
+    res = readExternalExpensesFromSubEntries(subEntries,data);
     if (res.isExpensesTracked) return res;
   }
 
   // group by amount
   subEntries = await getSubEntriesByAmount(entry);
   if (subEntries.length>1) {
-    res = readExternalExpensesFromSubEntries(subEntries);
+    res = readExternalExpensesFromSubEntries(subEntries,data);
     if (res.isExpensesTracked) return res;  
   }
 
@@ -92,7 +92,7 @@ export const readExternalExpensesFromEntry = async (entry) =>
  * 
  */
 
-const readExternalExpensesFromSubEntries = (subEntries) => 
+const readExternalExpensesFromSubEntries = (subEntries,data) => 
 {
   let res = {
     expensesData: [],
@@ -105,7 +105,7 @@ const readExternalExpensesFromSubEntries = (subEntries) =>
   for (let subEntry of subEntries) 
   {
     // read entry
-    let resSubEntry = readExternalExpenses(subEntry);
+    let resSubEntry = readExternalExpenses(subEntry,data);
 
     // if correct reading
     if (resSubEntry.isExpensesTracked) {
@@ -130,7 +130,7 @@ const readExternalExpensesFromSubEntries = (subEntries) =>
  * 
  */
 
-const readExternalExpenses = (lignes) => 
+const readExternalExpenses = (lignes,data) => 
 {
   // response
   let res = {

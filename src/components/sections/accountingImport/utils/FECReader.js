@@ -893,12 +893,16 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
       let ecriture = journal.filter((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum);
 
       data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
-      let entryData = await readExternalExpensesFromEntry(ecriture);
-      if (entryData.isExpensesTracked) {
-        data.externalExpenses.push(...entryData.expensesData);
-        data.defaultProviders.push(...entryData.defaultProviders);
-      } else {
-        throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : Plusieurs comptes fournisseurs détectés ");
+      try {
+        let entryData = await readExternalExpensesFromEntry(ecriture,data);
+        if (entryData.isExpensesTracked) {
+          data.externalExpenses.push(...entryData.expensesData);
+          data.defaultProviders.push(...entryData.defaultProviders);
+        } else {
+          throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : Plusieurs comptes fournisseurs détectés ");
+        }
+      } catch (error) {
+        throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +".");
       }
     } 
     
