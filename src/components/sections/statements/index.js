@@ -35,13 +35,14 @@ const DirectImpacts = ({
     wat: { status: "unselect", errorMessage: null },
   })
 
-  const [selectedStatements, setSelectedStatements] = useState([]); // session.validations[period.periodKey]
+  const [selectedStatements, setSelectedStatements] = useState(session.validations[period.periodKey]); 
   const [invalidStatements, setInvalidStatements] = useState([]);
   const [emptyStatements, setEmptyStatements] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+ 
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -54,7 +55,6 @@ const DirectImpacts = ({
     
     // update session
     session.validations[period.periodKey] = selectedStatements;
-
     // update state
     setSelectedStatements(selectedStatements);
     setInvalidStatements(invalidStatements);
@@ -79,7 +79,7 @@ const DirectImpacts = ({
     if (session.useChatGPT) {
       await session.buildAnalysis(period);
     }
-
+ 
     setIsLoading(false);
     submit();
   };
@@ -101,6 +101,8 @@ const DirectImpacts = ({
     "Empreinte sociale",
     "Empreinte environnementale"
   ];
+
+  const isDisabled = !isNextStepAvailable(emptyStatements, invalidStatements, selectedStatements);
 
   return (
       <section className="statement-section step">
@@ -206,14 +208,13 @@ const DirectImpacts = ({
           </Alert>
         )}
 
+
         <div className="text-end">
           <Button
             variant="secondary"
             onClick={handleSubmitStatements}
             disabled={
-              emptyStatements.length > 0 ||
-              invalidStatements.length > 0 ||
-              selectedStatements.length == 0
+             isDisabled
             }
           >
             Valider et accéder aux résultats
@@ -223,5 +224,17 @@ const DirectImpacts = ({
       </section>
   );
 };
+
+function isNextStepAvailable(emptyStatements, invalidStatements, selectedStatements) {
+  console.log('emptyStatements:', emptyStatements);
+  console.log('invalidStatements:', invalidStatements);
+  console.log('selectedStatements:', selectedStatements);
+
+  const isAvailable = emptyStatements.length === 0 && invalidStatements.length === 0 && selectedStatements.length > 0;
+  console.log('isAvailable:', isAvailable);
+
+  return isAvailable;
+}
+
 
 export default DirectImpacts;
