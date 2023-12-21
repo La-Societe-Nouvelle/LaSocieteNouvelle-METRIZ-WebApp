@@ -351,11 +351,22 @@ export const getIndividualsData = async (declarations) => {
   
   /* -------------------- INDIVIDUALS DATA GETTERS -------------------- */
   
-  export const getIndividualSex = (individu) => {
-    let sex = individu.sexe
-      ? individu.sexe
-      : (individu.identifiant || individu.identifiantTechnique).charAt(0); // erro if both id missing
-    return sex;
+  export const getIndividualSex = (individu) => 
+  {
+    // with property "sexe"
+    if (/^0(1|2)$/.test(individu.sexe)){
+      return individu.sexe == "01" ? 1 : 2;
+    } 
+    // with property "identifiant"
+    else if (/^(1|2)[0-9]{12}$/.test(individu.identifiant)) {
+      return individu.identifiant.charAt(0);
+    }
+    // with property "identifiant technique"
+    else if (/^(1|2)/.test(individu.identifiantTechnique)) {
+      return individu.identifiantTechnique.charAt(0);
+    }
+    // error
+    else return null;
   };
   
   /** Heures de travail
