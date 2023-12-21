@@ -579,7 +579,7 @@ const Summary = (props) => {
         statementFile
       );
 
-      if (resAdmin.status == 300 && resDeclarant.status && 300) {
+      if (resAdmin.status == 200 && resDeclarant.status == 200 ) {
         setIsSend(true);
         setError(false);
       } else {

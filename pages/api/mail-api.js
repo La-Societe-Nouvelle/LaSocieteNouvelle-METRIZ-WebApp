@@ -36,7 +36,7 @@ export const sendStatementToAdmin = async (message, statementFile) => {
   ];
 
   const contentMail = { recipientMail, objetMail, messageMail, attachments };
-  console.log(content)
+
   const request = {
     body: JSON.stringify(contentMail),
     headers: { "Content-Type": "application/json" },
