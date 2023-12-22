@@ -22,7 +22,7 @@ import {
 
 import { getClosestYearData } from "../../utils";
 
-import { calculateAvailableWidth, calculateBoxPositions, calculateBoxWidth, calculateBoxWidthWithSpacing, createRectObject, generateFooter, generateHeader, getChartImageData, loadFonts } from "../../../../../utils/exportsUtils";
+import { calculateAvailableWidth, calculateBoxWidth, createRectObject, generateFooter, generateHeader, getChartImageData, loadFonts } from "../../../../../utils/exportsUtils";
 
 import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 
@@ -160,17 +160,11 @@ export const buildSummaryReportContributionIndic = async ({
 
   const figureKeyBoxWidth = 200;
   const figureKeyBoxHeight = 65;
-  const figureKeyBoxSpacing = 55;
-  const remainingSpace = availableWidth - 2 * figureKeyBoxWidth - figureKeyBoxSpacing;
 
-  const firstBoxX = (remainingSpace + figureKeyBoxSpacing) / 2;  
-
-  const secondBoxX = firstBoxX + figureKeyBoxWidth + figureKeyBoxSpacing;
-
-  
+ 
   const keyFigureBoxes = [
-    { x: firstBoxX, y: 105, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
-    { x: secondBoxX, y: 105, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+    { x: 70, y: 100, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+    { x: 325, y: 100, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
   ];
   
   // ---------------------------------------------------------------
@@ -225,22 +219,22 @@ export const buildSummaryReportContributionIndic = async ({
         );
       });
 
-      // SIG
+      // Empreintes SIG
       canvas.push(
-        createRectObject(30, 245, availableWidth, 125, 1, "#f1f0f4", 10, null)
+        createRectObject(30, 235, availableWidth, 125, 1, "#f1f0f4", 10, null)
       );
 
       // Comparaison avec la branche d'activité
-      canvas.push(createRectObject(30, 400, 210, 170, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(30, 380, 210, 170, 1, "#f1f0f4", 10, null));
 
       // Comptes de charges les plus impactants
-      canvas.push(createRectObject(260, 400, 305, 170, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(260, 380, 305, 170, 1, "#f1f0f4", 10, null));
 
       //Empreinte de vos achat
-      canvas.push(createRectObject(30, 600, 210, 150, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(30, 570, 210, 150, 1, "#f1f0f4", 10, null));
 
       //Fournisseurs clés
-      canvas.push(createRectObject(260, 600, 305, 150, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(260, 570, 305, 150, 1, "#f1f0f4", 10, null));
 
       return {
         canvas: canvas,
@@ -258,10 +252,11 @@ export const buildSummaryReportContributionIndic = async ({
       { text: libelle, style: "header" },
       //--------------------------------------------------
       {
-        columns: [
+        columns: [       
           {
-            margin: [0, 30, 0, 30],
+            margin: [0, 20, 0, 0],
             stack: [
+              
               {
                 text: printValue(totalRevenue, 0) + "€",
                 alignment: "center",
@@ -276,7 +271,7 @@ export const buildSummaryReportContributionIndic = async ({
           },
 
           {
-            margin: [40, 15, 40, 30],
+            margin: [60, 5, 60, 15],
             stack: [
               {
                 text: "\tPour 1€ de chiffre d'affaires\t",
@@ -284,12 +279,13 @@ export const buildSummaryReportContributionIndic = async ({
                 background: "#FFFFFF",
               },
               {
-                margin: [0, 5, 0, 5],
+                margin: [0, 5, 0, 0],
                 text: contributionPerEuro.toFixed(2) + " €",
                 alignment: "center",
                 style: "numbers",
               },
               {
+                margin: [0, 5, 0, 0],
                 text: "de " + libelle,
                 alignment: "center",
               },
@@ -299,7 +295,7 @@ export const buildSummaryReportContributionIndic = async ({
       },
       //--------------------------------------------------
       {
-        margin: [40, 0, 40, 0],
+        margin: [0, 10, 0, 0],
         text: indicDescription,
         alignment: "center",
       },
@@ -421,7 +417,7 @@ export const buildSummaryReportContributionIndic = async ({
               {
                 text: "\tEmpreinte de vos achats\t",
                 style: "h3",
-                margin: [0, 18, 0, 10],
+                margin: [0, 20, 0, 10],
                 alignment: "center",
                 background: "#FFFFFF",
               },
@@ -449,7 +445,7 @@ export const buildSummaryReportContributionIndic = async ({
                 bold: true,
               },
               {
-                margin: [0, 5, 0, 0],
+                margin: [10, 5, 0, 0],
                 fontSize: 8,
                 alignment: "center",
                 text: [
@@ -502,7 +498,7 @@ export const buildSummaryReportContributionIndic = async ({
               {
                 text: "\tFournisseurs clés\t",
                 style: "h2",
-                margin: [0, 30, 0, 10],
+                margin: [0, 30, 0, 20],
               },
               ...getIntensKeyProviders(
                 mostImpactfulProviders,
@@ -521,8 +517,8 @@ export const buildSummaryReportContributionIndic = async ({
         text: "* " + uncertaintyText,
         fontSize: 6,
         italics: true,
-        margin: [0, 50, 0, 0],
         font: "Roboto",
+        absolutePosition: { x: 30, y: pdfPageSize.height - pdfMargins.bottom - 15 },
       },
       ,
     ],
@@ -539,7 +535,7 @@ export const buildSummaryReportContributionIndic = async ({
         fontSize: 14,
         color: "#fa595f",
         bold: true,
-        margin: [0, 5, 0, 10],
+        margin: [0, 10, 0, 10],
         alignment: "center",
       },
       h2: {
