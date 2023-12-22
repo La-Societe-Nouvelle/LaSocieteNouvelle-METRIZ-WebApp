@@ -22,7 +22,7 @@ import {
 
 import { getClosestYearData } from "../../utils";
 
-import { loadFonts } from "../../../../../utils/exportsUtils";
+import { calculateAvailableWidth, calculateBoxPositions, calculateBoxWidth, calculateBoxWidthWithSpacing, createRectObject, generateFooter, generateHeader, getChartImageData, loadFonts } from "../../../../../utils/exportsUtils";
 
 import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 
@@ -128,26 +128,20 @@ export const buildSummaryReportContributionIndic = async ({
 
   // ---------------------------------------------------------------
   // Get charts canvas and encode it to import in document
+ 
+  const chartIds = [
+    `comparative-chart-production-${indic}-print`,
+    `sig-chart-intermediateConsumptions-${indic}-print`,
+    `sig-chart-fixedCapitalConsumptions-${indic}-print`,
+    `sig-chart-netValueAdded-${indic}-print`,
+  ];
 
-  const prodChartCanvas = document.getElementById(
-    `comparative-chart-production-${indic}-print`
-  );
-  const prodChartImage = prodChartCanvas.toDataURL("image/png");
+  const chartImages = {};
+  chartIds.forEach((id) => {
+    chartImages[id] = getChartImageData(id);
+  });
 
-  const doughtnutIC = document.getElementById(
-    `sig-chart-intermediateConsumptions-${indic}-print`
-  );
-  const doughtnutICImage = doughtnutIC.toDataURL("image/png");
 
-  const doughtnutCCF = document.getElementById(
-    `sig-chart-fixedCapitalConsumptions-${indic}-print`
-  );
-  const doughtnutCCFImage = doughtnutCCF.toDataURL("image/png");
-
-  const doughtnutNVA = document.getElementById(
-    `sig-chart-netValueAdded-${indic}-print`
-  );
-  const doughtnutNVAImage = doughtnutNVA.toDataURL("image/png");
 
   // ---------------------------------------------------------------
   // key numbers
@@ -159,138 +153,99 @@ export const buildSummaryReportContributionIndic = async ({
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
 
-  // ---------------------------------------------------------------
-  // Document Property
 
-   
 
+  const availableWidth = await calculateAvailableWidth(pdfPageSize, pdfMargins);
+
+
+  const figureKeyBoxWidth = 200;
+  const figureKeyBoxHeight = 65;
+  const figureKeyBoxSpacing = 55;
+  const remainingSpace = availableWidth - 2 * figureKeyBoxWidth - figureKeyBoxSpacing;
+
+  const firstBoxX = (remainingSpace + figureKeyBoxSpacing) / 2;  
+
+  const secondBoxX = firstBoxX + figureKeyBoxWidth + figureKeyBoxSpacing;
+
+  
+  const keyFigureBoxes = [
+    { x: firstBoxX, y: 105, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+    { x: secondBoxX, y: 105, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+  ];
+  
   // ---------------------------------------------------------------
   // PDF Content and Layout
 
   const docDefinition = {
     pageSize: pdfPageSize,
     pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
-    header: {
-      columns: [
-        { text: corporateName, margin: [20, 15, 0, 0], bold: true },
-        {
-          text: "Exercice  " + currentPeriod,
-          alignment: "right",
-          margin: [0, 15, 20, 0],
-          bold: true,
-        },
-      ],
-    },
-    footer: function () {
-      return {
-        columns: [
-          {
-            text: "Edité le " + getShortCurrentDateString(),
-            margin: [20, 25, 0, 0],
-          },
-        ],
-        fontSize: 7,
-      };
-    },
+    header: generateHeader(corporateName, currentPeriod),
+    footer: generateFooter,
     background: function () {
+      const canvas = [];
+
+      // Background rectangles
+      canvas.push(
+        createRectObject(
+          0,
+          0,
+          pdfPageSize.width,
+          pdfPageSize.height,
+          0,
+          null,
+          null,
+          "#f1f0f4"
+        ),
+        createRectObject(
+          20,
+          35,
+          pdfPageSize.width - 40,
+          pdfPageSize.height - 65,
+          0,
+          null,
+          10,
+          "#FFFFFF"
+        )
+      );
+
+      // Key Figures
+
+      keyFigureBoxes.forEach((box) => {
+        canvas.push(
+          createRectObject(
+            box.x,
+            box.y,
+            box.width,
+            box.height,
+            1,
+            "#f1f0f4",
+            10,
+            null
+          )
+        );
+      });
+
+      // SIG
+      canvas.push(
+        createRectObject(30, 245, availableWidth, 125, 1, "#f1f0f4", 10, null)
+      );
+
+      // Comparaison avec la branche d'activité
+      canvas.push(createRectObject(30, 400, 210, 170, 1, "#f1f0f4", 10, null));
+
+      // Comptes de charges les plus impactants
+      canvas.push(createRectObject(260, 400, 305, 170, 1, "#f1f0f4", 10, null));
+
+      //Empreinte de vos achat
+      canvas.push(createRectObject(30, 600, 210, 150, 1, "#f1f0f4", 10, null));
+
+      //Fournisseurs clés
+      canvas.push(createRectObject(260, 600, 305, 150, 1, "#f1f0f4", 10, null));
+
       return {
-        canvas: [
-          // Background
-          {
-            type: "rect",
-            x: 0,
-            y: 0,
-            w: 595.28,
-            h: 841.89,
-            color: "#f1f0f4",
-          },
-          {
-            type: "rect",
-            x: pdfMargins.left - 20,
-            y: pdfMargins.top - 15,
-            w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
-            h: pdfPageSize.height - pdfMargins.top - 15,
-            color: "#FFFFFF",
-            r: 10,
-          },
-          // Key Figures
-          {
-            type: "rect",
-            x: 70,
-            y: 105,
-            w: 200,
-            h: 65,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          {
-            type: "rect",
-            x: 325,
-            y: 105,
-            w: 200,
-            h: 65,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // SIG
-          {
-            type: "rect",
-            x: 30,
-            y: 245,
-            w: 535,
-            h: 125,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          //Sector Comparaison Chart
-          {
-            type: "rect",
-            x: 30,
-            y: 392,
-            w: 210,
-            h: 150,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // Expenses Performances
-          {
-            type: "rect",
-            x: 30,
-            y: 561,
-            w: 210,
-            h: 150,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // Most impacting expense accounts
-          {
-            type: "rect",
-            x: 260,
-            y: 394,
-            w: 305,
-            h: 170,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // Suppliers activity
-          {
-            type: "rect",
-            x: 260,
-            y: 582,
-            w: 305,
-            h: 110,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-        ],
+        canvas: canvas,
       };
+    
     },
     info: {
       title: getDocumentTitle(indic, corporateName, currentPeriod),
@@ -381,7 +336,7 @@ export const buildSummaryReportContributionIndic = async ({
           {
             stack: [
               {
-                image: doughtnutICImage,
+                image: chartImages[`sig-chart-intermediateConsumptions-${indic}-print`],
                 alignment: "center",
                 width: 60,
               },
@@ -403,7 +358,7 @@ export const buildSummaryReportContributionIndic = async ({
           {
             stack: [
               {
-                image: doughtnutCCFImage,
+                image: chartImages[`sig-chart-fixedCapitalConsumptions-${indic}-print`],
                 alignment: "center",
                 width: 60,
               },
@@ -425,7 +380,7 @@ export const buildSummaryReportContributionIndic = async ({
           {
             stack: [
               {
-                image: doughtnutNVAImage,
+                image: chartImages[`sig-chart-netValueAdded-${indic}-print`],
                 width: 60,
                 alignment: "center",
               },
@@ -459,7 +414,7 @@ export const buildSummaryReportContributionIndic = async ({
                 style: "h2",
               },
               {
-                image: prodChartImage,
+                image: chartImages[`comparative-chart-production-${indic}-print`],
                 width: 130,
                 alignment: "center",
               },

@@ -1,3 +1,6 @@
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
+
+
 export function loadFonts() {
   pdfMake.fonts = {
     Raleway: {
@@ -32,6 +35,8 @@ export const calculateBoxWidth = async (
   );
 };
 
+
+
 export function createRectObject(x, y, w, h, lineWidth, lineColor, r, color) {
   const rectObj = {
     type: "rect",
@@ -52,4 +57,30 @@ export function createRectObject(x, y, w, h, lineWidth, lineColor, r, color) {
 export function getChartImageData(id) {
   const chartCanvas = document.getElementById(id);
   return chartCanvas ? chartCanvas.toDataURL("image/png") : null;
+}
+
+export function generateHeader(corporateName, currentPeriod) {
+  return {
+    columns: [
+      { text: corporateName, margin: [20, 15, 0, 0], bold: true },
+      {
+        text: "Exercice  " + currentPeriod,
+        alignment: "right",
+        margin: [0, 15, 20, 0],
+        bold: true,
+      },
+    ],
+  };
+}
+
+export function generateFooter() {
+  return {
+    columns: [
+      {
+        text: "Edité le " + getShortCurrentDateString(),
+        margin: [20, 25, 0, 0],
+      },
+    ],
+    fontSize: 7,
+  };
 }

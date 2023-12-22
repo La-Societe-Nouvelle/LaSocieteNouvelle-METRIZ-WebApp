@@ -2,8 +2,8 @@
 const pdfMargins = {
   top: 50,
   bottom: 50,
-  left: 40,
-  right: 40,
+  left: 30,
+  right: 30,
 };
 
 const pdfPageSize = {
