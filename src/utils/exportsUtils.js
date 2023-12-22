@@ -84,3 +84,25 @@ export function generateFooter() {
     fontSize: 7,
   };
 }
+
+export function getDocumentInfo(report, indic, corporateName, currentPeriod) {
+  return {
+    title: getDocumentTitle(report, indic, corporateName, currentPeriod),
+    author: corporateName,
+    subject: "Plaquette de résultat",
+    creator: "Metriz - La Société Nouvelle",
+    producer: "Metriz - La Societé Nouvelle",
+  };
+}
+
+function getDocumentTitle(report, indic, corporateName, currentPeriod) {
+  return (
+    report +
+    "_" +
+    indic.toUpperCase() +
+    "_" +
+    corporateName.replaceAll(" ", "") +
+    "-" +
+    currentPeriod
+  );
+}
