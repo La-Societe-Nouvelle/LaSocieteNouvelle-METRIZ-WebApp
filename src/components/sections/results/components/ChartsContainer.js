@@ -10,7 +10,7 @@ import indicators from "/lib/indics";
 // Charts
 import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
-import DeviationChart from "../charts/HorizontalBarChart";
+import HorizontalBarChart from "../charts/HorizontalBarChart";
 
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getPrevDate } from "../../../../utils/periodsUtils";
@@ -126,7 +126,7 @@ const IndicatorCharts = ({
         indicators[indic].type == "indice") && (
         <Row>
           <div className="deviation-chart-container">
-            <DeviationChart
+            <HorizontalBarChart
               id={`deviation-chart-${indic}-print`}
               session={session}
               period={period}

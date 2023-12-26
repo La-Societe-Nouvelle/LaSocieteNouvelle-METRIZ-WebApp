@@ -5,13 +5,14 @@ import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { aggregatesChartColors, colors, prevAggregatesChartColors } from "../../../../constants/chartColors";
 Chart.register(ChartDataLabels);
 
 // Libraries
 
 // to rename
 
-const DeviationChart = ({ 
+const HorizontalBarChart = ({ 
   id,
   session,
   period,
@@ -63,11 +64,12 @@ const DeviationChart = ({
     datasets: [
       {
         data: data,
-        backgroundColor: ["rgb(140, 138, 171)"],
+        backgroundColor: prevAggregatesChartColors.production,
         borderWidth: 0,
         type: "bar",
-        barPercentage: 0.9,
-        categoryPercentage: 0.4,
+        borderWidth: 0,
+        barPercentage: 1,
+        categoryPercentage: 0.70,
         minBarLength: 2,
       },
     ],
@@ -86,20 +88,17 @@ const DeviationChart = ({
           x: {
             min: minValue - 10,
             max: maxValue + 10,
-
             grid: {
               color: "#f0f0f8",
-              borderWidth : 4.5,
+              borderWidth : 1,
               borderColor: "#f0f0f8"
 
             },
-
             ticks: {
-              color: "#8c8aab",
+              color: colors.textColor,
               font: {
-                size: 9,
-                family: "Raleway",
-                weight: "bold",
+                size: 12,
+                family: "Roboto",
               },
               callback: (value, index) => {
                 if (value === 0 || value === 40 || value === -40) {
@@ -114,14 +113,7 @@ const DeviationChart = ({
             display: false,
           },
           tooltip: {
-            backgroundColor: "rgba(25,21,88,0.9)",
-            cornerRadius: 3,
-            callbacks: {
-              label: function (context) {
-                let label = context.formattedValue + "%";
-                return label;
-              },
-            },
+            enabled: false           
           },
           datalabels: {
             anchor: function (context) {
@@ -133,12 +125,11 @@ const DeviationChart = ({
               return context.dataset.data[context.dataIndex] < 0 ? -30 : 5;
             },
             align: "end",
-            color: "#8c8aab",
+            color: colors.textColor,
 
             font: {
-              size: 9,
-              family: "Raleway",
-              weight: "bold",
+              size: 12,
+              family: "Roboto",
             },
             formatter: (value) => {
               if (value !== 0) {
@@ -152,4 +143,4 @@ const DeviationChart = ({
   );
 };
 
-export default DeviationChart;
+export default HorizontalBarChart;
