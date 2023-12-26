@@ -10,7 +10,7 @@ import metaIndics from "/lib/indics";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
-import { getShortCurrentDateString } from "/src/utils/periodsUtils";
+
 import {
   cutString,
   getIndicDescription,
@@ -22,11 +22,11 @@ import {
 
 import { getClosestYearData } from "../../utils";
 
-import { calculateAvailableWidth, calculateBoxWidth, createRectObject, generateFooter, generateHeader, getChartImageData, getDocumentInfo, loadFonts } from "../../../../../utils/exportsUtils";
+import { calculateAvailableWidth, createRectObject, generateFooter, generateHeader, getChartImageData, getDocumentInfo, loadFonts, definePDFStyles } from "../../../../../utils/exportsUtils";
 
 import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 
-import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+import { pdfMargins, pdfPageSize, defaultPosition } from "../../../../../constants/pdfConfig";
 
 
 // --------------------------------------------------------------------------
@@ -35,7 +35,6 @@ import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-//Call function to load fonts
 loadFonts();
 
 export const buildSummaryReportContributionIndic = async ({
@@ -77,7 +76,6 @@ export const buildSummaryReportContributionIndic = async ({
 
   const indicDescription = getIndicDescription(indic);
 
-
   const providers = filterProvidersByPeriod(financialData, period);
 
   const {mostImpactfulExpenses, leastImpactfulExpenses, mostImpactfulProviders} = getImpactData(externalExpensesAccounts,period,indic, providers)
@@ -110,27 +108,32 @@ export const buildSummaryReportContributionIndic = async ({
   });
 
 
-
   // ---------------------------------------------------------------
   // key numbers
+  let positionY = defaultPosition.startY;
 
   const availableWidth = await calculateAvailableWidth(pdfPageSize, pdfMargins);
 
   const figureKeyBoxWidth = 200;
   const figureKeyBoxHeight = 65;
 
- 
   const keyFigureBoxes = [
-    { x: 70, y: 100, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
-    { x: 325, y: 100, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+    { x: 70, y: positionY, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
+    { x: 325, y: positionY, width: figureKeyBoxWidth, height: figureKeyBoxHeight },
   ];
   
   // ---------------------------------------------------------------
   // PDF Content and Layout
 
+  
   const docDefinition = {
     pageSize: pdfPageSize,
-    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
     header: generateHeader(corporateName, currentPeriod),
     footer: generateFooter,
     background: function () {
@@ -178,164 +181,77 @@ export const buildSummaryReportContributionIndic = async ({
       });
 
       // Empreintes SIG
+      positionY += 125; 
+   
       canvas.push(
-        createRectObject(30, 235, availableWidth, 125, 1, "#f1f0f4", 10, null)
+        createRectObject(defaultPosition.startX, positionY, availableWidth, 120, 1, "#f1f0f4", 10, null)
       );
 
+      positionY += 152; 
+
       // Comparaison avec la branche d'activité
-      canvas.push(createRectObject(30, 380, 210, 170, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 170, 1, "#f1f0f4", 10, null));
 
       // Comptes de charges les plus impactants
-      canvas.push(createRectObject(260, 380, 305, 170, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(260, positionY, 305, 170, 1, "#f1f0f4", 10, null));
+
+      positionY += 200; 
 
       //Empreinte de vos achat
-      canvas.push(createRectObject(30, 570, 210, 150, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 150, 1, "#f1f0f4", 10, null));
 
       //Fournisseurs clés
-      canvas.push(createRectObject(260, 570, 305, 150, 1, "#f1f0f4", 10, null));
+      canvas.push(createRectObject(260, positionY, 305, 150, 1, "#f1f0f4", 10, null));
 
       return {
         canvas: canvas,
       };
-    
     },
-    info: getDocumentInfo("Plaquette",indic, corporateName, currentPeriod),
+    info: getDocumentInfo("Plaquette", indic, corporateName, currentPeriod),
     content: [
-    // Header
-    ...buildHeaderContent(libelle, totalRevenue, contributionPerEuro, indicDescription),
+      // Header
+      ...buildHeaderContent(
+        libelle,
+        totalRevenue,
+        contributionPerEuro,
+        indicDescription
+      ),
 
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
-      ...buildIntermediateManagementContent(indic,production, period, chartImages),
+      ...buildIntermediateManagementContent(
+        indic,
+        production,
+        period,
+        chartImages
+      ),
       //--------------------------------------------------
       {
-        columnGap: 40,
+        columnGap: 35,
         columns: [
           // Left Box
           {
             width: "40%",
             stack: [
-              {
-                text: "\tComparaison avec la branche d'activité\t",
-                style: "h2",
-              },
-              {
-                image: chartImages[`comparative-chart-production-${indic}-print`],
-                width: 130,
-                alignment: "center",
-              },
-              {
-                text: "\tEmpreinte de vos achats\t",
-                style: "h3",
-                margin: [0, 20, 0, 10],
-                alignment: "center",
-                background: "#FFFFFF",
-              },
-              {
-                text: printValue(externalExpensesContribution.value, 1) + " %",
-                alignment: "center",
-                style: "bigNumber",
-                fontSize: 20,
-              },
-              {
-                text: "Taux de contribution de vos achats",
-                alignment: "center",
-                bold: true,
-                margin: [0, 0, 0, 10],
-              },
-              {
-                text: currentICdivisionData.value + " %",
-                alignment: "center",
-                style: "branchNumber",
-              },
-              {
-                text: "Moyenne de la branche",
-                alignment: "center",
-                fontSize: 8,
-                bold: true,
-              },
-              {
-                margin: [10, 5, 0, 0],
-                fontSize: 8,
-                alignment: "center",
-                text: [
-                  {
-                    text: comparativeData.comparativeDivision + " - ",
-                  },
-                  {
-                    text: cutString(divisionName, 120),
-                  },
-                ],
-              },
+              ...buildLeftColumnContent(indic,chartImages, externalExpensesContribution, currentICdivisionData, comparativeData, divisionName),
             ],
           },
           // Right Box
           {
-            width: "*",
+            width: "60%",
             stack: [
-              {
-                text: "\tComptes de charges les plus impactants\t",
-                style: "h2",
-              },
-              {
-                text: "Les plus contributifs ",
-                fontSize: 10,
-                bold: true,
-                margin: [0, 10, 0, 10],
-              },
-
-              mostImpactfulExpenses.map((expense) => ({
-                text: cutString(
-                  expense.accountNum + " - " + expense.accountLib,
-                  60
-                ),
-              })),
-
-              {
-                text: "Les moins contributifs ",
-                fontSize: 10,
-                bold: true,
-                margin: [0, 10, 0, 10],
-              },
-              leastImpactfulExpenses.map((expense) => ({
-                text: cutString(
-                  expense.accountNum + " - " + expense.accountLib,
-                  60
-                ),
-              })),
-
-              // ACTIVITES FOURNISSEURS
-              {
-                text: "\tFournisseurs clés\t",
-                style: "h2",
-                margin: [0, 30, 0, 20],
-              },
-              ...getIntensKeyProviders(
-                mostImpactfulProviders,
-                indic,
-                unit,
-                unitAbsolute,
-                nbDecimals,
-                period
-              ),
+              ...buildRightColumnContent(mostImpactfulExpenses, leastImpactfulExpenses, mostImpactfulProviders, indic, unit, unitAbsolute, nbDecimals, period),
             ],
           },
         ],
       },
       //--------------------------------------------------
-      {
-        text: "* " + uncertaintyText,
-        fontSize: 6,
-        italics: true,
-        font: "Roboto",
-        absolutePosition: { x: 30, y: pdfPageSize.height - pdfMargins.bottom - 15 },
-      },
+      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins), 
       ,
     ],
     //--------------------------------------------------
     //Style
     ...definePDFStyles(),
-
   };
 
   const summaryReport = pdfMake.createPdf(docDefinition);
@@ -374,7 +290,6 @@ async function processExternalExpenseAccounts(financialData, period, indic){
     account.periodsData.hasOwnProperty(period.periodKey)
   );
 
-  console.log(externalExpensesAccounts);
   const externalPurchaseAccounts  = financialData.externalExpensesAccounts.filter((account) =>
     /^60[^(8|9)]/.test(account.accountNum)
   );
@@ -386,7 +301,6 @@ async function processExternalExpenseAccounts(financialData, period, indic){
     period.periodKey
   );
 
-  console.log(externalExpensesContribution);
 
   return {
     externalExpensesAccounts,
@@ -424,55 +338,9 @@ function getImpactData(externalExpensesAccounts, period, indic, providers){
   };
 };
 
-function definePDFStyles() {
-  return {
-    defaultStyle: {
-      fontSize: 10,
-      color: "#191558",
-      font: "Raleway",
-    },
-    styles: {
-      header: {
-        fontSize: 14,
-        color: "#fa595f",
-        bold: true,
-        margin: [0, 10, 0, 10],
-        alignment: "center",
-      },
-      h2: {
-        fontSize: 12,
-        color: "#fa595f",
-        bold: true,
-        alignment: "center",
-        margin: [0, 20, 0, 10],
-        background: "#FFFFFF",
-      },
-      h3: {
-        fontSize: 12,
-        color: "#fa595f",
-        bold: true,
-        margin: [0, 0, 0, 10],
-      },
-      numbers: {
-        fontSize: 18,
-        bold: true,
-      },
-      bigNumber: {
-        bold: true,
-        color: "#fa595f",
-        margin: [0, 5, 0, 5],
-      },
-      branchNumber: {
-        fontSize: 16,
-        bold: true,
-        color: "#ffb642",
-        margin: [0, 5, 0, 5],
-      },
-    },
-  };
-}
 
-function buildHeaderContent(libelle, totalRevenue, contributionPerEuro, indicDescription) {
+// Content
+const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indicDescription) => {
   return [
     { text: libelle, style: "header" },
     //--------------------------------------------------
@@ -518,7 +386,7 @@ function buildHeaderContent(libelle, totalRevenue, contributionPerEuro, indicDes
     },
     //--------------------------------------------------
     {
-      margin: [0, 10, 0, 0],
+      margin: [0, 10, 0, 10],
       text: indicDescription,
       alignment: "center",
     },
@@ -526,16 +394,17 @@ function buildHeaderContent(libelle, totalRevenue, contributionPerEuro, indicDes
 
   ];
 }
+const buildIntermediateManagementContent = (indic, production, period, chartImages) => {
+  
 
-function buildIntermediateManagementContent(indic, production, period, chartImages) {
   return [
     // Box "Soldes Intermédiaires de Gestion"
     {
       text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
       style: "h2",
+      margin: [0, 0, 0, 15],
     },
     {
-      margin: [0, 10, 0, 10],
       columns: [
         {
           width: "25%",
@@ -564,6 +433,7 @@ function buildIntermediateManagementContent(indic, production, period, chartImag
               image: chartImages[`sig-chart-intermediateConsumptions-${indic}-print`],
               alignment: "center",
               width: 60,
+              height: 60,
             },
             {
               text: "Consommations",
@@ -586,6 +456,7 @@ function buildIntermediateManagementContent(indic, production, period, chartImag
               image: chartImages[`sig-chart-fixedCapitalConsumptions-${indic}-print`],
               alignment: "center",
               width: 60,
+              height: 60,
             },
             {
               text: "Consommations",
@@ -607,6 +478,7 @@ function buildIntermediateManagementContent(indic, production, period, chartImag
             {
               image: chartImages[`sig-chart-netValueAdded-${indic}-print`],
               width: 60,
+              height: 60,
               alignment: "center",
             },
             {
@@ -628,3 +500,131 @@ function buildIntermediateManagementContent(indic, production, period, chartImag
     },
   ];
 }
+
+const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution, currentICdivisionData, comparativeData, divisionName) => {
+
+  return [
+    {
+      text: "\tComparaison avec la branche d'activité\t",
+      style: "h2",
+      margin: [0, 40, 0, 10],
+      alignment: "center", 
+    },
+    {
+      image:
+      chartImages[`comparative-chart-production-${indic}-print`],
+      width: 130,
+      alignment: "center", 
+    },
+    {
+      text: "\tEmpreinte de vos achats\t",
+      style: "h3",
+      margin: [0, 30, 0, 10],
+      alignment: "center",
+      background: "#FFFFFF",
+    },
+    {
+      text: printValue(externalExpensesContribution.value, 1) + " %",
+      alignment: "center",
+      style: "bigNumber",
+      fontSize: 20,
+    },
+    {
+      text: "Taux de contribution de vos achats",
+      alignment: "center",
+      bold: true,
+      margin: [0, 0, 0, 10],
+    },
+    {
+      text: currentICdivisionData.value + " %",
+      alignment: "center",
+      style: "branchNumber",
+    },
+    {
+      text: "Moyenne de la branche",
+      alignment: "center",
+      fontSize: 8,
+      bold: true,
+    },
+    {
+      margin: [10, 5, 0, 0],
+      fontSize: 8,
+      alignment: "center",
+      text: [
+        {
+          text: comparativeData.comparativeDivision + " - ",
+        },
+        {
+          text: cutString(divisionName, 120),
+        },
+      ],
+    },
+  ]
+
+}
+
+const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, mostImpactfulProviders, indic, unit, unitAbsolute, nbDecimals, period) => {
+  return [
+    {
+      text: "\tComptes de charges les plus impactants\t",
+      style: "h2",
+      margin: [0, 40, 0, 10],
+    },
+    {
+      text: "Les plus contributifs ",
+      fontSize: 10,
+      bold: true,
+      margin: [0, 10, 0, 10],
+    },
+
+    mostImpactfulExpenses.map((expense) => ({
+      text: cutString(
+        expense.accountNum + " - " + expense.accountLib,
+        60
+      ),
+    })),
+
+    {
+      text: "Les moins contributifs ",
+      fontSize: 10,
+      bold: true,
+      margin: [0, 10, 0, 10],
+    },
+    leastImpactfulExpenses.map((expense) => ({
+      text: cutString(
+        expense.accountNum + " - " + expense.accountLib,
+        60
+      ),
+    })),
+
+    // ACTIVITES FOURNISSEURS
+    {
+      text: "\tFournisseurs clés\t",
+      style: "h2",
+      margin: [0, 40, 0, 20],
+    },
+    ...getIntensKeyProviders(
+      mostImpactfulProviders,
+      indic,
+      unit,
+      unitAbsolute,
+      nbDecimals,
+      period
+    ),
+  ]
+};
+
+const addUncertaintyText = (uncertaintyText, pdfPageSize, pdfMargins) => {
+  const textOptions = {
+    text: "* " + uncertaintyText,
+    fontSize: 6,
+    italics: true,
+    font: "Roboto",
+    absolutePosition: {
+      x: defaultPosition.startX,
+      y: pdfPageSize.height - pdfMargins.bottom - 15,
+    },
+  };
+
+  return textOptions;
+};

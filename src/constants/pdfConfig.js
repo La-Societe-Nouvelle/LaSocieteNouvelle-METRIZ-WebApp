@@ -11,4 +11,9 @@ const pdfPageSize = {
   height: 841.89,
 };
 
-export { pdfMargins, pdfPageSize };
+
+const defaultPosition = {
+  startX: 30,
+  startY : 100,
+};
+export { pdfMargins, pdfPageSize, defaultPosition };

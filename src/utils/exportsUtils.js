@@ -78,10 +78,11 @@ export function generateFooter() {
     columns: [
       {
         text: "Edité le " + getShortCurrentDateString(),
-        margin: [20, 25, 0, 0],
+        margin: [0, 30, 30, 0],
       },
     ],
-    fontSize: 7,
+    alignment: "right",
+    fontSize: 6,
   };
 }
 
@@ -105,4 +106,51 @@ function getDocumentTitle(report, indic, corporateName, currentPeriod) {
     "-" +
     currentPeriod
   );
+}
+
+export function definePDFStyles() {
+  return {
+    defaultStyle: {
+      fontSize: 10,
+      color: "#191558",
+      font: "Raleway",
+    },
+    styles: {
+      header: {
+        fontSize: 14,
+        color: "#fa595f",
+        bold: true,
+        margin: [0, 10, 0, 10],
+        alignment: "center",
+      },
+      h2: {
+        fontSize: 12,
+        color: "#fa595f",
+        bold: true,
+        alignment: "center",
+        background: "#FFFFFF",
+      },
+      h3: {
+        fontSize: 12,
+        color: "#fa595f",
+        bold: true,
+        margin: [0, 0, 0, 10],
+      },
+      numbers: {
+        fontSize: 18,
+        bold: true,
+      },
+      bigNumber: {
+        bold: true,
+        color: "#fa595f",
+        margin: [0, 5, 0, 5],
+      },
+      branchNumber: {
+        fontSize: 16,
+        bold: true,
+        color: "#ffb642",
+        margin: [0, 5, 0, 5],
+      },
+    },
+  };
 }
