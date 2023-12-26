@@ -12,7 +12,9 @@ import metaIndics from "/lib/indics";
 import { printValue } from "/src/utils/formatters";
 
 import {
+  addUncertaintyText,
   cutString,
+  filterProvidersByPeriod,
   getIndicDescription,
   getIntensKeyProviders,
   getUncertaintyDescription,
@@ -73,8 +75,6 @@ export const buildSummaryReportContributionIndic = async ({
   const {contributionPerEuro, totalRevenue} = await getFinancialData(financialData, period, indic);
 
   const {externalExpensesAccounts,externalExpensesContribution} = await processExternalExpenseAccounts(financialData, period,indic)
-
-  const indicDescription = getIndicDescription(indic);
 
   const providers = filterProvidersByPeriod(financialData, period);
 
@@ -214,7 +214,7 @@ export const buildSummaryReportContributionIndic = async ({
         libelle,
         totalRevenue,
         contributionPerEuro,
-        indicDescription
+        indic
       ),
 
       //--------------------------------------------------
@@ -246,7 +246,7 @@ export const buildSummaryReportContributionIndic = async ({
         ],
       },
       //--------------------------------------------------
-      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins), 
+      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins, defaultPosition), 
       ,
     ],
     //--------------------------------------------------
@@ -259,13 +259,6 @@ export const buildSummaryReportContributionIndic = async ({
   return summaryReport
 }
 
-function filterProvidersByPeriod(financialData, period) {
-  return financialData.providers.filter((provider) => {
-    return Object.keys(provider.periodsData).some(
-      (key) => key === period.periodKey
-    );
-  });
-}
 
 async function getFinancialData(financialData, period, indic) {
   const { revenue } = financialData.productionAggregates;
@@ -340,7 +333,7 @@ function getImpactData(externalExpensesAccounts, period, indic, providers){
 
 
 // Content
-const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indicDescription) => {
+const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indic) => {
   return [
     { text: libelle, style: "header" },
     //--------------------------------------------------
@@ -386,8 +379,8 @@ const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indicDes
     },
     //--------------------------------------------------
     {
-      margin: [0, 10, 0, 10],
-      text: indicDescription,
+      margin: [50, 10, 50, 10],
+      text: getIndicDescription(indic),
       alignment: "center",
     },
     //--------------------------------------------------
@@ -614,17 +607,4 @@ const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, 
   ]
 };
 
-const addUncertaintyText = (uncertaintyText, pdfPageSize, pdfMargins) => {
-  const textOptions = {
-    text: "* " + uncertaintyText,
-    fontSize: 6,
-    italics: true,
-    font: "Roboto",
-    absolutePosition: {
-      x: defaultPosition.startX,
-      y: pdfPageSize.height - pdfMargins.bottom - 15,
-    },
-  };
 
-  return textOptions;
-};

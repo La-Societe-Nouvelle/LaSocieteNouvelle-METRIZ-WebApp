@@ -151,6 +151,12 @@ export function definePDFStyles() {
         color: "#ffb642",
         margin: [0, 5, 0, 5],
       },
+      table: {
+        fontSize: 6,
+        bold: true,
+        alignment: "center",
+        font: "Roboto",
+      },
     },
   };
 }

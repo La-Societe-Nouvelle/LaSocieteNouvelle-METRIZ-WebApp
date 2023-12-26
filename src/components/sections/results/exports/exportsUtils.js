@@ -15,6 +15,13 @@ export function sortAccountsByFootprint(accounts, period, indicator, order) {
   return sortedAccounts;
 }
 
+export function filterProvidersByPeriod(financialData, period) {
+  return financialData.providers.filter((provider) => {
+    return Object.keys(provider.periodsData).some(
+      (key) => key === period.periodKey
+    );
+  });
+}
 export function sortProvidersByContrib(periodKey,expensesAccounts, indicator, order) {
   
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
@@ -91,35 +98,7 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
   return description;
 }
 
-export function getKeySuppliers(companies, indic, unit, precision) {
-  const keySuppliers = [];
-  companies
-    .filter((company) => !company.isDefaultAccount)
-    .filter((company) => company.footprintStatus == 200 && company.footprint.isValid())
-    .map((company) =>
-      keySuppliers.push({
-        stack: [
-          {
-            text: cutString(company.providerLib, 40),
-            fontSize: 8,
-            bold: true,
-          },
-          {
-            text:
-              indic == "idr"
-                ? "Rapport interdécile : " +
-                  company.footprint.indicators[indic].value.toFixed(precision)
-                : company.footprint.indicators[indic].value.toFixed(precision) +
-                  " " +
-                  unit,
-            fontSize: 7,
-          },
-        ],
-      })
-    );
 
-  return keySuppliers;
-}
 
 export function getIntensKeyProviders(
   providers,
@@ -269,3 +248,19 @@ export function loadFonts() {
     },
   };
 }
+
+
+export const addUncertaintyText = (uncertaintyText, pdfPageSize, pdfMargins,defaultPosition) => {
+  const textOptions = {
+    text: "* " + uncertaintyText,
+    fontSize: 6,
+    italics: true,
+    font: "Roboto",
+    absolutePosition: {
+      x: defaultPosition.startX,
+      y: pdfPageSize.height - pdfMargins.bottom - 15,
+    },
+  };
+
+  return textOptions;
+};

@@ -7,19 +7,33 @@ import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 // Utils
-import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import {
+  addUncertaintyText,
   calculateAverageEvolutionRate,
+  cutString,
+  filterProvidersByPeriod,
   getIndicDescription,
-  getKeySuppliers,
   getUncertaintyDescription,
   targetAnnualReduction,
 } from "../exportsUtils";
 import { printValue } from "/src/utils/formatters";
 
-import { loadFonts } from "../../../../../utils/exportsUtils";
+import {
+  createRectObject,
+  generateFooter,
+  generateHeader,
+  getDocumentInfo,
+  loadFonts,
+  definePDFStyles,
+  calculateAvailableWidth,
+  getChartImageData,
+} from "../../../../../utils/exportsUtils";
 import { sortProvidersByImpact } from "../../utils";
-import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+import {
+  defaultPosition,
+  pdfMargins,
+  pdfPageSize,
+} from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
 //  Report for Index Indicator
@@ -29,54 +43,44 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const buildSummaryReportIndexIndic = async({
+export const buildSummaryReportIndexIndic = async ({
   session,
   indic,
-  period
+  period,
 }) => {
+  // Session data --------------------------------------------------
 
-  // ---------------------------------------------------------------
-  // Variables
-
-  const { libelle, unit, libelleGrandeur } = metaIndics[indic];
-
-  const {
-    legalUnit,
-    financialData,
-    comparativeData
-  } = session;
+  const { legalUnit, financialData, comparativeData } = session;
 
   const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
-  const precision = metaIndics[indic].nbDecimals;
+
+  // Metadata ------------------------------------------------------
+  const { unit, nbDecimals } = metaIndics[indic];
   const divisionName = divisions[comparativeData.comparativeDivision];
 
-  const { revenue } = financialData.productionAggregates;
-
+  // ---------------------------------------------------------------
+  // PDF Data
   const {
     production,
-    netValueAdded,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
   } = financialData.mainAggregates;
 
-  const totalRevenue = revenue.periodsData[period.periodKey].amount;
+  const { revenue } = financialData.productionAggregates;
 
   // ---------------------------------------------------------------
   // utils
 
-  const indicDescription = getIndicDescription(indic);
+  let branchProductionTarget = "-";
 
-  let branchProductionTarget = null;
-  
   if (comparativeData.production.division.target.data[indic].length) {
     branchProductionTarget = targetAnnualReduction(
       comparativeData.production.division.target.data[indic]
     );
   }
 
-  let lastEstimatedData = comparativeData.production.division.history.data[indic]
-    .filter((item) => item.year <= currentPeriod);
+  let lastEstimatedData = comparativeData.production.division.history.data[
+    indic
+  ].filter((item) => item.year <= currentPeriod);
 
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
@@ -85,25 +89,9 @@ export const buildSummaryReportIndexIndic = async({
   const branchProductionEvolution =
     calculateAverageEvolutionRate(lastEstimatedData);
 
-  const providers = financialData.providers.filter((provider) => {
-    return Object.keys(provider.periodsData).some(
-      (key) => key === period.periodKey
-    );
-  }).filter((provider) => provider.footprintStatus == 200 && provider.footprint.isValid());
+  let providers = filterProvidersByPeriod(financialData, period);
 
-  console.log('providers',providers)
-
-  const firstMostImpactfulCompanies = sortProvidersByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(0, 2);
-  console.log('firstMostImpactfulCompanies',firstMostImpactfulCompanies)
-  const scdMostImpactfulCompanies = sortProvidersByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(2, 4);
+  const { topProviders, nextTopProviders } = getImpactData(indic, providers);
 
   const uncertaintyText = getUncertaintyDescription(
     "indice",
@@ -112,810 +100,894 @@ export const buildSummaryReportIndexIndic = async({
   );
 
   // ---------------------------------------------------------------
-  // Get chart canvas and encode it to import in document
+  // Get charts canvas and encode it to import in document
+ 
+  const chartIds = [
+    `deviation-chart-${indic}-print`,
+    `trend-chart-${indic}-print`,
+  ];
 
-  const deviationChart = document.getElementById(
-    `deviation-chart-${indic}-print`
-  );
-  const deviationImage = deviationChart.toDataURL("image/png");
+  const chartImages = {};
+  chartIds.forEach((id) => {
+    chartImages[id] = getChartImageData(id);
+  });
 
-  const trendChart = document.getElementById(`trend-chart-${indic}-print`);
-  const trendImage = trendChart.toDataURL("image/png");
 
   // ---------------------------------------------------------------
   // Document Property
+  let positionY = defaultPosition.startY;
 
+  const availableWidth = await calculateAvailableWidth(pdfPageSize, pdfMargins);
+
+  const figureKeyBoxWidth = 200;
+  const figureKeyBoxHeight = 65;
+
+  const keyFigureBoxes = [
+    {
+      x: 70,
+      y: positionY,
+      width: figureKeyBoxWidth,
+      height: figureKeyBoxHeight,
+    },
+    {
+      x: 325,
+      y: positionY,
+      width: figureKeyBoxWidth,
+      height: figureKeyBoxHeight,
+    },
+  ];
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
     pageSize: pdfPageSize,
-    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
-    header: {
-      columns: [
-        { text: corporateName, margin: [20, 15, 0, 0], bold: true },
-        {
-          text: "Exercice  " + currentPeriod,
-          alignment: "right",
-          margin: [0, 15, 20, 0],
-          bold: true,
-        },
-      ],
-    },
-    footer: function () {
-      return {
-        columns: [
-          {
-            text: "Edité le " + getShortCurrentDateString(),
-            margin: [20, 25, 0, 0],
-          },
-        ],
-        fontSize: 7,
-      };
-    },
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
+    header: generateHeader(corporateName, currentPeriod),
+    footer: generateFooter,
+
     background: function () {
+      const canvas = [];
+      // Background rectangles
+      canvas.push(
+        createRectObject(
+          0,
+          0,
+          pdfPageSize.width,
+          pdfPageSize.height,
+          0,
+          null,
+          null,
+          "#f1f0f4"
+        ),
+        createRectObject(
+          20,
+          35,
+          pdfPageSize.width - 40,
+          pdfPageSize.height - 65,
+          0,
+          null,
+          10,
+          "#FFFFFF"
+        )
+      );
+      // Key Figures
+
+      keyFigureBoxes.forEach((box) => {
+        canvas.push(
+          createRectObject(
+            box.x,
+            box.y,
+            box.width,
+            box.height,
+            1,
+            "#f1f0f4",
+            10,
+            null
+          )
+        );
+      });
+
+      // Empreintes SIG
+      positionY += 127;
+
+      canvas.push(
+        createRectObject(
+          defaultPosition.startX,
+          positionY,
+          availableWidth,
+          90,
+          1,
+          "#f1f0f4",
+          10,
+          null
+        )
+      );
+      positionY += 110;
+      canvas.push(
+        createRectObject(
+          defaultPosition.startX,
+          positionY,
+          availableWidth,
+          80,
+          1,
+          "#f1f0f4",
+          10,
+          null
+        )
+      );
+      positionY += 272;
+
+      canvas.push(
+        createRectObject(
+          defaultPosition.startX,
+          positionY,
+          180,
+          150,
+          1,
+          "#f1f0f4",
+          10,
+          null
+        )
+      );
+
+      canvas.push(
+        createRectObject(
+          220,
+          positionY,
+          345,
+          150,
+          1,
+          "#f1f0f4",
+          10,
+          null
+        )
+      );
+
       return {
-        canvas: [
-          // Background
-          {
-            type: "rect",
-            x: 0,
-            y: 0,
-            w: 595.28,
-            h: 841.89,
-            color: "#f1f0f4",
-          },
-          {
-            type: "rect",
-            x: pdfMargins.left - 20,
-            y: pdfMargins.top - 15,
-            w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
-            h: pdfPageSize.height - pdfMargins.top - 15,
-            color: "#FFFFFF",
-            r: 10,
-          },
-          // Key Figures
-          {
-            type: "rect",
-            x: 70,
-            y: 90,
-            w: 200,
-            h: 65,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          {
-            type: "rect",
-            x: 325,
-            y: 90,
-            w: 200,
-            h: 65,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // SIG
-          {
-            type: "rect",
-            x: 30,
-            y: 220,
-            w: 535,
-            h: 100,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // Key Suppliers
-          {
-            type: "rect",
-            x: 30,
-            y: 340,
-            w: 535,
-            h: 75,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          // Target + Chart
-          {
-            type: "rect",
-            x: 30,
-            y: 602,
-            w: 180,
-            h: 140,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-          {
-            type: "rect",
-            x: 220,
-            y: 602,
-            w: 345,
-            h: 150,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            r: 10,
-          },
-        ],
+        canvas: canvas,
       };
     },
     info: {
-      title: getDocumentTitle(indic, currentPeriod, corporateName),
-      author: corporateName,
-      subject: "Plaquette de résultat",
-      creator: "Metriz - La Société Nouvelle",
-      producer: "Metriz - La Societé Nouvelle",
+      info: getDocumentInfo("Plaquette", indic, corporateName, currentPeriod),
     },
     content: [
-      { text: libelle, style: "header" },
-
-      //--------------------------------------------------
-      {
-        margin: [0, 20, 0, 25],
-        columns: [
-          {
-            stack: [
-              {
-                text: printValue(totalRevenue, 0) + "€",
-                alignment: "center",
-                style: "numbers",
-              },
-              {
-                text: "de chiffre d'affaires",
-                alignment: "center",
-                margin: [0, 5, 0, 0],
-              },
-            ],
-          },
-
-          {
-            stack: [
-              {
-                margin: [0, 5, 0, 5],
-                text:
-                  printValue(
-                    revenue.periodsData[period.periodKey].footprint.indicators[
-                      indic
-                    ].value,
-                    precision
-                  ) +
-                  " " +
-                  unit,
-                alignment: "center",
-                style: "numbers",
-              },
-              {
-                text:
-                  indic == "idr"
-                    ? "Rapport interdécile "
-                    : "d'" + libelleGrandeur,
-                alignment: "center",
-              },
-            ],
-          },
-        ],
-      },
-      //--------------------------------------------------
-      {
-        text: indicDescription,
-        alignment: "center",
-      },
+      // Header
+      ...buildHeaderContent(revenue, indic, period),
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
-      {
-        text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
-        style: "h2",
-      },
-      {
-        margin: [0, 10, 0, 10],
-        columns: [
-          {
-            width: "25%",
-            stack: [
-              {
-                alignment: "center",
-                bold: true,
-                fontSize: 24,
-                color: "#fa595f",
-                text: [
-                  {
-                    text: printValue(
-                      production.periodsData[period.periodKey].footprint
-                        .indicators[indic].value,
-                      precision
-                    ),
-                  },
-                  {
-                    text: indic == "idr" ? " " : "%",
-                  },
-                ],
-              },
-              {
-                text: "Indice associé",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-                margin: [0, 5, 0, 0],
-              },
-              {
-                text: "à la valeur produite",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-              },
-            ],
-          },
-          {
-            stack: [
-              {
-                alignment: "center",
-                bold: true,
-                fontSize: 24,
-                text: [
-                  {
-                    text: printValue(
-                      intermediateConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].value,
-                      precision
-                    ),
-                  },
-                  {
-                    text: indic == "idr" ? " " : "%",
-                  },
-                ],
-              },
-              {
-                text: "Consommations",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-                margin: [0, 5, 0, 0],
-              },
-              {
-                text: "intermédiaires",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-              },
-            ],
-          },
-          {
-            stack: [
-              {
-                alignment: "center",
-                bold: true,
-                fontSize: 24,
-                text: [
-                  {
-                    text: printValue(
-                      fixedCapitalConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].value,
-                      precision
-                    ),
-                  },
-                  {
-                    text: indic == "idr" ? " " : "%",
-                  },
-                ],
-              },
-              {
-                text: "Consommations",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-                margin: [0, 5, 0, 0],
-              },
-              {
-                text: "de capital fixe",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-              },
-            ],
-          },
-          {
-            stack: [
-              {
-                alignment: "center",
-                bold: true,
-                fontSize: 24,
-                text: [
-                  {
-                    text: printValue(
-                      netValueAdded.periodsData[period.periodKey].footprint
-                        .indicators[indic].value,
-                      precision
-                    ),
-                  },
-                  {
-                    text: indic == "idr" ? " " : "%",
-                  },
-                ],
-              },
-
-              {
-                text: "Valeur ajoutée",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-                margin: [0, 5, 0, 0],
-              },
-              {
-                text: "nette",
-                alignment: "center",
-                bold: true,
-                fontSize: 8,
-              },
-            ],
-          },
-        ],
-      },
+      ...buildIntermediateManagementContent(
+        financialData.mainAggregates,
+        indic,
+        period
+      ),
       //--------------------------------------------------
       // Key Suppliers
-      {
-        text: "\tFournisseurs clés\t",
-        style: "h2",
-        alignment: "center",
-        margin: [0, 25, 0, 0],
-        background: "#FFFFFF",
-      },
-      {
-        margin: [0, 10, 0, firstMostImpactfulCompanies.length>0 ? 0 : 25],
-        columns: [
-          {
-            columnGap: 20,
-            columns: [
-              ...getKeySuppliers(
-                firstMostImpactfulCompanies,
-                indic,
-                unit,
-                precision
-              ),
-            ],
-          },
-        ],
-      },
-      {
-        margin: [0, 10, 0, scdMostImpactfulCompanies.length>0 ? 0 : 25],
-        columns: [
-          {
-            columnGap: 20,
-            columns: [
-              ...getKeySuppliers(
-                scdMostImpactfulCompanies,
-                indic,
-                unit,
-                precision
-              ),
-            ],
-          },
-        ],
-      },
+      ...buildKeyProvidersSection(topProviders, nextTopProviders, indic),
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 25, 0, 0],
+        margin: [0, 25, 0, 20],
         columns: [
           {
-            width: "*",
-            style: "table",
-            table: {
-              body: [
-                // header
-                [
-                  {
-                    text: "",
-                  },
-                  {
-                    text: "Montant",
-                  },
-                  {
-                    text: "Empreinte",
-                  },
-
-                  {
-                    text: "Incert.*",
-                    alignment: "center",
-                  },
-                ],
-                // rows
-                [
-                  {},
-                  {},
-                  {
-                    text: unit ? unit : "Rapport interdécile",
-                    fontSize: "5",
-                    alignment: "right",
-                  },
-                  { text: "%", fontSize: "5", alignment: "center" },
-                ],
-                [
-                  {
-                    text: "Production",
-                    margin: [2, 7, 2, 8],
-                    alignment: "left",
-                  },
-                  {
-                    text:
-                      printValue(
-                        production.periodsData[period.periodKey].amount,
-                        0
-                      ) + " €",
-                    margin: [2, 7, 2, 8],
-                    alignment: "right",
-                  },
-                  {
-                    columns: [
-                      {
-                        text: [
-                          {
-                            text: printValue(
-                              production.periodsData[period.periodKey].footprint
-                                .indicators[indic].value,
-                              precision
-                            ),
-                          },
-                        ],
-                      },
-                    ],
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-
-                  {
-                    text: printValue(
-                      production.periodsData[period.periodKey].footprint
-                        .indicators[indic].uncertainty,
-                      0
-                    ),
-                    fontSize: "5",
-                    alignment: "center",
-                    margin: [2, 7, 2, 8],
-                  },
-                ],
-                [
-                  {
-                    text: "Cons. intermédiaires",
-                    margin: [2, 7, 2, 8],
-                    alignment: "left",
-                  },
-                  {
-                    text:
-                      printValue(
-                        intermediateConsumptions.periodsData[period.periodKey]
-                          .amount,
-                        0
-                      ) + " €",
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-
-                  {
-                    columns: [
-                      {
-                        text: [
-                          {
-                            text: printValue(
-                              intermediateConsumptions.periodsData[
-                                period.periodKey
-                              ].footprint.indicators[indic].value,
-                              precision
-                            ),
-                          },
-                        ],
-                      },
-                    ],
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-                  {
-                    text: printValue(
-                      intermediateConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].uncertainty,
-                      0
-                    ),
-                    fontSize: "5",
-                    alignment: "center",
-                    margin: [2, 7, 2, 8],
-                  },
-                ],
-                [
-                  {
-                    text: "Cons. de capital fixe",
-                    alignment: "left",
-                    margin: [2, 7, 2, 8],
-                  },
-                  {
-                    text:
-                      printValue(
-                        fixedCapitalConsumptions.periodsData[period.periodKey]
-                          .amount,
-                        0
-                      ) + " €",
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-                  {
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                    columns: [
-                      {
-                        text: [
-                          {
-                            text: printValue(
-                              fixedCapitalConsumptions.periodsData[
-                                period.periodKey
-                              ].footprint.indicators[indic].value,
-                              precision
-                            ),
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    text: printValue(
-                      fixedCapitalConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].uncertainty,
-                      0
-                    ),
-                    fontSize: "5",
-                    alignment: "center",
-                    margin: [2, 7, 2, 8],
-                  },
-                ],
-                [
-                  {
-                    text: "Valeur ajoutée nette",
-                    alignment: "left",
-                    margin: [2, 7, 2, 8],
-                  },
-                  {
-                    text:
-                      printValue(
-                        netValueAdded.periodsData[period.periodKey].amount,
-                        0
-                      ) + " €",
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-                  {
-                    columns: [
-                      {
-                        text: [
-                          {
-                            text: printValue(
-                              netValueAdded.periodsData[period.periodKey]
-                                .footprint.indicators[indic].value,
-                              precision
-                            ),
-                          },
-                        ],
-                      },
-                    ],
-                    alignment: "right",
-                    margin: [2, 7, 2, 8],
-                  },
-
-                  {
-                    text: printValue(
-                      netValueAdded.periodsData[period.periodKey].footprint
-                        .indicators[indic].uncertainty,
-                      0
-                    ),
-                    fontSize: "5",
-                    alignment: "center",
-                    margin: [2, 7, 2, 8],
-                  },
-                ],
-              ],
-            },
-            layout: {
-              hLineWidth: function (i, node) {
-                return i === 0 || i === 1 ? 0 : 2;
-              },
-              vLineWidth: function (i, node) {
-                return i === 0 || i === node.table.widths.length ? 0 : 2;
-              },
-              vLineColor: function (i, node) {
-                return "#f0f0f8";
-              },
-              hLineColor: function (i, node) {
-                return "#f0f0f8";
-              },
-            },
+            ...buildSIGTableSection(
+              financialData.mainAggregates,
+              period,
+              indic,
+            ),
           },
           //--------------------------------------------------
           //Deviation chart
           {
-            width: "*",
-            stack: [
-              {
-                table: {
-                  widths: ["100%"],
-                  body: [
-                    [
-                      {
-                        text: "Ecart par rapport à la moyenne de la branche",
-                        width: "100%",
-                        fontSize: "6",
-                        bold: true,
-                        alignment: "center",
-                        font: "Roboto",
-                        border: [false, false, false, true],
-                      },
-                    ],
-                  ],
-                },
-                layout: {
-                  hLineWidth: function (i, node) {
-                    return 2;
-                  },
-
-                  hLineColor: function (i, node) {
-                    return "#f0f0f8";
-                  },
-                  paddingTop: function (i, node) {
-                    return 0;
-                  },
-
-                  paddingBottom: function (i, node) {
-                    return 12;
-                  },
-                },
-              },
-              {
-                margin: [0, 1, 0, 0],
-                width: 245,
-                image: deviationImage,
-              },
-            ],
+            ...buildDeviationChartSection(chartImages[`deviation-chart-${indic}-print`])
           },
         ],
       },
       //--------------------------------------------------
+     
       {
-        columnGap: 40,
-        columns: [
-          //Left Box
-          {
-            width: "33%",
-            stack: [
-              {
-                text: "\tObjectif de la branche\t",
-                style: "h2",
-                alignment: "center",
-                background: "#FFFFFF",
-              },
-              {
-                text: branchProductionTarget
-                  ? branchProductionTarget + " %"
-                  : "-",
-                alignment: "center",
-                style: "numbers",
-                color: "#ffb642",
-              },
-              {
-                text: branchProductionTarget
-                  ? "Objectif annuel"
-                  : "Aucun objectif défini",
-                alignment: "center",
-                margin: [0, 2, 0, 10],
-                bold: true,
-              },
-              {
-                text:
-                  branchProductionEvolution > 0
-                    ? " + " + branchProductionEvolution + " % "
-                    : branchProductionEvolution + " % ",
-                alignment: "center",
-                fontSize: "10",
-                style: "numbers",
-                color: "#ffb642",
-              },
-              {
-                text:
-                  "Taux d'évolution moyen observé entre " +
-                  lastEstimatedData[0].year +
-                  " et " +
-                  lastEstimatedData[1].year,
-                alignment: "center",
-                fontSize: "8",
-                margin: [0, 2, 0, 0],
-              },
-              {
-                margin: [0, 15, 0, 0],
-                fontSize: 6,
-                text: [
-                  {
-                    text:
-                      "Branche de référence : " +
-                      comparativeData.comparativeDivision +
-                      " - ",
-                  },
-                  {
-                    text: divisionName,
-                  },
-                ],
-              },
-            ],
-          },
-          //Right Box
-          {
-            width: "*",
-            stack: [
-              {
-                text: "\tEvolution de la performance de la branche\t",
-                style: "h2",
-                alignment: "center",
-                background: "#FFFFFF",
-              },
-              {
-                width: 250,
-                image: trendImage,
-              },
-            ],
-          },
-        ],
+        ...buildBranchPerformanceSection( branchProductionTarget,
+          branchProductionEvolution,
+          lastEstimatedData,
+          comparativeData,
+          divisionName,
+          chartImages,
+          indic)
       },
       //--------------------------------------------------
-      {
-        text: "* " + uncertaintyText,
-        fontSize: 6,
-        italics: true,
-        font: "Roboto",
-        margin: [0, 20, 0, 0],
-      },
+      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins,defaultPosition), 
       ,
     ],
     //--------------------------------------------------
     // Style
-    defaultStyle: {
-      fontSize: 10,
-      color: "#191558",
-      font: "Raleway",
-    },
-    styles: {
-      header: {
-        fontSize: 14,
-        color: "#fa595f",
-        bold: true,
-        margin: [0, 5, 0, 10],
-        alignment: "center",
-      },
-      h2: {
-        fontSize: 12,
-        color: "#fa595f",
-        bold: true,
-        alignment: "center",
-        margin: [0, 20, 0, 10],
-        background: "#FFFFFF",
-      },
-      numbers: {
-        fontSize: 18,
-        bold: true,
-      },
-      table: {
-        fontSize: 6,
-        bold: true,
-        alignment: "center",
-        font: "Roboto",
-      },
-    },
+
+    ...definePDFStyles(),
   };
 
   const summaryReport = pdfMake.createPdf(docDefinition);
 
   return summaryReport;
+};
+
+function getImpactData(indic, providers) {
+  providers = providers.filter(
+    (provider) =>
+      provider.footprintStatus == 200 && provider.footprint.isValid()
+  );
+
+  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
+    0,
+    2
+  );
+  const nextTopProviders = sortProvidersByImpact(
+    providers,
+    indic,
+    "desc"
+  ).slice(2, 4);
+
+  return {
+    topProviders,
+    nextTopProviders,
+  };
 }
 
-function getDocumentTitle(indic, currentPeriod, corporateName) {
-  return "Plaquette_" +
-    indic.toUpperCase() +
-    "_" +
-    currentPeriod +
-    "-" +
-    corporateName.replaceAll(" ", "");
-}
+const buildHeaderContent = (revenue, indic, period) => {
+  const { libelle, unit, libelleGrandeur } = metaIndics[indic];
+
+  const totalRevenue = revenue.periodsData[period.periodKey].amount;
+
+  return [
+    { text: libelle, style: "header" },
+    //--------------------------------------------------
+    {
+      margin: [0, 20, 0, 0],
+      columns: [
+        {
+          stack: [
+            {
+              text: printValue(totalRevenue, 0) + "€",
+              alignment: "center",
+              style: "numbers",
+            },
+            {
+              text: "de chiffre d'affaires",
+              alignment: "center",
+              margin: [0, 5, 0, 0],
+            },
+          ],
+        },
+        {
+          margin: [60, 0, 60, 0],
+          stack: [
+            {
+              text:
+                printValue(
+                  revenue.periodsData[period.periodKey].footprint.indicators[
+                    indic
+                  ].value,
+                  1
+                ) +
+                " " +
+                unit,
+              alignment: "center",
+              style: "numbers",
+            },
+            {
+              margin: indic == "idr" ? [0, 5, 0, 12] :  [0, 5, 0, 0],
+              text: indic == "idr" ? "Rapport interdécile D9/D1" : "d'" + libelleGrandeur,
+              alignment: "center",
+            },
+          ],
+        },
+      ],
+    },
+    //--------------------------------------------------
+    {
+      margin: [0, 30, 0, 10],
+      text: getIndicDescription(indic),
+      alignment: "center",
+    },
+    //--------------------------------------------------
+  ];
+};
+
+const buildIntermediateManagementContent = (mainAggregates, indic, period) => {
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  const {
+    production,
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+  } = mainAggregates;
+
+  return [
+    // Box "Soldes Intermédiaires de Gestion"
+    {
+      text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
+      style: "h2",
+      margin: [0, 0, 0, 15],
+    },
+    {
+      columns: [
+        {
+          width: "25%",
+          stack: [
+            {
+              alignment: "center",
+              bold: true,
+              fontSize: 24,
+              color: "#fa595f",
+              text: [
+                {
+                  text: printValue(
+                    production.periodsData[period.periodKey].footprint
+                      .indicators[indic].value,
+                    nbDecimals
+                  ),
+                },
+                {
+                  text: unit,
+                },
+              ],
+            },
+            {
+              text: "Indice associé",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              margin: [0, 5, 0, 0],
+            },
+            {
+              text: "à la valeur produite",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+            },
+          ],
+        },
+        {
+          stack: [
+            {
+              alignment: "center",
+              bold: true,
+              fontSize: 24,
+              text: [
+                {
+                  text: printValue(
+                    intermediateConsumptions.periodsData[period.periodKey]
+                      .footprint.indicators[indic].value,
+                    nbDecimals
+                  ),
+                },
+                {
+                  text: unit,
+                },
+              ],
+            },
+            {
+              text: "Consommations",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              margin: [0, 5, 0, 0],
+            },
+            {
+              text: "intermédiaires",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+            },
+          ],
+        },
+        {
+          stack: [
+            {
+              alignment: "center",
+              bold: true,
+              fontSize: 24,
+              text: [
+                {
+                  text: printValue(
+                    fixedCapitalConsumptions.periodsData[period.periodKey]
+                      .footprint.indicators[indic].value,
+                    nbDecimals
+                  ),
+                },
+                {
+                  text: unit,
+                },
+              ],
+            },
+            {
+              text: "Consommations",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              margin: [0, 5, 0, 0],
+            },
+            {
+              text: "de capital fixe",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+            },
+          ],
+        },
+        {
+          stack: [
+            {
+              alignment: "center",
+              bold: true,
+              fontSize: 24,
+              text: [
+                {
+                  text: printValue(
+                    netValueAdded.periodsData[period.periodKey].footprint
+                      .indicators[indic].value,
+                    nbDecimals
+                  ),
+                },
+                {
+                  text: unit,
+                },
+              ],
+            },
+
+            {
+              text: "Valeur ajoutée",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              margin: [0, 5, 0, 0],
+            },
+            {
+              text: "nette",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+};
+
+const buildKeyProvidersSection = (topProviders, nextTopProviders, indic) => {
+  return [
+    {
+      text: "\tFournisseurs clés\t",
+      style: "h2",
+      alignment: "center",
+      margin: [0, 30, 0, 15],
+      background: "#FFFFFF",
+    },
+    generateKeyProviderColumns(topProviders, indic),
+    generateKeyProviderColumns(nextTopProviders, indic),
+  ];
+};
+
+const generateKeyProviderColumns = (providers, indic) => {
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  providers = providers.filter(
+    (provider) =>
+      !provider.isDefaultAccount &&
+      provider.footprintStatus === 200 &&
+      provider.footprint.isValid()
+  );
+
+  const keyProviders = generateKeyProviders(providers, indic, unit, nbDecimals);
+
+  return {
+    margin: [10, 0, 10, 10],
+    columns: [
+      {
+        columnGap: 20,
+        columns: keyProviders,
+      },
+    ],
+  };
+};
+
+const generateKeyProviders = (providers, indic, unit, precision) =>
+  providers.map((provider) => ({
+    stack: [
+      {
+        text: cutString(provider.providerLib, 40),
+        fontSize: 8,
+        bold: true,
+      },
+      {
+        text:
+          indic === "idr"
+            ? `Rapport interdécile : ${provider.footprint.indicators[
+                indic
+              ].value.toFixed(precision)}`
+            : `${provider.footprint.indicators[indic].value.toFixed(
+                precision
+              )} ${unit}`,
+        fontSize: 7,
+      },
+    ],
+  }));
+
+const buildSIGTableSection = (mainAggregates, period, indic) => {
+  const {
+    production,
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+  } = mainAggregates;
+
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  return {
+    width: "50%",
+    style: "table",
+    table: {
+      body: [
+        // header
+        [
+          {
+            text: "",
+          },
+          {
+            text: "Montant",
+          },
+          {
+            text: "Empreinte",
+          },
+
+          {
+            text: "Incertitude*",
+            alignment: "center",
+          },
+        ],
+        // rows
+        [
+          {},
+          {},
+          {
+            text: unit ,
+            fontSize: "5",
+            alignment: "right",
+          },
+          { text: "%", fontSize: "5", alignment: "center" },
+        ],
+        [
+          {
+            text: "Production",
+            margin: [2, 7, 2, 8],
+            alignment: "left",
+          },
+          {
+            text:
+              printValue(production.periodsData[period.periodKey].amount, 0) +
+              " €",
+            margin: [2, 7, 2, 8],
+            alignment: "right",
+          },
+          {
+            columns: [
+              {
+                text: [
+                  {
+                    text: printValue(
+                      production.periodsData[period.periodKey].footprint
+                        .indicators[indic].value,
+                      nbDecimals
+                    ),
+                  },
+                ],
+              },
+            ],
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+
+          {
+            text: printValue(
+              production.periodsData[period.periodKey].footprint.indicators[
+                indic
+              ].uncertainty,
+              0
+            ),
+            fontSize: "5",
+            alignment: "center",
+            margin: [2, 7, 2, 8],
+          },
+        ],
+        [
+          {
+            text: "Consommations intermédiaires",
+            margin: [2, 7, 2, 8],
+            alignment: "left",
+          },
+          {
+            text:
+              printValue(
+                intermediateConsumptions.periodsData[period.periodKey].amount,
+                0
+              ) + " €",
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+
+          {
+            columns: [
+              {
+                text: [
+                  {
+                    text: printValue(
+                      intermediateConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].value,
+                      nbDecimals
+                    ),
+                  },
+                ],
+              },
+            ],
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+          {
+            text: printValue(
+              intermediateConsumptions.periodsData[period.periodKey].footprint
+                .indicators[indic].uncertainty,
+              0
+            ),
+            fontSize: "5",
+            alignment: "center",
+            margin: [2, 7, 2, 8],
+          },
+        ],
+        [
+          {
+            text: "Consommations de capital fixe",
+            alignment: "left",
+            margin: [2, 7, 2, 8],
+          },
+          {
+            text:
+              printValue(
+                fixedCapitalConsumptions.periodsData[period.periodKey].amount,
+                0
+              ) + " €",
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+          {
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+            columns: [
+              {
+                text: [
+                  {
+                    text: printValue(
+                      fixedCapitalConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].value,
+                      nbDecimals
+                    ),
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            text: printValue(
+              fixedCapitalConsumptions.periodsData[period.periodKey].footprint
+                .indicators[indic].uncertainty,
+              0
+            ),
+            fontSize: "5",
+            alignment: "center",
+            margin: [2, 7, 2, 8],
+          },
+        ],
+        [
+          {
+            text: "Valeur ajoutée nette",
+            alignment: "left",
+            margin: [2, 7, 2, 8],
+          },
+          {
+            text:
+              printValue(
+                netValueAdded.periodsData[period.periodKey].amount,
+                0
+              ) + " €",
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+          {
+            columns: [
+              {
+                text: [
+                  {
+                    text: printValue(
+                      netValueAdded.periodsData[period.periodKey].footprint
+                        .indicators[indic].value,
+                      nbDecimals
+                    ),
+                  },
+                ],
+              },
+            ],
+            alignment: "right",
+            margin: [2, 7, 2, 8],
+          },
+
+          {
+            text: printValue(
+              netValueAdded.periodsData[period.periodKey].footprint.indicators[
+                indic
+              ].uncertainty,
+              0
+            ),
+            fontSize: "5",
+            alignment: "center",
+            margin: [2, 7, 2, 8],
+          },
+        ],
+      ],
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return i === 0 || i === 1 ? 0 : 1;
+      },
+      vLineWidth: function (i, node) {
+        return i === 0 || i === node.table.widths.length ? 0 : 1;
+      },
+      vLineColor: function (i, node) {
+        return "#f0f0f8";
+      },
+      hLineColor: function (i, node) {
+        return "#f0f0f8";
+      },
+    },
+  };
+};
+
+const buildDeviationChartSection = (chartImage) => {
+  return {
+    width: "50%",
+    stack: [
+      {
+        table: {
+          widths: ["100%"],
+          body: [
+            [
+              {
+                text: "Ecart par rapport à la moyenne de la branche",
+                fontSize: "6",
+                bold: true,
+                alignment: "center",
+                font: "Roboto",
+                border: [false, false, false, true],
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: function (i, node) {
+            return 1;
+          },
+          hLineColor: function (i, node) {
+            return "#f0f0f8";
+          },
+          paddingTop: function (i, node) {
+            return 0;
+          },
+          paddingBottom: function (i, node) {
+            return 12;
+          },
+        },
+      },
+      {
+        width: 240,
+        image : chartImage
+      },
+    ],
+  };
+};
+
+const buildBranchPerformanceSection = (
+  branchProductionTarget,
+  branchProductionEvolution,
+  lastEstimatedData,
+  comparativeData,
+  divisionName,
+  chartImages,
+  indic
+) => {
+  const branchReferenceText =
+    "Branche de référence : " +
+    comparativeData.comparativeDivision +
+    " - " +
+    divisionName;
+
+  return {
+    columnGap: 40,
+    columns: [
+      // Left Box
+      {
+        margin: [10, 0, 0, 0],
+        width: "33%",
+        stack: [
+          {
+            text: "\tObjectif de la branche\t",
+            style: "h2",
+            alignment: "center",
+            background: "#FFFFFF",
+            margin: [0, 0, 0, 10],
+          },
+          {
+            text: branchProductionTarget ? branchProductionTarget + " %" : "-",
+            alignment: "center",
+            style: "numbers",
+            color: "#ffb642",
+          },
+          {
+            text: branchProductionTarget
+              ? "Objectif annuel"
+              : "Aucun objectif défini",
+            alignment: "center",
+            margin: [0, 2, 0, 10],
+            bold: true,
+          },
+          {
+            text:
+              branchProductionEvolution > 0
+                ? " + " + branchProductionEvolution + " % "
+                : branchProductionEvolution + " % ",
+            alignment: "center",
+            fontSize: "10",
+            style: "numbers",
+            color: "#ffb642",
+          },
+          {
+            text:
+              "Taux d'évolution moyen observé entre " +
+              lastEstimatedData[0].year +
+              " et " +
+              lastEstimatedData[1].year,
+            alignment: "center",
+            fontSize: "8",
+            margin: [0, 2, 0, 0],
+          },
+          {
+            margin: [0, 15, 0, 0],
+            fontSize: 6,
+            text: [
+              {
+                text: branchReferenceText,
+              },
+            ],
+          },
+        ],
+      },
+      // Right Box
+      {
+        width: "*",
+        stack: [
+          {
+            text: "\tEvolution de la performance de la branche\t",
+            style: "h2",
+            alignment: "center",
+            background: "#FFFFFF",
+          },
+          {
+            width: 300,
+            image: chartImages[`trend-chart-${indic}-print`],
+          },
+        ],
+      },
+    ],
+  };
+};
