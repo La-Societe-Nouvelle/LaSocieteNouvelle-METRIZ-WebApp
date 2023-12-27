@@ -26,7 +26,6 @@ export const getStatementPDF = (
   declarantOrganisation,
   price,
   legalUnitFootprint,
-  comments
 ) => {
   // date
   const today = new Date();
@@ -69,34 +68,34 @@ export const getStatementPDF = (
                 alignment: "center",
               },
             ],
-            ...Object.entries(legalUnitFootprint).flatMap(
-              ([key, indicator]) => {
+            ...legalUnitFootprint.flatMap(
+              ({ indicator, values })=> {
                 const indicatorRow = [
                   {
-                    text: metaIndics[key].libelle,
+                    text: metaIndics[indicator].libelle,
                     style: "tableCell",
                   },
                   {
-                    text: printValue(indicator.value, metaIndics[key].nbDecimals),
+                    text: printValue(values.value, metaIndics[indicator].nbDecimals),
                     alignment: "right",
                     style: "tableCell",
                   },
                   {
-                    text: metaIndics[key].unit,
+                    text: metaIndics[indicator].unit,
                     style: "tableCell",
                   },
                   {
-                    text: printValue(indicator.uncertainty, 0) + " %",
+                    text: printValue(values.uncertainty, 0) + " %",
                     fontSize: 6,
                     alignment: "right",
                     style: "tableCell",
                   },
                 ];
 
-                const commentRow = comments[key]
+                const commentRow = values.comment
                   ? [
                       {
-                        text: "Commentaire : " + comments[key],
+                        text: "Commentaire : " + values.comment,
                         colSpan: 4,
                         fontSize: 6,
                         style: "tableCell",
@@ -218,7 +217,6 @@ export const getStatementPDF = (
       },
     },
   };
-
   // generator pdf
   const statementPDF = pdfMake.createPdf(documentDefinition);
 
