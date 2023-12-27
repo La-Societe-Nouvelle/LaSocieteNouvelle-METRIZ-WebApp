@@ -1,5 +1,25 @@
 import apiStats from "../../config/api-stats";
 
+export const sendPublications = async (data) =>
+{
+    // log data
+    const publicationsData = {
+        siren: data.siren,
+        year : data.year,
+        indicators: data.footprint,
+      };
+    
+      try {
+            console.log(publicationsData)
+        // post data
+        const response = await apiStats.post(`/publication`, publicationsData);
+        return response;
+      } catch (error) {
+        console.error(error);
+        // throw Error(error.message);
+      }
+}
+
 const PublicationService = {
   async sendPublications(publications) {
     try {

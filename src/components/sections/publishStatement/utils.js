@@ -12,6 +12,8 @@ export const getPublishableIndicators = (legalUnitFootprint, comments) => {
         uncertainty: indicator.uncertainty,
         comment: comments[indic],
         toPublish: true,
+        flag : "w",
+        source : "Metriz"
       };
       return acc;
     }, {});

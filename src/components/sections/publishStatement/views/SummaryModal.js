@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 
 // Lib
@@ -16,13 +17,14 @@ import { mailToAdminWriter, mailToDeclarantWriter } from "../utils";
 // Writers
 import { getStatementPDF } from "/src/writers/StatementPDFBuilder";
 
+// Services
+import { sendPublications } from "../../../../services/PublicationService";
+
 const SummaryModal = ({ formData, showModal, handleClose }) => {
 
 
     const [isSend, setIsSend] = useState(false);
     const [error, setError] = useState(false);
-
-
   const indicatorsToPublish = Object.entries(formData.footprint)
     .filter(([_, indicator]) => indicator.toPublish === true)
     .map(([indicator, values]) => ({ indicator, values }));
@@ -52,56 +54,64 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
   };
   const handlePublish = async () => {
     try {
-      // build PDF
-      const statementPDF = getStatementPDF(
-        formData.siren,
-        formData.corporateName,
-        formData.year,
-        formData.declarant,
-        formData.declarantOrganisation,
-        formData.price,
-        indicatorsToPublish
-      );
 
-      const statementFilePromise = new Promise((resolve, reject) => {
-        statementPDF.getBase64((datauristring) => {
-          resolve(datauristring);
-        });
-      });
+        const response = await sendPublications(formData);
+        console.log(response)
 
-      const statementFile = await statementFilePromise;
+    //   // build PDF
+    //   const statementPDF = getStatementPDF(
+    //     formData.siren,
+    //     formData.corporateName,
+    //     formData.year,
+    //     formData.declarant,
+    //     formData.declarantOrganisation,
+    //     formData.price,
+    //     indicatorsToPublish
+    //   );
 
-      const messageToAdmin = mailToAdminWriter(
-        formData.siren,
-        formData.corporateName,
-        formData.year,
-        indicatorsToPublish,
-        formData.declarant,
-        formData.declarantOrganisation,
-        formData.email,
-        formData.price
-      );
+    //   const statementFilePromise = new Promise((resolve, reject) => {
+    //     statementPDF.getBase64((datauristring) => {
+    //       resolve(datauristring);
+    //     });
+    //   });
 
-      const resAdmin = await sendStatementToAdmin(
-        messageToAdmin,
-        statementFile
-      );
+    //   const statementFile = await statementFilePromise;
 
-      const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
+    //   const messageToAdmin = mailToAdminWriter(
+    //     formData.siren,
+    //     formData.corporateName,
+    //     formData.year,
+    //     indicatorsToPublish,
+    //     formData.declarant,
+    //     formData.declarantOrganisation,
+    //     formData.email,
+    //     formData.price
+    //   );
 
-      const resDeclarant = await sendStatementToDeclarant(
-        formData.email,
-        messageToDeclarant,
-        statementFile
-      );
+  
+       
+ 
 
-      if (resAdmin.status == 200 && resDeclarant.status == 200) {
-        setIsSend(true);
-        setError(false);
-      } else {
-        setIsSend(false);
-        setError(true);
-      }
+    //   const resAdmin = await sendStatementToAdmin(
+    //     messageToAdmin,
+    //     statementFile
+    //   );
+
+    //   const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
+
+    //   const resDeclarant = await sendStatementToDeclarant(
+    //     formData.email,
+    //     messageToDeclarant,
+    //     statementFile
+    //   );
+
+    //   if (resAdmin.status == 200 && resDeclarant.status == 200) {
+    //     setIsSend(true);
+    //     setError(false);
+    //   } else {
+    //     setIsSend(false);
+    //     setError(true);
+    //   }
     } catch (error) {
       setIsSend(false);
       setError(true);
