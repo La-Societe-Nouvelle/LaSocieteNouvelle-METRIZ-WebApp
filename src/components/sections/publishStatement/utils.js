@@ -2,8 +2,7 @@ export const getPublishableIndicators = (legalUnitFootprint, comments) => {
   if (!legalUnitFootprint) return {};
 
   const indicatorsData = legalUnitFootprint.indicators;
-  console.log(comments);
-  console.log(indicatorsData);
+
   const publishableIndicators = Object.entries(indicatorsData)
     .filter(([_, indicator]) => indicator.value != null)
     .reduce((acc, [indic, indicator]) => {
@@ -13,7 +12,7 @@ export const getPublishableIndicators = (legalUnitFootprint, comments) => {
         comment: comments[indic],
         toPublish: true,
         flag : "w",
-        source : "Metriz"
+        source : "La Société Nouvelle (via l'outil Metriz : https://metriz.lasocietenouvelle.org ) ",
       };
       return acc;
     }, {});
