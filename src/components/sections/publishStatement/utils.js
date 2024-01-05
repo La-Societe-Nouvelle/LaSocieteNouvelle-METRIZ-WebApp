@@ -1,7 +1,7 @@
-export const getPublishableIndicators = (legalUnitFootprint, comments) => {
-  if (!legalUnitFootprint) return {};
+export const getPublishableIndicators = (indicators, comments) => {
+  if (!indicators) return {};
 
-  const indicatorsData = legalUnitFootprint.indicators;
+  const indicatorsData = indicators.indicators;
 
   const publishableIndicators = Object.entries(indicatorsData)
     .filter(([_, indicator]) => indicator.value != null)
@@ -26,25 +26,26 @@ export const mailToAdminWriter = (
   siren,
   corporateName,
   year,
-  legalUnitFootprint,
-  comments,
+  footprints,
   declarant,
   declarantOrganisation,
   email,
   price
 ) => {
+
+
   let mailContent = `Unité légale : ${siren} \n
-    Dénomination : ${corporateName} \n
-    Année : ${year}  \n
-    Valeurs à publier :\n
-    ${Object.entries(legalUnitFootprint)
-      .map(([indicator, value]) => {
-        const comment = comments[indicator]
-          ? ` Commentaire : ${comments[indicator]}`
-          : "";
-        return `- ${indicator} : ${value.value} ( incertitude : +/- ${value.uncertainty} % )${comment}`;
-      })
-      .join("\n")}`;
+  Dénomination : ${corporateName} \n
+  Année : ${year}  \n
+  Valeurs à publier :\n
+  ${Object.values(footprints)
+    .map((footprint) => {
+      const comment = footprint.values.comment
+        ? ` Commentaire : ${footprint.values.comment}`
+        : "";
+      return `- ${footprint.indicator} :  ${footprint.values.value} ( incertitude : +/- ${footprint.values.uncertainty} % )${comment}`;
+    })
+    .join("\n")}`;
 
   if (declarantOrganisation) {
     mailContent += `\nStructure déclarante : ${declarantOrganisation}`;

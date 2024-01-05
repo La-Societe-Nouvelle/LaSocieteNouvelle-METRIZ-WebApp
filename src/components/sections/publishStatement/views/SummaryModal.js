@@ -57,59 +57,60 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
 
       const publications = convertFormDataToPublications(formData);
       
-      const response = await sendPublications(publications); 
-      console.log(response);
+     // const response = await sendPublications(publications); 
 
       //   // build PDF
-      //   const statementPDF = getStatementPDF(
-      //     formData.siren,
-      //     formData.corporateName,
-      //     formData.year,
-      //     formData.declarant,
-      //     formData.declarantOrganisation,
-      //     formData.price,
-      //     indicatorsToPublish
-      //   );
+        const statementPDF = getStatementPDF(
+          formData.siren,
+          formData.corporateName,
+          formData.year,
+          formData.declarant,
+          formData.declarantOrganisation,
+          formData.price,
+          indicatorsToPublish
+        );
 
-      //   const statementFilePromise = new Promise((resolve, reject) => {
-      //     statementPDF.getBase64((datauristring) => {
-      //       resolve(datauristring);
-      //     });
-      //   });
+        const statementFilePromise = new Promise((resolve, reject) => {
+          statementPDF.getBase64((datauristring) => {
+            resolve(datauristring);
+          });
+        });
 
-      //   const statementFile = await statementFilePromise;
+         const statementFile = await statementFilePromise;
 
-      //   const messageToAdmin = mailToAdminWriter(
-      //     formData.siren,
-      //     formData.corporateName,
-      //     formData.year,
-      //     indicatorsToPublish,
-      //     formData.declarant,
-      //     formData.declarantOrganisation,
-      //     formData.email,
-      //     formData.price
-      //   );
+        const messageToAdmin = mailToAdminWriter(
+          formData.siren,
+          formData.corporateName,
+          formData.year,
+          indicatorsToPublish,
+          formData.declarant,
+          formData.declarantOrganisation,
+          formData.email,
+          formData.price
+        );
 
-      //   const resAdmin = await sendStatementToAdmin(
-      //     messageToAdmin,
-      //     statementFile
-      //   );
+        console.log(messageToAdmin);
 
-      //   const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
+        // const resAdmin = await sendStatementToAdmin(
+        //   messageToAdmin,
+        //   statementFile
+        // );
 
-      //   const resDeclarant = await sendStatementToDeclarant(
-      //     formData.email,
-      //     messageToDeclarant,
-      //     statementFile
-      //   );
+         const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
 
-      //   if (resAdmin.status == 200 && resDeclarant.status == 200) {
-      //     setIsSend(true);
-      //     setError(false);
-      //   } else {
-      //     setIsSend(false);
-      //     setError(true);
-      //   }
+        // const resDeclarant = await sendStatementToDeclarant(
+        //   formData.email,
+        //   messageToDeclarant,
+        //   statementFile
+        // );
+
+        if (response.data.status == 200 && resAdmin.status == 200 && resDeclarant.status == 200) {
+          setIsSend(true);
+          setError(false);
+        } else {
+          setIsSend(false);
+          setError(true);
+        }
     } catch (error) {
       setIsSend(false);
       setError(true);
