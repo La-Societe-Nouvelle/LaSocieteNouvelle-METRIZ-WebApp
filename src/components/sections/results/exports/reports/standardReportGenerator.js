@@ -6,7 +6,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-// Utils 
+// Utils
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { generateSIGtable } from "./generateSIGtable";
 
@@ -29,25 +29,16 @@ export const buildStandardReport = async ({
   session,
   indic,
   period,
-  showAnalyses
+  showAnalyses,
 }) => {
-
   // Session data --------------------------------------------------
 
-  const {
-    legalUnit,
-    financialData,
-    impactsData,
-    comparativeData,
-    analysis
-  } = session;
+  const { legalUnit, financialData, impactsData, comparativeData, analysis } =
+    session;
 
   // Metadata ------------------------------------------------------
 
-  const {
-    libelle,
-    unit 
-  } = metaIndics[indic];
+  const { libelle, unit } = metaIndics[indic];
 
   // ---------------------------------------------------------------
   // Text Generation
@@ -56,21 +47,17 @@ export const buildStandardReport = async ({
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
 
-  const analysisNotes = analysis[period.periodKey][indic]?.isAvailable && showAnalyses ? analysis[period.periodKey][indic].analysis : null;
-  
-  // get Intermediate Aggregates
-    const intermediateConsumptionsAggregates =
-      await buildIntermediateConsumptionsAggregates(
-        financialData,
-        [period]
-      );
+  const analysisNotes =
+    analysis[period.periodKey][indic]?.isAvailable && showAnalyses
+      ? analysis[period.periodKey][indic].analysis
+      : null;
 
-    const fixedCapitalConsumptionsAggregates =
-      await buildFixedCapitalConsumptionsAggregates(
-        financialData,
-        [period]
-      );
-        
+  // get Intermediate Aggregates
+  const intermediateConsumptionsAggregates =
+    await buildIntermediateConsumptionsAggregates(financialData, [period]);
+
+  const fixedCapitalConsumptionsAggregates =
+    await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
 
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
@@ -85,8 +72,10 @@ export const buildStandardReport = async ({
   );
   const interConsChartImage = interConsChartCanvas.toDataURL("image/png");
 
-  const valueAddedCanvas = document.getElementById(`comparative-chart-netValueAdded-${indic}-print`); 
-  
+  const valueAddedCanvas = document.getElementById(
+    `comparative-chart-netValueAdded-${indic}-print`
+  );
+
   const valueAddedImage = valueAddedCanvas.toDataURL("image/png");
 
   const fixedCapConsChartCanvas = document.getElementById(
@@ -96,7 +85,6 @@ export const buildStandardReport = async ({
 
   // ---------------------------------------------------------------
   // Document Property
-
 
   const documentTitle =
     "Rapport_" +
@@ -110,7 +98,12 @@ export const buildStandardReport = async ({
   // PDF Content and Layout
   const docDefinition = {
     pageSize: pdfPageSize,
-    pageMargins: [pdfMargins.left, pdfMargins.top, pdfMargins.right, pdfMargins.bottom],
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
     header: {
       columns: [
         { text: legalUnit.corporateName, margin: [20, 15, 0, 0], bold: true },
@@ -242,14 +235,19 @@ export const buildStandardReport = async ({
           }
         : "",
       {
+        margin: [0, 20, 0, 0],
         columns: [
           {
             stack: [
-              { text: "Production ", style: "h4" },
+              {
+                text: "Production ",
+                style: "h4",
+                alignment: "center",
+                margin: [0, 0, 0, 20],
+              },
               {
                 image: prodChartImage,
-                width: 225,
-                margin: [0, 10, 0, 20],
+                width: 150,
                 alignment: "center",
               },
             ],
@@ -259,11 +257,12 @@ export const buildStandardReport = async ({
               {
                 text: "Valeur ajoutée",
                 style: "h4",
+                alignment: "center",
+                margin: [0, 0, 0, 20],
               },
               {
                 image: valueAddedImage,
-                width: 225,
-                margin: [0, 10, 0, 20],
+                width: 150,
                 alignment: "center",
               },
             ],
@@ -271,21 +270,24 @@ export const buildStandardReport = async ({
         ],
       },
       {
+        margin: [0, 20, 0, 0],
         columns: [
           {
             stack: [
               {
                 text: "Consommations intermédiaires ",
                 style: "h4",
+                alignment: "center",
+                margin: [0, 0, 0, 20],
               },
               {
                 image: interConsChartImage,
-                width: 225,
-                margin: [0, 10, 0, 20],
+                width: 150,
                 alignment: "center",
               },
               ///
               {
+                margin: [0, 30, 0, 0],
                 table: {
                   widths: [1, "*"],
                   heights: [4, 4, 4, 4],
@@ -407,11 +409,12 @@ export const buildStandardReport = async ({
               {
                 text: "Consommations de capital fixe ",
                 style: "h4",
+                alignment: "center",
+                margin: [0, 0, 0, 20],
               },
               {
                 image: fixedCapConsChartImage,
-                width: 225,
-                margin: [0, 10, 0, 20],
+                width: 150,
                 alignment: "center",
               },
             ],
@@ -421,12 +424,12 @@ export const buildStandardReport = async ({
       // ---------------------------------------------------------------------------
       //  PAGE 3
       analysisNotes && [
-      {
-        text: "Analyse - " + libelle,
-        style: "header",
-        pageBreak: "before",
-      },
-      // Analysis note
+        {
+          text: "Analyse - " + libelle,
+          style: "header",
+          pageBreak: "before",
+        },
+        // Analysis note
         { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
         {
           text: analysisNotes,
@@ -465,7 +468,6 @@ export const buildStandardReport = async ({
       h4: {
         fontSize: 10,
         font: "Raleway",
-        margin: [0, 10, 0, 10],
         bold: true,
       },
       text: {
@@ -499,6 +501,6 @@ export const buildStandardReport = async ({
   };
 
   const standardReport = pdfMake.createPdf(docDefinition);
-  
+
   return standardReport;
-}
+};

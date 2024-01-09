@@ -27,7 +27,7 @@ import { VerticalBarChart } from "../charts/VerticalBarChart";
  *  Build charts for all indicators (to use in report)
  */
 
-export const ChartsContainer = ({
+export const PrintChartsContainer = ({
   session,
   period,
 }) => {
@@ -161,25 +161,20 @@ const renderComparativeCharts = ({
 }) => {
   return (
     <div key={chartId} className={"comparative-chart-container"}>
-
-         
-<VerticalBarChart
-                id={chartId}
-                // id={`${aggregate}-${indic}`}
-                session={session}
-                period={period}
-                aggregate={aggregate}
-                indic={indic}
-                printMode={true}
-                showDivisionData={true}
-                showAreaData={false}
-                showTargetData={true}
-                showPreviousData={false}
-                useIndicColors={false}
-                label={"Production"}
-              />
-
-  
+      <VerticalBarChart
+        id={chartId}
+        session={session}
+        period={period}
+        aggregate={aggregate}
+        indic={indic}
+        printMode={true}
+        showDivisionData={true}
+        showAreaData={true}
+        showTargetData={true}
+        showPreviousData={false}
+        useIndicColors={false}
+        label={"Production"}
+      />
     </div>
   );
 };

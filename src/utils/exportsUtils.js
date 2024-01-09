@@ -160,3 +160,20 @@ export function definePDFStyles() {
     },
   };
 }
+
+export function rgbaToHex(rgbaColor) {
+  const rgbaRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/;
+  const match = rgbaColor.match(rgbaRegex);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, r, g, b, a = 1] = match;
+  const alpha = Math.round(parseFloat(a) * 255).toString(16).padStart(2, '0');
+  const red = parseInt(r, 10).toString(16).padStart(2, '0');
+  const green = parseInt(g, 10).toString(16).padStart(2, '0');
+  const blue = parseInt(b, 10).toString(16).padStart(2, '0');
+
+  return `#${red}${green}${blue}${alpha !== 'ff' ? alpha : ''}`;
+}

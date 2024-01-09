@@ -11,8 +11,9 @@ import { HomeView } from "./views/HomeView";
 
 // Components
 import DownloadDropdown from "./components/DownloadDropdown";
-import { ChartsContainer } from "./components/ChartsContainer";
 import { Loader } from "../../modals/Loader";
+
+import { PrintChartsContainer } from "./components/PrintChartsContainer";
 
 import { buildSummaryReportContributionIndic } from "./exports/reports/summaryReportGeneratorContribution";
 import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryReportGeneratorIntensity";
@@ -52,8 +53,11 @@ const Results = ({ session, period, publish, goBack }) => {
   const handleDownload = async (selectedFiles) => {
     setIsGenerating(true);
 
-    await buildDownloadableFiles(session, period, showedView, selectedFiles);
-
+    try {
+      await buildDownloadableFiles(session, period, showedView, selectedFiles);
+    } catch (error) {
+      setIsGenerating(false);
+    }
     setIsGenerating(false);
   };
 
@@ -125,7 +129,7 @@ const Results = ({ session, period, publish, goBack }) => {
 
       <View viewCode={showedView} period={period} session={session} />
 
-      {!isLoading && <ChartsContainer session={session} period={period} />}
+      {!isLoading && <PrintChartsContainer session={session} period={period} />}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
       {isLoading && (

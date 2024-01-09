@@ -63,6 +63,9 @@ export const buildSummaryReportIndexIndic = async ({
   // PDF Data
   const {
     production,
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
   } = financialData.mainAggregates;
 
   const { revenue } = financialData.productionAggregates;

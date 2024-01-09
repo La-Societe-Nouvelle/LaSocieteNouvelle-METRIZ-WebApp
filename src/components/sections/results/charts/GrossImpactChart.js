@@ -93,7 +93,7 @@ export const GrossImpactChart = ({
       datalabels: {
         color: "#FFFFFF",
         font: {
-          size: 10,
+          size: printMode ? 24 : 10,
           family: "Raleway",
           weight: "bold",
         },
@@ -124,8 +124,8 @@ export const GrossImpactChart = ({
     },
     layout: {
       padding: {
-        left: 50,
-        right: 50,
+        left: printMode? 0 : 50,
+        right: printMode ? 0 : 50,
         top : 0
       },
     },
