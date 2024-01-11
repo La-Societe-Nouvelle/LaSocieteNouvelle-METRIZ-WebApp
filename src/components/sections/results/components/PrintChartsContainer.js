@@ -171,7 +171,6 @@ const renderComparativeCharts = ({
         showDivisionData={true}
         showAreaData={true}
         showTargetData={true}
-        showPreviousData={false}
         useIndicColors={false}
         label={"Production"}
       />
