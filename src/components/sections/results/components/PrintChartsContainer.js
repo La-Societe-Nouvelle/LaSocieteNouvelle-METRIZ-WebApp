@@ -80,7 +80,7 @@ const IndicatorCharts = ({
   return (
     <div
       className={"charts-container " + indic}
-      // style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
+       style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
     >
       <Row className="charts">
         {Object.keys(aggregates).map((aggregate) => (

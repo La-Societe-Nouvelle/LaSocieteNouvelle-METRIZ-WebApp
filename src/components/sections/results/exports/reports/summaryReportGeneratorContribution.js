@@ -355,7 +355,7 @@ const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indic) =
           ],
         },
         {
-          margin: [60, 5, 60, 15],
+          margin: [40, 5, 40, 15],
           stack: [
             {
               text: "\tPour 1€ de chiffre d'affaires\t",
