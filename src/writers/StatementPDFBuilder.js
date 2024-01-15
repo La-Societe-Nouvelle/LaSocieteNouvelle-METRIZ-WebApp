@@ -29,8 +29,18 @@ export const getStatementPDF = (
 ) => {
   // date
   const today = new Date();
-
   // document definition
+
+  const tableData = Object.entries(legalUnitFootprint).map(([indicator, details]) => ({
+    libelle: details.libelle,
+    value: details.value,
+    unit: details.unit,
+    uncertainty : details.uncertainty,
+    comment : details.comment ?? " - "
+  }));
+
+  console.log(tableData);
+
   const documentDefinition = {
     content: [
       {
@@ -60,61 +70,27 @@ export const getStatementPDF = (
           body: [
             [
               { text: "Indicateur", style: "tableHeader" },
-              { text: "Valeur", style: "tableHeader", colSpan: 2 },
-              {},
-              {
-                text: "Incertitude",
-                style: "tableHeader",
-                alignment: "center",
-              },
+              { text: "Valeur", style: "tableHeader" },
+              { text: "Unité", style: "tableHeader" },
+              { text: "Incertitude", style: "tableHeader" },
             ],
-            ...legalUnitFootprint.flatMap(
-              ({ indicator, values })=> {
-                const indicatorRow = [
-                  {
-                    text: metaIndics[indicator].libelle,
-                    style: "tableCell",
-                  },
-                  {
-                    text: printValue(values.value, metaIndics[indicator].nbDecimals),
-                    alignment: "right",
-                    style: "tableCell",
-                  },
-                  {
-                    text: metaIndics[indicator].unit,
-                    style: "tableCell",
-                  },
-                  {
-                    text: printValue(values.uncertainty, 0) + " %",
-                    fontSize: 6,
-                    alignment: "right",
-                    style: "tableCell",
-                  },
-                ];
-
-                const commentRow = values.comment
-                  ? [
-                      {
-                        text: "Commentaire : " + values.comment,
-                        colSpan: 4,
-                        fontSize: 6,
-                        style: "tableCell",
-                        fillColor: "#F0F0F8",
-                      },
-                    ]
-                  : [
-                      {
-                        text: "Commentaire : -",
-                        colSpan: 4,
-                        fontSize: 6,
-                        style: "tableCell",
-                        fillColor: "#F0F0F8",
-                      },
-                    ];
-
-                return [indicatorRow, commentRow];
-              }
-            ),
+            ...tableData.flatMap(row => [
+              [
+                { text: row.libelle, style: "tableCell" },
+                { text: row.value, style: "tableCell" },
+                { text: row.unit, style: "tableCell" },
+                { text: row.uncertainty, style: "tableCell" },
+              ],
+              [
+                {
+                  text: `Commentaire : ${row.comment}`,
+                  colSpan: 4,
+                  fontSize: 6,
+                  style: "tableCell",
+                  fillColor: "#F0F0F8",
+                },
+              ],
+            ]),
           ],
         },
         layout: {
@@ -222,3 +198,4 @@ export const getStatementPDF = (
 
   return statementPDF;
 }
+

@@ -52,9 +52,14 @@ export const useForm = (initialState) => {
     if (formData.declarant.trim() === "") {
       newErrors.declarant = "Veuillez saisir le nom et prénom du déclarant.";
     }
-    if (formData.email.trim() === "") {
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (formData.email.trim() === "" || !emailRegex.test(formData.email.trim())) {
       newErrors.email = "Veuillez saisir une adresse e-mail valide.";
     }
+
+    
     if (!formData.autorisation) {
       newErrors.autorisation =
         "Vous devez certifier être autorisé(e) à soumettre la déclaration.";

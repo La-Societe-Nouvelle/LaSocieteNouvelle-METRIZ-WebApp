@@ -11,8 +11,6 @@ export const getPublishableIndicators = (indicators, comments) => {
         uncertainty: indicator.uncertainty,
         comment: comments[indic],
         toPublish: true,
-        flag : "w",
-        source : "La Société Nouvelle (via l'outil Metriz : https://metriz.lasocietenouvelle.org ) ",
       };
       return acc;
     }, {});
@@ -38,12 +36,12 @@ export const mailToAdminWriter = (
   Dénomination : ${corporateName} \n
   Année : ${year}  \n
   Valeurs à publier :\n
-  ${Object.values(footprints)
-    .map((footprint) => {
-      const comment = footprint.values.comment
-        ? ` Commentaire : ${footprint.values.comment}`
+  ${Object.entries(footprints)
+    .map(([indicator, details]) => {
+      const comment = details.comment
+        ? ` Commentaire : ${details.comment}`
         : "";
-      return `- ${footprint.indicator} :  ${footprint.values.value} ( incertitude : +/- ${footprint.values.uncertainty} % )${comment}`;
+      return `- ${indicator} :  ${details.value} ( incertitude : +/- ${details.uncertainty} % )${comment}`;
     })
     .join("\n")}`;
 

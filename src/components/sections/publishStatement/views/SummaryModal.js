@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
+import { printValue } from "/src/utils/formatters";
 
 // Lib
 import metaIndics from "/lib/indics";
@@ -16,16 +17,15 @@ import { mailToAdminWriter, mailToDeclarantWriter } from "../utils";
 
 // Writers
 import { getStatementPDF } from "/src/writers/StatementPDFBuilder";
+import { sendPublications } from "../../../../services/PublicationService";
 
 // Services
-import { sendPublications } from "../../../../services/PublicationService";
 
 const SummaryModal = ({ formData, showModal, handleClose }) => {
   const [isSend, setIsSend] = useState(false);
   const [error, setError] = useState(false);
-  const indicatorsToPublish = Object.entries(formData.footprint)
-    .filter(([_, indicator]) => indicator.toPublish === true)
-    .map(([indicator, values]) => ({ indicator, values }));
+
+  const publishableFootprint = buildPublication(formData.footprint);
 
   const exportStatement = () => {
     // build pdf
@@ -36,7 +36,7 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
       formData.declarant,
       formData.declarantOrganisation,
       formData.price,
-      indicatorsToPublish
+      publishableFootprint
     );
 
     let today = new Date();
@@ -49,68 +49,73 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
         String(today.getMonth() + 1).padStart(2, "0") +
         today.getFullYear() +
         ".pdf"
-    ); 
-    
+    );
   };
   const handlePublish = async () => {
     try {
+      const publications = {
+        siren: formData.siren,
+        footprint: publishableFootprint,
+        year: formData.year,
+      };
 
-      const publications = convertFormDataToPublications(formData);
-      
-     // const response = await sendPublications(publications); 
-
+      const response = await sendPublications(publications);
       //   // build PDF
-        const statementPDF = getStatementPDF(
-          formData.siren,
-          formData.corporateName,
-          formData.year,
-          formData.declarant,
-          formData.declarantOrganisation,
-          formData.price,
-          indicatorsToPublish
-        );
+      const statementPDF = getStatementPDF(
+        formData.siren,
+        formData.corporateName,
+        formData.year,
+        formData.declarant,
+        formData.declarantOrganisation,
+        formData.price,
+        publishableFootprint
+      );
 
-        const statementFilePromise = new Promise((resolve, reject) => {
-          statementPDF.getBase64((datauristring) => {
-            resolve(datauristring);
-          });
+      const statementFilePromise = new Promise((resolve, reject) => {
+        statementPDF.getBase64((datauristring) => {
+          resolve(datauristring);
         });
+      });
 
-         const statementFile = await statementFilePromise;
+      const statementFile = await statementFilePromise;
 
-        const messageToAdmin = mailToAdminWriter(
-          formData.siren,
-          formData.corporateName,
-          formData.year,
-          indicatorsToPublish,
-          formData.declarant,
-          formData.declarantOrganisation,
-          formData.email,
-          formData.price
-        );
+      const messageToAdmin = mailToAdminWriter(
+        formData.siren,
+        formData.corporateName,
+        formData.year,
+        publishableFootprint,
+        formData.declarant,
+        formData.declarantOrganisation,
+        formData.email,
+        formData.price
+      );
 
-        console.log(messageToAdmin);
+      console.log(messageToAdmin);
 
-        // const resAdmin = await sendStatementToAdmin(
-        //   messageToAdmin,
-        //   statementFile
-        // );
+      const resAdmin = await sendStatementToAdmin(
+        messageToAdmin,
+        statementFile
+      );
 
-         const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
+      const messageToDeclarant = mailToDeclarantWriter(formData.declarant);
 
-        // const resDeclarant = await sendStatementToDeclarant(
-        //   formData.email,
-        //   messageToDeclarant,
-        //   statementFile
-        // );
+      const resDeclarant = await sendStatementToDeclarant(
+        formData.email,
+        messageToDeclarant,
+        statementFile
+      );
 
-        if (response.data.status == 200 && resAdmin.status == 200 && resDeclarant.status == 200) {
-          setIsSend(true);
-          setError(false);
-        } else {
-          setIsSend(false);
-          setError(true);
-        }
+      if (
+        response.status == 200 &&
+        resAdmin.status == 200 &&
+        resDeclarant.status == 200
+      ) {
+        setIsSend(true);
+        setError(false);
+      } else {
+        setIsSend(false);
+        setError(true);
+      }
     } catch (error) {
       setIsSend(false);
       setError(true);
@@ -119,33 +124,6 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
 
     //handleClose();
   };
-
-  function convertFormDataToPublications(formData) {
-    const { siren, year, footprint } = formData;
-
-    const publications = [];
-    
-    for (const indicator in footprint) {
-      const { value, flag, comment, source, uncertainty, toPublish } =
-        footprint[indicator];
-
-      if (toPublish) {
-        publications.push({
-          siren,
-          indic: indicator.toUpperCase(),
-          year,
-          value,
-          flag,
-          info: comment || "",
-          source,
-          uncertainty,
-          lastupdate: new Date().toISOString(),
-        });
-      }
-    }
-
-    return publications;
-  }
 
   return (
     <Modal show={showModal} onHide={handleClose} size="lg">
@@ -166,11 +144,13 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
             <b>Indicateurs à publier : </b>
           </p>
           <ul className="list-unstyled small">
-            {indicatorsToPublish.map(({ indicator, values }) => (
-              <li key={indicator} className="mb-2">
-                ▪ {metaIndics[indicator].libelle}
-              </li>
-            ))}
+            {Object.entries(publishableFootprint).map(
+              ([indicator, details]) => (
+                <li key={indicator} className="mb-2">
+                  ▪ {details.libelle} : {details.value} {details.unit}
+                </li>
+              )
+            )}
           </ul>{" "}
           <hr className="w-25"></hr>
           <p>
@@ -194,7 +174,11 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
 
         {isSend && (
           <div className="alert alert-success">
-            <p>Demande de publication envoyée ! Merci.</p>
+            <p>
+              Votre demande de publication a bien été prise en compte. Un
+              récapitulatif vient d'être envoyé à votre adresse e-mail. Nous
+              vous remercions pour votre contribution !
+            </p>
           </div>
         )}
         {error && (
@@ -219,5 +203,22 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
     </Modal>
   );
 };
+
+const buildPublication = (legalUnitFootprint) => {
+  return Object.entries(legalUnitFootprint)
+    .filter(([_, footprint]) => footprint.toPublish === true) 
+    .reduce((acc, [indicator, footprint]) => {
+      acc[indicator] = {
+        libelle: metaIndics[indicator].libelle,
+        value: footprint.value,
+        unit: metaIndics[indicator].unit,
+        uncertainty: footprint.uncertainty,
+        comment: footprint.comment || null,
+        source : "La Société Nouvelle (via l'outil Metriz : https://metriz.lasocietenouvelle.org ) ",
+
+      };
+      return acc;
+    }, {});
+}
 
 export default SummaryModal;

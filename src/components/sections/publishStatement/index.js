@@ -99,7 +99,6 @@ const PublishStatementSection = ({ session, period }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const isFormValid = await validateForm();
-
     if (isFormValid) {
       setShowModalSummary(true);
     }
@@ -154,13 +153,13 @@ const PublishStatementSection = ({ session, period }) => {
 
           <Button
             variant="secondary"
-            disabled={!formData.autorisation}
+            disabled={!formData.autorisation || formErrors.siren}
             onClick={handleSubmit}
           >
             Publier mes résultats
           </Button>
         </Form>
-
+      
         {showModalSummary && (
           <SummaryModal
             formData={formData}

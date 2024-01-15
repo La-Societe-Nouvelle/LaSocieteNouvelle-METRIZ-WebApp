@@ -1,28 +1,15 @@
-import apiStats from "../../config/api-stats";
+import api from "../../config/api";
 
 export const sendPublications = async (data) =>
 {
  
       try {
         // post data
-        const response = await apiStats.post(`/publication`, {publication : data});
+        const response = await api.post(`/publications`, data);
         return response;
       } catch (error) {
-        console.error(error);
-        // throw Error(error.message);
+        throw Error(error.message);
       }
 }
 
-const PublicationService = {
-  async sendPublications(publications) {
-    try {
-      const response = await apiStats.post('/publication', publications);
-      return response.data; 
-    } catch (error) {
-        console.log(error)
-      throw new Error(`Erreur lors de l'envoi des publications : ${error.message}`);
-    }
-  },
-};
 
-export default PublicationService;
