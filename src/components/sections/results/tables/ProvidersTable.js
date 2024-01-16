@@ -19,9 +19,10 @@ import flagData from "/lib/flags";
 
 const indicsWithGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"];
 
-export const ProvidersTable = ({ session, period, indic }) => {
+export const ProvidersTable = ({ session, period, indic }) => 
+{
   const { financialData } = session;
-  const providers = financialData.providers;
+  const providers = financialData.providers.filter(provider => provider.periodsData.hasOwnProperty(period.periodKey));
 
   const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
 

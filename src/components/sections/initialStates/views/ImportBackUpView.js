@@ -11,6 +11,7 @@ import { updateVersion } from "/src/version/updateVersion";
 // Utils
 import { checkLoadedSession } from "../utils";
 import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../../modals/userInfoModals";
+import { sortChronologicallyDates } from "../../../../utils/periodsUtils";
 
 /* ---------- INITIAL STATES DROPZONE  ---------- */
 
@@ -68,8 +69,14 @@ export const ImportBackUpView = ({
         {
           // Update session with back up
           await session.loadSessionFromBackup(loadedSession);
-          setPopupSuccess(true);
 
+          // Re-compute footprints -> order chronogically
+          const periods = session.availablePeriods.sort((a,b) => sortChronologicallyDates(a.dateStart,b.dateStart));
+          for (let period of periods) {
+            await session.updateFootprints(period);
+          }
+          
+          setPopupSuccess(true);
           backUpDidLoad();
         }
 

@@ -484,7 +484,7 @@ export class FinancialData
 
     // Providers
     for (let loadedProvider of loadedFinancialData.providers) {
-      const existingProvider = this.amortisationExpensesAccounts
+      const existingProvider = this.providers
         .find((provider) => provider.providerNum === loadedProvider.providerNum);
       if (existingProvider) {
         existingProvider.periodsData = {
