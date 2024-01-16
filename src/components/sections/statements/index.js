@@ -225,14 +225,12 @@ const DirectImpacts = ({
   );
 };
 
-function isNextStepAvailable(emptyStatements, invalidStatements, selectedStatements) {
-  console.log('emptyStatements:', emptyStatements);
-  console.log('invalidStatements:', invalidStatements);
-  console.log('selectedStatements:', selectedStatements);
-
-  const isAvailable = emptyStatements.length === 0 && invalidStatements.length === 0 && selectedStatements.length > 0;
-  console.log('isAvailable:', isAvailable);
-
+function isNextStepAvailable(emptyStatements, invalidStatements, selectedStatements) 
+{
+  const isAvailable = emptyStatements.length === 0 
+    && invalidStatements.length === 0 
+    && selectedStatements.length > 0;
+  
   return isAvailable;
 }
 
