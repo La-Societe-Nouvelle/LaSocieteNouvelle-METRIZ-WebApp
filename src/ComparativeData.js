@@ -26,7 +26,8 @@ const metaAggregates = {
 
 const metaScales = [
   "area",
-  "division"
+  "division",
+  "legalUnit"
 ];
 
 const metaSeries = {

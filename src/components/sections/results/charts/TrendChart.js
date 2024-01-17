@@ -14,18 +14,17 @@ import { trendChartColors } from "./chartColors";
 import { colors } from "./chartColors"
 
 function TrendChart({
+  id,
+  unit,
   historical,
   trend,
   target,
-  unit,
   aggregate,
   indic,
-  id,
   isPrinting,
 }) {
   
   const [max, setMax] = useState(null);
-  const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
 
   const legalUnitData = [];
 
@@ -44,86 +43,17 @@ function TrendChart({
     });
   }
 
-  const filteredHistorical = historical.filter((data) => data.currency != "EUR2022" && data.year >=  (legalUnitData[0].x - 10 ));
-
-  let updatedTrend = trend;
-
-  if (filteredHistorical.length > 0 
-   && trend.length > 0 
-   && filteredHistorical.at(-1).year !== trend[0].year) {
-    let firstYearTrend = trend.at(0).year;
-    let lastYearHistorical = filteredHistorical.at(-1).year;
-    updatedTrend = [
-      ...trend, 
-      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTrend)
-    ].sort((a, b) => a.year - b.year);
-  }
-
-  let updatedTarget = linearTarget;
-
-  if (filteredHistorical.length > 0 
-   && linearTarget.length > 0 
-   && filteredHistorical.at(-1).year !== linearTarget[0].year) {
-     let lastYearHistorical = filteredHistorical.at(-1).year;
-    let firstYearTarget = linearTarget.filter((data) => data.year>lastYearHistorical).at(0).year;
-    updatedTarget = [
-      ...linearTarget.filter((data) => data.year>lastYearHistorical), 
-      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTarget)
-    ].sort((a, b) => a.year - b.year);
-  }
+  const startYear = legalUnitData[0].x - 10;
+  const historicalData = historical.filter((data) => data.currency != "EUR2022" && data.year >=  startYear );
+  const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
 
   const chartData = {
     datasets: [
-      {
-        label: "Historique",
-        data: filteredHistorical.map((data) => ({ x: data.year, y: data.value })),
-        borderColor: trendChartColors.trend,
-        backgroundColor: trendChartColors.trend,
-        order: 2,
-        borderWidth: 4,
-        tension: 0.3,
-      },
-      {
-        label: "Tendance", 
-        data: updatedTrend.map((data) => ({ x: data.year, y: data.value })),
-        borderColor: trendChartColors.trend,
-        backgroundColor: trendChartColors.trend,
-        borderWidth: 4,
-        borderDash: [12, 6],
-        order: 3,
-        tension: 0.3,
-      },
-      {
-        label: "Objectif",
-        data: updatedTarget.map((data) => ({ x: data.year, y: data.value })),
-        skipNull: true,
-        borderColor: trendChartColors.target,
-        backgroundColor:  trendChartColors.target,
-        borderWidth: 4,
-        order: 4,
-        tension: 0.3,
-      },
-      {
-        label: "Situation",
-        type: "bubble",
-        data: legalUnitData,
-        backgroundColor: trendChartColors.legalunit,
-        borderColor: trendChartColors.legalunit,
-        borderWidth: 4, 
-        order: 1,
-        tooltip: {
-          enabled: true,
-        },
-      },
-      {
-        data: legalUnitData,
-        type: "line",
-        borderColor:  trendChartColors.legalunit,
-        fill: false,
-        tooltip: {
-          enabled: false,
-        },
-      },
+      buildHistoricalDataset(historicalData),
+      buildTrendDataset(trend,historicalData),
+      buildTargetDataset(linearTarget,historicalData),
+      buildLegalUnitDataset(legalUnitData),
+      buildLegalUnitLineDataset(legalUnitData),
     ],
   };
 
@@ -274,6 +204,100 @@ function TrendChart({
       options={{ ...commonOptions, suggestedMax: max }}
     />
   );
+}
+
+function buildHistoricalDataset(historicalData) {
+
+  return {
+    label: "Historique",
+    data: historicalData.map((item) => ({ x: item.year, y: item.value })),
+    borderColor: trendChartColors.trend,
+    backgroundColor: trendChartColors.trend,
+    order: 2,
+    borderWidth: 4,
+    tension: 0.3,
+  };
+}
+
+function buildTrendDataset(trend, historicalData) {
+
+const trendData = mergeMissingYears(trend, historicalData);
+
+  return {
+    label: "Tendance",
+    data: trendData.map((item) => ({ x: item.year, y: item.value })),
+    borderColor: trendChartColors.trend,
+    backgroundColor: trendChartColors.trend,
+    borderWidth: 4,
+    borderDash: [12, 6],
+    order: 3,
+    tension: 0.3,
+  };
+}
+
+function mergeMissingYears(trendData, historicalData) {
+  if (historicalData.length > 0 && trendData.length > 0 && historicalData.at(-1).year !== trendData[0].year) {
+    const firstYearTrend = trendData.at(0).year;
+    const lastYearHistorical = historicalData.at(-1).year;
+    return [
+      ...trendData,
+      ...historicalData.filter((data) => data.year >= lastYearHistorical && data.year < firstYearTrend)
+    ].sort((a, b) => a.year - b.year);
+  }
+  return trendData;
+}
+function buildTargetDataset(target,historicalData) {
+
+  const targetData = mergeTargetData(target, historicalData);
+  return {
+    label: "Objectif",
+    data: targetData.map((item) => ({ x: item.year, y: item.value })),
+    skipNull: true,
+    borderColor: trendChartColors.target,
+    backgroundColor: trendChartColors.target,
+    borderWidth: 4,
+    order: 4,
+    tension: 0.3,
+  };
+}
+
+function mergeTargetData(targetData, historicalData) {
+  if (historicalData.length > 0 && targetData.length > 0 && historicalData.at(-1).year !== targetData[0].year) {
+    const lastYearHistorical = historicalData.at(-1).year;
+    const firstYearTarget = targetData.filter((data) => data.year > lastYearHistorical).at(0).year;
+    return [
+      ...targetData.filter((data) => data.year > lastYearHistorical),
+      ...historicalData.filter((data) => data.year >= lastYearHistorical && data.year < firstYearTarget)
+    ].sort((a, b) => a.year - b.year);
+  }
+  return targetData;
+}
+
+function buildLegalUnitDataset(data) {
+  return {
+    label: "Situation",
+    type: "bubble",
+    data: data,
+    backgroundColor: trendChartColors.legalunit,
+    borderColor: trendChartColors.legalunit,
+    borderWidth: 4,
+    order: 1,
+    tooltip: {
+      enabled: true,
+    },
+  };
+}
+
+function buildLegalUnitLineDataset(data) {
+  return {
+    data: data,
+    type: "line",
+    borderColor: trendChartColors.legalunit,
+    fill: false,
+    tooltip: {
+      enabled: false,
+    },
+  };
 }
 
 export default TrendChart;

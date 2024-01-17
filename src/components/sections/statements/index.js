@@ -73,14 +73,23 @@ const DirectImpacts = ({
     await session.updateFootprints(period);
 
     // fetch comparative data
-    await session.comparativeData.fetchComparativeData(selectedStatements);
+    try {
+      await session.comparativeData.fetchComparativeData(selectedStatements);
+      
+    } catch (error) {
+        console.log(error)
+        // Set error
+    }
+    finally {
+      setIsLoading(false);
+
+    }
 
     // fetch analysis
     if (session.useChatGPT) {
       await session.buildAnalysis(period);
     }
  
-    setIsLoading(false);
     submit();
   };
 
@@ -150,7 +159,7 @@ const DirectImpacts = ({
           </div>
         )}
       
-        {isLoading && <Loader title={"Chargement en cours..."} />}
+        {/* {isLoading && <Loader title={"Chargement en cours..."} />} */}
 
         {invalidStatements.length > 0 && (
           <Alert variant="danger" className="flex-column align-items-start">

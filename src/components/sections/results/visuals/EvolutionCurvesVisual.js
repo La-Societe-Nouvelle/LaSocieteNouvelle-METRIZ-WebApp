@@ -82,7 +82,7 @@ export const EvolutionCurvesVisual = ({
           <div>
             <h5>{title}</h5>
             <TrendChart
-              id={`trend-${showedAggregate.value}-${indic}`}
+              id={`trend-${showedAggregate}-${indic}`}
               unit={unit}
               {...evolutionCurvesData}
               indic={indic}
