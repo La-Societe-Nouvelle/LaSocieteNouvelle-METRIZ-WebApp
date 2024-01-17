@@ -78,10 +78,10 @@ export function generateFooter() {
     columns: [
       {
         text: "Edité le " + getShortCurrentDateString(),
-        margin: [0, 30, 30, 0],
+        margin: [30, 30, 0, 0],
       },
     ],
-    alignment: "right",
+    alignment: "left",
     fontSize: 6,
   };
 }

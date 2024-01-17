@@ -8,9 +8,9 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import metaDivisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
-// Utils
-import { printValue } from "/src/utils/formatters";
+import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 
+// Exports Utils
 import {
   addUncertaintyText,
   cutString,
@@ -22,12 +22,13 @@ import {
   sortProvidersByContrib,
 } from "../exportsUtils";
 
-import { getClosestYearData } from "../../utils";
-
 import { calculateAvailableWidth, createRectObject, generateFooter, generateHeader, getChartImageData, getDocumentInfo, loadFonts, definePDFStyles } from "../../../../../utils/exportsUtils";
 
-import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
+// Utils
+import { printValue } from "/src/utils/formatters";
+import { getClosestYearData } from "../../utils";
 
+// PDF Config
 import { pdfMargins, pdfPageSize, defaultPosition } from "../../../../../constants/pdfConfig";
 
 
@@ -210,7 +211,7 @@ export const buildSummaryReportContributionIndic = async ({
     info: getDocumentInfo("Plaquette", indic, corporateName, currentPeriod),
     content: [
       // Header
-      ...buildHeaderContent(
+      ...buildHeaderSection(
         libelle,
         totalRevenue,
         contributionPerEuro,
@@ -219,7 +220,7 @@ export const buildSummaryReportContributionIndic = async ({
 
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
-      ...buildIntermediateManagementContent(
+      ...buildSigFootprintSection(
         indic,
         production,
         period,
@@ -230,6 +231,7 @@ export const buildSummaryReportContributionIndic = async ({
         columnGap: 35,
         columns: [
           // Left Box
+          
           {
             width: "40%",
             stack: [
@@ -259,81 +261,8 @@ export const buildSummaryReportContributionIndic = async ({
   return summaryReport
 }
 
-
-async function getFinancialData(financialData, period, indic) {
-  const { revenue } = financialData.productionAggregates;
-  const totalRevenue = revenue.periodsData[period.periodKey].amount;
-
-  const contributionPercentage =
-    revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
-  const contributionAmount = (contributionPercentage / 100) * totalRevenue;
-  const contributionPerEuro = contributionAmount / totalRevenue;
-
-
-
-  return {
-    totalRevenue,
-    contributionPerEuro,
-  };
-}
-
-async function processExternalExpenseAccounts(financialData, period, indic){
-
-  const externalExpensesAccounts = financialData.externalExpensesAccounts.filter((account) =>
-    account.periodsData.hasOwnProperty(period.periodKey)
-  );
-
-  const externalPurchaseAccounts  = financialData.externalExpensesAccounts.filter((account) =>
-    /^60[^(8|9)]/.test(account.accountNum)
-  );
-
-
-  const externalExpensesContribution = await buildAggregatePeriodIndicator(
-    indic,
-    externalPurchaseAccounts ,
-    period.periodKey
-  );
-
-
-  return {
-    externalExpensesAccounts,
-    externalExpensesContribution,
-  };
-};
-
-function getImpactData(externalExpensesAccounts, period, indic, providers){
-
-  const mostImpactfulExpenses = sortAccountsByFootprint(
-    externalExpensesAccounts,
-    period,
-    indic,
-    "desc"
-  ).slice(0, 3);
-
-  const leastImpactfulExpenses = sortAccountsByFootprint(
-    externalExpensesAccounts,
-    period,
-    indic,
-    "asc"
-  ).slice(0, 3);
-
-  const mostImpactfulProviders = sortProvidersByContrib(
-    period.periodKey,
-    providers,
-    indic,
-    "desc"
-  ).slice(0, 4);
-
-  return {
-    mostImpactfulExpenses,
-    leastImpactfulExpenses,
-    mostImpactfulProviders,
-  };
-};
-
-
-// Content
-const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indic) => {
+// Sections  -----------------------------------------------------------
+const buildHeaderSection = (libelle, totalRevenue, contributionPerEuro, indic) => {
   return [
     { text: libelle, style: "header" },
     //--------------------------------------------------
@@ -369,7 +298,7 @@ const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indic) =
               style: "numbers",
             },
             {
-              margin: [0, 5, 0, 0],
+              margin: [0, 5, 10, 0],
               text: "de " + libelle,
               alignment: "center",
             },
@@ -387,7 +316,7 @@ const buildHeaderContent = (libelle, totalRevenue, contributionPerEuro, indic) =
 
   ];
 }
-const buildIntermediateManagementContent = (indic, production, period, chartImages) => {
+const buildSigFootprintSection = (indic, production, period, chartImages) => {
   
 
   return [
@@ -608,3 +537,77 @@ const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, 
 };
 
 
+// Functions -----------------------------------------------------------
+
+
+async function getFinancialData(financialData, period, indic) {
+  const { revenue } = financialData.productionAggregates;
+  const totalRevenue = revenue.periodsData[period.periodKey].amount;
+
+  const contributionPercentage =
+    revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
+  const contributionAmount = (contributionPercentage / 100) * totalRevenue;
+  const contributionPerEuro = contributionAmount / totalRevenue;
+
+
+
+  return {
+    totalRevenue,
+    contributionPerEuro,
+  };
+}
+
+async function processExternalExpenseAccounts(financialData, period, indic){
+
+  const externalExpensesAccounts = financialData.externalExpensesAccounts.filter((account) =>
+    account.periodsData.hasOwnProperty(period.periodKey)
+  );
+
+  const externalPurchaseAccounts  = financialData.externalExpensesAccounts.filter((account) =>
+    /^60[^(8|9)]/.test(account.accountNum)
+  );
+
+
+  const externalExpensesContribution = await buildAggregatePeriodIndicator(
+    indic,
+    externalPurchaseAccounts ,
+    period.periodKey
+  );
+
+
+  return {
+    externalExpensesAccounts,
+    externalExpensesContribution,
+  };
+};
+
+
+function getImpactData(externalExpensesAccounts, period, indic, providers){
+
+  const mostImpactfulExpenses = sortAccountsByFootprint(
+    externalExpensesAccounts,
+    period,
+    indic,
+    "desc"
+  ).slice(0, 3);
+
+  const leastImpactfulExpenses = sortAccountsByFootprint(
+    externalExpensesAccounts,
+    period,
+    indic,
+    "asc"
+  ).slice(0, 3);
+
+  const mostImpactfulProviders = sortProvidersByContrib(
+    period.periodKey,
+    providers,
+    indic,
+    "desc"
+  ).slice(0, 4);
+
+  return {
+    mostImpactfulExpenses,
+    leastImpactfulExpenses,
+    mostImpactfulProviders,
+  };
+};

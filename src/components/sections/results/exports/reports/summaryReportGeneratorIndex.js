@@ -6,7 +6,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
-// Utils
+// Exports Utils
 import {
   addUncertaintyText,
   calculateAverageEvolutionRate,
@@ -16,7 +16,6 @@ import {
   getUncertaintyDescription,
   targetAnnualReduction,
 } from "../exportsUtils";
-import { printValue } from "/src/utils/formatters";
 
 import {
   createRectObject,
@@ -28,7 +27,12 @@ import {
   calculateAvailableWidth,
   getChartImageData,
 } from "../../../../../utils/exportsUtils";
+
+// Utils
 import { sortProvidersByImpact } from "../../utils";
+import { printValue } from "/src/utils/formatters";
+
+// PDF Config
 import {
   defaultPosition,
   pdfMargins,
@@ -56,17 +60,11 @@ export const buildSummaryReportIndexIndic = async ({
   const currentPeriod = period.periodKey.slice(2);
 
   // Metadata ------------------------------------------------------
-  const { unit, nbDecimals } = metaIndics[indic];
   const divisionName = divisions[comparativeData.comparativeDivision];
 
   // ---------------------------------------------------------------
   // PDF Data
-  const {
-    production,
-    netValueAdded,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-  } = financialData.mainAggregates;
+  const { production } = financialData.mainAggregates;
 
   const { revenue } = financialData.productionAggregates;
 
@@ -89,8 +87,7 @@ export const buildSummaryReportIndexIndic = async ({
     Math.max(lastEstimatedData.length - 2, 1)
   );
 
-  const branchProductionEvolution =
-    calculateAverageEvolutionRate(lastEstimatedData);
+  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
 
   let providers = filterProvidersByPeriod(financialData, period);
 
@@ -260,10 +257,10 @@ export const buildSummaryReportIndexIndic = async ({
     },
     content: [
       // Header
-      ...buildHeaderContent(revenue, indic, period),
+      ...buildHeaderSection(revenue, indic, period),
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
-      ...buildIntermediateManagementContent(
+      ...buildSigFootprintSection(
         financialData.mainAggregates,
         indic,
         period
@@ -291,7 +288,7 @@ export const buildSummaryReportIndexIndic = async ({
         ],
       },
       //--------------------------------------------------
-     
+      // Branch Performance
       {
         ...buildBranchPerformanceSection( branchProductionTarget,
           branchProductionEvolution,
@@ -316,29 +313,9 @@ export const buildSummaryReportIndexIndic = async ({
   return summaryReport;
 };
 
-function getImpactData(indic, providers) {
-  providers = providers.filter(
-    (provider) =>
-      provider.footprintStatus == 200 && provider.footprint.isValid()
-  );
+// SECTIONS CONTENT -----------------------------------------------------------
 
-  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
-    0,
-    2
-  );
-  const nextTopProviders = sortProvidersByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(2, 4);
-
-  return {
-    topProviders,
-    nextTopProviders,
-  };
-}
-
-const buildHeaderContent = (revenue, indic, period) => {
+const buildHeaderSection = (revenue, indic, period) => {
   const { libelle, unit, libelleGrandeur } = metaIndics[indic];
 
   const totalRevenue = revenue.periodsData[period.periodKey].amount;
@@ -398,7 +375,9 @@ const buildHeaderContent = (revenue, indic, period) => {
   ];
 };
 
-const buildIntermediateManagementContent = (mainAggregates, indic, period) => {
+// Sections  -----------------------------------------------------------
+
+const buildSigFootprintSection = (mainAggregates, indic, period) => {
   const { unit, nbDecimals } = metaIndics[indic];
 
   const {
@@ -618,7 +597,9 @@ const generateKeyProviders = (providers, indic, unit, precision) =>
         fontSize: 7,
       },
     ],
-  }));
+  }
+)
+);
 
 const buildSIGTableSection = (mainAggregates, period, indic) => {
   const {
@@ -648,7 +629,7 @@ const buildSIGTableSection = (mainAggregates, period, indic) => {
           },
 
           {
-            text: "Incertitude*",
+            text: "Incertitude *",
             alignment: "center",
           },
         ],
@@ -663,181 +644,10 @@ const buildSIGTableSection = (mainAggregates, period, indic) => {
           },
           { text: "%", fontSize: "5", alignment: "center" },
         ],
-        [
-          {
-            text: "Production",
-            margin: [2, 7, 2, 8],
-            alignment: "left",
-          },
-          {
-            text:
-              printValue(production.periodsData[period.periodKey].amount, 0) +
-              " €",
-            margin: [2, 7, 2, 8],
-            alignment: "right",
-          },
-          {
-            columns: [
-              {
-                text: [
-                  {
-                    text: printValue(
-                      production.periodsData[period.periodKey].footprint
-                        .indicators[indic].value,
-                      nbDecimals
-                    ),
-                  },
-                ],
-              },
-            ],
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-
-          {
-            text: printValue(
-              production.periodsData[period.periodKey].footprint.indicators[
-                indic
-              ].uncertainty,
-              0
-            ),
-            fontSize: "5",
-            alignment: "center",
-            margin: [2, 7, 2, 8],
-          },
-        ],
-        [
-          {
-            text: "Consommations intermédiaires",
-            margin: [2, 7, 2, 8],
-            alignment: "left",
-          },
-          {
-            text:
-              printValue(
-                intermediateConsumptions.periodsData[period.periodKey].amount,
-                0
-              ) + " €",
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-
-          {
-            columns: [
-              {
-                text: [
-                  {
-                    text: printValue(
-                      intermediateConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].value,
-                      nbDecimals
-                    ),
-                  },
-                ],
-              },
-            ],
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-          {
-            text: printValue(
-              intermediateConsumptions.periodsData[period.periodKey].footprint
-                .indicators[indic].uncertainty,
-              0
-            ),
-            fontSize: "5",
-            alignment: "center",
-            margin: [2, 7, 2, 8],
-          },
-        ],
-        [
-          {
-            text: "Consommations de capital fixe",
-            alignment: "left",
-            margin: [2, 7, 2, 8],
-          },
-          {
-            text:
-              printValue(
-                fixedCapitalConsumptions.periodsData[period.periodKey].amount,
-                0
-              ) + " €",
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-          {
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-            columns: [
-              {
-                text: [
-                  {
-                    text: printValue(
-                      fixedCapitalConsumptions.periodsData[period.periodKey]
-                        .footprint.indicators[indic].value,
-                      nbDecimals
-                    ),
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            text: printValue(
-              fixedCapitalConsumptions.periodsData[period.periodKey].footprint
-                .indicators[indic].uncertainty,
-              0
-            ),
-            fontSize: "5",
-            alignment: "center",
-            margin: [2, 7, 2, 8],
-          },
-        ],
-        [
-          {
-            text: "Valeur ajoutée nette",
-            alignment: "left",
-            margin: [2, 7, 2, 8],
-          },
-          {
-            text:
-              printValue(
-                netValueAdded.periodsData[period.periodKey].amount,
-                0
-              ) + " €",
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-          {
-            columns: [
-              {
-                text: [
-                  {
-                    text: printValue(
-                      netValueAdded.periodsData[period.periodKey].footprint
-                        .indicators[indic].value,
-                      nbDecimals
-                    ),
-                  },
-                ],
-              },
-            ],
-            alignment: "right",
-            margin: [2, 7, 2, 8],
-          },
-
-          {
-            text: printValue(
-              netValueAdded.periodsData[period.periodKey].footprint.indicators[
-                indic
-              ].uncertainty,
-              0
-            ),
-            fontSize: "5",
-            alignment: "center",
-            margin: [2, 7, 2, 8],
-          },
-        ],
+        buildTableRow(production, period, indic, nbDecimals),
+        buildTableRow(intermediateConsumptions, period, indic, nbDecimals),
+        buildTableRow(fixedCapitalConsumptions, period, indic, nbDecimals),
+        buildTableRow(netValueAdded, period, indic, nbDecimals),
       ],
     },
     layout: {
@@ -855,6 +665,46 @@ const buildSIGTableSection = (mainAggregates, period, indic) => {
       },
     },
   };
+};
+
+const buildTableRow = (aggregate, period, indic, precision) => {
+  const data = aggregate.periodsData[period.periodKey];
+
+  return [
+    {
+      text: aggregate.label,
+      margin: [2, 7, 2, 8],
+      alignment: "left",
+    },
+    {
+      text: printValue(data.amount, 0) + " €",
+      alignment: "right",
+      margin: [2, 7, 2, 8],
+    },
+    {
+      columns: [
+        {
+          text: [
+            {
+              text: printValue(
+                data.footprint.indicators[indic].value,
+                precision
+              ),
+            },
+          ],
+        },
+      ],
+      alignment: "right",
+      margin: [2, 7, 2, 8],
+    },
+
+    {
+      text: printValue(data.footprint.indicators[indic].uncertainty, 0),
+      fontSize: "5",
+      alignment: "center",
+      margin: [2, 7, 2, 8],
+    },
+  ];
 };
 
 const buildDeviationChartSection = (chartImage) => {
@@ -994,3 +844,28 @@ const buildBranchPerformanceSection = (
     ],
   };
 };
+
+
+// Functions -----------------------------------------------------------
+
+function getImpactData(indic, providers) {
+  providers = providers.filter(
+    (provider) =>
+      provider.footprintStatus == 200 && provider.footprint.isValid()
+  );
+
+  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
+    0,
+    2
+  );
+  const nextTopProviders = sortProvidersByImpact(
+    providers,
+    indic,
+    "desc"
+  ).slice(2, 4);
+
+  return {
+    topProviders,
+    nextTopProviders,
+  };
+}

@@ -5,7 +5,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
-// Utils
+// Exports Utils
 import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
@@ -28,16 +28,22 @@ import {
   definePDFStyles,
   rgbaToHex,
 } from "../../../../../utils/exportsUtils";
+
+// Utils
 import { printValue } from "/src/utils/formatters";
 import {
   getMostImpactfulExpensesPart,
   sortProvidersByImpact,
 } from "../../utils";
+
+// PDF Config
 import {
   pdfMargins,
   pdfPageSize,
   defaultPosition,
 } from "../../../../../constants/pdfConfig";
+
+// Colors
 import { aggregatesChartColors } from "../../../../../constants/chartColors";
 
 // --------------------------------------------------------------------------
@@ -61,12 +67,7 @@ export const buildSummaryReportIntensityIndic = async ({
 
   const { revenue } = financialData.productionAggregates;
 
-  const {
-    production,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    netValueAdded,
-  } = financialData.mainAggregates;
+  const { production } = financialData.mainAggregates;
 
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
@@ -116,13 +117,12 @@ export const buildSummaryReportIntensityIndic = async ({
 
   const providers = filterProvidersByPeriod(financialData, period);
 
-  const firstMostImpactfulCompanies = sortProvidersByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(0, 2);
+  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
+    0,
+    2
+  );
 
-  const scdMostImpactfulCompanies = sortProvidersByImpact(
+  const nextTopProviders = sortProvidersByImpact(
     providers,
     indic,
     "desc"
@@ -234,6 +234,7 @@ export const buildSummaryReportIntensityIndic = async ({
       );
 
       if (currentPage == 1) {
+        // Key Figures
         keyFigureBoxes.forEach((box) => {
           canvas.push(
             createRectObject(
@@ -295,7 +296,7 @@ export const buildSummaryReportIntensityIndic = async ({
           )
         );
 
-                // Objectifs
+        // Objectifs
 
         positionY += 257;
 
@@ -324,7 +325,7 @@ export const buildSummaryReportIntensityIndic = async ({
     },
     content: [
       // Header
-      ...buildHeaderContent(
+      ...buildHeaderSection(
         libelle,
         totalRevenue,
         production,
@@ -334,39 +335,48 @@ export const buildSummaryReportIntensityIndic = async ({
         unit,
         precision
       ),
-
-      ...buildProductionImpactContent(
+      //--------------------------------------------------
+      ...buildProductionImpactSection(
         intermediateConsumptionsPart,
         mostImpactfulExpenseAccountsPart,
         indic,
         chartImages
       ),
-      //   // KEY SUPPLIERS
-      ...buildKeyProvidersContent(
-        firstMostImpactfulCompanies,
-        scdMostImpactfulCompanies,
+      //--------------------------------------------------
+      // Key Suppliers
+      ...buildKeyProvidersSection(
+        topProviders,
+        nextTopProviders,
         indic,
         unit,
         unitGrossImpact,
         precision,
         period
       ),
+      //--------------------------------------------------
+      // SIG Table
+      {
+        margin: [0, 25, 0, 20],
+        columns: [
+          {
+            ...buildSIGTableSection(
+              financialData.mainAggregates,
+              period,
+              indic
+            ),
+          },
+          //--------------------------------------------------
+          //Deviation chart
+          {
+            ...buildDeviationChartSection(
+              chartImages[`deviation-chart-${indic}-print`]
+            ),
+          },
+        ],
+      },
 
-      //   // TABLE SIG
-
-      ...buildTableSigContent(
-        production,
-        intermediateConsumptions,
-        fixedCapitalConsumptions,
-        netValueAdded,
-        indic,
-        unit,
-        unitGrossImpact,
-        precision,
-        period,
-        chartImages
-      ),
-      //     //--------------------------------------------------
+      //-------------------------------------------------
+      // Branch Performance
       {
         ...buildBranchPerformanceSection(
           branchProductionTarget,
@@ -378,7 +388,7 @@ export const buildSummaryReportIntensityIndic = async ({
           indic
         ),
       },
-
+      //--------------------------------------------------
       addUncertaintyText(
         uncertaintyText,
         pdfPageSize,
@@ -388,7 +398,6 @@ export const buildSummaryReportIntensityIndic = async ({
     ],
     //--------------------------------------------------
     // Style
-
     ...definePDFStyles(),
   };
 
@@ -397,8 +406,8 @@ export const buildSummaryReportIntensityIndic = async ({
   return summaryReport;
 };
 
-// Content
-const buildHeaderContent = (
+// SECTIONS CONTENT -----------------------------------------------------------
+const buildHeaderSection = (
   libelle,
   totalRevenue,
   production,
@@ -517,7 +526,7 @@ const buildHeaderContent = (
     //--------------------------------------------------
   ];
 };
-const buildProductionImpactContent = (
+const buildProductionImpactSection = (
   intermediateConsumptionsPart,
   mostImpactfulExpenseAccountsPart,
   indic,
@@ -614,7 +623,7 @@ const buildProductionImpactContent = (
             },
           ],
         },
-        createChargesImpactContent(
+        buildChargesImpactSection(
           intermediateConsumptionsPart,
           mostImpactfulExpenseAccountsPart,
           rgbaToHex(aggregatesChartColors.intermediateConsumptions)
@@ -624,15 +633,17 @@ const buildProductionImpactContent = (
   ];
 };
 
-function buildKeyProvidersContent(
-  firstMostImpactfulCompanies,
-  scdMostImpactfulCompanies,
+// Sections  -----------------------------------------------------------
+
+const buildKeyProvidersSection = (
+  topProviders,
+  nextTopProviders,
   indic,
   unit,
   unitGrossImpact,
   precision,
   period
-) {
+) => {
   const getContent = (companies) => ({
     margin: [5, 10, 0, 0],
     columns: [
@@ -660,131 +671,85 @@ function buildKeyProvidersContent(
       margin: [0, 15, 0, 0],
       background: "#FFFFFF",
     },
-    getContent(firstMostImpactfulCompanies),
-    getContent(scdMostImpactfulCompanies),
+    getContent(topProviders),
+    getContent(nextTopProviders),
   ];
-}
+};
 
-function buildTableSigContent(
-  production,
-  intermediateConsumptions,
-  fixedCapitalConsumptions,
-  netValueAdded,
-  indic,
-  unit,
-  unitGrossImpact,
-  precision,
-  period,
-  chartImages
-) {
-  return [
-    {
-      margin: [0, 25, 0, 15],
-      columns: [
-        {
-          width: "*",
-          style: "table",
-          table: {
-            body: [
-              // HEADER
-              [
-                {
-                  text: "",
-                },
-                {
-                  text: "Montant",
-                },
-                {
-                  text: "Empreinte",
-                },
-                {
-                  text: "Impact",
-                },
-                {
-                  text: "Incert.*",
-                  alignment: "center",
-                },
-              ],
-              // ROWS
-              [
-                {},
-                {},
-                { text: "en " + unit, fontSize: "5", alignment: "center" },
-                {
-                  text: "en " + unitGrossImpact,
-                  fontSize: "5",
-                  alignment: "center",
-                },
-                { text: "en " + "%", fontSize: "5", alignment: "center" },
-              ],
-              buildTableRow("Production", production.periodsData[period.periodKey], indic, precision),
-              buildTableRow("Cons. intermédiaires", intermediateConsumptions.periodsData[period.periodKey], indic, precision),
-              buildTableRow("Cons. de capital fixe", fixedCapitalConsumptions.periodsData[period.periodKey], indic, precision),
-              buildTableRow("Valeur ajoutée nette", netValueAdded.periodsData[period.periodKey], indic, precision),
+const buildSIGTableSection = (mainAggregates, period, indic) => {
+  const {
+    production,
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+  } = mainAggregates;
 
-          
-            ],
-
+  const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
+  return {
+    width: "50%",
+    style: "table",
+    table: {
+      body: [
+        // header
+        [
+          {
+            text: "",
           },
-          layout: {
-            hLineWidth: (i, node) => (i === 0 || i === 1 ? 0 : 1),
-            vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length ? 0 : 1),
-            vLineColor: "#f0f0f8",
-            hLineColor: "#f0f0f8",
+          {
+            text: "Montant",
           },
-        },
-        {
-          width: "*",
-          stack: [
-            {
-              table: {
-                widths: ["100%"],
-                body: [
-                  [
-                    {
-                      text: "Ecart par rapport à la moyenne de la branche",
-                      fontSize: "6",
-                      bold: true,
-                      alignment: "center",
-                      font: "Roboto",
-                      border: [false, false, false, true],
-                    },
-                  ],
-                ],
-              },
-              layout: {
-                hLineWidth: function (i, node) {
-                  return 1;
-                },
-
-                hLineColor: function (i, node) {
-                  return "#f0f0f8";
-                },
-                paddingTop: function (i, node) {
-                  return 0;
-                },
-
-                paddingBottom: function (i, node) {
-                  return 12;
-                },
-              },
-            },
-            {
-              width: 240,
-              image: chartImages[`deviation-chart-${indic}-print`],
-            },
-          ],
-        },
+          {
+            text: "Empreinte",
+          },
+          {
+            text: "Impact",
+          },
+          {
+            text: "Incertitude *",
+            alignment: "center",
+          },
+        ],
+        // rows
+        [
+          {},
+          {},
+          { text: "en " + unit, fontSize: "5", alignment: "center" },
+          {
+            text: "en " + unitAbsolute,
+            fontSize: "5",
+            alignment: "center",
+          },
+          { text: "en " + "%", fontSize: "5", alignment: "center" },
+        ],
+        buildTableRow(production, period, indic, nbDecimals),
+        buildTableRow(intermediateConsumptions, period, indic, nbDecimals),
+        buildTableRow(fixedCapitalConsumptions, period, indic, nbDecimals),
+        buildTableRow(netValueAdded, period, indic, nbDecimals),
       ],
     },
-  ];
-}
+    layout: {
+      hLineWidth: function (i, node) {
+        return i === 0 || i === 1 ? 0 : 1;
+      },
+      vLineWidth: function (i, node) {
+        return i === 0 || i === node.table.widths.length ? 0 : 1;
+      },
+      vLineColor: function (i, node) {
+        return "#f0f0f8";
+      },
+      hLineColor: function (i, node) {
+        return "#f0f0f8";
+      },
+    },
+  };
+};
 
-function buildTableRow(label, data, indic, precision) {
- 
+const buildTableRow = (aggregate, period, indic, precision) => {
+  const data = aggregate.periodsData[period.periodKey];
+
   return [
     {
-      text: label,
+      text: aggregate.label,
       margin: [2, 7, 2, 8],
       alignment: "left",
     },
@@ -799,9 +764,7 @@ function buildTableRow(label, data, indic, precision) {
           text: [
             {
               text: printValue(
-                data.footprint.indicators[
-                  indic
-                ].value,
+                data.footprint.indicators[indic].value,
                 precision
               ),
             },
@@ -817,11 +780,7 @@ function buildTableRow(label, data, indic, precision) {
           text: [
             {
               text: printValue(
-                data.footprint.indicators[
-                  indic
-                ].getGrossImpact(
-                  data.amount
-                ),
+                data.footprint.indicators[indic].getGrossImpact(data.amount),
                 precision
               ),
             },
@@ -832,17 +791,55 @@ function buildTableRow(label, data, indic, precision) {
       margin: [2, 7, 2, 8],
     },
     {
-      text: printValue(
-        data.footprint.indicators[indic]
-          .uncertainty,
-        0
-      ),
+      text: printValue(data.footprint.indicators[indic].uncertainty, 0),
       fontSize: "5",
       alignment: "center",
       margin: [2, 7, 2, 8],
     },
   ];
-}
+};
+const buildDeviationChartSection = (chartImage) => {
+  return {
+    width: "50%",
+    stack: [
+      {
+        table: {
+          widths: ["100%"],
+          body: [
+            [
+              {
+                text: "Ecart par rapport à la moyenne de la branche",
+                fontSize: "6",
+                bold: true,
+                alignment: "center",
+                font: "Roboto",
+                border: [false, false, false, true],
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: function (i, node) {
+            return 1;
+          },
+          hLineColor: function (i, node) {
+            return "#f0f0f8";
+          },
+          paddingTop: function (i, node) {
+            return 0;
+          },
+          paddingBottom: function (i, node) {
+            return 12;
+          },
+        },
+      },
+      {
+        width: 240,
+        image: chartImage,
+      },
+    ],
+  };
+};
 
 const buildBranchPerformanceSection = (
   branchProductionTarget,
@@ -938,13 +935,11 @@ const buildBranchPerformanceSection = (
     ],
   };
 };
-function createChargesImpactContent(
+const buildChargesImpactSection = (
   intermediateConsumptionsPart,
   mostImpactfulExpenseAccountsPart,
   bgColor
-) {
-  console.log(bgColor);
-
+) => {
   let content = {
     stack: [
       // Arrow
@@ -981,7 +976,9 @@ function createChargesImpactContent(
   if (intermediateConsumptionsPart > 40) {
     return content;
   }
-}
+};
+
+// Functions -----------------------------------------------------------
 
 function getIntermediateConsumptionsPart(financialData, indic, period) {
   let total =
