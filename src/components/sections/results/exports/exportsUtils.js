@@ -221,14 +221,17 @@ export function targetAnnualReduction(data) {
   let yearsCount = data.length - 1;
   let totalReduction = firstYearValue - lastYearValue;
   let annualReduction = totalReduction / firstYearValue / yearsCount;
-  let percentageReduction = (annualReduction * 100).toFixed(0);
+  let percentageReduction = (annualReduction * 100).toFixed(1);
 
-  isNaN(percentageReduction)
-    ? (percentageReduction = undefined)
-    : (percentageReduction = "- " + percentageReduction);
+  if (!isNaN(percentageReduction)) {
+    percentageReduction = percentageReduction < 0 ? " + " + Math.abs(percentageReduction) : "- " + percentageReduction;
+  } else {
+    percentageReduction = undefined;
+  }
 
   return percentageReduction;
 }
+
 
 export function calculateAverageEvolutionRate(data) {
   let evolutionRates = [];

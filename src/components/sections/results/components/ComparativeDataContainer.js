@@ -18,7 +18,7 @@ export const ComparativeDataContainer = ({
   };
 
   return (
-    <div>
+    <div className="mb-4">
       <h4>Comparaison par activité</h4>
       <Row>
         {Object.keys(aggregates).map((aggregate) => (

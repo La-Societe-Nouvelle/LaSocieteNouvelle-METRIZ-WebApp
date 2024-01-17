@@ -71,12 +71,12 @@ export const buildSummaryReportIndexIndic = async ({
   // ---------------------------------------------------------------
   // utils
 
-  let branchProductionTarget = "-";
+  let branchProductionTarget = null;
+  const target = comparativeData.production.division.target.data[indic];
 
-  if (comparativeData.production.division.target.data[indic].length) {
-    branchProductionTarget = targetAnnualReduction(
-      comparativeData.production.division.target.data[indic]
-    );
+  if (target.length) {
+    const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
+    branchProductionTarget = targetAnnualReduction(linearTarget);
   }
 
   let lastEstimatedData = comparativeData.production.division.history.data[

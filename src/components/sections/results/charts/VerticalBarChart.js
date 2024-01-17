@@ -123,6 +123,8 @@ export const VerticalBarChart = ({
         left: printMode ? 0 : 10,
         right: printMode ? 0 : 10,
         top: printMode ? 0 : 30,
+        bottom: printMode ? 10 : 0,
+
       },
     },
     scales: {
@@ -232,6 +234,8 @@ const generateCurrentFootprintsDataset = (
     let areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0]?.value;
     dataset_currentFootprints.push(areaValue);
     labels.push("France");
+
+    
     backgroundColors.push(comparativeChartColors.area);
   }
   // Legal Unit Footprint
@@ -239,7 +243,12 @@ const generateCurrentFootprintsDataset = (
   let legalUnitValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic]?.value;
   dataset_currentFootprints.push(legalUnitValue);
   labels.push(label);
-  backgroundColors.push(comparativeChartColors.legalunit);
+
+  if (useIndicColors) {
+    backgroundColors.push(indicColor);
+  } else {
+    backgroundColors.push(comparativeChartColors.legalunit);
+  }
 
   // Division Footprint
 

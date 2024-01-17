@@ -78,9 +78,12 @@ export const buildSummaryReportIntensityIndic = async ({
   // UTILS
   let branchProductionTarget = null;
 
-  if (comparativeData.production.division.target.data[indic].length) {
+  const target = comparativeData.production.division.target.data[indic];
+
+  if (target.length) {
+    const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
     branchProductionTarget = targetAnnualReduction(
-      comparativeData.production.division.target.data[indic]
+      linearTarget
     );
   }
 
@@ -112,8 +115,7 @@ export const buildSummaryReportIntensityIndic = async ({
     indic
   );
 
-  const branchProductionEvolution =
-    calculateAverageEvolutionRate(lastEstimatedData);
+  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
 
   const providers = filterProvidersByPeriod(financialData, period);
 
@@ -499,7 +501,7 @@ const buildHeaderSection = (
               text: [
                 {
                   width: "auto",
-                  text: branchProductionTarget
+                  text: branchProductionTarget 
                     ? branchProductionTarget + " %"
                     : "-",
                   style: "numbers",
