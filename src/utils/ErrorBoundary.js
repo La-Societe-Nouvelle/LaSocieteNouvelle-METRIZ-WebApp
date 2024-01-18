@@ -27,7 +27,7 @@ class ErrorBoundary extends React.Component {
     const componentStackLines = errorInfo.componentStack.split("\n");
     const componentNameLine = componentStackLines[1];
     if (process.env.NODE_ENV === "production") {
-      saveErrorLog(new Date(), componentNameLine, error.message);
+      saveErrorLog(componentNameLine, error);
     }
   }
 

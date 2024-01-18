@@ -28,7 +28,7 @@ export const logUserProgress = async (
     step: step,
     datelasttreatment: currentDate,
     validatedindics: validatedindics,
-    firm: "VERSION PUBLIQUE",
+    firm: process.env.NEXT_PUBLIC_VERSION_NAME,
   };
 
   try {
@@ -45,10 +45,8 @@ export const logUserProgress = async (
 /* -------------------------------------------------- ERROR LOGGER -------------------------------------------------- */
 
 /** Params
- *    date: current date
- *    info: component
- *    errors: list of errors
- * 
+ * @property {string} info - Informations supplémentaires sur l'erreur.
+ * @property {Array<string>} errors - Liste des erreurs.
  */
 
 export const saveErrorLog = async (info, errors) => 
@@ -64,6 +62,33 @@ export const saveErrorLog = async (info, errors) =>
     // post data
     await apiStats.post(`logs/error/`, errorLog);
 
+  } catch (error) {
+    console.error("Error while logging user error :", error);
+    throw Error(error.message);
+  }
+};
+
+/* -------------------------------------------------- APPLICATION LOGGER -------------------------------------------- */
+
+/** Params
+ * @property {string} id - ID de la session.
+ * @property {string} type - Type de log.
+ * @property {string} message - Message associé au log.
+ */
+
+export const saveApplicationLog = async (id, type, message) => {
+  // Create a Log
+  const applicationLog = {
+    version: process.env.NEXT_PUBLIC_VERSION_NAME,
+    id,
+    date: currentDate,
+    type,
+    message,
+  };
+
+  try {
+    // post data
+    await apiStats.post(`logs/application/`, applicationLog);
   } catch (error) {
     console.error("Error while logging user error :", error);
     throw Error(error.message);
