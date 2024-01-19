@@ -136,7 +136,7 @@ export const Metriz = () =>
 
     // server logs
     if (process.env.NODE_ENV === "production") {
-      await logUserProgress(session.id, 1, currentDate, []);
+      await logUserProgress(session.id, 1, []);
     }
   };
 
@@ -158,7 +158,7 @@ export const Metriz = () =>
 
     // server logs
     if (process.env.NODE_ENV === "production") {
-      await logUserProgress(session.id, 2, currentDate, []);
+      await logUserProgress(session.id, 2, []);
     }
 
     // next step
@@ -182,7 +182,7 @@ export const Metriz = () =>
     
     // server logs
     if (process.env.NODE_ENV === "production") {
-      await logUserProgress(session.id, 3, currentDate, []);
+      await logUserProgress(session.id, 3, []);
     }
 
     // next step
@@ -206,8 +206,11 @@ export const Metriz = () =>
 
     // server logs
     if (process.env.NODE_ENV === "production") {
-      await logUserProgress(session.id, 4, currentDate, 
-        session.validations[selectedPeriod.periodKey]);
+      await logUserProgress(
+        session.id,
+        4,
+        session.validations[selectedPeriod.periodKey]
+      );
     }
 
     // Anonymous stats report
