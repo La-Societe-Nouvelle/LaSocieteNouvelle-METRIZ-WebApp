@@ -19,15 +19,15 @@ import { customSelectStyles } from "/config/customStyles";
 /* ---------- EVOLUTION CURVES VISUAL ---------- */
 
 /** Component to visualize evolution of footprint over years (legal unit & comparative division)
- *  
+ *
  *  Props :
  *    - session
  *    - indic
  *  (no period -> show on all year periods)
- * 
+ *
  *  Params (in component) :
  *    - aggregate
- * 
+ *
  */
 
 const graphOptions = [
@@ -37,19 +37,20 @@ const graphOptions = [
   { label: "Valeur ajoutée nette", value: "netValueAdded" },
 ];
 
-export const EvolutionCurvesVisual = ({
-  session,
-  indic
-}) => {
+const targetOptions = [
+  { label: "Performance de la branche", value: "target" },
+  { label: "Effort similaire à la branche", value: "" },
+  { label: "Objectif personnalisé", value: "customTarget" },
+];
 
-  const {
-    comparativeData
-  } = session;
+export const EvolutionCurvesVisual = ({ session, indic }) => {
+  const { financialData, comparativeData, availablePeriods } = session;
+
+  const { unit } = metaIndics[indic];
 
   const [showedAggregate, setShowedAggregate] = useState("production");
 
   useEffect(() => {
-
     setShowedAggregate("production");
   }, [indic]);
 
@@ -62,38 +63,72 @@ export const EvolutionCurvesVisual = ({
   // --------------------------------------------------
 
   const title = "";
+  const [showedTarget, setShowedTarget] = useState("target");
+  const changeShowedTarget = (selectedOption) => {
+    setShowedTarget(selectedOption.value);
+  };
+
+  const evolutionCurvesData = {
+    historical: comparativeData[showedAggregate].division.history.data[indic],
+    trend: comparativeData[showedAggregate].division.trend.data[indic],
+    target: comparativeData[showedAggregate].division.target.data[indic],
+    aggregate: financialData.mainAggregates[showedAggregate].periodsData,
+  };
 
   return (
     <Row>
       <Col lg={8}>
-        <div id="evolution" className="box ">
-          <h4>Courbes d'évolution</h4>
-          <Select
-            styles={customSelectStyles}
-            className="mb-4"
-            value={graphOptions.find((option) => option.value==showedAggregate)}
-            options={graphOptions}
-            onChange={changeShowedAggregate}
-          />
-          <div>
-            <h5>{title}</h5>
-            <TrendChart
-              id={`trend-${showedAggregate.value}-${indic}`}
-              session={session}
-              datasetOptions={{
-                aggregate: showedAggregate,
-                indic
-              }}
-              printOptions={{
-                printMode: false
-              }}
+        <div id="evolution" className="box">
+          <h4>Evolution de la Performance</h4>
+          <div className="chart-title">
+            <label className="graph-label">Sélectionner la vue : </label>
+            <Select
+              styles={graphSelectStyles()}
+              defaultValue={graphOptions.find(
+                (option) => option.value == showedAggregate
+              )}
+              options={graphOptions}
+              onChange={changeShowedAggregate}
             />
           </div>
+
+          <div className="d-flex flex-column my-4">
+            <label className="graph-label mb-2">
+              Selectionner un objectif pour l'unité légale :{" "}
+            </label>
+            <Select
+              styles={customSelectStyles("250px")}
+              defaultValue={targetOptions.find(
+                (option) => option.value == showedTarget
+              )}
+              options={targetOptions}
+              onChange={changeShowedTarget}
+            />
+          </div>
+
+          <CustomTargetForm
+            aggregate={evolutionCurvesData.aggregate}
+            target={comparativeData[showedAggregate].legalUnit.target}
+            periods={availablePeriods}
+            indic={indic}
+          />
+
+          <TrendChart
+            id={`trend-${showedAggregate.value}-${indic}`}
+            session={session}
+            datasetOptions={{
+              aggregate: showedAggregate,
+              indic,
+            }}
+            printOptions={{
+              printMode: false,
+            }}
+          ></TrendChart>
         </div>
       </Col>
-      
+
       <Col>
-        <div className="box ">
+        <div className="box">
           <h4>Notes</h4>
           {comparativeData.production.division.trend.data[indic] && (
             <>
@@ -107,23 +142,19 @@ export const EvolutionCurvesVisual = ({
                 l'économie nationale, ses interactions avec l’extérieur et de la
                 dynamique des prix par branche.
               </p>
-              <p className="small mt-3">
-                Source : {metaTrends[indic].source}
-              </p>
+              <p className="small mt-3">Source : {metaTrends[indic].source}</p>
             </>
           )}
-          {comparativeData.production.division.target.data[indic].length>0 && (
+          {comparativeData.production.division.target.data[indic].length >
+            0 && (
             <>
               <h5>Objectif de la branche :</h5>
               {metaTargets[indic].info}
-              <p className="small mt-3">
-                Source : {metaTargets[indic].source}
-              </p>
+              <p className="small mt-3">Source : {metaTargets[indic].source}</p>
             </>
           )}
         </div>
       </Col>
-
     </Row>
   );
-}
+};
