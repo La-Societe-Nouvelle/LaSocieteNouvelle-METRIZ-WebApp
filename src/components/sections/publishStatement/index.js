@@ -14,7 +14,7 @@ import {
 
 // Sources
 import {
-  getStatementPDF,
+  buildStatementPDF,
 } from "/src/writers/StatementPDFBuilder";
 
 import { printValue } from "/src/utils/formatters";
@@ -507,7 +507,7 @@ const Summary = (props) => {
   const exportStatement = () => 
   {
     // build pdf
-    const statementPDF = getStatementPDF(
+    const statementPDF = buildStatementPDF(
       siren,
       corporateName,
       year,
@@ -534,7 +534,7 @@ const Summary = (props) => {
 
     try {
       // build PDF
-      const statementPDF = getStatementPDF(
+      const statementPDF = buildStatementPDF(
         siren,
         corporateName,
         year,
