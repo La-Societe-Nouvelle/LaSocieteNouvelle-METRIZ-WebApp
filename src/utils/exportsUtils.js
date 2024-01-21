@@ -1,27 +1,34 @@
+// Utils
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 
+// --------------------------------------------------
+// loader fonts
 
-export function loadFonts() {
+export const loadFonts = () => 
+{
   pdfMake.fonts = {
+    // download Raleway
     Raleway: {
-      normal:
-        "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
-      bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
+      normal:     "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
+      bold:       "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
     },
     // download default Roboto font from cdnjs.com
     Roboto: {
-      normal:
-        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
-      bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
-      italics:
-        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
-      bolditalics:
-        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
+      normal:      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
+      bold:        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
+      italics:     "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
+      bolditalics: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
     },
   };
 }
 
-export const calculateAvailableWidth = async (pageSize, margins) => {
+// --------------------------------------------------
+// width
+
+export const calculateAvailableWidth = async (
+  pageSize, 
+  margins
+) => {
   return pageSize.width - (margins.left + margins.right);
 };
 
@@ -35,9 +42,11 @@ export const calculateBoxWidth = async (
   );
 };
 
+// --------------------------------------------------
+// shapes
 
-
-export function createRectObject(x, y, w, h, lineWidth, lineColor, r, color) {
+export const createRectObject = (x, y, w, h, lineWidth, lineColor, r, color) =>
+{
   const rectObj = {
     type: "rect",
     x,
@@ -48,32 +57,45 @@ export function createRectObject(x, y, w, h, lineWidth, lineColor, r, color) {
     lineColor,
     r,
   };
+
+  // add color
   if (color) {
     rectObj.color = color;
-  }
+  };
+
   return rectObj;
 }
 
-export function getChartImageData(id) {
+// --------------------------------------------------
+// images
+
+export const getChartImageData = (id) => {
   const chartCanvas = document.getElementById(id);
   return chartCanvas ? chartCanvas.toDataURL("image/png") : null;
 }
 
-export function generateHeader(corporateName, currentPeriod) {
+// --------------------------------------------------
+// header / footer
+
+export const generateHeader = (corporateName, currentPeriod) =>
+{
   return {
     columns: [
-      { text: corporateName, margin: [20, 15, 0, 0], bold: true },
       {
+        text: corporateName, 
+        margin: [20, 15, 0, 0], 
+        bold: true,
+      }, {
         text: "Exercice  " + currentPeriod,
         alignment: "right",
         margin: [0, 15, 20, 0],
         bold: true,
-      },
+      }
     ],
   };
 }
 
-export function generateFooter() {
+export const generateFooter = () => {
   return {
     columns: [
       {
@@ -86,7 +108,11 @@ export function generateFooter() {
   };
 }
 
-export function getDocumentInfo(report, indic, corporateName, currentPeriod) {
+// --------------------------------------------------
+// Document properties
+
+export const getDocumentInfo = (report, indic, corporateName, currentPeriod) => 
+{
   return {
     title: getDocumentTitle(report, indic, corporateName, currentPeriod),
     author: corporateName,
@@ -96,19 +122,26 @@ export function getDocumentInfo(report, indic, corporateName, currentPeriod) {
   };
 }
 
-function getDocumentTitle(report, indic, corporateName, currentPeriod) {
-  return (
-    report +
-    "_" +
-    indic.toUpperCase() +
-    "_" +
-    corporateName.replaceAll(" ", "") +
-    "-" +
-    currentPeriod
-  );
+const getDocumentTitle = (report, indic, corporateName, currentPeriod) => 
+{
+  const title = 
+      report
+    + "_" 
+    + indic.toUpperCase()
+    + "_" 
+    + corporateName.replaceAll(" ", "")
+    + "-" 
+    + currentPeriod;
+  
+  return title;
 }
 
-export function definePDFStyles() {
+
+// --------------------------------------------------
+// Styles
+
+export function definePDFStyles() 
+{
   return {
     defaultStyle: {
       fontSize: 10,
@@ -161,19 +194,25 @@ export function definePDFStyles() {
   };
 }
 
-export function rgbaToHex(rgbaColor) {
+// color converter
+export function rgbaToHex(rgbaColor) 
+{
   const rgbaRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/;
   const match = rgbaColor.match(rgbaRegex);
 
+  // no matching regex
   if (!match) {
     return null;
+  } 
+  
+  // if matching
+  else {
+    const [, r, g, b, a = 1] = match;
+    const alpha = Math.round(parseFloat(a) * 255).toString(16).padStart(2, '0');
+    const red = parseInt(r, 10).toString(16).padStart(2, '0');
+    const green = parseInt(g, 10).toString(16).padStart(2, '0');
+    const blue = parseInt(b, 10).toString(16).padStart(2, '0');
+
+    return `#${red}${green}${blue}${alpha !== 'ff' ? alpha : ''}`;
   }
-
-  const [, r, g, b, a = 1] = match;
-  const alpha = Math.round(parseFloat(a) * 255).toString(16).padStart(2, '0');
-  const red = parseInt(r, 10).toString(16).padStart(2, '0');
-  const green = parseInt(g, 10).toString(16).padStart(2, '0');
-  const blue = parseInt(b, 10).toString(16).padStart(2, '0');
-
-  return `#${red}${green}${blue}${alpha !== 'ff' ? alpha : ''}`;
 }
