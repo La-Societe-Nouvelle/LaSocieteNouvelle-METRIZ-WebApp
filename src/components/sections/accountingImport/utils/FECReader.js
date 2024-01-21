@@ -126,7 +126,7 @@ export async function FECFileReader(content) {
   const rows = content.slice(content.indexOf("\n") + 1).split("\n");
 
   // Lecture des lignes
-  await rows.forEach(async (rowString, index) => 
+  await Promise.all(rows.map(async (rowString, index) => 
   {
     // Segmentation des colonnes (String -> JSON)
     let row = rowString.replace("\r", "").split(separator);
@@ -195,7 +195,7 @@ export async function FECFileReader(content) {
 
     } else if (rowString != "")
       throw "Erreur - Ligne incomplète (" + (index + 2) + ")";
-  });
+  }));
 
   // Mapping accounts ----------------------------------------------------------------------------------- //
 
