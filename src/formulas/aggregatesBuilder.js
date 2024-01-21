@@ -82,7 +82,7 @@ export const buildProductionAggregates = async (FECData, periods) =>
 const metaMainAggregates = {
   "production":               {   label: "Production"},
   "intermediateConsumptions": {   label: "Consommations intermédiaires"},
-  "fixedCapitalConsumptions": {   label: "Consomamtions de capital fixe"},
+  "fixedCapitalConsumptions": {   label: "Consommations de capital fixe"},
   "netValueAdded":            {   label: "Valeur ajoutée nette"},
 }
 
