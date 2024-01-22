@@ -7,11 +7,11 @@ import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
 
 // Utils
-import { getSuggestedMax } from "./chartsUtils";
+import { getMaxY } from "./chartsUtils";
 
 // Colors
 import { trendChartColors } from "../../../../constants/chartColors";
-import { colors } from "../../../../constants/chartColors"
+import { colors } from "../../../../constants/chartColors";
 
 function TrendChart({
   historical,
@@ -23,17 +23,11 @@ function TrendChart({
   id,
   printMode,
 }) {
-  
-  const [max, setMax] = useState(null);
-  const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
+  const linearTarget = target.filter(
+    (data) => data.path == "LIN" && data.flag == "f"
+  );
 
   const legalUnitData = [];
-
-  useEffect(() => {
-    if (unit === "%") {
-      setMax(getSuggestedMax(Math.max(...trend.map((o) => o.value))));
-    }
-  }, [unit, trend]);
 
   for (const period in aggregate) {
     const periodDetails = aggregate[period];
@@ -44,39 +38,69 @@ function TrendChart({
     });
   }
 
-  const filteredHistorical = historical.filter((data) => data.currency != "EUR2022" && data.year >=  (legalUnitData[0].x - 10 ));
+  const filteredHistorical = historical.filter(
+    (data) => data.currency != "EUR2022" && data.year >= legalUnitData[0].x - 10
+  );
 
   let updatedTrend = trend;
 
-  if (filteredHistorical.length > 0 
-   && trend.length > 0 
-   && filteredHistorical.at(-1).year !== trend[0].year) {
+  if (
+    filteredHistorical.length > 0 &&
+    trend.length > 0 &&
+    filteredHistorical.at(-1).year !== trend[0].year
+  ) {
     let firstYearTrend = trend.at(0).year;
     let lastYearHistorical = filteredHistorical.at(-1).year;
     updatedTrend = [
-      ...trend, 
-      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTrend)
+      ...trend,
+      ...filteredHistorical.filter(
+        (data) => data.year >= lastYearHistorical && data.year < firstYearTrend
+      ),
     ].sort((a, b) => a.year - b.year);
   }
 
   let updatedTarget = linearTarget;
 
-  if (filteredHistorical.length > 0 
-   && linearTarget.length > 0 
-   && filteredHistorical.at(-1).year !== linearTarget[0].year) {
-     let lastYearHistorical = filteredHistorical.at(-1).year;
-    let firstYearTarget = linearTarget.filter((data) => data.year>lastYearHistorical).at(0).year;
+  if (
+    filteredHistorical.length > 0 &&
+    linearTarget.length > 0 &&
+    filteredHistorical.at(-1).year !== linearTarget[0].year
+  ) {
+    let lastYearHistorical = filteredHistorical.at(-1).year;
+    let firstYearTarget = linearTarget
+      .filter((data) => data.year > lastYearHistorical)
+      .at(0).year;
     updatedTarget = [
-      ...linearTarget.filter((data) => data.year>lastYearHistorical), 
-      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTarget)
+      ...linearTarget.filter((data) => data.year > lastYearHistorical),
+      ...filteredHistorical.filter(
+        (data) => data.year >= lastYearHistorical && data.year < firstYearTarget
+      ),
     ].sort((a, b) => a.year - b.year);
   }
+
+// Determine Y-Axis Max
+  const targetValues = extractValues(target);
+  const trendValues = extractValues(trend);
+  const historicalValues = extractValues(historical);
+
+  const legalUnitValues = legalUnitData.map((data) => data.y);
+
+  const maxY = unit === "%" ? getMaxY([
+          targetValues,
+          trendValues,
+          historicalValues,
+          legalUnitValues,
+        ])
+      : null;
 
   const chartData = {
     datasets: [
       {
         label: "Historique",
-        data: filteredHistorical.map((data) => ({ x: data.year, y: data.value })),
+        data: filteredHistorical.map((data) => ({
+          x: data.year,
+          y: data.value,
+        })),
         borderColor: trendChartColors.trend,
         backgroundColor: trendChartColors.trend,
         order: 2,
@@ -84,7 +108,7 @@ function TrendChart({
         tension: 0.3,
       },
       {
-        label: "Tendance", 
+        label: "Tendance",
         data: updatedTrend.map((data) => ({ x: data.year, y: data.value })),
         borderColor: trendChartColors.trend,
         backgroundColor: trendChartColors.trend,
@@ -98,7 +122,7 @@ function TrendChart({
         data: updatedTarget.map((data) => ({ x: data.year, y: data.value })),
         skipNull: true,
         borderColor: trendChartColors.target,
-        backgroundColor:  trendChartColors.target,
+        backgroundColor: trendChartColors.target,
         borderWidth: 4,
         order: 4,
         tension: 0.3,
@@ -109,7 +133,7 @@ function TrendChart({
         data: legalUnitData,
         backgroundColor: trendChartColors.legalunit,
         borderColor: trendChartColors.legalunit,
-        borderWidth: 4, 
+        borderWidth: 4,
         order: 1,
         tooltip: {
           enabled: true,
@@ -118,7 +142,7 @@ function TrendChart({
       {
         data: legalUnitData,
         type: "line",
-        borderColor:  trendChartColors.legalunit,
+        borderColor: trendChartColors.legalunit,
         fill: false,
         tooltip: {
           enabled: false,
@@ -127,16 +151,15 @@ function TrendChart({
     ],
   };
 
-
-
   const commonOptions = {
     devicePixelRatio: 2,
     maintainAspectRatio: printMode ? false : true,
     pointRadius: 0,
-    
+
     scales: {
       y: {
         min: 0,
+        max: maxY,
         title: {
           display: false,
         },
@@ -149,7 +172,7 @@ function TrendChart({
         },
         grid: {
           color: colors.gridColor,
-          lineWidth : 2,
+          lineWidth: 2,
         },
       },
       x: {
@@ -161,7 +184,7 @@ function TrendChart({
         },
         grid: {
           color: colors.gridColor,
-          lineWidth : 2,
+          lineWidth: 2,
         },
         type: "time",
         time: {
@@ -171,7 +194,7 @@ function TrendChart({
         },
       },
     },
-    
+
     plugins: {
       legend: {
         display: true,
@@ -188,9 +211,8 @@ function TrendChart({
           generateLabels: function (chart) {
             const dataset = chart.data.datasets;
             return dataset
-              .map((data, i) => (
-                {
-                hidden: !chart.getDataVisibility(i) ,
+              .map((data, i) => ({
+                hidden: !chart.getDataVisibility(i),
                 index: i,
                 lineWidth: 3,
                 lineDashOffset: i === 1 ? 10 : 0,
@@ -199,7 +221,7 @@ function TrendChart({
                 pointStyle: "line",
                 strokeStyle: data.borderColor,
                 text:
-                  data.label === undefined || data.label === "" 
+                  data.label === undefined || data.label === ""
                     ? null
                     : data.label,
               }))
@@ -267,13 +289,9 @@ function TrendChart({
     },
   };
 
-  return (
-    <Line
-      data={chartData}
-      id={id}
-      options={{ ...commonOptions, suggestedMax: max }}
-    />
-  );
+  return <Line data={chartData} id={id} options={{ ...commonOptions }} />;
 }
+
+const extractValues = (data) => data.map((item) => item.value);
 
 export default TrendChart;
