@@ -12,7 +12,7 @@ import { comparativeChartColors } from "../../../../constants/chartColors";
 
 // utils
 import { printValue } from "/src/utils/formatters";
-import { changeOpacity, getSuggestedMax } from "./chartsUtils";
+import { getMaxY, changeOpacity } from "./chartsUtils";
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
@@ -46,7 +46,6 @@ export const VerticalBarChart = ({
   label,
 }) => {
   const { unit, nbDecimals } = metaIndics[indic];
-
   // Datasets --------------------------------------------------------------
 
   const { financialData, comparativeData } = session;
@@ -62,7 +61,6 @@ export const VerticalBarChart = ({
   );
 
   // current footprints dataset
-
   const { dataset_currentFootprints, labels, backgroundColors } = generateCurrentFootprintsDataset(
       comparativeData,
       aggregate,
@@ -105,8 +103,12 @@ export const VerticalBarChart = ({
 
   // Data for chart --------------------------------------------------------
 
-  const max = Math.max(...dataset_currentFootprints.filter((o) => o != null));
-  const suggestedMax = unit === "%" ? getSuggestedMax(max) : null;
+  // Determine Y-Axis Max
+  const datasetsForMaxY  = showTargetData
+  ? [dataset_currentFootprints, dataset_target]
+  : [dataset_currentFootprints];
+  
+  const maxY = unit === "%" ? getMaxY(datasetsForMaxY) : null;
 
   const chartData = {
     labels: labels,
@@ -131,7 +133,7 @@ export const VerticalBarChart = ({
       y: {
         display: true,
         min: 0,
-        max: suggestedMax,
+        max: maxY,
         ticks: {
           color: "#191558",
           font: {
@@ -203,7 +205,6 @@ export const VerticalBarChart = ({
       data={chartData}
       options={{
         ...commonOptions,
-        suggestedMax: suggestedMax,
       }}
     />
   );
@@ -286,7 +287,7 @@ const generateTargetDataset = (
   targetBackgroundColors.push(comparativeChartColors.targetarea);
 
   //
-  dataset_target.push(null); // TO DO : Affichage de de l'objectif défini par l'entreprise
+  dataset_target.push(null); 
   targetBackgroundColors.push(null);
 
   // Division Target

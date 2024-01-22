@@ -8,21 +8,31 @@ export const getCutOut = (width, factor) => {
   return width / factor;
 };
 
-export const getSuggestedMax = (max) => {
-  if (max < 10) {
-    return 10;
-  }
-  switch (true) {
-    case max > 10 && max < 25:
-      return 25;
-    case max > 25 && max < 50:
-      return 50;
-    default:
-      return 100;
+export const getMaxY = (datasets) => {
+  const maxValues = datasets.map((dataset) => {
+    if (dataset) {
+      const max = Math.max(...dataset.filter((value) => value != null));
+      return max;
+    }
+    return 0;
+  });
+
+  const max = Math.max(...maxValues);
+
+  const threshold1 = 10;
+  const threshold2 = 25;
+  const threshold3 = 50;
+  
+  if (max < threshold1) {
+    return threshold1;
+  } else if (max < threshold2) {
+    return threshold2;
+  } else if (max < threshold3) {
+    return threshold3;
+  } else {
+    return 100;
   }
 };
-
-
 
 export function getAggregatesDistribution(aggregates, periodKey) {
   const amounts = aggregates.map((item) => item.periodsData[periodKey].amount || 0);
