@@ -116,6 +116,8 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     } else if (targetMode === "extend") {
       handleExtendTarget(targetYear, targetMode);
     }
+
+    setShowFormModal(false);
   };
 
   const handleCustomTarget = async (
@@ -231,9 +233,12 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
               onChange={changeShowedAggregate}
             />
           </div>
-          <Button variant="secondary" onClick={() => setShowFormModal(true)}>
-            Définir un objectif
-          </Button>
+          <div className="text-end mt-5">
+            <Button variant="secondary" size="sm" onClick={() => setShowFormModal(true)}>
+            <i className="bi bi-graph-up-arrow"></i> Définir un objectif
+            </Button>
+
+          </div>
 
           {console.log("data", evolutionCurves)}
           <TargetFormModal

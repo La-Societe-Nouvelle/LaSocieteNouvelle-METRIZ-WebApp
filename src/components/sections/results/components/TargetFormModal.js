@@ -22,6 +22,10 @@ const TargetFormModal = ({ showModal, showBranchTargetMode,indic, year, onClose,
 );
 
 
+useEffect(() => {
+  setTargetMode(showBranchTargetMode ? "industry" : "custom")
+}, [indic]);
+
 
   const changeTargetMode = ({ value }) => {
     setTargetMode(value);
@@ -73,11 +77,11 @@ const TargetFormModal = ({ showModal, showBranchTargetMode,indic, year, onClose,
 
   
 const targetOptions = [
-  { label: "Objectif de la branche", value: "industry"  },
+  { label: "Objectif de la branche", value: "industry", isDisabled: !showBranchTargetMode, },
   {
     label: "Objectif aligné sur la branche",
     value: "aligned",
-     
+    isDisabled: !showBranchTargetMode,
   },
   { label: "Objectif personnalisé ", value: "custom" },
   { label: "Poursuivre avec une réduction annuelle similaire", value: "extend" },
@@ -96,15 +100,12 @@ const renderFormElements = () => {
             placeholder="Sélectionner "
             styles={customSelectStyles()}
             value={targetOptions.find((option) => option.value === targetMode)}
-            options={targetOptions.map(({ isDisabled, ...rest }) => ({
-              ...rest,
-              isDisabled: isDisabled && !showBranchTargetMode,
-            }))}
+            options={ targetOptions}
             onChange={changeTargetMode}
           />
         </Col>
       </Form.Group>
-    
+      {console.log(targetMode)}
       {targetMode === "custom" && (
         <>
           <Form.Group as={Row} className="mb-3">
