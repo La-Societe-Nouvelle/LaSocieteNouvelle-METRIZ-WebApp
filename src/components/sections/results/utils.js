@@ -52,12 +52,11 @@ export const calculateSimilarEffortTarget = (
 
 export async function getTrend(footprints, targetYear, targetMode) {
   const years = footprints.map((footprint) => footprint.year);
-  const latestYear = Math.max(...years.map(Number)).toString();
+  const latestYear =  Math.max(...years.map(Number)).toString();
 
-  const secondLatestYear = Math.max(
+  const secondLatestYear = footprints.length > 1 ?  Math.max(
     ...years.filter((year) => year !== latestYear).map(Number)
-  ).toString();
-
+  ).toString() : latestYear;
   const dataPoints = [
     [
       parseInt(secondLatestYear),
