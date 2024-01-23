@@ -1,7 +1,5 @@
-// La Société Nouvelle
-
-// React
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+// Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Line } from "react-chartjs-2";
@@ -281,6 +279,18 @@ const buildBranchTargetData = (
   return data;
 }
 
+const buildLegalUnitTargetdataset = (legalUnitTarget) => {
+
+  return {
+    label: "Objectif personnalisé",
+    data: legalUnitTarget.map((item) => ({ x: item.year, y: item.value })),
+    borderColor: trendChartColors.legalunitTarget,
+    backgroundColor: trendChartColors.legalunitTarget,
+    borderWidth: 4,
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (printOptions,datasetOptions,chartData) => 

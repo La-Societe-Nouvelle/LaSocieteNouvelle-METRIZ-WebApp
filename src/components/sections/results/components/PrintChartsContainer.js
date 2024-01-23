@@ -104,17 +104,23 @@ const IndicatorCharts = ({
       </Row>
       <Row>
         <div className="trend-chart-container">
-          <TrendChart
+          {/* TO DO : CUSTOM TARGET */}
+          {/* <TrendChart
             id={`trend-chart-${indic}-print`}
-            session={session}
-            datasetOptions={{
-              aggregate: "production",
-              indic
-            }}
-            printOptions={{
-              printMode: true
-            }}
-          />
+            unit={indicators[indic].unit}
+            historical={
+              comparativeData["production"].division.history.data[indic]
+            }
+            trend={
+              comparativeData["production"].division.trend.data[indic]
+            }
+            target={
+              comparativeData["production"].division.target.data[indic]
+            }
+            aggregate={mainAggregates.production.periodsData}
+            indic={indic}
+            isPrinting={true}
+          /> */}
         </div>
       </Row>
       {(indicators[indic].type == "intensité" ||

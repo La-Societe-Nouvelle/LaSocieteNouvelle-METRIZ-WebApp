@@ -4,6 +4,8 @@
 import keyIndics from "/lib/keyIndics";
 
 // --------------------------------------------------
+import keyIndics from "/lib/keyIndics";
+import regression from "regression";
 
 // get closest year data
 //  call(s) : summaryReportGeneratorContribution.js
@@ -31,7 +33,6 @@ export const getLatestYear = (values) => {
   if (values.length === 0) {
     return null;
   }
-
   const latestYear = values.reduce((maxYear, object) => {
     const objectYear = parseInt(object.year, 10); // Convert year to integer
 
@@ -43,14 +44,103 @@ export const getLatestYear = (values) => {
 }
 
 
+export const getPeriodFootprint = (
+  financialData,
+  aggregate,
+  defaultPeriod,
+  indic
+) => {
+  return financialData.mainAggregates[aggregate].periodsData[
+    defaultPeriod.periodKey
+  ].footprint.indicators[indic];
+};
+
+export const getLastBranchTargetData = (targetData) => {
+  const lastTargetValue =
+    targetData.length > 0 ? targetData[targetData.length - 1].value : 0;
+  const lastTargetYear =
+    targetData.length > 0 ? targetData[targetData.length - 1].year : 2030;
+
+  return { lastTargetValue, lastTargetYear };
+};
+
+export const calculateSimilarEffortTarget = (
+  currentValue,
+  branchValue,
+  targetYear
+) => {
+  return currentValue >= branchValue
+    ? targetYear
+    : targetYear * (currentValue / branchValue);
+};
+
+
+export async function getTrend(footprints, targetYear, targetMode) {
+  const years = footprints.map((footprint) => footprint.year);
+  const latestYear = Math.max(...years.map(Number)).toString();
+
+  const secondLatestYear = Math.max(
+    ...years.filter((year) => year !== latestYear).map(Number)
+  ).toString();
+
+  const dataPoints = [
+    [
+      parseInt(secondLatestYear),
+      footprints.find((f) => f.year === secondLatestYear).value,
+    ],
+    [parseInt(latestYear), footprints.find((f) => f.year === latestYear).value],
+  ];
+
+  const allYears = Array.from(
+    { length: targetYear - secondLatestYear + 1 },
+    (_, index) => (parseInt(secondLatestYear) + index).toString()
+  );
+
+  const result = regression.linear(dataPoints);
+
+  const projectedValues = allYears.map((year) => ({
+    value: result.predict(parseInt(year))[1].toFixed(1),
+    year: year,
+    target: targetMode,
+  }));
+
+  return projectedValues;
+}
+
+export async function buildLinearPath(
+  startYear,
+  startValue,
+  endYear,
+  endValue,
+  targetMode
+) {
+  const dataPoints = [
+    [parseInt(startYear), startValue],
+    [parseInt(endYear), parseInt(endValue)],
+  ];
+
+  const result = regression.linear(dataPoints);
+
+  const valuesBetweenPoints = [];
+  for (let year = parseInt(startYear); year <= parseInt(endYear); year++) {
+    const projectedValue = result.predict(year)[1];
+    valuesBetweenPoints.push({
+      value: projectedValue.toFixed(1),
+      year: year.toString(),
+      target: targetMode,
+    });
+  }
+
+  return valuesBetweenPoints;
+}
+
 
 
 // --------------------------------------------------
 
 // trigger download chart image
 //  call(s) : ComparativeHorizontalBarChartVisual.js
-export const downloadChartImage = (chartId, fileName) => 
-{
+export const downloadChartImage = (chartId, fileName) => {
   const canvas = document.getElementById(chartId);
   const dataURL = canvas.toDataURL("image/png");
   const link = document.createElement("a");
@@ -63,8 +153,8 @@ export const downloadChartImage = (chartId, fileName) =>
 
 // key indics
 export const getKeyIndics = (division) => {
-  return(keyIndics[division].keyIndics)
-}
+  return keyIndics[division].keyIndics;
+};
 
 // --------------------------------------------------
 
@@ -74,11 +164,8 @@ export const getTagsIndic = (
   aggregate,
   indic
 ) => {
+  const { financialData, comparativeData } = session;
 
-  const {
-    financialData,
-    comparativeData
-  } = session;
 
   const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
   const divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
@@ -104,7 +191,8 @@ export const getTagsIndic = (
       class: "primary"
     }])
   }
-}
+};
+
 
 const isBetter = (indic,value,reference,margin) => {
   const positiveImpact = ["eco","art","soc","knw"].includes(indic)
@@ -128,8 +216,7 @@ const isWorst = (indic,value,reference,margin) => {
 
 // Check if comparative data exists for a specific scale, series, and indicator.
 
-export const hasComparativeData = (session, scale, serie,indic) => 
-{
+export const hasComparativeData = (session, scale, serie, indic) => {
   const aggregates = [
     "production",
     "intermediateConsumptions",
