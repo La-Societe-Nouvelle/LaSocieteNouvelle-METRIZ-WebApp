@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 // Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
@@ -19,19 +19,19 @@ function TrendChart({
   historical,
   trend,
   target,
+  legalUnitTarget,
   aggregate,
   indic,
   isPrinting,
 }) {
   const [max, setMax] = useState(null);
-
   const legalUnitData = [];
 
   useEffect(() => {
     if (unit === "%") {
       setMax(getSuggestedMax(Math.max(...trend.map((o) => o.value))));
     }
-  }, [unit, trend]);
+  }, [unit, aggregate]);
 
   for (const period in aggregate) {
     const periodDetails = aggregate[period];
@@ -49,15 +49,24 @@ function TrendChart({
   const linearTarget = target.filter(
     (data) => data.path == "LIN" && data.flag == "f"
   );
-  const chartData = {
-    datasets: [
+
+  const chartData = useMemo(() => {
+    const datasets = [
       buildHistoricalDataset(historicalData),
       buildTrendDataset(trend, historicalData),
       buildTargetDataset(linearTarget, historicalData),
       buildLegalUnitLineDataset(legalUnitData),
-    ],
-  };
+    ];
 
+    if (legalUnitTarget) {
+      const customLegalUnitTarget = buildLegalUnitTargetdataset(legalUnitTarget);
+      datasets.push(customLegalUnitTarget);
+    }
+
+    return { datasets };
+  }, [historicalData, trend, linearTarget, legalUnitData, legalUnitTarget]);
+
+  
   const commonOptions = {
     devicePixelRatio: 2,
     maintainAspectRatio: isPrinting ? false : true,
@@ -255,6 +264,19 @@ function buildTargetDataset(target, historicalData) {
     backgroundColor: trendChartColors.target,
     borderWidth: 4,
     order: 4,
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}
+
+function buildLegalUnitTargetdataset(legalUnitTarget) {
+
+  return {
+    label: "Objectif personnalisé",
+    data: legalUnitTarget.map((item) => ({ x: item.year, y: item.value })),
+    borderColor: trendChartColors.legalunitTarget,
+    backgroundColor: trendChartColors.legalunitTarget,
+    borderWidth: 4,
     pointRadius: 0,
     tension: 0.3,
   };

@@ -2,7 +2,7 @@
 
 // React
 import React, { useState } from "react";
-import { Col,  Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import Select from "react-select";
 
 // Chart
@@ -13,14 +13,25 @@ import metaIndics from "/lib/indics";
 import metaTargets from "/lib/target";
 import metaTrends from "/lib/trend.json";
 
-
-// Select Style 
-import { customSelectStyles,graphSelectStyles } from "/config/customStyles";
+// Select Style
+import { graphSelectStyles } from "/config/customStyles";
 
 //
-import CustomTargetForm from "../components/CustomTargetForm";
+import TargetFormModal from "../components/TargetFormModal";
 
+import {
+  getMoreRecentYearlyPeriod,
+  getYearPeriod,
+} from "../../../../utils/periodsUtils";
 
+import {
+  calculateSimilarEffortTarget,
+  getClosestYearData,
+  getPeriodFootprint,
+  getLastBranchTargetData,
+  getTrend,
+  buildLinearPath,
+} from "../utils";
 
 /* ---------- EVOLUTION CURVES CONTAINER ---------- */
 
@@ -44,32 +55,151 @@ const graphOptions = [
   { label: "Valeur ajoutée nette", value: "netValueAdded" },
 ];
 
-const targetOptions = [
-  { label: "Performance de la branche", value: "target" },
-  { label: "Effort similaire à la branche", value: "" },
-  { label: "Objectif personnalisé", value: "customTarget" },
-];
-
 export const EvolutionCurvesVisual = ({ session, indic }) => {
   const { financialData, comparativeData, availablePeriods } = session;
+  const defaultPeriod = getMoreRecentYearlyPeriod(availablePeriods);
+  const periodYear = getYearPeriod(defaultPeriod);
 
-  const { unit } = metaIndics[indic];
+  const { unit, nbDecimals } = metaIndics[indic];
 
   const [showedAggregate, setShowedAggregate] = useState("production");
   const changeShowedAggregate = (selectedOption) => {
     setShowedAggregate(selectedOption.value);
   };
 
-  const [showedTarget, setShowedTarget] = useState("target");
-  const changeShowedTarget = (selectedOption) => {
-    setShowedTarget(selectedOption.value);
-  };
+  const [showFormModal, setShowFormModal] = useState(false);
 
-  const evolutionCurvesData = {
+  const evolutionCurves = {
     historical: comparativeData[showedAggregate].division.history.data[indic],
     trend: comparativeData[showedAggregate].division.trend.data[indic],
     target: comparativeData[showedAggregate].division.target.data[indic],
     aggregate: financialData.mainAggregates[showedAggregate].periodsData,
+    legalUnitTarget:
+      comparativeData[showedAggregate].legalUnit.target.data[indic] ?? [],
+  };
+
+  const [evolutionCurvesData, setEvolutionCurvesData] =
+    useState(evolutionCurves);
+
+  const handleTargetFormSubmit = async (
+    targetMode,
+    targetYear,
+    targetValue
+  ) => {
+    const periodFootprint = getPeriodFootprint(
+      financialData,
+      showedAggregate,
+      defaultPeriod,
+      indic
+    );
+    const currentFootprint = periodFootprint.value;
+
+    if (targetMode === "custom") {
+      handleCustomTarget(targetValue, targetYear, currentFootprint, targetMode);
+    } else if (targetMode === "industry") {
+      handleIndustryTarget(currentFootprint, periodYear, targetMode);
+    } else if (targetMode === "aligned") {
+      handleAlignedTarget(currentFootprint, periodYear, targetMode);
+    } else if (targetMode === "extend") {
+      handleExtendTarget(targetYear, targetMode);
+    }
+  };
+
+  const handleCustomTarget = async (
+    targetValue,
+    targetYear,
+    currentFootprint,
+    targetMode
+  ) => {
+    const values = await buildLinearPath(
+      periodYear,
+      currentFootprint,
+      targetYear,
+      targetValue,
+      targetMode
+    );
+
+    updateLegalUnitTarget(values);
+  };
+
+  const handleIndustryTarget = async (
+    currentFootprint,
+    periodYear,
+    targetMode
+  ) => {
+    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(evolutionCurves.target);
+
+    const values = await buildLinearPath(
+      periodYear,
+      currentFootprint,
+      lastTargetYear,
+      lastTargetValue,
+      targetMode
+    );
+
+    updateLegalUnitTarget(values);
+  };
+
+  const handleAlignedTarget = async (
+    currentFootprint,
+    periodYear,
+    targetMode
+  ) => {
+    const branchValue = getClosestYearData(
+      evolutionCurves.historical,
+      periodYear
+    );
+
+    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(evolutionCurves.target);
+
+    const similarEffortTarget = calculateSimilarEffortTarget(
+      currentFootprint,
+      branchValue.value,
+      lastTargetValue
+    );
+
+    const values = await buildLinearPath(
+      periodYear,
+      currentFootprint,
+      lastTargetYear,
+      similarEffortTarget,
+      targetMode
+    );
+
+    updateLegalUnitTarget(values);
+  };
+
+  const handleExtendTarget = async (targetYear, targetMode) => {
+    const footprints = [];
+
+    availablePeriods.forEach((period) => {
+      const footprint = getPeriodFootprint(
+        financialData,
+        showedAggregate,
+        period,
+        indic
+      );
+      footprint.year = getYearPeriod(period);
+
+      footprints.push(footprint);
+    });
+
+    const projectedValues = await getTrend(footprints, targetYear, targetMode);
+    updateLegalUnitTarget(projectedValues);
+  };
+
+  const updateLegalUnitTarget = (dataSeries) => {
+    comparativeData[showedAggregate].legalUnit.target.data = {
+      ...comparativeData[showedAggregate].legalUnit.target.data,
+      [indic]: dataSeries,
+    };
+
+    const updatedEvolutionCurvesData = {
+      ...evolutionCurvesData,
+      legalUnitTarget: dataSeries,
+    };
+
+    setEvolutionCurvesData(updatedEvolutionCurvesData);
   };
 
   return (
@@ -88,32 +218,23 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
               onChange={changeShowedAggregate}
             />
           </div>
+          <Button variant="secondary" onClick={() => setShowFormModal(true)}>
+            Définir un objectif
+          </Button>
 
-          <div className="d-flex flex-column my-4">
-            <label className="graph-label mb-2">
-              Selectionner un objectif pour l'unité légale :{" "}
-            </label>
-            <Select
-              styles={customSelectStyles("250px")}
-              defaultValue={targetOptions.find(
-                (option) => option.value == showedTarget
-              )}
-              options={targetOptions}
-              onChange={changeShowedTarget}
-            />
-          </div>
-      
-          <CustomTargetForm
-            aggregate={evolutionCurvesData.aggregate}
-            target={comparativeData[showedAggregate].legalUnit.target}
-            periods={availablePeriods}
+          {console.log("data", evolutionCurves)}
+          <TargetFormModal
+            showModal={showFormModal}
+            showBranchTargetMode={evolutionCurves.target.length > 0}
+            onClose={() => setShowFormModal(false)}
+            year={periodYear}
             indic={indic}
+            onSubmit={handleTargetFormSubmit}
           />
-
           <TrendChart
             id={`trend-${showedAggregate}-${indic}`}
             unit={unit}
-            {...evolutionCurvesData}
+            {...evolutionCurves}
             indic={indic}
             isPrinting={false}
           />

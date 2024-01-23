@@ -23,6 +23,7 @@ export const comparativeChartColors = {
     trend: "rgba(255, 182, 66, 1)",
     target : "rgba(255, 238, 200, 1)",
     legalunit : "rgba(250,89,95,1)",
+    legalunitTarget : "rgba(250,89,95,0.5)",
     previous : "rgba(250,89,95,0.5)",
     tooltipBackground: "rgba(25,21,88,0.9)",
   };

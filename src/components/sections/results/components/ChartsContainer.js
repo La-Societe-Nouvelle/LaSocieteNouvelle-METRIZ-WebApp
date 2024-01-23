@@ -100,7 +100,8 @@ const IndicatorCharts = ({
       </Row>
       <Row>
         <div className="trend-chart-container">
-          <TrendChart
+          {/* TO DO : CUSTOM TARGET */}
+          {/* <TrendChart
             id={`trend-chart-${indic}-print`}
             unit={indicators[indic].unit}
             historical={
@@ -115,7 +116,7 @@ const IndicatorCharts = ({
             aggregate={mainAggregates.production.periodsData}
             indic={indic}
             isPrinting={true}
-          />
+          /> */}
         </div>
       </Row>
       {(indicators[indic].type == "intensité" ||
