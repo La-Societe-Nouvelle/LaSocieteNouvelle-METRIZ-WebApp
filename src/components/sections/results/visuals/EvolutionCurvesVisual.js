@@ -106,8 +106,9 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     targetValue
   ) => {
 
- 
-    const currentFootprint = evolutionCurvesData.aggregate[defaultPeriod.periodKey].footprint.indicators[indic].value;
+    const currentFootprint = financialData.mainAggregates[showedAggregate].periodsData[defaultPeriod.periodKey].footprint.indicators[indic].value
+    
+    console.log(currentFootprint)
 
   // Switch based on the selected target mode
     switch (targetMode) {
@@ -208,7 +209,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     const footprints = availablePeriods.map((period) => {
      
       let footprint = {};
-      footprint.value = evolutionCurvesData.aggregate[period.periodKey].footprint.indicators[indic].value
+      footprint.value = evolutionCurves.aggregate[period.periodKey].footprint.indicators[indic].value
       footprint.year = getYearPeriod(period);
       return footprint;
     });
