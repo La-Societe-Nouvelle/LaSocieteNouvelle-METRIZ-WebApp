@@ -257,7 +257,7 @@ function mergeMissingYears(trendData, historicalData) {
 function buildTargetDataset(target, historicalData) {
   const targetData = mergeTargetData(target, historicalData);
   return {
-    label: "Objectif",
+    label: "Objectif de la branche",
     data: targetData.map((item) => ({ x: item.year, y: item.value })),
     skipNull: true,
     borderColor: trendChartColors.target,
@@ -272,7 +272,7 @@ function buildTargetDataset(target, historicalData) {
 function buildLegalUnitTargetdataset(legalUnitTarget) {
 
   return {
-    label: "Objectif personnalisé",
+    label: "Objectif de l'unité légale",
     data: legalUnitTarget.map((item) => ({ x: item.year, y: item.value })),
     borderColor: trendChartColors.legalunitTarget,
     backgroundColor: trendChartColors.legalunitTarget,

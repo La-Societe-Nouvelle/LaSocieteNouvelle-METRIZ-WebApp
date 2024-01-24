@@ -266,15 +266,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
             onSubmit={handleTargetFormSubmit}
           />
 
-          <TrendChart
-            id={`trend-${showedAggregate}-${indic}`}
-            unit={unit}
-            {...evolutionCurves}
-            indic={indic}
-            isPrinting={false}
-          />
-
-          <div className=" mt-5">
+          <div className="text-end mt-5">
             <Button
               variant="secondary"
               size="sm"
@@ -283,6 +275,16 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
               <i className="bi bi-graph-up-arrow"></i> Définir un objectif personnalisé
             </Button>
           </div>
+
+          <TrendChart
+            id={`trend-${showedAggregate}-${indic}`}
+            unit={unit}
+            {...evolutionCurves}
+            indic={indic}
+            isPrinting={false}
+          />
+
+        
         </div>
       </Col>
 
