@@ -19,74 +19,65 @@ export const getClosestYearData = (data, currentYear) => {
     : null;
 };
 
-export const getPeriodFootprint = (
-  financialData,
-  aggregate,
-  defaultPeriod,
-  indic
-) => {
-  return financialData.mainAggregates[aggregate].periodsData[
-    defaultPeriod.periodKey
-  ].footprint.indicators[indic];
-};
-
-export const getLastBranchTargetData = (targetData) => {
-  const lastTargetValue =
-    targetData.length > 0 ? targetData[targetData.length - 1].value : 0;
-  const lastTargetYear =
-    targetData.length > 0 ? targetData[targetData.length - 1].year : 2030;
+export const getLastIndustryTargetData = (targetData) => {
+  const lastTargetValue = targetData.length > 0 ? targetData[targetData.length - 1].value : 0;
+  const lastTargetYear = targetData.length > 0 ? targetData[targetData.length - 1].year : 2030;
 
   return { lastTargetValue, lastTargetYear };
 };
 
-export const calculateSimilarEffortTarget = (
+export const determineAlignedTargetValue = (
   currentValue,
   branchValue,
   targetYear
 ) => {
-  return currentValue >= branchValue
-    ? targetYear
-    : targetYear * (currentValue / branchValue);
+  return currentValue >= branchValue ? targetYear : targetYear * (currentValue / branchValue);
 };
 
+export async function projectTrendValues(footprints, targetYear, targetMode, decimals) {
 
-export async function getTrend(footprints, targetYear, targetMode) {
-  const years = footprints.map((footprint) => footprint.year);
-  const latestYear =  Math.max(...years.map(Number)).toString();
+  const currentYear = footprints[0].year;
+  const currentValue = footprints[0].value;
 
-  const secondLatestYear = footprints.length > 1 ?  Math.max(
-    ...years.filter((year) => year !== latestYear).map(Number)
-  ).toString() : latestYear;
+  const previousYear =  footprints[1].year;
+  const previousValue = footprints[1].value;
+
   const dataPoints = [
     [
-      parseInt(secondLatestYear),
-      footprints.find((f) => f.year === secondLatestYear).value,
+      parseInt(previousYear),
+      previousValue,
     ],
-    [parseInt(latestYear), footprints.find((f) => f.year === latestYear).value],
+    [
+      parseInt(currentYear),
+      currentValue,
+    ],
   ];
-
-  const allYears = Array.from(
-    { length: targetYear - secondLatestYear + 1 },
-    (_, index) => (parseInt(secondLatestYear) + index).toString()
-  );
 
   const result = regression.linear(dataPoints);
 
-  const projectedValues = allYears.map((year) => ({
-    value: result.predict(parseInt(year))[1].toFixed(1),
-    year: year,
-    target: targetMode,
-  }));
+  const projectedValues = [];
+
+  for (let year = parseInt(previousYear); year <= parseInt(targetYear); year++) {
+    const projectedValue  = result.predict(year)[1];
+
+    projectedValues.push({
+      value: projectedValue.toFixed(decimals),
+      year: year.toString(),
+      target: targetMode,
+    });
+  }
+
 
   return projectedValues;
 }
 
-export async function buildLinearPath(
+export async function interpolateLinearValues(
   startYear,
   startValue,
   endYear,
   endValue,
-  targetMode
+  targetMode,
+  decimals
 ) {
   const dataPoints = [
     [parseInt(startYear), startValue],
@@ -95,17 +86,17 @@ export async function buildLinearPath(
 
   const result = regression.linear(dataPoints);
 
-  const valuesBetweenPoints = [];
+  const interpolatedValues = [];
   for (let year = parseInt(startYear); year <= parseInt(endYear); year++) {
-    const projectedValue = result.predict(year)[1];
-    valuesBetweenPoints.push({
-      value: projectedValue.toFixed(1),
+    const interpolatedValue = result.predict(year)[1];
+    interpolatedValues.push({
+      value: interpolatedValue.toFixed(decimals),
       year: year.toString(),
       target: targetMode,
     });
   }
 
-  return valuesBetweenPoints;
+  return interpolatedValues;
 }
 
 export const downloadChartImage = (chartId, fileName) => {
