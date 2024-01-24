@@ -17,7 +17,7 @@ import metaTrends from "/lib/trend.json";
 import { graphSelectStyles } from "/config/customStyles";
 
 //
-import TargetFormModal from "../components/TargetFormModal";
+import TargetModeFormModal from "../components/TargetModeFormModal";
 
 import {
   getMoreRecentYearlyPeriod,
@@ -94,20 +94,20 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     );
     const currentFootprint = periodFootprint.value;
 
-    if (targetMode === "custom") {
-      handleCustomTarget(targetValue, targetYear, currentFootprint, targetMode);
-    } else if (targetMode === "industry") {
-      handleIndustryTarget(currentFootprint, periodYear, targetMode);
-    } else if (targetMode === "aligned") {
+    if (targetMode === "personalTarget") {
+      handlePersonnalTarget(targetValue, targetYear, currentFootprint, targetMode);
+    } else if (targetMode === "industryTarget") {
+      handleAlignedIndustryTarget(currentFootprint, periodYear, targetMode);
+    } else if (targetMode === "alignedIndustryTarget") {
       handleAlignedTarget(currentFootprint, periodYear, targetMode);
-    } else if (targetMode === "extend") {
+    } else if (targetMode === "extendTarget") {
       handleExtendTarget(targetYear, targetMode);
     }
 
     setShowFormModal(false);
   };
 
-  const handleCustomTarget = async (
+  const handlePersonnalTarget = async (
     targetValue,
     targetYear,
     currentFootprint,
@@ -124,12 +124,14 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     updateLegalUnitTarget(values);
   };
 
-  const handleIndustryTarget = async (
+  const handleAlignedIndustryTarget = async (
     currentFootprint,
     periodYear,
     targetMode
   ) => {
-    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(evolutionCurves.target);
+    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(
+      evolutionCurves.target
+    );
 
     const values = await buildLinearPath(
       periodYear,
@@ -152,7 +154,9 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       periodYear
     );
 
-    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(evolutionCurves.target);
+    const { lastTargetValue, lastTargetYear } = getLastBranchTargetData(
+      evolutionCurves.target
+    );
 
     const similarEffortTarget = calculateSimilarEffortTarget(
       currentFootprint,
@@ -221,21 +225,26 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
             />
           </div>
           <div className="text-end mt-5">
-            <Button variant="secondary" size="sm" onClick={() => setShowFormModal(true)}>
-            <i className="bi bi-graph-up-arrow"></i> Définir un objectif
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowFormModal(true)}
+            >
+              <i className="bi bi-graph-up-arrow"></i> Définir un objectif
+              personnalisé
             </Button>
-
           </div>
 
-          {console.log("data", evolutionCurves)}
-          <TargetFormModal
+          <TargetModeFormModal
             showModal={showFormModal}
-            showBranchTargetMode={evolutionCurves.target.length > 0}
+            showIndustryMode={evolutionCurves.target.length > 0}
+            legalUnitTarget={evolutionCurves.legalUnitTarget}
             onClose={() => setShowFormModal(false)}
-            year={periodYear}
+            currentPeriod={periodYear}
             indic={indic}
             onSubmit={handleTargetFormSubmit}
           />
+
           <TrendChart
             id={`trend-${showedAggregate}-${indic}`}
             unit={unit}
