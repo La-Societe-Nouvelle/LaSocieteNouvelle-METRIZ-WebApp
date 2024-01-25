@@ -1,6 +1,6 @@
 <h1 align="center">Metriz.lasocietenouvelle.org</h1>
 <p align="center">
-    <img src="https://lasocietenouvelle.org/logo.svg" height="100px">  
+    <img src="https://lasocietenouvelle.org/logo-La-Societe-Nouvelle.svg" height="100px">  
 </p>
 
 <p align="center">
