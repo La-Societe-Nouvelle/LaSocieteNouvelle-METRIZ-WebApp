@@ -17,18 +17,19 @@ import { buildSummaryReportIndexIndic } from "./reports/summaryReportGeneratorIn
 
 import { generateFootprintPDF } from "../../../../writers/Export";
 import { buildDataFile } from "./dataFiles/dataFileGenerator";
+import { getYearPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- DOWNLOADABLES FILES ---------- */
 
 /** Function to build files
  *  
- *  -> buildCompleteFiles (with all elements) :
+ *  -> buildCompleteZipFiles (with all elements) :
  *      - backup
  *      - ...
  * 
  */
 
-export async function buildCompleteFile({
+export async function buildCompleteZipFile({
   session,
   period,
   showAnalyses
@@ -37,9 +38,12 @@ export async function buildCompleteFile({
   const legalUnit = session.legalUnit.corporateName;
   const validations = session.validations[period.periodKey];
   
-  const year = period.periodKey.slice(2); // dangerous
+  const year = getYearPeriod(period);
+
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
   
+  const indicators = session.validations[period.periodKey];
+
   // Build zip ----------------------------------------
   
   const zip = new jsZip();
@@ -49,6 +53,8 @@ export async function buildCompleteFile({
     session,
     period,
     year,
+    indicators,
+    showStandardReports : true,
     showAnalyses
   });
 
@@ -82,29 +88,34 @@ export async function buildCompleteFile({
   zip.file(`session-metriz-${legalUnit.replaceAll(" ", "-")}.json`, sessionBlob);
 
 
-
   // Generate ZIP file containing the generated files and download the ZIP file
   let zipBlob = await zip.generateAsync({ type: "blob" });
 
   return zipBlob;
 }
 
-
-async function buildCompleteReport({
+export async function buildCompleteReport({
   session,
   period,
   year,
+  indicators,
+  showStandardReports,
   showAnalyses
 }) {
   try {
+
+
     // Report Cover
     const coverPage = generateReportCover(year, session.legalUnit.corporateName);
 
     // Generate standard reports and their blobs
-    const standardPDFs = await generateStandardReports(session, period,showAnalyses);
-
+    let standardPDFs = [];
+    if (showStandardReports) {
+      standardPDFs = await generateStandardReports(session, period,indicators,showAnalyses);
+    }
+    
     // Generate summary reports and their blobs
-    const summaryPDFs = await generateSummaryReports(session, period);
+    const summaryPDFs = await generateSummaryReports(session, period, indicators);
 
     // Merge all PDFs
     const completeReport = await generateMergedPDF([coverPage,...summaryPDFs, ...standardPDFs]);
@@ -120,10 +131,10 @@ async function buildCompleteReport({
   }
 }
 
-async function generateStandardReports(session, period,showAnalyses) {
-  const validation = session.validations[period.periodKey];
+
+async function generateStandardReports(session, period,indicators,showAnalyses) {
   const standardPDFs = await Promise.all(
-    validation.map(async (indic) => {
+    indicators.map(async (indic) => {
       const standardReport = await buildStandardReport({
         session,
         indic,
@@ -142,8 +153,7 @@ async function generateStandardReports(session, period,showAnalyses) {
   return standardPDFs;
 }
 
-async function generateSummaryReports(session, period) {
-  const validation = session.validations[period.periodKey];
+async function generateSummaryReports(session, period, indicators) {
   const reportGenerators = {
     proportion: buildSummaryReportContributionIndic,
     intensité: buildSummaryReportIntensityIndic,
@@ -151,7 +161,7 @@ async function generateSummaryReports(session, period) {
   };
 
   const reportPDFpromises = await Promise.all(
-    validation.map(async (indic) => {
+    indicators.map(async (indic) => {
       const { type } = metaIndics[indic];
       const reportFunction = reportGenerators[type];
 
@@ -173,7 +183,6 @@ async function generateSummaryReports(session, period) {
 
   return reportPDFpromises.filter(Boolean); // Filter out undefined values
 }
-
 
 async function generateMergedPDF(mergedPromises) {
   try {
