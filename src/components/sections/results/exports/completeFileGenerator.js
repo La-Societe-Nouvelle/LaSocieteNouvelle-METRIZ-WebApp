@@ -189,7 +189,6 @@ async function generateMergedPDF(mergedPromises) {
     const pdfBuffers  = await Promise.all(mergedPromises);
 
     const mergedPdfDoc = await PDFDocument.create();
-    mergedPdfDoc.setTitle("title");
 
     const fontBytes = await fetch(
       "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf"

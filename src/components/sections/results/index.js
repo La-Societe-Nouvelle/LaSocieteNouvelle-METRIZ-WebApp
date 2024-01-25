@@ -74,6 +74,7 @@ const Results = ({ session, period, publish, goBack }) => {
   };
 
   const handleGenerate = async ({ selectedIndicators, selectedFiles }) => {
+    setShowReportGeneratorModal(false);
     setIsGenerating(true);
 
     try {
@@ -103,14 +104,8 @@ const Results = ({ session, period, publish, goBack }) => {
         <div className="d-flex justify-content-between mb-4">
           <h2>Etape 5 - Empreinte Sociétale </h2>
           <div className="d-flex">
-            <ReportGeneratorModal
-              showModal={showReportGeneratorModal}
-              onClose={() => setShowReportGeneratorModal(false)}
-              onDownload={handleGenerate}
-              indicators={session.validations[period.periodKey]}
-            />
-
             <DownloadDropdown onDownload={handleDownload} view={showedView} />
+
             <Button
               variant="download"
               className="me-2"
@@ -118,6 +113,14 @@ const Results = ({ session, period, publish, goBack }) => {
             >
               <i className="bi bi-gear"></i> Générer un rapport
             </Button>
+
+            <ReportGeneratorModal
+              showModal={showReportGeneratorModal}
+              onClose={() => setShowReportGeneratorModal(false)}
+              onDownload={handleGenerate}
+              indicators={session.validations[period.periodKey]}
+            />
+
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats <i className="bi bi-chevron-right"></i>
             </Button>
@@ -368,11 +371,11 @@ const buildCustomizedReport = async (
   const year = getYearPeriod(period);
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
 
-  const PDFTitle = `Rapport-Empreinte-Sociétale_${legalUnitNameFile}_${year}.pdf`;
+  const PDFTitle = `Rapport-Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`;
 
   const showStandardReports = selectedFiles.includes("standardReports");
   const showAnalyses = selectedFiles.includes("with-analyses");
-  
+
   const PDFFile = await buildCompleteReport({
     session,
     period,
