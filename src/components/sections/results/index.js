@@ -107,7 +107,7 @@ const Results = ({ session, period, publish, goBack }) => {
             <DownloadDropdown onDownload={handleDownload} view={showedView} />
 
             <Button
-              variant="download"
+              variant="light"
               className="me-2"
               onClick={() => setShowReportGeneratorModal(true)}
             >
