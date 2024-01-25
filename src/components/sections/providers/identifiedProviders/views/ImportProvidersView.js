@@ -12,6 +12,7 @@ import {
   XLSXFileWriterFromJSON,
   processCSVCompaniesData,
 } from "../utils";
+import { triggerFileDownload } from "../../../../../utils/Utils";
 
 // Modals
 import { ProvidersImportSuccessModal } from "../modals/ProvidersImportSuccessModal";
@@ -125,10 +126,10 @@ const ImportProvidersView = ({
     );
     // Trigger the file download
     let blob = new Blob([file], { type: "application/octet-stream" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "fournisseurs.xlsx";
-    link.click();
+
+    await triggerFileDownload(blob,"fournisseurs.xlsx");
+
+  
   };
 
   return (
