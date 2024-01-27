@@ -29,15 +29,19 @@ export const ComparativeDataContainer = ({
               <VerticalBarChart
                 id={`${aggregate}-${indic}`}
                 session={session}
-                period={period}
-                aggregate={aggregate}
-                indic={indic}
-                printMode={false}
-                showDivisionData={true}
-                showAreaData={true}
-                showTargetData={true}
-                useIndicColors={false}
-                label={"Exercice"}
+                datasetOptions={{
+                  period,
+                  aggregate,
+                  indic
+                }}
+                printOptions={{
+                  printMode: false,
+                  showDivisionData: true,
+                  showAreaData: true,
+                  showTargetData: true,
+                  useIndicColors: false,
+                  label: "Exercice"
+                }}
               />
 
             </Col>

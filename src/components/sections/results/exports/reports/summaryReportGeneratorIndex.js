@@ -29,7 +29,7 @@ import {
 } from "../../../../../utils/exportsUtils";
 
 // Utils
-import { sortProvidersByImpact } from "../../utils";
+import { sortByImpact } from "../../utils";
 import { printValue } from "/src/utils/formatters";
 
 // PDF Config
@@ -854,11 +854,11 @@ function getImpactData(indic, providers) {
       provider.footprintStatus == 200 && provider.footprint.isValid()
   );
 
-  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
+  const topProviders = sortByImpact(providers, indic, "desc").slice(
     0,
     2
   );
-  const nextTopProviders = sortProvidersByImpact(
+  const nextTopProviders = sortByImpact(
     providers,
     indic,
     "desc"

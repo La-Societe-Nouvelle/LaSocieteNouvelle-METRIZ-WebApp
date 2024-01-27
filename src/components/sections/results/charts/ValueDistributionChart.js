@@ -4,76 +4,139 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
+Chart.register(ChartDataLabels);
 
-// Colors
-
-
+// Utils
 import { getAggregatesDistribution } from "./chartsUtils";
+
+// Styles
 import { aggregatesChartColors, prevAggregatesChartColors, tooltips } from "../../../../constants/chartColors";
+
+/* ---------- VALUE DISTRIBUTION CHART ---------- */
+
+/** Pie chart to show production distribution between main aggregates
+ *  
+ *  Args :
+ *    - id
+ *    - session
+ *    - datasetOptions
+ *    - printOptions
+ * 
+ *  datasetOptions :
+ *    - period
+ * 
+ *  printOptions :
+ *    - printMode -> to maintain aspect ratio
+ *    - shpwPreviousPeriod
+ * 
+ */
 
 export const ValueDistributionChart = ({
   id,
   session,
-  period,
-  prevPeriod,
-  printMode,
+  datasetOptions,
+  printOptions
 }) => {
-  const { financialData } = session;
 
+  // --------------------------------------------------
+  // Data
+
+  const chartData =buildChartData(session,datasetOptions);
+
+  // --------------------------------------------------
+  // Options
+
+  const chartOptions = buildChartOptions(printOptions);
+
+  // --------------------------------------------------
+
+  return (
+    <Doughnut 
+      id={id} 
+      data={chartData} 
+      options={chartOptions} 
+    />
+  );
+}
+
+// ################################################## DATASET ##################################################
+
+const buildChartData = (session,datasetOptions,printOptions) => 
+{
+  const { financialData } = session;
   const {
     intermediateConsumptions,
     fixedCapitalConsumptions,
     netValueAdded
   } = financialData.mainAggregates;
-
   const aggregates = [intermediateConsumptions,fixedCapitalConsumptions,netValueAdded];
 
-  const distribution = getAggregatesDistribution(aggregates,period.periodKey);
-  const labels = distribution.map((item) => item.label); 
-  const backgrounds =  distribution.map((item) => aggregatesChartColors[item.id]); 
- 
-  const data = {
-    labels: labels,
-    datasets: [],
-  };
+  const {
+    period
+  } = datasetOptions;
 
+  const {
+    showPreviousPeriod
+  } = printOptions;
 
-    // prev
+  const datasets = [];
+  const labels = [];
 
-  if (prevPeriod) {
+  // --------------------------------------------------
+  // Previous period
 
-    const prevDistribution = getAggregatesDistribution(aggregates,prevPeriod.periodKey);
-    const labels = prevDistribution.map((item) => item.label); 
-    const backgrounds = prevDistribution.map((item) => prevAggregatesChartColors[item.id]); 
+  if (showPreviousPeriod)
+  {
+    const prevPeriodDistribution = getAggregatesDistribution(aggregates,prevPeriod.periodKey);
    
-
-    const prevData = {
-      labels : labels,
-      data: prevDistribution.map(aggregate => aggregate.percentage),
+    const prevPeriodData = {
+      labels : prevPeriodDistribution.map((item) => item.label),
+      data: prevPeriodDistribution.map(aggregate => aggregate.percentage),
       borderWidth: 2,
-      backgroundColor: backgrounds,
+      backgroundColor: prevPeriodDistribution.map((item) => prevAggregatesChartColors[item.id]),
       weight: 0.4
     };
-    data.datasets.push(prevData);
-  }
 
-
-  const currentPeriod = {
-    data: distribution.map((aggregate) => aggregate.percentage),
-    borderWidth: 2,
-    backgroundColor: backgrounds,
+    datasets.push(prevPeriodData);
   };
 
-  data.datasets.push(currentPeriod);
+  // --------------------------------------------------
+  // Current period
 
-  const options = {
+  const currPeriodDistribution = getAggregatesDistribution(aggregates,period.periodKey);
+
+  const currentPeriod = {
+    labels: currPeriodDistribution.map((item) => item.label),
+    data: currPeriodDistribution.map((aggregate) => aggregate.percentage),
+    borderWidth: 2,
+    backgroundColor: currPeriodDistribution.map((item) => aggregatesChartColors[item.id]),
+  };
+
+  chartData.datasets.push(currentPeriod);
+
+  // --------------------------------------------------
+
+  const chartData = {
+    datasets: datasets,
+    labels: labels,
+  };
+
+  return chartData;
+}
+
+// ################################################## OPTIONS ##################################################
+
+const buildChartOptions = (printOptions) => 
+{
+  const {
+    printMode
+  } = printOptions;
+
+  const chartOptions = {
     devicePixelRatio: 2,
     maintainAspectRatio: printMode ? false : true,
-
     plugins: {
-  
       legend: {
         display: false,
       },
@@ -107,7 +170,6 @@ export const ValueDistributionChart = ({
           },
         },
       },
-
     },
     layout: {
       padding: {
@@ -119,7 +181,5 @@ export const ValueDistributionChart = ({
     },
   };
 
-  return <Doughnut id={id} data={data} options={options} />;
-};
-
-
+  return chartOptions;
+}

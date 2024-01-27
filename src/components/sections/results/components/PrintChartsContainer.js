@@ -10,7 +10,7 @@ import indicators from "/lib/indics";
 // Charts
 import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
-import HorizontalBarChart from "../charts/HorizontalBarChart";
+import { HorizontalBarChart } from "../charts/HorizontalBarChart";
 
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getPrevDate } from "../../../../utils/periodsUtils";
@@ -57,7 +57,6 @@ const IndicatorCharts = ({
 
   const {
     financialData,
-    comparativeData
   } = session;
 
   // Define the aggregates and their corresponding titles
@@ -93,10 +92,10 @@ const IndicatorCharts = ({
               indic
             })}
             {renderSigCharts(
-             mainAggregates[aggregate],
+              session,
+              mainAggregates[aggregate],
               indic,
               period,
-              prevPeriod,
               `sig-chart-${aggregate}-${indic}-print`,
             )}
           </React.Fragment>
@@ -106,19 +105,14 @@ const IndicatorCharts = ({
         <div className="trend-chart-container">
           <TrendChart
             id={`trend-chart-${indic}-print`}
-            unit={indicators[indic].unit}
-            historical={
-              comparativeData["production"].division.history.data[indic]
-            }
-            trend={
-              comparativeData["production"].division.trend.data[indic]
-            }
-            target={
-              comparativeData["production"].division.target.data[indic]
-            }
-            aggregate={mainAggregates.production.periodsData}
-            indic={indic}
-            printMode={true}
+            session={session}
+            datasetOptions={{
+              aggregate: "production",
+              indic
+            }}
+            printOptions={{
+              printMode: true
+            }}
           />
         </div>
       </Row>
@@ -129,9 +123,13 @@ const IndicatorCharts = ({
             <HorizontalBarChart
               id={`deviation-chart-${indic}-print`}
               session={session}
-              period={period}
-              indic={indic}
-              printMode={true}
+              datasetOptions={{
+                period,
+                indic
+              }}
+              printOptions={{
+                printMode: true
+              }}
             />
           </div>
         </Row>
@@ -143,9 +141,14 @@ const IndicatorCharts = ({
           <GrossImpactChart
             id={`gross-impact-chart-${indic}-print`}
             session={session}
-            period={period}
-            indic={indic}
-            printMode={true}/>
+            datasetOptions={{
+              period,
+              indic
+            }}
+            printOptions={{
+              printMode: true
+            }}
+          />
         </div>
       )}
     </div>
@@ -164,15 +167,19 @@ const renderComparativeCharts = ({
       <VerticalBarChart
         id={chartId}
         session={session}
-        period={period}
-        aggregate={aggregate}
-        indic={indic}
-        printMode={true}
-        showDivisionData={true}
-        showAreaData={true}
-        showTargetData={true}
-        useIndicColors={false}
-        label={"Production"}
+        datasetOptions={{
+          period,
+          aggregate,
+          indic
+        }}
+        printOptions={{
+          printMode: true,
+          showDivisionData: true,
+          showAreaData: true,
+          showTargetData: true,
+          useIndicColors: false,
+          label: "Production"
+        }}
       />
     </div>
   );
@@ -181,19 +188,23 @@ const renderComparativeCharts = ({
   /* --------- SIG Footprints charts ----------  */
 }
 
-const renderSigCharts = (aggregate, indic, period, prevPeriod, id) => {
+const renderSigCharts = (session, aggregate, indic, period, id) => {
   return (
     <>
       {indicators[indic].type == "proportion" && (
         <div key={id} className="doughnut-chart-container">
           <SigPieChart
-            aggregate={aggregate}
-            indic={indic}
-            period={period}
-            prevPeriod={prevPeriod}
             id={id}
-            showPreviousData={false}
-            printMode={true}
+            session={session}
+            datasetOptions={{
+              aggregate,
+              indic,
+              period
+            }}
+            printOptions={{
+              showPreviousData: false,
+              printMode: true
+            }}
           />
         </div>
       )}

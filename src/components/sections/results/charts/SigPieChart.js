@@ -1,13 +1,19 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
+
 // Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import ChartAnnotation from "chartjs-plugin-annotation";
-Chart.register(ChartDataLabels, ChartAnnotation);
 import { Doughnut } from "react-chartjs-2";
+Chart.register(ChartDataLabels, ChartAnnotation);
 
-// Colors
+// Utils
+import { getPrevPeriod } from "../../../../utils/periodsUtils";
 
+// Styles
 import {
   colors,
   prevAggregatesChartColors,
@@ -15,18 +21,101 @@ import {
   tooltips,
 } from "../../../../constants/chartColors";
 
-function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData, printMode }) {
+/* ---------- SIG PIE CHART ---------- */
 
+/** ... add description
+ *  
+ *  Args :
+ *    - id
+ *    - session
+ *    - datasetOptions
+ *    - printOptions
+ * 
+ *  datasetOptions :
+ *    - period
+ *    - aggregate
+ *    - indic
+ * 
+ *  printOptions :
+ *    - showPreviousData
+ *    - printMode
+ * 
+ */
+
+export const SigPieChart = ({ 
+  id,
+  session,
+  datasetOption,
+  printOptions
+}) => {
+
+  // --------------------------------------------------
+  // Data
+
+  const chartData = buildChartData(
+    session,
+    datasetOption
+  );
+
+  // --------------------------------------------------
+  // Options
+
+  const chartOptions = buildChartOptions(
+    printOptions
+  );
+
+  // --------------------------------------------------
+
+  return (
+    <Doughnut 
+      id={id} 
+      data={chartData} 
+      options={chartOptions} 
+    />
+  );
+}
+
+// ################################################## DATASET ##################################################
+
+const buildChartData = (
+  session,
+  datasetOptions,
+  printOptions
+) => {
+
+  const {
+    availablePeriods,
+    financialData
+  } = session;
   
-  const value = aggregate.periodsData[period.periodKey].footprint.indicators[indic].value;
+  const {
+    period,
+    aggregate,
+    indic
+  } = datasetOptions;
+  
+  const {
+    showPreviousData
+  } = printOptions;
 
-  const prevValue = showPreviousData ? (prevPeriod ? aggregate.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : null) : null;
-
+  const aggregateData = financialData.mainAggregates[aggregate];
+  
   const datasets = [];
+  const labels = [];
+  
+  // --------------------------------------------------
+  // prev period
+  
+  if (showPreviousData)
+  {
+    const prevPeriod = getPrevPeriod(availablePeriods,period);
+    const prevValue = aggregateData.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value;
 
-  if (showPreviousData && prevValue !== null) {
     datasets.push({
-      data: [prevValue, 100 - prevValue],
+      data: [
+        prevValue, 
+        100 - prevValue
+      ],
       datalabels: { display: false },
       borderWidth: 2,
       backgroundColor: [
@@ -36,10 +125,18 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
       weight: 0.3,
     });
   }
-
+  labels.push(aggregateData.label);
   
+  // --------------------------------------------------
+  // current period
+  
+  const value = aggregateData.periodsData[period.periodKey].footprint.indicators[indic].value;
+
   datasets.push({
-    data: [value, 100 - value],
+    data: [
+      value, 
+      100 - value
+    ],
     datalabels: { display: false },
     borderWidth: 2,
     backgroundColor: [
@@ -47,14 +144,31 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
       "rgb(247, 247, 247)",
     ],
   });
+  labels.push("");
 
+  // --------------------------------------------------
 
-  const data = {
-    labels: [aggregate.label, ""],
-    datasets: datasets,
+  const chartData = {
+    datasets,
+    labels,
   };
 
-  const options = {
+  return chartData;
+}
+
+// ################################################## OPTIONS ##################################################
+
+const buildChartOptions = (printOptions,datasetOptions) => 
+{
+  const {
+    period
+  } = datasetOptions;
+
+  const {
+    printMode
+  } = printOptions;
+
+  const chartOptions = {
     hover: { mode: null },
     scales: {
       x: {
@@ -69,12 +183,10 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
       legend: {
         display: false,
       },
-
       annotation: {
         annotations: [
           {
             type: "label",
-
             xScaleID: "x-axis-0",
             content: value + "%", 
             color: colors.textColor,
@@ -86,7 +198,6 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
           },
         ],
       },
-
       tooltip: {
         backgroundColor: tooltips.tooltipBackground,
         cornerRadius: 2,
@@ -108,7 +219,5 @@ function SigPieChart({ aggregate, indic, period, prevPeriod, id,showPreviousData
     },
   };
 
-  return <Doughnut id={id} data={data} options={options} />;
+  return chartOptions;
 }
-
-export default SigPieChart;

@@ -143,7 +143,7 @@ export function getMostImpactfulExpensesPart(expenses, total, indic) {
 }
 
 
-export function sortProvidersByImpact(expensesAccounts, indicator, order) {
+export function sortByImpact(expensesAccounts, indicator, order) {
 
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);

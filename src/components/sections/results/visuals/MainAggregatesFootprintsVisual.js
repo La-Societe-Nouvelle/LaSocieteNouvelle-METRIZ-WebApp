@@ -32,13 +32,17 @@ export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
         <div className="sig-piechart-container">
           
           <SigPieChart
-            aggregate={aggregate}
-            indic={indic}
-            period={period}
-            prevPeriod={prevPeriod}
             id={id}
-            showPreviousData={true}
-            printMode={false}
+            session={session}
+            datasetOptions={{
+              aggregate,
+              indic,
+              period
+            }}
+            printOptions={{
+              showPreviousData: true,
+              printMode: false
+            }}
           />
         </div>
       </Col>
@@ -53,9 +57,13 @@ export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
           <ValueDistributionChart
             id={"part-" + indic}
             session={session}
-            period={period}
-            prevPeriod={prevPeriod}
-            printMode={false}
+            datasetOptions={{
+              period
+            }}
+            printOptions={{
+              showPreviousData: true,
+              printMode: false
+            }}
           />
         </Col>
         <Col>

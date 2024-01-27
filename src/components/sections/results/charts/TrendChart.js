@@ -1,161 +1,307 @@
+// La Société Nouvelle
+
+// React
 import React, { useEffect, useState } from "react";
-// Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
+Chart.register(ChartDataLabels);
 
 // Utils
 import { getMaxY } from "./chartsUtils";
 
-// Colors
+// Lib
+import metaIndics from "/lib/indics";
+
+// Styles
 import { trendChartColors } from "../../../../constants/chartColors";
 import { colors } from "../../../../constants/chartColors";
 
-function TrendChart({
-  historical,
-  trend,
-  target,
-  unit,
-  aggregate,
-  indic,
+/* ---------- TREND CHART ---------- */
+
+/** Chart to show evolution through years
+ *  
+ *  Args :
+ *    - id
+ *    - session
+ *    - datasetOptions
+ *    - printOptions
+ * 
+ *  datasetOptions :
+ *    - aggregate
+ *    - indic
+ * 
+ *  printOptions :
+ *    - printMode -> to maintain aspect ratio
+ * 
+ */
+
+export const TrendChart = ({
   id,
-  printMode,
-}) {
-  const linearTarget = target.filter(
-    (data) => data.path == "LIN" && data.flag == "f"
+  session,
+  datasetOptions,
+  printOptions
+}) => {
+
+  // --------------------------------------------------
+  // Data
+
+  const chartData = buildChartData(
+    session,
+    datasetOptions
   );
 
-  const legalUnitData = [];
+  // --------------------------------------------------
+  // Options
 
-  for (const period in aggregate) {
-    const periodDetails = aggregate[period];
-    legalUnitData.push({
+  const chartOptions = buildChartOptions(
+    printOptions,
+    datasetOptions,
+    chartData
+  );
+
+  // --------------------------------------------------
+
+  return (
+    <Line 
+      id={id} 
+      data={chartData} 
+      options={chartOptions}
+    />
+  );
+}
+
+// ################################################## DATASET ##################################################
+
+const buildChartData = (session,datasetOptions) => 
+{
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
+  const {
+    aggregate,
+    indic
+  } = datasetOptions;
+
+  const datasets = [];
+  const labels = [];
+
+  // --------------------------------------------------
+  // Legal unit situation & evolution
+
+  const legalUnitData = buildLegalUnitData(
+    financialData,
+    aggregate,
+    indic
+  );
+  const legalUnitSituationDataset = {
+    label: "Situation",
+    type: "bubble",
+    data: legalUnitData,
+    backgroundColor: trendChartColors.legalunit,
+    borderColor: trendChartColors.legalunit,
+    borderWidth: 4,
+    order: 1,
+    tooltip: {
+      enabled: true,
+    },
+  };
+  datasets.push(legalUnitSituationDataset);
+
+  const legalunitEvolutionDataset = {
+    data: legalUnitData,
+    type: "line",
+    borderColor: trendChartColors.legalunit,
+    fill: false,
+    tooltip: {
+      enabled: false,
+    },
+  };
+  datasets.push(legalunitEvolutionDataset);
+
+  // --------------------------------------------------
+  // Division - Historical
+
+  const branchHistoricalData = buildBranchHistoricalData = (
+    comparativeData,
+    aggregate,
+    indic
+  );
+  const branchHistoricalDataset = {
+    label: "Historique",
+    data: branchHistoricalData.map((item) => ({
+      x: item.year,
+      y: item.value,
+    })),
+    borderColor: trendChartColors.trend,
+    backgroundColor: trendChartColors.trend,
+    order: 2,
+    borderWidth: 4,
+    tension: 0.3,
+  };
+  datasets.push(branchHistoricalDataset);
+
+  // --------------------------------------------------
+  // Division - Trend
+
+  if (branchHistoricalData.length > 0)
+  {
+    const branchTrendData = buildBranchTrendData(
+      comparativeData,
+      aggregate,
+      indic,
+      branchHistoricalData
+    );
+    const branchTrendDataset ={
+      label: "Tendance",
+      data: branchTrendData.map((data) => ({ 
+        x: data.year, 
+        y: data.value 
+      })),
+      borderColor: trendChartColors.trend,
+      backgroundColor: trendChartColors.trend,
+      borderWidth: 4,
+      borderDash: [12, 6],
+      order: 3,
+      tension: 0.3,
+    };
+    datasets.push(branchTrendDataset);
+  }
+
+  // --------------------------------------------------
+  // Division - Target
+
+  if (branchHistoricalData.length > 0)
+  {
+    const branchTargetData = buildBranchTargetData(
+      comparativeData,
+      aggregate,
+      indic,
+      branchHistoricalData
+    );
+    const branchTargetDataset = {
+      label: "Objectif",
+      data: branchTargetData.map((data) => ({ 
+        x: data.year, 
+        y: data.value
+      })),
+      skipNull: true,
+      borderColor: trendChartColors.target,
+      backgroundColor: trendChartColors.target,
+      borderWidth: 4,
+      order: 4,
+      tension: 0.3,
+    };
+    datasets.push(branchTargetDataset);
+  }
+
+  // --------------------------------------------------
+
+  const chartData = {
+    datasets,
+    labels
+  };
+
+  return chartData;
+}
+
+const buildLegalUnitData = (
+  financialData,
+  aggregate,
+  indic
+) => {
+
+  const data = [];
+
+  const aggregateData = financialData.mainAggregates[aggregate].periodsData;
+
+  for (const period in aggregateData) {
+    const periodDetails = aggregateData[period];
+    data.push({
       x: period.slice(2),
       y: periodDetails.footprint.indicators[indic].value,
       r: 5,
     });
   }
+  
+  return data;
+}
 
-  const filteredHistorical = historical.filter(
-    (data) => data.currency != "EUR2022" && data.year >= legalUnitData[0].x - 10
-  );
+const buildBranchHistoricalData = (
+  comparativeData,
+  aggregate,
+  indic
+) => {
 
-  let updatedTrend = trend;
+  const currency = ["ghg"].includes(indic) ? "CPEUR" : "NA";
+  
+  const data = comparativeData[aggregate].division.history.data[indic]
+    .filter((data) => data.currency == currency)
+    .sort((a, b) => a.year - b.year);
 
-  if (
-    filteredHistorical.length > 0 &&
-    trend.length > 0 &&
-    filteredHistorical.at(-1).year !== trend[0].year
-  ) {
-    let firstYearTrend = trend.at(0).year;
-    let lastYearHistorical = filteredHistorical.at(-1).year;
-    updatedTrend = [
-      ...trend,
-      ...filteredHistorical.filter(
-        (data) => data.year >= lastYearHistorical && data.year < firstYearTrend
-      ),
-    ].sort((a, b) => a.year - b.year);
-  }
+  return data;
+}
 
-  let updatedTarget = linearTarget;
+const buildBranchTrendData = (
+  comparativeData,
+  aggregate,
+  indic,
+  historicalData
+) => {
 
-  if (
-    filteredHistorical.length > 0 &&
-    linearTarget.length > 0 &&
-    filteredHistorical.at(-1).year !== linearTarget[0].year
-  ) {
-    let lastYearHistorical = filteredHistorical.at(-1).year;
-    let firstYearTarget = linearTarget
-      .filter((data) => data.year > lastYearHistorical)
-      .at(0).year;
-    updatedTarget = [
-      ...linearTarget.filter((data) => data.year > lastYearHistorical),
-      ...filteredHistorical.filter(
-        (data) => data.year >= lastYearHistorical && data.year < firstYearTarget
-      ),
-    ].sort((a, b) => a.year - b.year);
-  }
+  let lastYearHistoricalData = historicalData.at(-1).year;
 
-// Determine Y-Axis Max
-  const targetValues = extractValues(target);
-  const trendValues = extractValues(trend);
-  const historicalValues = extractValues(historical);
+  let data = comparativeData[aggregate].division.trend.data[indic]
+    .filter((item) => item.year >= lastYearHistoricalData)
+    .sort((a, b) => a.year - b.year);
 
-  const legalUnitValues = legalUnitData.map((data) => data.y);
+  return data;
+}
 
-  const maxY = unit === "%" ? getMaxY([
-          targetValues,
-          trendValues,
-          historicalValues,
-          legalUnitValues,
-        ])
-      : null;
+const buildBranchTargetData = (
+  comparativeData,
+  aggregate,
+  indic,
+  historicalData
+) => {
 
-  const chartData = {
-    datasets: [
-      {
-        label: "Historique",
-        data: filteredHistorical.map((data) => ({
-          x: data.year,
-          y: data.value,
-        })),
-        borderColor: trendChartColors.trend,
-        backgroundColor: trendChartColors.trend,
-        order: 2,
-        borderWidth: 4,
-        tension: 0.3,
-      },
-      {
-        label: "Tendance",
-        data: updatedTrend.map((data) => ({ x: data.year, y: data.value })),
-        borderColor: trendChartColors.trend,
-        backgroundColor: trendChartColors.trend,
-        borderWidth: 4,
-        borderDash: [12, 6],
-        order: 3,
-        tension: 0.3,
-      },
-      {
-        label: "Objectif",
-        data: updatedTarget.map((data) => ({ x: data.year, y: data.value })),
-        skipNull: true,
-        borderColor: trendChartColors.target,
-        backgroundColor: trendChartColors.target,
-        borderWidth: 4,
-        order: 4,
-        tension: 0.3,
-      },
-      {
-        label: "Situation",
-        type: "bubble",
-        data: legalUnitData,
-        backgroundColor: trendChartColors.legalunit,
-        borderColor: trendChartColors.legalunit,
-        borderWidth: 4,
-        order: 1,
-        tooltip: {
-          enabled: true,
-        },
-      },
-      {
-        data: legalUnitData,
-        type: "line",
-        borderColor: trendChartColors.legalunit,
-        fill: false,
-        tooltip: {
-          enabled: false,
-        },
-      },
-    ],
-  };
+  const path = "LIN";
 
-  const commonOptions = {
+  let lastYearHistoricalData = historicalData.at(-1).year;
+
+  const data = comparativeData[aggregate].division.target.data[indic]
+    .filter((item) => item.path == path)
+    .filter((item) => item.year >= lastYearHistoricalData)
+    .sort((a, b) => a.year - b.year);
+
+  return data;
+}
+
+// ################################################## OPTIONS ##################################################
+
+const buildChartOptions = (printOptions,datasetOptions,chartData) => 
+{
+  const {
+    printMode
+  } = printOptions;
+
+  const {
+    indic
+  } = datasetOptions;
+
+  const values = chartData.datasets
+    .map((dataset) => dataset.data)
+    .flat()
+    .map((item) => item.y);
+  const maxY = metaIndics[indic].unit === "%" ? getMaxY(values) : null;
+
+  const chartOptions = {
     devicePixelRatio: 2,
     maintainAspectRatio: printMode ? false : true,
     pointRadius: 0,
-
     scales: {
       y: {
         min: 0,
@@ -194,7 +340,6 @@ function TrendChart({
         },
       },
     },
-
     plugins: {
       legend: {
         display: true,
@@ -289,9 +434,5 @@ function TrendChart({
     },
   };
 
-  return <Line data={chartData} id={id} options={{ ...commonOptions }} />;
+  return chartOptions;
 }
-
-const extractValues = (data) => data.map((item) => item.value);
-
-export default TrendChart;

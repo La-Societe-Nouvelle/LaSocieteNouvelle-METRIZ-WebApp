@@ -8,115 +8,287 @@ import { Bar } from "react-chartjs-2";
 // Libraries
 import metaIndics from "/lib/indics";
 
-import { comparativeChartColors } from "../../../../constants/chartColors";
-
-// utils
+// Utils
 import { printValue } from "/src/utils/formatters";
 import { getMaxY, changeOpacity } from "./chartsUtils";
+
+// Styles
+import { comparativeChartColors } from "../../../../constants/chartColors";
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
 /** Bar chart to compare footprint with macro & branch
- *
- *  Args :
- *    - id
- *    - session
+ * 
+ *  datasetOptions :
  *    - period
  *    - aggregate
  *    - indic
+ * 
+ *  printOptions :
  *    - printMode -> use in report
- *    - showDivisionData
  *    - showAreaData
+ *    - showDivisionData
  *    - showTargetData
  *    - useIndicColors
  *    - label
+ * 
  */
 
 export const VerticalBarChart = ({
   id,
   session,
-  period,
-  aggregate,
-  indic,
-  printMode,
-  showDivisionData,
-  showAreaData,
-  showTargetData,
-  useIndicColors,
-  label,
+  datasetOptions,
+  printOptions
 }) => {
-  const { unit, nbDecimals } = metaIndics[indic];
-  // Datasets --------------------------------------------------------------
 
-  const { financialData, comparativeData } = session;
+  // --------------------------------------------------
+  // Data
+
+  const chartData = buildChartData(session,datasetOptions,printOptions);
+
+  // --------------------------------------------------
+  // Options
+
+  const chartOptions = buildChartOptions(printOptions);
+
+  // --------------------------------------------------
+
+  return (
+    <Bar
+      id={id}
+      data={chartData}
+      options={chartOptions}
+    />
+  );
+};
+
+// ################################################## DATASET ##################################################
+
+const buildChartData = (session,datasetOptions,printOptions) => 
+{
+  const { 
+    financialData, 
+    comparativeData 
+  } = session;
   const mainAggregates = financialData.mainAggregates;
 
-  // targets dataset
-  const { dataset_target, targetBackgroundColors } = generateTargetDataset(
-    comparativeData,
-    aggregate,
+  const {
     indic,
-    showAreaData,
-    showDivisionData
-  );
+    aggregate,
+    period
+  } = datasetOptions;
 
-  // current footprints dataset
-  const { dataset_currentFootprints, labels, backgroundColors } = generateCurrentFootprintsDataset(
+  const {
+    showAreaData,
+    showDivisionData,
+    showTargetData,
+    useIndicColors,
+    label
+  } = printOptions;
+
+  const datasets = [];
+  const labels = [
+    "France",
+    label,
+    "Branche"  
+  ];
+
+  // --------------------------------------------------
+  // footprint dataset
+
+  const footprintDataset = {
+    label: "Empreinte " + period.periodKey,
+    data: buildFootprintData(
       comparativeData,
       aggregate,
       indic,
-      useIndicColors,
       showAreaData,
       showDivisionData,
       mainAggregates,
       period,
-      label
-    );
+    ),
+    skipNull: true,
+    backgroundColor: buildFootprintBackgroundColors(
+      indic,
+      useIndicColors,
+      showAreaData,
+      showDivisionData,
+    ),
+    borderWidth: 0,
+    type: "bar",
+    barPercentage: 0.6,
+    categoryPercentage: 0.6,
+    minBarLength: 2,
+  };
 
-  // Datasets
+  datasets.push(footprintDataset);
 
-  const datasets = [
-    {
-      label: "Empreinte " + period.periodKey,
-      data: dataset_currentFootprints,
-      skipNull: true,
-      backgroundColor: backgroundColors,
-      borderWidth: 0,
-      type: "bar",
-      barPercentage: 0.6,
-      categoryPercentage: 0.6,
-      minBarLength: 2,
-    },
-  ];
+  // --------------------------------------------------
+  // target dataset
 
   if (showTargetData)
-    datasets.push({
+  {
+    const targetDataset = {
       label: "Objectif 2030",
-      data: dataset_target,
+      data: buildTargetData(
+        comparativeData,
+        aggregate,
+        indic,
+        showAreaData,
+        showDivisionData
+      ),
       skipNull: true,
-      backgroundColor: targetBackgroundColors,
+      backgroundColor: buildTargetBackgroundColors(
+        showAreaData,
+        showDivisionData
+      ),
       borderWidth: 0,
       barPercentage: 0.6,
       categoryPercentage: 0.6,
       minBarLength: 2,
-    });
+    }
 
-  // Data for chart --------------------------------------------------------
+    datasets.push(targetDataset);
+  }
+
+  // --------------------------------------------------
+  
+  const chartData = {
+    datasets,
+    labels,
+  };
+  
+  return chartData;
+}
+
+const buildFootprintData = (
+  comparativeData,
+  aggregate,
+  indic,
+  showAreaData,
+  showDivisionData,
+  mainAggregates,
+  period,
+) => {
+
+  const data = [];
+
+  // Footprint area
+  if (showAreaData) {
+    let areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0]?.value;
+    data.push(areaValue);
+  }
+
+  // Footprint legal unit
+  let legalUnitValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic]?.value;
+  data.push(legalUnitValue);
+
+  // Footprint division
+  if (showDivisionData) {
+    let divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
+    data.push(divisionValue);
+  }
+
+  return data;
+}
+
+const buildFootprintBackgroundColors = (
+  indic,
+  useIndicColors,
+  showAreaData,
+  showDivisionData,
+) => {
+
+  const { color: indicColor } = metaIndics[indic];
+
+  const backgroundColors = [];
+
+  // Footprint area
+  if (showAreaData) {
+    backgroundColors.push(comparativeChartColors.area);
+  }
+
+  // Footprint legal unit
+  let legalUnitBackgroundColor = useIndicColors ? indicColor : comparativeChartColors.legalunit;
+  backgroundColors.push(legalUnitBackgroundColor);
+
+  // Footprint division
+  if (showDivisionData) {
+    let divisionBackgroundColor = useIndicColors ? changeOpacity(indicColor, 0.3) : comparativeChartColors.branch;
+    backgroundColors.push(divisionBackgroundColor);
+  }
+
+  return backgroundColors;
+}
+
+const buildTargetData = (
+  comparativeData,
+  aggregate,
+  indic,
+  showAreaData,
+  showDivisionData
+) => {
+
+  const data = [];
+
+  // Target area
+  if (showAreaData) {
+    let areaTargetValue = comparativeData[aggregate].area.target.data[indic].slice(-1)[0]?.value;
+    data.push(areaTargetValue);
+  } 
+
+  // Target legal unit
+  data.push(null); 
+
+  // Target division
+  if (showDivisionData) {
+    let divisionTargetValue = comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value;
+    data.push(divisionTargetValue);
+  }
+
+  return data;
+}
+
+const buildTargetBackgroundColors = (
+  showAreaData,
+  showDivisionData
+) => {
+
+  const backgroundColors = [];
+
+  // Target area
+  if (showAreaData) {
+    backgroundColors.push(comparativeChartColors.targetarea);
+  } 
+
+  // Target legal unit
+  backgroundColors.push(null);
+
+  // Target division
+  if (showDivisionData) {
+    backgroundColors.push(comparativeChartColors.targetbranch);
+  }
+
+  return backgroundColors;
+}
+
+// ################################################## OPTIONS ##################################################
+
+const buildChartOptions = (printOptions) => 
+{
+  const {
+    printMode,
+    showTargetData
+  } = printOptions;
 
   // Determine Y-Axis Max
   const datasetsForMaxY  = showTargetData
-  ? [dataset_currentFootprints, dataset_target]
-  : [dataset_currentFootprints];
+  ? [footprintDataset, targetDataset]
+  : [footprintDataset];
   
   const maxY = unit === "%" ? getMaxY(datasetsForMaxY) : null;
 
-  const chartData = {
-    labels: labels,
-    datasets: datasets,
-  };
-
-  // Options
-  const commonOptions = {
+  const chartOptions = {
     responsive: true,
     devicePixelRatio: 2,
     aspectRatio: 1,
@@ -199,103 +371,5 @@ export const VerticalBarChart = ({
     },
   };
 
-  return (
-    <Bar
-      id={id}
-      data={chartData}
-      options={{
-        ...commonOptions,
-      }}
-    />
-  );
-};
-
-const generateCurrentFootprintsDataset = (
-  comparativeData,
-  aggregate,
-  indic,
-  useIndicColors,
-  showAreaData,
-  showDivisionData,
-  mainAggregates,
-  period,
-  label
-) => {
-
-  // To do : récupérer les données correspondant à la période analysée
-  
-  const dataset_currentFootprints = [];
-  const backgroundColors = [];
-  const labels = [];
-  const indicColor = metaIndics[indic].color;
-  const branchIndicColor = changeOpacity(indicColor, 0.3);
-
-  // Area Footprint
-  if (showAreaData) {
-    let areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0]?.value;
-    dataset_currentFootprints.push(areaValue);
-    labels.push("France");
-
-    
-    backgroundColors.push(comparativeChartColors.area);
-  }
-  // Legal Unit Footprint
-
-  let legalUnitValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic]?.value;
-  dataset_currentFootprints.push(legalUnitValue);
-  labels.push(label);
-
-  if (useIndicColors) {
-    backgroundColors.push(indicColor);
-  } else {
-    backgroundColors.push(comparativeChartColors.legalunit);
-  }
-
-  // Division Footprint
-
-  if (showDivisionData) {
-    let divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
-    
-    dataset_currentFootprints.push(divisionValue);
-    labels.push("Branche");
-
-    if (useIndicColors) {
-      backgroundColors.push(branchIndicColor);
-    } else {
-      backgroundColors.push(comparativeChartColors.branch);
-    }
-  }
-
-  return { dataset_currentFootprints, labels, backgroundColors };
-};
-
-const generateTargetDataset = (
-  comparativeData,
-  aggregate,
-  indic,
-  showAreaData,
-  showDivisionData
-) => {
-  const dataset_target = [];
-  const targetBackgroundColors = [];
-
-  // Area Target
-  let areaTargetValue = showAreaData
-    ? comparativeData[aggregate].area.target.data[indic].slice(-1)[0]?.value
-    : null;
-  dataset_target.push(areaTargetValue);
-  targetBackgroundColors.push(comparativeChartColors.targetarea);
-
-  //
-  dataset_target.push(null); 
-  targetBackgroundColors.push(null);
-
-  // Division Target
-  let divisionTargetValue = showDivisionData
-    ? comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value
-    : null;
-  dataset_target.push(divisionTargetValue);
-  targetBackgroundColors.push(comparativeChartColors.targetbranch);
-
-  return { dataset_target, targetBackgroundColors };
-};
+  return chartOptions;
+}

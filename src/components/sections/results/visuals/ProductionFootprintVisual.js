@@ -55,12 +55,20 @@ export const ProductionFootprintVisual = ({
               {buildIndicatorChart({
                 id: "socialfootprintvisual_" + indic,
                 session,
-                period,
-                aggregate: "production",
-                indic,
-                showDivisionData: true,
-                useIndicColors: true,
-                label : "Production"
+                datasetOptions: {
+                  period,
+                  aggregate: "production",
+                  indic
+                },
+                printOptions: {
+                  printMode: false,
+                  showDivisionData: true,
+                  showAreaData: true,
+                  showTargetData: true,
+                  useIndicColors: true,
+                  label: "Production",
+                  cutOut: ""
+                }
               })}
               <div className="my-4">
                 {tags[indic].map((tag, index) => (

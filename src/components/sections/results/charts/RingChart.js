@@ -1,3 +1,6 @@
+// La Société Nouvelle
+
+// React
 import React, { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 
@@ -8,52 +11,143 @@ import metaIndics from "/lib/indics.json";
 import { roundValue } from "/src/utils/Utils";
 import { changeOpacity, getCutOut } from "./chartsUtils";
 
-const RingChart = ({
+/* ---------- RING CHART ---------- */
+
+/** Ring chart to show..
+ *  
+ *  Args :
+ *    - id
+ *    - session
+ *    - datasetOptions
+ *    - printOptions
+ * 
+ *  datasetOptions :
+ *    - period
+ *    - aggregate
+ *    - indic
+ * 
+ *  printOptions :
+ *    - cutOut
+ * 
+ */
+
+export const RingChart = ({
+  id,
   session,
-  period,
-  aggregate,
-  indic,
-  cutOut
+  datasetOptions,
+  printOptions
 }) => {
 
-  const [width, setWidth] = useState(100);
+  // --------------------------------------------------
+  // Data
+  
+  const chartData = buildChartData(
+    session,
+    datasetOptions
+  );
 
-  const {financialData,comparativeData} = session;
+  // --------------------------------------------------
+  // Options
 
-  const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
-  const divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
+  const chartOptions = buildChartOptions(printOptions);
 
+  // --------------------------------------------------
+
+  return (
+    <Doughnut 
+      id={id}
+      data={chartData} 
+      options={chartOptions} 
+    />
+  );
+}
+
+// ################################################## DATASET ##################################################
+
+const buildChartData = (session,datasetOptions) => 
+{
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
+  const {
+    aggregate,
+    indic,
+    period
+  } = datasetOptions;
+  
   const backgroundColor = "rgba(245, 245, 245, 0.75)";
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
 
   const indicColor = metaIndics[indic].color;
   const branchIndicColor = changeOpacity( indicColor, 0.3); 
 
-  const datasets = [{
-    data: [divisionFootprint,roundValue(100-divisionFootprint,2)],
-    backgroundColor: [branchIndicColor, backgroundColorBis],
+  const datasets = [];
+  const labels = [];
+
+  // --------------------------------------------------
+  // Branch
+
+  const branchFpt = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
+  datasets.push({
+    data: [
+      branchFpt,
+      roundValue(100-branchFpt,2)
+    ],
+    backgroundColor: [
+      branchIndicColor, 
+      backgroundColorBis
+    ],
     label: "Branche",
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
-  },{
-    data: [companyFootprint,roundValue(100-companyFootprint,2)],
-    backgroundColor: [indicColor, backgroundColor],
+  });
+
+  // --------------------------------------------------
+  // Legal unit
+
+  const legalUnitFpt = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
+  datasets.push({
+    data: [
+      legalUnitFpt,
+      roundValue(100-legalUnitFpt,2)
+    ],
+    backgroundColor: [
+      indicColor, 
+      backgroundColor
+    ],
     label: financialData.mainAggregates[aggregate].label,
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
-    }
-  ];
+  });
+  labels.push(financialData.mainAggregates[aggregate].label);
 
-  const data = {
-    labels: [financialData.mainAggregates[aggregate].label],
-    datasets: datasets,
+  // --------------------------------------------------
+
+  const chartData = {
+    datasets,
+    labels,
   };
+
+  return chartData;
+}
+
+// ################################################## OPTIONS ##################################################
+
+const buildChartOptions = (printOptions) => 
+{
+  const {
+    cutOut
+  } = printOptions;
+
+  const [width, setWidth] = useState(100);
 
   const handleResize = (chart) => {
     setWidth(chart.canvas.width)
   };
 
-  const options = {
+  const chartOptions = {
     maintainAspectRatio: true,
     responsive: true,
     onResize: handleResize,
@@ -77,7 +171,6 @@ const RingChart = ({
         font: {
           size: 10,
           family: "Roboto",
-          
         },
       },
       tooltip: {
@@ -121,10 +214,8 @@ const RingChart = ({
         },
       },
     },
-    cutout:getCutOut(width,cutOut ?? 5),
+    cutout: getCutOut(width,cutOut ?? 5),
   };
-
-  return <Doughnut  data={data} options={options} />;
-};
-
-export default RingChart;
+  
+  return chartOptions;
+}

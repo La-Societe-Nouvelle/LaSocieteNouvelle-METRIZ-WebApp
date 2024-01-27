@@ -17,6 +17,7 @@ export const aggregatesChartColors = {
   fixedCapitalConsumptions:"rgba(15,63,176,1)",
   netValueAdded:"rgba(250,89,95,1)",
 };
+
 export const prevAggregatesChartColors = {
   production:"rgba(25,21,88,0.4)",
   intermediateConsumptions:"rgba(67,62,140,0.4)",

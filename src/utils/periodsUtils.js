@@ -11,6 +11,8 @@
  * 
  */
 
+/* -------------------------- PERIOD PROPS -------------------------- */
+
 export const getLabelPeriod = (periodKey) => {
   if (periodKey.startsWith("FY")) {
     return "Exercice "+periodKey.slice(2);
@@ -18,6 +20,12 @@ export const getLabelPeriod = (periodKey) => {
     return periodKey;
   }
 }
+
+export const getYearPeriod = (period) => {
+  return period.dateEnd.substring(0,4);
+}
+
+/* -------------------------- PERIODS MANAGEMENT -------------------------- */
 
 export const getMoreRecentYearlyPeriod = (periods) => {
   
@@ -30,8 +38,18 @@ export const getMoreRecentYearlyPeriod = (periods) => {
   return yearlyPeriods[0];
 };
 
-export const getYearPeriod = (period) => {
-  return period.dateEnd.substring(0,4);
+export const getPrevPeriod = (periods,currPeriod) => 
+{
+  // year period
+  if (/^FY/.test(currPeriod.periodKey)) {
+    let prevPeriod = periods.find((period) => 
+      /^FY/.test(period.periodKey) && period.dateEnd == getPrevDate(currPeriod.dateStart));
+    return prevPeriod;
+  } 
+  
+  else {
+    return null;
+  }
 }
 
 /* -------------------------- DATES -------------------------- */

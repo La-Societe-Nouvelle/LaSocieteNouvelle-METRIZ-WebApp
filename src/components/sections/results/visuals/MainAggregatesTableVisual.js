@@ -61,10 +61,15 @@ export const MainAggregatesTableVisual = ({ session, period, indic }) => {
             <Row>
               <Col sm="6">
                 <StackedHorizontalBarChart
-                  financialData={session.financialData}
-                  period={period}
-                  prevPeriod={prevPeriod}
-                  indic={indic}
+                  id={""}
+                  session={session}
+                  datasetOptions={{
+                    period,
+                    indic
+                  }}
+                  printOptions={{
+                    showPreviousPeriod: true
+                  }}
                 />
               </Col>
             </Row>

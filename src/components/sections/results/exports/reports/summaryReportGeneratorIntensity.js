@@ -33,7 +33,7 @@ import {
 import { printValue } from "/src/utils/formatters";
 import {
   getMostImpactfulExpensesPart,
-  sortProvidersByImpact,
+  sortByImpact,
 } from "../../utils";
 
 // PDF Config
@@ -101,7 +101,7 @@ export const buildSummaryReportIntensityIndic = async ({
       expense.date.slice(0, 4) == period.periodKey.slice(2)
   );
 
-  const mostImpactfulExpenses = sortProvidersByImpact(
+  const mostImpactfulExpenses = sortByImpact(
     expensesAccounts,
     indic,
     "desc"
@@ -119,12 +119,12 @@ export const buildSummaryReportIntensityIndic = async ({
 
   const providers = filterProvidersByPeriod(financialData, period);
 
-  const topProviders = sortProvidersByImpact(providers, indic, "desc").slice(
+  const topProviders = sortByImpact(providers, indic, "desc").slice(
     0,
     2
   );
 
-  const nextTopProviders = sortProvidersByImpact(
+  const nextTopProviders = sortByImpact(
     providers,
     indic,
     "desc"
