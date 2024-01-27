@@ -41,6 +41,8 @@ export const VerticalBarChart = ({
   printOptions
 }) => {
 
+  console.log(id);
+
   // --------------------------------------------------
   // Data
 
@@ -49,7 +51,11 @@ export const VerticalBarChart = ({
   // --------------------------------------------------
   // Options
 
-  const chartOptions = buildChartOptions(printOptions);
+  const chartOptions = buildChartOptions(
+    datasetOptions,
+    printOptions,
+    chartData
+  );
 
   // --------------------------------------------------
 
@@ -87,11 +93,11 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   } = printOptions;
 
   const datasets = [];
-  const labels = [
-    "France",
-    label,
-    "Branche"  
-  ];
+  const labels = buildLabels(
+    showAreaData,
+    showDivisionData,
+    label
+  );
 
   // --------------------------------------------------
   // footprint dataset
@@ -272,21 +278,50 @@ const buildTargetBackgroundColors = (
   return backgroundColors;
 }
 
+const buildLabels = (
+  showAreaData,
+  showDivisionData,
+  label
+) => {
+
+  const labels = [];
+
+  if (showAreaData) {
+    labels.push("France");
+  }
+
+  labels.push(label);
+
+  if (showDivisionData) {
+    labels.push("Branche");
+  }
+
+  return labels;
+}
+
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (printOptions) => 
-{
+const buildChartOptions = (
+  datasetOptions,
+  printOptions,
+  chartData
+) => {
+
   const {
-    printMode,
-    showTargetData
+    indic
+  } = datasetOptions;
+
+  const {
+    printMode
   } = printOptions;
 
+  const {
+    unit,
+    nbDecimals
+  } = metaIndics[indic];
+
   // Determine Y-Axis Max
-  const datasetsForMaxY  = showTargetData
-  ? [footprintDataset, targetDataset]
-  : [footprintDataset];
-  
-  const maxY = unit === "%" ? getMaxY(datasetsForMaxY) : null;
+  const maxY = unit === "%" ? getMaxY(chartData.datasets) : null;
 
   const chartOptions = {
     responsive: true,

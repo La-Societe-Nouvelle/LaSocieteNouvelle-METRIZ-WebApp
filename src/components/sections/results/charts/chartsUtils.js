@@ -1,3 +1,5 @@
+import { isValidNumber } from "../../../../utils/Utils";
+
 export const changeOpacity = (rgbaColor, newOpacity) => {
   const rgbaArray = rgbaColor.split(",");
   rgbaArray[3] = newOpacity;
@@ -11,7 +13,7 @@ export const getCutOut = (width, factor) => {
 export const getMaxY = (datasets) => {
   const maxValues = datasets.map((dataset) => {
     if (dataset) {
-      const max = Math.max(...dataset.filter((value) => value != null));
+      const max = Math.max(...dataset.data.filter((value) => isValidNumber(value)));
       return max;
     }
     return 0;

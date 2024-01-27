@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Col, Row } from "react-bootstrap";
-import SigPieChart from "../charts/SigPieChart";
+import { SigPieChart } from "../charts/SigPieChart";
 
 // Lib
 import { ValueDistributionChart } from "../charts/ValueDistributionChart";
@@ -30,12 +30,11 @@ export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
       <Col lg={3}>
         <h5 className="mb-4 text-center">{aggregate.label}</h5>
         <div className="sig-piechart-container">
-          
           <SigPieChart
             id={id}
             session={session}
             datasetOptions={{
-              aggregate,
+              aggregate: aggregate.id,
               indic,
               period
             }}

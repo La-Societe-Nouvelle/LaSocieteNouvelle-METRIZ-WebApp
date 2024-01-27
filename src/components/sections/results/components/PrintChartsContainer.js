@@ -8,8 +8,8 @@ import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 // Charts
-import TrendChart from "../charts/TrendChart";
-import SigPieChart from "../charts/SigPieChart";
+import { TrendChart } from "../charts/TrendChart";
+import { SigPieChart } from "../charts/SigPieChart";
 import { HorizontalBarChart } from "../charts/HorizontalBarChart";
 
 import { GrossImpactChart } from "../charts/GrossImpactChart";
@@ -93,7 +93,7 @@ const IndicatorCharts = ({
             })}
             {renderSigCharts(
               session,
-              mainAggregates[aggregate],
+              aggregate,
               indic,
               period,
               `sig-chart-${aggregate}-${indic}-print`,

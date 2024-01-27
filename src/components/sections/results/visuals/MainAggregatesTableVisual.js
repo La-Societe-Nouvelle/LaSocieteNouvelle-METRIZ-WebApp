@@ -5,7 +5,7 @@ import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesT
 import { ExpensesTable } from "../tables/ExpensesTable";
 import { ProvidersTable } from "../tables/ProvidersTable";
 import { getPrevDate } from "../../../../utils/periodsUtils";
-import StackedHorizontalBarChart from "../charts/StackedHorizontalBarChart";
+import { StackedHorizontalBarChart } from "../charts/StackedHorizontalBarChart";
 
 export const MainAggregatesTableVisual = ({ session, period, indic }) => {
   // Prev period

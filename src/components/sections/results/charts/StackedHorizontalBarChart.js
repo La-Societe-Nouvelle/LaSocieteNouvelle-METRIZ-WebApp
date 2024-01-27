@@ -120,10 +120,10 @@ const buildChartData = (
 
   // --------------------------------------------------
   // Previous period
-
-  if (showPreviousPeriod)
+  
+  const prevPeriod = getPrevPeriod(availablePeriods, period);
+  if (showPreviousPeriod && prevPeriod)
   {
-    const prevPeriod = getPrevPeriod(availablePeriods, period);
     const prevPeriodDistribution = getAggregatesDistribution(
       aggregates,
       prevPeriod.periodKey

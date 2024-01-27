@@ -6,7 +6,7 @@ import { Col, Row } from "react-bootstrap";
 import Select from "react-select";
 
 // Chart
-import TrendChart from "../charts/TrendChart";
+import { TrendChart } from "../charts/TrendChart";
 
 // Lib
 import metaIndics from "/lib/indics";

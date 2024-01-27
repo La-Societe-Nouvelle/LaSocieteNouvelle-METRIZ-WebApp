@@ -2,7 +2,7 @@
 
 import { Col, Image, Row } from "react-bootstrap";
 import {  getKeyIndics, getTagsIndic } from "../utils";
-import RingChart from "../charts/RingChart";
+import { RingChart } from "../charts/RingChart";
 import { VerticalBarChart } from "../charts/VerticalBarChart";
 
 import metaIndics from "/lib/indics";
@@ -63,11 +63,10 @@ export const ProductionFootprintVisual = ({
                 printOptions: {
                   printMode: false,
                   showDivisionData: true,
-                  showAreaData: true,
-                  showTargetData: true,
+                  showAreaData: false,
+                  showTargetData: false,
                   useIndicColors: true,
-                  label: "Production",
-                  cutOut: ""
+                  label: "Production"
                 }
               })}
               <div className="my-4">
@@ -89,7 +88,7 @@ export const ProductionFootprintVisual = ({
 
 const buildIndicatorChart = (props) => 
 {
-  switch(props.indic) 
+  switch(props.datasetOptions.indic) 
   {
     case "art": return(<RingChart {...props}/>);
     case "eco": return(<RingChart {...props}/>);

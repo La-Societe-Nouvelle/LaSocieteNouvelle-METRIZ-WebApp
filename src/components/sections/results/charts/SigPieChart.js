@@ -40,12 +40,13 @@ import {
  *    - showPreviousData
  *    - printMode
  * 
+ *  /!\ annotation -> value
  */
 
 export const SigPieChart = ({ 
   id,
   session,
-  datasetOption,
+  datasetOptions,
   printOptions
 }) => {
 
@@ -54,13 +55,15 @@ export const SigPieChart = ({
 
   const chartData = buildChartData(
     session,
-    datasetOption
+    datasetOptions,
+    printOptions
   );
 
   // --------------------------------------------------
   // Options
 
   const chartOptions = buildChartOptions(
+    datasetOptions,
     printOptions
   );
 
@@ -106,9 +109,9 @@ const buildChartData = (
   // --------------------------------------------------
   // prev period
   
-  if (showPreviousData)
+  const prevPeriod = getPrevPeriod(availablePeriods,period);
+  if (showPreviousData && prevPeriod)
   {
-    const prevPeriod = getPrevPeriod(availablePeriods,period);
     const prevValue = aggregateData.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value;
 
     datasets.push({
@@ -158,8 +161,11 @@ const buildChartData = (
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (printOptions,datasetOptions) => 
-{
+const buildChartOptions = (
+  datasetOptions,
+  printOptions
+) => {
+
   const {
     period
   } = datasetOptions;
@@ -188,7 +194,7 @@ const buildChartOptions = (printOptions,datasetOptions) =>
           {
             type: "label",
             xScaleID: "x-axis-0",
-            content: value + "%", 
+            //content: value + "%", 
             color: colors.textColor,
             font: {
               size: 14,

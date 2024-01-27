@@ -44,7 +44,10 @@ export const HorizontalBarChart = ({
   // --------------------------------------------------
   // Options
 
-  const chartOptions = buildChartOptions(printOptions);
+  const chartOptions = buildChartOptions(
+    printOptions,
+    chartData
+  );
 
   // --------------------------------------------------
   
@@ -122,9 +125,10 @@ const buildChartData = (session,datasetOptions) =>
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (printOptions,chartData) => 
-{
-  // Data for chart
+const buildChartOptions = (
+  printOptions,
+  chartData
+) => {
 
   const data = chartData.datasets
     .map(dataset => dataset.data)

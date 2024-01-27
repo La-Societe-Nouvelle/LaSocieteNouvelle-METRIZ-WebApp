@@ -38,6 +38,8 @@ export const RingChart = ({
   printOptions
 }) => {
 
+  console.log(id);
+
   // --------------------------------------------------
   // Data
   
@@ -49,10 +51,13 @@ export const RingChart = ({
   // --------------------------------------------------
   // Options
 
-  const chartOptions = buildChartOptions(printOptions);
+  const chartOptions = buildChartOptions(
+    printOptions
+  );
 
   // --------------------------------------------------
 
+  console.log(chartData);
   return (
     <Doughnut 
       id={id}
@@ -82,6 +87,9 @@ const buildChartData = (session,datasetOptions) =>
 
   const indicColor = metaIndics[indic].color;
   const branchIndicColor = changeOpacity( indicColor, 0.3); 
+
+  console.log(indicColor);
+  console.log(backgroundColor);
 
   const datasets = [];
   const labels = [];
@@ -135,8 +143,10 @@ const buildChartData = (session,datasetOptions) =>
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (printOptions) => 
-{
+const buildChartOptions = (
+  printOptions
+) => {
+
   const {
     cutOut
   } = printOptions;

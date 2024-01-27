@@ -42,7 +42,11 @@ export const ValueDistributionChart = ({
   // --------------------------------------------------
   // Data
 
-  const chartData =buildChartData(session,datasetOptions);
+  const chartData = buildChartData(
+    session,
+    datasetOptions,
+    printOptions
+  );
 
   // --------------------------------------------------
   // Options
@@ -62,8 +66,12 @@ export const ValueDistributionChart = ({
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (session,datasetOptions,printOptions) => 
-{
+const buildChartData = (
+  session,
+  datasetOptions,
+  printOptions
+) => {
+
   const { financialData } = session;
   const {
     intermediateConsumptions,
@@ -113,13 +121,13 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     backgroundColor: currPeriodDistribution.map((item) => aggregatesChartColors[item.id]),
   };
 
-  chartData.datasets.push(currentPeriod);
+  datasets.push(currentPeriod);
 
   // --------------------------------------------------
 
   const chartData = {
-    datasets: datasets,
-    labels: labels,
+    datasets,
+    labels,
   };
 
   return chartData;

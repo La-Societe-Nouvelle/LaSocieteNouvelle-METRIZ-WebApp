@@ -125,7 +125,7 @@ const buildChartData = (session,datasetOptions) =>
   // --------------------------------------------------
   // Division - Historical
 
-  const branchHistoricalData = buildBranchHistoricalData = (
+  const branchHistoricalData = buildBranchHistoricalData(
     comparativeData,
     aggregate,
     indic
@@ -292,11 +292,11 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
     indic
   } = datasetOptions;
 
-  const values = chartData.datasets
-    .map((dataset) => dataset.data)
-    .flat()
-    .map((item) => item.y);
-  const maxY = metaIndics[indic].unit === "%" ? getMaxY(values) : null;
+  const {
+    unit
+  } = metaIndics[indic];
+
+  const maxY = unit === "%" ? getMaxY(chartData.datasets) : null;
 
   const chartOptions = {
     devicePixelRatio: 2,
