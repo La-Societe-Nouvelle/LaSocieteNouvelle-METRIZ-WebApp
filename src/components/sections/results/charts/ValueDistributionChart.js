@@ -12,6 +12,7 @@ import { getAggregatesDistribution } from "./chartsUtils";
 
 // Styles
 import { aggregatesChartColors, prevAggregatesChartColors, tooltips } from "../../../../constants/chartColors";
+import { getPrevPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- VALUE DISTRIBUTION CHART ---------- */
 
@@ -72,7 +73,7 @@ const buildChartData = (
   printOptions
 ) => {
 
-  const { financialData } = session;
+  const { availablePeriods, financialData } = session;
   const {
     intermediateConsumptions,
     fixedCapitalConsumptions,
@@ -94,7 +95,8 @@ const buildChartData = (
   // --------------------------------------------------
   // Previous period
 
-  if (showPreviousPeriod)
+  const prevPeriod = getPrevPeriod(availablePeriods,period);
+  if (showPreviousPeriod && prevPeriod)
   {
     const prevPeriodDistribution = getAggregatesDistribution(aggregates,prevPeriod.periodKey);
    

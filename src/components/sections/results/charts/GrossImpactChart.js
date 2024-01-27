@@ -7,6 +7,9 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
+// Utils
+import { getPrevPeriod } from "../../../../utils/periodsUtils";
+
 // Colors
 import {
   prevAggregatesChartColors,
@@ -70,7 +73,7 @@ export const GrossImpactChart = ({
 
 const buildChartData = (session,datasetOptions,printOptions) => 
 {
-  const { financialData } = session;
+  const { availablePeriods, financialData } = session;
   const {
     production,
   } = financialData.mainAggregates;
@@ -98,9 +101,9 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   // --------------------------------------------------
   // prev period
 
-  if (showPrevPeriod) 
+  const prevPeriod = getPrevPeriod(availablePeriods,period);
+  if (showPrevPeriod && prevPeriod) 
   {
-    const prevPeriod = "";
     const prevProductionGrossImpacts = getGrossImpact(production, prevPeriod, indic);
     const prevGrossImpactsDistribution = getGrossImpactsDistribution(financialData.mainAggregates, prevPeriod, indic, prevProductionGrossImpacts);
   
