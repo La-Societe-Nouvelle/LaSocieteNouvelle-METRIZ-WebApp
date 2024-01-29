@@ -40,7 +40,10 @@ export const ComparativeDataContainer = ({
                   showAreaData: true,
                   showTargetData: true,
                   useIndicColors: false,
-                  label: "Exercice"
+                  showLegend : false,
+                  showXlabels : true,
+                  aspectRatio : 1.5,
+                  label: "Empreinte"
                 }}
               />
 

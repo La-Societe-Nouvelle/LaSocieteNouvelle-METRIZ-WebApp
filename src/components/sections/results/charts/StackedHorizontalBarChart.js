@@ -171,7 +171,7 @@ const buildChartOptions = (printOptions) =>
         },
       },
       tooltip: {
-        backgroundColor: tooltips.tooltipBackground,
+        backgroundColor: tooltips.backgroundColor,
         padding: 15,
         cornerRadius: 3,
         usePointStyle: true,

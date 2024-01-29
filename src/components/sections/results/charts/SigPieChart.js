@@ -205,7 +205,7 @@ const buildChartOptions = (
         ],
       },
       tooltip: {
-        backgroundColor: tooltips.tooltipBackground,
+        backgroundColor: tooltips.backgroundColor,
         cornerRadius: 2,
         callbacks: {
           label: function (context) {

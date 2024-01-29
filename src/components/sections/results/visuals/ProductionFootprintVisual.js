@@ -66,7 +66,10 @@ export const ProductionFootprintVisual = ({
                   showAreaData: false,
                   showTargetData: false,
                   useIndicColors: true,
-                  label: "Production"
+                  showLegend : true,
+                  showXlabels : false,
+                  aspectRatio : 1,
+                  label: "Empreinte de la production"
                 }
               })}
               <div className="my-4">

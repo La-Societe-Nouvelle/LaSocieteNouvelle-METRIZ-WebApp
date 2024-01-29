@@ -15,7 +15,7 @@ import { getMaxY } from "./chartsUtils";
 import metaIndics from "/lib/indics";
 
 // Styles
-import { trendChartColors } from "../../../../constants/chartColors";
+import { tooltips, trendChartColors } from "../../../../constants/chartColors";
 import { colors } from "../../../../constants/chartColors";
 
 /* ---------- TREND CHART ---------- */
@@ -409,9 +409,9 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         },
       },
       tooltip: {
-        backgroundColor: trendChartColors.tooltipBackground,
-        padding: 15,
-        cornerRadius: 3,
+        backgroundColor: tooltips.backgroundColor,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         usePointStyle: true,
         intersect: false,
         filter: function (tooltipItem) {

@@ -178,6 +178,7 @@ const renderComparativeCharts = ({
           showAreaData: true,
           showTargetData: true,
           useIndicColors: false,
+          aspectRatio : 1,
           label: "Production"
         }}
       />

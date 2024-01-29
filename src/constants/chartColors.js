@@ -1,5 +1,7 @@
 export const tooltips = {
-  tooltipBackground:"rgba(25,21,88,0.6)",
+  backgroundColor:"rgba(25,21,88,0.9)",
+  padding: 10,
+  cornerRadius : 10,
 };
 
 export const comparativeChartColors = {
@@ -35,5 +37,8 @@ export const trendChartColors = {
 export const colors = {
   textColor:"#191558",
   primaryBackgroundColor:"#191558",
-  gridColor:"#ececff",
+  gridColor:"rgba(237, 237, 255,0.5)",
+  lightBackground : "rgba(245, 245, 245, 0.75)",
+  transparent : "rgba(245, 245, 245, 0)",
+  
 };

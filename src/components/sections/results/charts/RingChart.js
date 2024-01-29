@@ -11,102 +11,69 @@ import metaIndics from "/lib/indics.json";
 import { roundValue } from "/src/utils/Utils";
 import { changeOpacity, getCutOut } from "./chartsUtils";
 
+// Styles
+import { colors, tooltips } from "../../../../constants/chartColors";
+import { getLabelPeriod } from "../../../../utils/periodsUtils";
+
 /* ---------- RING CHART ---------- */
 
 /** Ring chart to show..
- *  
+ *
  *  Args :
  *    - id
  *    - session
  *    - datasetOptions
  *    - printOptions
- * 
+ *
  *  datasetOptions :
  *    - period
  *    - aggregate
  *    - indic
- * 
+ *
  *  printOptions :
  *    - cutOut
- * 
+ *
  */
 
-export const RingChart = ({
-  id,
-  session,
-  datasetOptions,
-  printOptions
-}) => {
-
+export const RingChart = ({ id, session, datasetOptions, printOptions }) => {
   console.log(id);
 
   // --------------------------------------------------
   // Data
-  
-  const chartData = buildChartData(
-    session,
-    datasetOptions
-  );
+
+  const chartData = buildChartData(session, datasetOptions);
 
   // --------------------------------------------------
   // Options
 
-  const chartOptions = buildChartOptions(
-    printOptions
-  );
+  const chartOptions = buildChartOptions(printOptions);
 
   // --------------------------------------------------
 
   console.log(chartData);
-  return (
-    <Doughnut 
-      id={id}
-      data={chartData} 
-      options={chartOptions} 
-    />
-  );
-}
+  return <Doughnut id={id} data={chartData} options={chartOptions} />;
+};
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (session,datasetOptions) => 
-{
-  const {
-    financialData,
-    comparativeData
-  } = session;
+const buildChartData = (session, datasetOptions) => {
+  const { financialData, comparativeData } = session;
 
-  const {
-    aggregate,
-    indic,
-    period
-  } = datasetOptions;
-  
-  const backgroundColor = "rgba(245, 245, 245, 0.75)";
-  const backgroundColorBis = "rgba(245, 245, 245, 0)";
+  const { aggregate, indic, period } = datasetOptions;
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = changeOpacity( indicColor, 0.3); 
+  const branchIndicColor = changeOpacity(indicColor, 0.3);
 
-  console.log(indicColor);
-  console.log(backgroundColor);
 
   const datasets = [];
-  const labels = [];
 
   // --------------------------------------------------
   // Branch
 
   const branchFpt = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
   datasets.push({
-    data: [
-      branchFpt,
-      roundValue(100-branchFpt,2)
-    ],
-    backgroundColor: [
-      branchIndicColor, 
-      backgroundColorBis
-    ],
+    data: [branchFpt, roundValue(100 - branchFpt, 2)],
+    backgroundColor: [branchIndicColor, colors.transparent],
     label: "Branche",
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
@@ -115,46 +82,35 @@ const buildChartData = (session,datasetOptions) =>
   // --------------------------------------------------
   // Legal unit
 
-  const legalUnitFpt = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
+  const legalUnitFpt =
+    financialData.mainAggregates[aggregate].periodsData[period.periodKey]
+      .footprint.indicators[indic].value;
   datasets.push({
-    data: [
-      legalUnitFpt,
-      roundValue(100-legalUnitFpt,2)
-    ],
-    backgroundColor: [
-      indicColor, 
-      backgroundColor
-    ],
-    label: financialData.mainAggregates[aggregate].label,
+    data: [legalUnitFpt, roundValue(100 - legalUnitFpt, 2)],
+    backgroundColor: [indicColor, colors.lightBackground],
+    label: getLabelPeriod(period.periodKey),
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
   });
-  labels.push(financialData.mainAggregates[aggregate].label);
 
   // --------------------------------------------------
 
   const chartData = {
     datasets,
-    labels,
   };
 
   return chartData;
-}
+};
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (
-  printOptions
-) => {
-
-  const {
-    cutOut
-  } = printOptions;
+const buildChartOptions = (printOptions) => {
+  const { cutOut } = printOptions;
 
   const [width, setWidth] = useState(100);
 
   const handleResize = (chart) => {
-    setWidth(chart.canvas.width)
+    setWidth(chart.canvas.width);
   };
 
   const chartOptions = {
@@ -162,42 +118,66 @@ const buildChartOptions = (
     responsive: true,
     onResize: handleResize,
     layout: {
-      padding : {
-        top : 20,
+      padding: {
+        top: 20,
         left: 20,
-        right : 20,
+        right: 20,
       },
     },
     plugins: {
       datalabels: {
         formatter: (value, context) => {
           if (context.dataIndex === 0) {
-              return `${value}%`;
+            return `${value}%`;
           } else {
-              return ''; 
+            return "";
           }
         },
-        color: "#191558",
+        backgroundColor: (context) => {
+          if (context.dataIndex === 0) {
+            return colors.lightBackground;
+          } else {
+            return colors.transparent;
+          }
+        },
+        borderRadius: 5,
+        align: (context) => {
+          if (context.datasetIndex === 0) {
+            return "right";
+          } else {
+            return "left";
+          }
+        },
+        color : colors.textColor,
         font: {
           size: 10,
           family: "Roboto",
         },
       },
       tooltip: {
+        filter: function (tooltipItem) {
+          return tooltipItem.dataIndex === 0; // show first value only
+        },
+        backgroundColor: tooltips.backgroundColor,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         callbacks: {
           label: (context) => {
-            const label = context.label;
             const value = context.parsed;
-            return `${label}: ${value}%`;
+            return `Empreinte de la production: ${value}%`;
+          },
+          title: (context) => {
+            return context[0]?.dataset.label
           },
         },
       },
       legend: {
         display: true,
         position: "bottom",
-        align: "start",
+        align: "center",
         labels: {
           boxWidth: 10,
+          color : colors.textColor,
           font: {
             size: 10,
           },
@@ -213,7 +193,7 @@ const buildChartOptions = (
                   text: indicator,
                   fillStyle: backgroundColor,
                   strokeStyle: backgroundColor,
-                  lineWidth: 1,
+                  lineWidth: 0,
                   hidden: false,
                   boxWidth: 10,
                 });
@@ -224,8 +204,8 @@ const buildChartOptions = (
         },
       },
     },
-    cutout: getCutOut(width,cutOut ?? 5),
+    cutout: getCutOut(width, cutOut ?? 5),
   };
-  
+
   return chartOptions;
-}
+};

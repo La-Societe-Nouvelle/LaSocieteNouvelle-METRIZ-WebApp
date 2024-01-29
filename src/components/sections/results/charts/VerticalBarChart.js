@@ -13,7 +13,8 @@ import { printValue } from "/src/utils/formatters";
 import { getMaxY, changeOpacity } from "./chartsUtils";
 
 // Styles
-import { comparativeChartColors } from "../../../../constants/chartColors";
+import { colors, comparativeChartColors, tooltips } from "../../../../constants/chartColors";
+import { getLabelPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
@@ -83,7 +84,6 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     aggregate,
     period
   } = datasetOptions;
-
   const {
     showAreaData,
     showDivisionData,
@@ -96,14 +96,14 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   const labels = buildLabels(
     showAreaData,
     showDivisionData,
-    label
+    period
   );
 
   // --------------------------------------------------
   // footprint dataset
 
   const footprintDataset = {
-    label: "Empreinte " + period.periodKey,
+    label : label,
     data: buildFootprintData(
       comparativeData,
       aggregate,
@@ -158,12 +158,11 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   }
 
   // --------------------------------------------------
-  
+
   const chartData = {
     datasets,
     labels,
   };
-  
   return chartData;
 }
 
@@ -281,7 +280,7 @@ const buildTargetBackgroundColors = (
 const buildLabels = (
   showAreaData,
   showDivisionData,
-  label
+  period
 ) => {
 
   const labels = [];
@@ -290,12 +289,11 @@ const buildLabels = (
     labels.push("France");
   }
 
-  labels.push(label);
+  labels.push(getLabelPeriod(period.periodKey));
 
   if (showDivisionData) {
     labels.push("Branche");
   }
-
   return labels;
 }
 
@@ -312,9 +310,11 @@ const buildChartOptions = (
   } = datasetOptions;
 
   const {
-    printMode
+    printMode,
+    showLegend,
+    showXlabels,
+    aspectRatio
   } = printOptions;
-
   const {
     unit,
     nbDecimals
@@ -324,9 +324,7 @@ const buildChartOptions = (
   const maxY = unit === "%" ? getMaxY(chartData.datasets) : null;
 
   const chartOptions = {
-    responsive: true,
-    devicePixelRatio: 2,
-    aspectRatio: 1,
+    aspectRatio: aspectRatio,
     layout: {
       padding: {
         left: printMode ? 0 : 10,
@@ -342,40 +340,73 @@ const buildChartOptions = (
         min: 0,
         max: maxY,
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 10,
           },
         },
         grid: {
-          color: "rgba(245, 245, 245, 0.5)",
+          color: colors.gridColor,
           lineWidth: 1,
         },
       },
       x: {
+        display : showXlabels,
         ticks: {
-          color: "#191558",
+          color: colors.textColor,
           font: {
             size: 10,
           },
         },
         grid: {
           lineWidth: 1,
-          color: "rgba(245, 245, 245, 0.5)",
+          color: colors.gridColor,
         },
       },
     },
     plugins: {
       legend: {
-        display: false,
+        display: showLegend,
+        position: "bottom",
+        align: "center",
+        labels: {
+          boxWidth: 10,
+          color : colors.textColor,
+          font: {
+            size: 10,
+            family: "Roboto",
+          },
+          generateLabels: (chart) => {
+            const labels = [];
+            chart.data.labels.forEach((label, labelIndex) => {
+              chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const backgroundColor = dataset.backgroundColor[labelIndex];
+                if(backgroundColor) {
+                    labels.push({
+                      text: datasetIndex === 0 ? label : dataset.label,
+                      fillStyle: backgroundColor,
+                      strokeStyle: backgroundColor,
+                      lineWidth: 0,
+                      hidden: false,
+                      boxWidth: 10,
+                    });
+                }
+              });
+            });
+          
+            return labels;
+          },
+       
+        },
       },
+      
       datalabels: {
         display: printMode ? false : true,
         anchor: "end",
         align: "top",
-        formatter: function (value, context) {
+        formatter: function (value) {
           if (value) {
-            return printValue(value, nbDecimals) + " " + unit;
+            return `${printValue(value, nbDecimals)} ${unit}`;
           }
         },
         color: "#191558",
@@ -388,17 +419,13 @@ const buildChartOptions = (
         display: false,
       },
       tooltip: {
-        backgroundColor: "#191558",
-        padding: 10,
-        cornerRadius: 2,
+        backgroundColor: tooltips.backgroundColor,
+        padding : tooltips.padding,
+        cornerRadius : tooltips.cornerRadius,
         callbacks: {
           label: function (context) {
             return (
-              context.dataset.label +
-              " : " +
-              printValue(context.parsed.y, nbDecimals) +
-              " " +
-              unit
+              `${context.dataset.label} : ${ printValue(context.raw, nbDecimals)}${unit}`
             );
           },
         },

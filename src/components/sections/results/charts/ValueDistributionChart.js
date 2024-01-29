@@ -166,9 +166,9 @@ const buildChartOptions = (printOptions) =>
         },
       },
       tooltip: {
-        backgroundColor: tooltips.tooltipBackground,
-        padding: 15,
-        cornerRadius: 3,
+        backgroundColor: tooltips.backgroundColor,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         usePointStyle: true,
         callbacks: {
           label: function (context) {
