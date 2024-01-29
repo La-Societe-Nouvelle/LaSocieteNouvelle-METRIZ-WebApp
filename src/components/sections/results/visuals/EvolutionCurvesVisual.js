@@ -77,7 +77,7 @@ export const EvolutionCurvesVisual = ({
               id={`trend-${showedAggregate.value}-${indic}`}
               session={session}
               datasetOptions={{
-                aggregate: "production",
+                aggregate: showedAggregate,
                 indic
               }}
               printOptions={{

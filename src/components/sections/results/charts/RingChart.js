@@ -88,7 +88,7 @@ const buildChartData = (session, datasetOptions) => {
   datasets.push({
     data: [legalUnitFpt, roundValue(100 - legalUnitFpt, 2)],
     backgroundColor: [indicColor, colors.lightBackground],
-    label: getLabelPeriod(period.periodKey),
+    label: getLabelPeriod(period),
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
   });

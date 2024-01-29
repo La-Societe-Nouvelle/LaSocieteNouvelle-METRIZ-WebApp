@@ -11,10 +11,10 @@ import metaIndics from "/lib/indics";
 // Utils
 import { printValue } from "/src/utils/formatters";
 import { getMaxY, changeOpacity } from "./chartsUtils";
+import { getLabelPeriod } from "../../../../utils/periodsUtils";
 
 // Styles
 import { colors, comparativeChartColors, tooltips } from "../../../../constants/chartColors";
-import { getLabelPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
@@ -103,7 +103,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   // footprint dataset
 
   const footprintDataset = {
-    label : label,
+    label: getLabelPeriod(period),
     data: buildFootprintData(
       comparativeData,
       aggregate,
@@ -289,7 +289,7 @@ const buildLabels = (
     labels.push("France");
   }
 
-  labels.push(getLabelPeriod(period.periodKey));
+  labels.push(getLabelPeriod(period));
 
   if (showDivisionData) {
     labels.push("Branche");

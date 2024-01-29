@@ -44,6 +44,7 @@ export const TrendChart = ({
   printOptions
 }) => {
 
+  if (datasetOptions.indic=="wat") console.log(datasetOptions);
   // --------------------------------------------------
   // Data
 
@@ -51,6 +52,7 @@ export const TrendChart = ({
     session,
     datasetOptions
   );
+  console.log(chartData);
 
   // --------------------------------------------------
   // Options
@@ -236,10 +238,8 @@ const buildBranchHistoricalData = (
   indic
 ) => {
 
-  const currency = ["ghg"].includes(indic) ? "CPEUR" : "NA";
-  
   const data = comparativeData[aggregate].division.history.data[indic]
-    .filter((data) => data.currency == currency)
+    //.filter((data) => data.currency == "CPEUR" || data.currency == "NA")
     .sort((a, b) => a.year - b.year);
 
   return data;
@@ -255,7 +255,8 @@ const buildBranchTrendData = (
   let lastYearHistoricalData = historicalData.at(-1).year;
 
   let data = comparativeData[aggregate].division.trend.data[indic]
-    .filter((item) => item.year >= lastYearHistoricalData)
+    .filter((item) => item.year > lastYearHistoricalData)
+    .concat([historicalData.at(-1)])
     .sort((a, b) => a.year - b.year);
 
   return data;
@@ -268,13 +269,14 @@ const buildBranchTargetData = (
   historicalData
 ) => {
 
-  const path = "LIN";
+  const path = "GEO";
 
   let lastYearHistoricalData = historicalData.at(-1).year;
 
   const data = comparativeData[aggregate].division.target.data[indic]
     .filter((item) => item.path == path)
-    .filter((item) => item.year >= lastYearHistoricalData)
+    .filter((item) => item.year > lastYearHistoricalData)
+    .concat([historicalData.at(-1)])
     .sort((a, b) => a.year - b.year);
 
   return data;

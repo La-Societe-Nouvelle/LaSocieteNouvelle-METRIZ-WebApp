@@ -99,7 +99,7 @@ const buildChartData = (
     const aggregatesLabels = prevPeriodDistribution.map((item) => item.label);
 
     const prevPeriodData = {
-      label: getLabelPeriod(prevPeriod.periodKey),
+      label: getLabelPeriod(prevPeriod),
       data: prevPeriodDistribution.map(aggregate => aggregate.percentage),
       borderWidth: 2,
       backgroundColor: prevPeriodDistribution.map((item) => prevAggregatesChartColors[item.id]),
@@ -116,7 +116,7 @@ const buildChartData = (
 
   const currPeriodDistribution = getAggregatesDistribution(aggregates,period.periodKey);
   const currentPeriod = {
-    label: getLabelPeriod(period.periodKey),
+    label: getLabelPeriod(period),
     data: currPeriodDistribution.map((aggregate) => aggregate.percentage),
     borderWidth: 2,
     backgroundColor: currPeriodDistribution.map((item) => aggregatesChartColors[item.id]),

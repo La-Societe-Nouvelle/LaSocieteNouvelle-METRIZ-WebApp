@@ -116,7 +116,7 @@ const buildChartData = (
     const prevValue = aggregateData.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value;
 
     datasets.push({
-      label : getLabelPeriod(prevPeriod.periodKey),
+      label : getLabelPeriod(prevPeriod),
       data: [
         prevValue, 
         100 - prevValue
@@ -138,7 +138,7 @@ const buildChartData = (
   const value = aggregateData.periodsData[period.periodKey].footprint.indicators[indic].value;
 
   datasets.push({
-    label : getLabelPeriod(period.periodKey),
+    label : getLabelPeriod(period),
     data: [
       value, 
       100 - value
