@@ -169,11 +169,9 @@ const getSignificativeAccountsByIndic = async (indic,accounts,minFpt,maxFpt,limi
   return significativeAccounts;
 }
 
-/* ------------------------------------- FORMULAS - ACCOUNTS (BIS) -------------------------------------------- */
+/* ------------------------------------- FORMULAS - FLOWS -------------------------------------------- */
 
-// flows already filtered by date
-
-export async function getSignificativeAccountsBis(flows,minFpt,maxFpt,period)
+export async function getSignificativeAccountsFromFlows(flows,accounts,providers,minFpt,maxFpt,period)
 {
   // if no data -> return list of all provider with default footprint
   if (minFpt==null || maxFpt==null) {
@@ -183,26 +181,31 @@ export async function getSignificativeAccountsBis(flows,minFpt,maxFpt,period)
     return significativeAccounts;
   }
 
-  // significative companies
+  // split flows
+  let identifiedProviders = providers
+    .filter(provider => !provider.useDefaultFootprint)
+    .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey))
+    .map(provider => provider.providerNum);
   let identifiedFlows = flows
-    .filter(flow => flow.footprintOrigin=="provider")
+    .filter(flow => flow.footprintOrigin=="provider" 
+         && identifiedProviders.includes(flow.providerNum));
   let unidentifiedFlows = flows
-    .filter(provider => provider.footprintOrigin=="account")
+    .filter(flow => flow.footprintOrigin!="provider"
+         || !identifiedProviders.includes(flow.providerNum))
     .sort((a,b) => Math.abs(a.amount) - Math.abs(b.amount));
-  console.log(unidentifiedFlows);
 
   let significativeAccounts = [];
   for (let indic of Object.keys(metaIndics)) 
   {
-    // significative providers for indic
-    let significativeFlowsForIndic = await getSignificativeFlowsByIndic(indic,identifiedFlows,unidentifiedFlows,minFpt,maxFpt,limit,period); // return list flows
-    let significativeAccountsForIndic = flows
+    // significative flows for indic
+    let significativeFlowsForIndic = await getSignificativeFlowsByIndic(indic,identifiedFlows,unidentifiedFlows,minFpt,maxFpt,limit,period,accounts); // return list flows
+    let significativeAccountsForIndic = significativeFlowsForIndic
       .map((flow) => flow.accountNum)
       .filter((value, index, self) => index === self.findIndex(item => item === value));
     significativeAccounts.push(...significativeAccountsForIndic);
   }
 
-  // significative companies for investments -> all by default
+  // significative providers for investments -> all by default
   let immobilisationProviders = providers
     .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey))
     .filter(provider => provider.periodsData[period.periodKey].amountInvestments > 0)
@@ -214,7 +217,7 @@ export async function getSignificativeAccountsBis(flows,minFpt,maxFpt,period)
 }
 
 // iteration until provider under limit are significative
-const getSignificativeFlowsByIndic = async (indic,identifiedFlows,unidentifiedFlows,minFpt,maxFpt,limit,period) =>
+const getSignificativeFlowsByIndic = async (indic,identifiedFlows,unidentifiedFlows,minFpt,maxFpt,limit,period,accounts) =>
 {
   // build impact for tracked expenses (with siren)
   let impactOfIdentifiedFlows = getSumItems(identifiedFlows.map(flow => flow.footprint.indicators[indic].value*flow.amount));
@@ -226,29 +229,41 @@ const getSignificativeFlowsByIndic = async (indic,identifiedFlows,unidentifiedFl
 
   while (!isSignificative && index <= unidentifiedFlows.length)
   {    
-    // build impact for upper limit providers (mininum footprint case) -> use activity footprint if defined otherwise use min footprint
+    // build impact for upper limit flows (mininum footprint case) -> use activity footprint if defined otherwise use min footprint
     let upperLimitFlows = unidentifiedFlows.slice(index);
-    let impactOfUpperLimitFlows = getSumItems(upperLimitFlows.map(flow => 
-      (accounts[flow.accountNum].defaultFootprintParams.code=="00" || accounts[flow.accountNum].footprintStatus!=200) ?                       // 
-      minFpt.indicators[indic].value*flow.amount :                //  if no activity set or footprint unfetched
-      flow.footprint.indicators[indic].value*flow.amount));   //  if activity set & fpt fetched
+    let impactOfUpperLimitFlows = getSumItems(upperLimitFlows.map(flow => {
+      let account = accounts.find(account => account.accountNum == flow.accountNum);
+      if (!account 
+       || account.defaultFootprintParams.code=="00" 
+       || account.footprintStatus!=200) {
+        return minFpt.indicators[indic].value*flow.amount;
+      } else {
+        return flow.footprint.indicators[indic].value*flow.amount
+      }
+    }));
     
-    // build impact for under limit providers (maximum footprint case) -> use activity footprint if defined otherwise use max footprint
-    let underLimitProviders = unidentifiedFlows.slice(0,index);
-    let impactOfUnderLimitCompanies = getSumItems(underLimitProviders.map(provider => 
-      (provider.defaultFootprintParams.code=="00" || provider.footprintStatus!=200) ? 
-      maxFpt.indicators[indic].value*provider.periodsData[period.periodKey].amountExpenses : 
-      provider.footprint.indicators[indic].value*provider.periodsData[period.periodKey].amountExpenses));
+    // build impact for under limit flows (maximum footprint case) -> use activity footprint if defined otherwise use max footprint
+    let underLimitFlows = unidentifiedFlows.slice(0,index);
+    let impactOfUnderLimitFlows = getSumItems(underLimitFlows.map(flow => {
+      let account = accounts.find(account => account.accountNum == flow.accountNum);
+      if (!account 
+       || account.defaultFootprintParams.code=="00" 
+       || account.footprintStatus!=200) {
+        return maxFpt.indicators[indic].value*flow.amount;
+      } else {
+        return flow.footprint.indicators[indic].value*flow.amount
+      }
+    }));
 
     // check if impact of under limit providers represent more than [limit] % of identified expenses and upper limit providers impacts
-    if (Math.abs(impactOfUnderLimitCompanies) >= Math.abs(impactOfIdentifiedFlows + impactOfUpperLimitFlows)*limit) isSignificative = true;
+    if (Math.abs(impactOfUnderLimitFlows) >= Math.abs(impactOfIdentifiedFlows + impactOfUpperLimitFlows)*limit) isSignificative = true;
 
     if (!isSignificative) index++;
   }
 
   // Retrieve list of companies
-  let significativeProviders = index>0 ? unidentifiedFlows.slice(index-1).map(provider => provider.providerNum) : [];
-  return significativeProviders;
+  let significativeFlows = index>0 ? unidentifiedFlows.slice(index-1) : [];
+  return significativeFlows;
 }
 
 /* ------------------------------------- DEFAULT MAPPING BY CHAT-GPT -------------------------------------------- */
