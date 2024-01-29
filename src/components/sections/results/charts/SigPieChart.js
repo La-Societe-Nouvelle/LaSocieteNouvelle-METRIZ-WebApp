@@ -11,7 +11,7 @@ import { Doughnut } from "react-chartjs-2";
 Chart.register(ChartDataLabels, ChartAnnotation);
 
 // Utils
-import { getPrevPeriod } from "../../../../utils/periodsUtils";
+import { getLabelPeriod, getPrevPeriod } from "../../../../utils/periodsUtils";
 
 // Styles
 import {
@@ -61,10 +61,11 @@ export const SigPieChart = ({
 
   // --------------------------------------------------
   // Options
+  const value =  chartData.datasets.length > 1 ? chartData.datasets[1]?.data[0] : chartData.datasets[0]?.data[0];
 
   const chartOptions = buildChartOptions(
     datasetOptions,
-    printOptions
+    value
   );
 
   // --------------------------------------------------
@@ -96,7 +97,6 @@ const buildChartData = (
     aggregate,
     indic
   } = datasetOptions;
-  
   const {
     showPreviousData
   } = printOptions;
@@ -110,11 +110,13 @@ const buildChartData = (
   // prev period
   
   const prevPeriod = getPrevPeriod(availablePeriods,period);
+
   if (showPreviousData && prevPeriod)
   {
     const prevValue = aggregateData.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value;
 
     datasets.push({
+      label : getLabelPeriod(prevPeriod.periodKey),
       data: [
         prevValue, 
         100 - prevValue
@@ -122,8 +124,8 @@ const buildChartData = (
       datalabels: { display: false },
       borderWidth: 2,
       backgroundColor: [
-        prevAggregatesChartColors[aggregate.id],
-        "rgba(215, 220, 251, 0)",
+        prevAggregatesChartColors[aggregate],
+        colors.lightBackground
       ],
       weight: 0.3,
     });
@@ -136,6 +138,7 @@ const buildChartData = (
   const value = aggregateData.periodsData[period.periodKey].footprint.indicators[indic].value;
 
   datasets.push({
+    label : getLabelPeriod(period.periodKey),
     data: [
       value, 
       100 - value
@@ -143,8 +146,8 @@ const buildChartData = (
     datalabels: { display: false },
     borderWidth: 2,
     backgroundColor: [
-      aggregatesChartColors[aggregate.id],
-      "rgb(247, 247, 247)",
+      aggregatesChartColors[aggregate],
+      colors.lightBackground
     ],
   });
   labels.push("");
@@ -162,20 +165,15 @@ const buildChartData = (
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (
-  datasetOptions,
-  printOptions
+  printOptions,
+  value
 ) => {
-
-  const {
-    period
-  } = datasetOptions;
 
   const {
     printMode
   } = printOptions;
 
   const chartOptions = {
-    hover: { mode: null },
     scales: {
       x: {
         display: false,
@@ -185,7 +183,6 @@ const buildChartOptions = (
       },
     },
     plugins: {
-
       legend: {
         display: false,
       },
@@ -194,10 +191,10 @@ const buildChartOptions = (
           {
             type: "label",
             xScaleID: "x-axis-0",
-            //content: value + "%", 
+            content: value + "%", 
             color: colors.textColor,
             font: {
-              size: 14,
+              size: 12,
               family: "Raleway",
               weight: "bold",
             },
@@ -205,12 +202,19 @@ const buildChartOptions = (
         ],
       },
       tooltip: {
+        filter: function (tooltipItem) {
+          return tooltipItem.dataIndex === 0; // show first value only
+        },
         backgroundColor: tooltips.backgroundColor,
-        cornerRadius: 2,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         callbacks: {
-          label: function (context) {
-            const period = context.datasetIndex == 0 ? "(N-1)" : "";
-            return context.parsed + "% " + period;
+          label: (context) => {
+            const value = context.parsed;
+            return `Empreinte  ${value}%`;
+          },
+          title: (context) => {
+            return context[0]?.dataset.label
           },
         },
       },

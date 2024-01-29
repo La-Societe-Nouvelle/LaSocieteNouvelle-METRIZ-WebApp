@@ -11,8 +11,8 @@ Chart.register(ChartDataLabels);
 import { getAggregatesDistribution } from "./chartsUtils";
 
 // Styles
-import { aggregatesChartColors, prevAggregatesChartColors, tooltips } from "../../../../constants/chartColors";
-import { getPrevPeriod } from "../../../../utils/periodsUtils";
+import { aggregatesChartColors, colors, prevAggregatesChartColors, tooltips } from "../../../../constants/chartColors";
+import { getLabelPeriod, getPrevPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- VALUE DISTRIBUTION CHART ---------- */
 
@@ -84,24 +84,22 @@ const buildChartData = (
   const {
     period
   } = datasetOptions;
-
   const {
-    showPreviousPeriod
+    showPreviousData
   } = printOptions;
 
   const datasets = [];
-  const labels = [];
 
   // --------------------------------------------------
   // Previous period
-
   const prevPeriod = getPrevPeriod(availablePeriods,period);
-  if (showPreviousPeriod && prevPeriod)
+  if (showPreviousData && prevPeriod)
   {
     const prevPeriodDistribution = getAggregatesDistribution(aggregates,prevPeriod.periodKey);
-   
+    const aggregatesLabels = prevPeriodDistribution.map((item) => item.label);
+
     const prevPeriodData = {
-      labels : prevPeriodDistribution.map((item) => item.label),
+      label: getLabelPeriod(prevPeriod.periodKey),
       data: prevPeriodDistribution.map(aggregate => aggregate.percentage),
       borderWidth: 2,
       backgroundColor: prevPeriodDistribution.map((item) => prevAggregatesChartColors[item.id]),
@@ -109,57 +107,96 @@ const buildChartData = (
     };
 
     datasets.push(prevPeriodData);
+  
+  
   };
 
   // --------------------------------------------------
   // Current period
 
   const currPeriodDistribution = getAggregatesDistribution(aggregates,period.periodKey);
-
   const currentPeriod = {
-    labels: currPeriodDistribution.map((item) => item.label),
+    label: getLabelPeriod(period.periodKey),
     data: currPeriodDistribution.map((aggregate) => aggregate.percentage),
     borderWidth: 2,
     backgroundColor: currPeriodDistribution.map((item) => aggregatesChartColors[item.id]),
   };
 
+
   datasets.push(currentPeriod);
+
 
   // --------------------------------------------------
 
   const chartData = {
     datasets,
-    labels,
+    labels: [
+      "Consommations intermédiaires",
+      "Consommations de capital fixe",
+      "Valeur ajoutée nette",
+    ],
   };
-
   return chartData;
 }
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = (printOptions) => 
+const buildChartOptions = () => 
 {
-  const {
-    printMode
-  } = printOptions;
 
   const chartOptions = {
     devicePixelRatio: 2,
-    maintainAspectRatio: printMode ? false : true,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "bottom",
+        labels: {
+          boxWidth: 10,
+          color : colors.textColor,
+          font: {
+            size: 10,
+            family: "Roboto",
+          },
+          generateLabels: (chart) => {
+            const labels = [];
+            console.log(chart.data)
+            const dataset = chart.data.datasets.length > 1? chart.data.datasets[1] :chart.data.datasets[0];  
+            chart.data.labels.forEach((label,index) => {
+              labels.push({
+                text: chart.data.labels[index],
+                fillStyle: dataset.backgroundColor[index],
+                strokeStyle: dataset.backgroundColor[index],
+                lineWidth: 0,
+                hidden: false,
+                boxWidth: 10,
+              });
+                    
+            })
+        
+            return labels;
+          },
+       
+        },
       },
       datalabels: {
-        color : "#FFFFFF",
+        color : "#FFF",
+        // color: (context) => {
+        //   console.log('context labels',context)
+        //   if (context.datasetIndex === 1 ) {
+        //     return "#FFF";
+        //   } else {
+        //     return colors.textColor;
+        //   }
+        // },
         font: {
           size: 10,
-          family: "Raleway",
-          weight: "bold",
+          family: "Roboto",
         },
+        borderRadius: 5,
+        align: "center",
         formatter: (value) => {
           if (value !== 0) {
-            return value + "%";
+            return `${value}%`;
           } else {
             return null;
           }
@@ -169,15 +206,15 @@ const buildChartOptions = (printOptions) =>
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,
-        usePointStyle: true,
         callbacks: {
-          label: function (context) {
-            let label = context.label;
-            if (context.datasetIndex === 0) {
-              label += " (N-1)"; 
-            }
-            return label;
+          label: (context) => {
+            const value = context.parsed;
+            return `Empreinte  ${value}%`;
           },
+          title: (context) => {
+            return context[0]?.dataset.label
+          },
+
         },
       },
     },
@@ -185,8 +222,8 @@ const buildChartOptions = (printOptions) =>
       padding: {
         left: 50,
         right: 50,
-        top : 0,
-        bottom : 0
+        top: 0,
+        bottom: 0,
       },
     },
   };

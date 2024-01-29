@@ -129,7 +129,7 @@ const Results = ({ session, period, publish, goBack }) => {
 
       <View viewCode={showedView} period={period} session={session} />
 
-      {!isLoading && <PrintChartsContainer session={session} period={period} />}
+      {/* {!isLoading && <PrintChartsContainer session={session} period={period} />} */}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
       {isLoading && (

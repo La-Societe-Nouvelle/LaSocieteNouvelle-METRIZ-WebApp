@@ -108,7 +108,7 @@ export const GrossImpactDistributionVisual = ({
               period
             }}
             printOptions={{
-              showPreviousPeriod: true,
+              showPreviousData: true,
               printMode: false
             }}
           />
