@@ -235,13 +235,14 @@ const buildChartOptions = (printOptions) =>
         },
       },
       datalabels: {
-        align : "top",
-        backgroundColor : colors.lightBackground,
+        align : printMode ? "center" : "top",
+        backgroundColor : printMode ? colors.transparent : colors.lightBackground,
         borderRadius: 5,
-        color : colors.textColor,
+        color : printMode ? "#FFF" : colors.textColor,
         font: {
-          size: 10,
+          size: printMode ? 32 : 10,
           family: "Roboto",
+          weight : "bold"
         },
         borderRadius: 5,
         formatter: (value) => {

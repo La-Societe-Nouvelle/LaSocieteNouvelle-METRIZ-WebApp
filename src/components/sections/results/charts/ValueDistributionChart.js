@@ -164,13 +164,13 @@ const buildChartOptions = () => {
       },
       datalabels: {
         align: "top",
-
         backgroundColor: colors.lightBackground,
         borderRadius: 5,
         color: colors.textColor,
         font: {
           size: 10,
           family: "Roboto",
+          weight : "bold"
         },
         borderRadius: 5,
         formatter: (value) => {
