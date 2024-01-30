@@ -98,28 +98,29 @@ const buildChartData = (session,datasetOptions) =>
     aggregate,
     indic
   );
-  const legalUnitSituationDataset = {
-    label: "Situation",
-    type: "bubble",
-    data: legalUnitData,
-    backgroundColor: trendChartColors.legalunit,
-    borderColor: trendChartColors.legalunit,
-    borderWidth: 4,
-    order: 1,
-    tooltip: {
-      enabled: true,
-    },
-  };
-  datasets.push(legalUnitSituationDataset);
+
+  const lastItemIndex = legalUnitData.length - 1;
 
   const legalunitEvolutionDataset = {
+    label : "Unité légale",
     data: legalUnitData,
     type: "line",
-    borderColor: trendChartColors.legalunit,
     fill: false,
-    tooltip: {
-      enabled: false,
+    tension: 0.3,
+    borderColor : trendChartColors.previous,
+    borderWidth: (context) => {
+      return context.dataset.type === 'line' ? 4 : 1;
+    }, 
+    pointBorderColor: (context) => {
+      return context.dataIndex !== lastItemIndex ? trendChartColors.legalunit : trendChartColors.previous;
     },
+    backgroundColor: (context) => {
+      return context.dataIndex !== lastItemIndex ?  trendChartColors.legalunit :  trendChartColors.previous;
+    },
+    pointRadius: (context) => {
+      return context.dataIndex !== lastItemIndex ?  6 :  4;
+    },
+ 
   };
   datasets.push(legalunitEvolutionDataset);
 
@@ -335,8 +336,9 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         },
         type: "time",
         time: {
-          time: {
-            unit: "year",
+          unit: "year",
+          displayFormats: {
+            year: "YYYY", 
           },
         },
       },
@@ -415,20 +417,17 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         cornerRadius: tooltips.cornerRadius,
         usePointStyle: true,
         intersect: false,
-        filter: function (tooltipItem) {
-          return tooltipItem.datasetIndex !== 4; // Dataset à exclure
-        },
         callbacks: {
-          title: function (tooltipItems, data) {
-            if (tooltipItems.length > 0) {
-              let date = new Date(tooltipItems[0].raw.x);
-              let year = date.getFullYear();
-              return year;
-            }
+          title: (context) => {
+            return context[0]?.dataset.label;
           },
           label: function (context) {
-            let label = " " + context.parsed.y + " " + unit;
-            return label;
+      
+            if (context.dataIndex !== 0 || context.datasetIndex == 0) {
+              return `${context.raw.x} : ${context.raw.y} ${unit}`;
+            } else {
+              return null;
+            }
           },
         },
       },
