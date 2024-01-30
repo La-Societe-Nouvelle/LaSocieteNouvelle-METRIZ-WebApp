@@ -52,7 +52,6 @@ export const TrendChart = ({
     session,
     datasetOptions
   );
-  console.log(chartData);
 
   // --------------------------------------------------
   // Options
