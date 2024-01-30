@@ -235,7 +235,7 @@ const buildChartOptions = (printOptions) =>
         },
       },
       datalabels: {
-        align : printMode ? "center" : "top",
+        align : printMode ? "center" : "bottom",
         backgroundColor : printMode ? colors.transparent : colors.lightBackground,
         borderRadius: 5,
         color : printMode ? "#FFF" : colors.textColor,

@@ -163,7 +163,7 @@ const buildChartOptions = () => {
         },
       },
       datalabels: {
-        align: "top",
+        align: "bottom",
         backgroundColor: colors.lightBackground,
         borderRadius: 5,
         color: colors.textColor,
