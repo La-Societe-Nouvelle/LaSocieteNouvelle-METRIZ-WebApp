@@ -13,7 +13,11 @@ export const getCutOut = (width, factor) => {
 export const getMaxY = (datasets) => {
   const maxValues = datasets.map((dataset) => {
     if (dataset) {
-      const max = Math.max(...dataset.data.filter((value) => isValidNumber(value)));
+      const max = Math.max(...dataset.data
+        .filter(value => value)
+        .map(value => value.y || value)
+        .filter((yValue) => isValidNumber(yValue))
+      );
       return max;
     }
     return 0;
