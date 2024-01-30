@@ -17,37 +17,32 @@ import { getLabelPeriod, getPrevPeriod } from "../../../../utils/periodsUtils";
 /* ---------- VALUE DISTRIBUTION CHART ---------- */
 
 /** Pie chart to show production distribution between main aggregates
- *  
+ *
  *  Args :
  *    - id
  *    - session
  *    - datasetOptions
  *    - printOptions
- * 
+ *
  *  datasetOptions :
  *    - period
- * 
+ *
  *  printOptions :
  *    - printMode -> to maintain aspect ratio
  *    - shpwPreviousPeriod
- * 
+ *
  */
 
 export const ValueDistributionChart = ({
   id,
   session,
   datasetOptions,
-  printOptions
+  printOptions,
 }) => {
-
   // --------------------------------------------------
   // Data
 
-  const chartData = buildChartData(
-    session,
-    datasetOptions,
-    printOptions
-  );
+  const chartData = buildChartData(session, datasetOptions, printOptions);
 
   // --------------------------------------------------
   // Options
@@ -56,75 +51,65 @@ export const ValueDistributionChart = ({
 
   // --------------------------------------------------
 
-  return (
-    <Doughnut 
-      id={id} 
-      data={chartData} 
-      options={chartOptions} 
-    />
-  );
-}
+  return <Doughnut id={id} data={chartData} options={chartOptions} />;
+};
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (
-  session,
-  datasetOptions,
-  printOptions
-) => {
-
+const buildChartData = (session, datasetOptions, printOptions) => {
   const { availablePeriods, financialData } = session;
-  const {
+  const { intermediateConsumptions, fixedCapitalConsumptions, netValueAdded } =
+    financialData.mainAggregates;
+  const aggregates = [
     intermediateConsumptions,
     fixedCapitalConsumptions,
-    netValueAdded
-  } = financialData.mainAggregates;
-  const aggregates = [intermediateConsumptions,fixedCapitalConsumptions,netValueAdded];
+    netValueAdded,
+  ];
 
-  const {
-    period
-  } = datasetOptions;
-  const {
-    showPreviousData
-  } = printOptions;
+  const { period } = datasetOptions;
+  const { showPreviousData } = printOptions;
 
   const datasets = [];
 
   // --------------------------------------------------
   // Previous period
-  const prevPeriod = getPrevPeriod(availablePeriods,period);
-  if (showPreviousData && prevPeriod)
-  {
-    const prevPeriodDistribution = getAggregatesDistribution(aggregates,prevPeriod.periodKey);
-    const aggregatesLabels = prevPeriodDistribution.map((item) => item.label);
+  const prevPeriod = getPrevPeriod(availablePeriods, period);
+  if (showPreviousData && prevPeriod) {
+    const prevPeriodDistribution = getAggregatesDistribution(
+      aggregates,
+      prevPeriod.periodKey
+    );
 
     const prevPeriodData = {
       label: getLabelPeriod(prevPeriod),
-      data: prevPeriodDistribution.map(aggregate => aggregate.percentage),
+      data: prevPeriodDistribution.map((aggregate) => aggregate.percentage),
       borderWidth: 2,
-      backgroundColor: prevPeriodDistribution.map((item) => prevAggregatesChartColors[item.id]),
-      weight: 0.4
+      backgroundColor: prevPeriodDistribution.map(
+        (item) => prevAggregatesChartColors[item.id]
+      ),
+      weight: 0.4,
     };
 
     datasets.push(prevPeriodData);
-  
-  
-  };
+  }
 
   // --------------------------------------------------
   // Current period
 
-  const currPeriodDistribution = getAggregatesDistribution(aggregates,period.periodKey);
+  const currPeriodDistribution = getAggregatesDistribution(
+    aggregates,
+    period.periodKey
+  );
   const currentPeriod = {
     label: getLabelPeriod(period),
     data: currPeriodDistribution.map((aggregate) => aggregate.percentage),
     borderWidth: 2,
-    backgroundColor: currPeriodDistribution.map((item) => aggregatesChartColors[item.id]),
+    backgroundColor: currPeriodDistribution.map(
+      (item) => aggregatesChartColors[item.id]
+    ),
   };
 
-
   datasets.push(currentPeriod);
-
 
   // --------------------------------------------------
 
@@ -137,31 +122,32 @@ const buildChartData = (
     ],
   };
   return chartData;
-}
+};
 
 // ################################################## OPTIONS ##################################################
 
-const buildChartOptions = () => 
-{
-
+const buildChartOptions = () => {
   const chartOptions = {
     devicePixelRatio: 2,
     plugins: {
       legend: {
         display: true,
         position: "bottom",
+
         labels: {
           boxWidth: 10,
-          color : colors.textColor,
+          color: colors.textColor,
           font: {
             size: 10,
             family: "Roboto",
           },
           generateLabels: (chart) => {
             const labels = [];
-            console.log(chart.data)
-            const dataset = chart.data.datasets.length > 1? chart.data.datasets[1] :chart.data.datasets[0];  
-            chart.data.labels.forEach((label,index) => {
+            const dataset =
+              chart.data.datasets.length > 1
+                ? chart.data.datasets[1]
+                : chart.data.datasets[0];
+            chart.data.labels.forEach((label, index) => {
               labels.push({
                 text: chart.data.labels[index],
                 fillStyle: dataset.backgroundColor[index],
@@ -170,30 +156,23 @@ const buildChartOptions = () =>
                 hidden: false,
                 boxWidth: 10,
               });
-                    
-            })
-        
+            });
+
             return labels;
           },
-       
         },
       },
       datalabels: {
-        color : "#FFF",
-        // color: (context) => {
-        //   console.log('context labels',context)
-        //   if (context.datasetIndex === 1 ) {
-        //     return "#FFF";
-        //   } else {
-        //     return colors.textColor;
-        //   }
-        // },
+        align: "top",
+
+        backgroundColor: colors.lightBackground,
+        borderRadius: 5,
+        color: colors.textColor,
         font: {
           size: 10,
           family: "Roboto",
         },
         borderRadius: 5,
-        align: "center",
         formatter: (value) => {
           if (value !== 0) {
             return `${value}%`;
@@ -212,21 +191,12 @@ const buildChartOptions = () =>
             return `Empreinte  ${value}%`;
           },
           title: (context) => {
-            return context[0]?.dataset.label
+            return context[0]?.dataset.label;
           },
-
         },
-      },
-    },
-    layout: {
-      padding: {
-        left: 50,
-        right: 50,
-        top: 0,
-        bottom: 0,
       },
     },
   };
 
   return chartOptions;
-}
+};

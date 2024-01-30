@@ -61,9 +61,8 @@ export const GrossImpactDistributionVisual = ({
 
   return (
     <div className="box">
-      <Row className="align-items-center mx-auto ">
-        <Col lg="1"></Col>
-        <Col lg="3">
+      <Row className="align-items-center">
+        <Col  lg={{ span: 3, offset: 1 }}  >
           <h4 className="text-center">Répartition des impacts bruts</h4>
           <GrossImpactChart
             id={"part-" + indic}
@@ -78,8 +77,8 @@ export const GrossImpactDistributionVisual = ({
             }}
           />
         </Col>
-        <Col lg="4">
-          <div className="impactful-expenses mx-5">
+        <Col lg={4}  className="border-right" >
+          <div className="impactful-expenses ">
             <h5 className="mb-4">Comptes de charges ayant le plus d'impact</h5>
             {mostImpactfulExpensesAccounts.map((account, index) => (
               <div
@@ -99,7 +98,7 @@ export const GrossImpactDistributionVisual = ({
             ))}
           </div>
         </Col>
-        <Col lg="3">
+        <Col lg={3}>
           <h4 className="text-center">Répartition de la valeur</h4>
           <ValueDistributionChart
             id={"part-" + indic}
@@ -113,7 +112,6 @@ export const GrossImpactDistributionVisual = ({
             }}
           />
         </Col>
-        <Col lg="1"></Col>
       </Row>
     </div>
   );

@@ -8,13 +8,14 @@ Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
 // Utils
-import { getPrevPeriod } from "../../../../utils/periodsUtils";
+import { getLabelPeriod, getPrevPeriod } from "../../../../utils/periodsUtils";
 
 // Colors
 import {
   prevAggregatesChartColors,
   aggregatesChartColors,
   tooltips,
+  colors,
 } from "../../../../constants/chartColors";
 
 /* ---------- GROSS IMPACT CHART ---------- */
@@ -108,6 +109,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     const prevGrossImpactsDistribution = getGrossImpactsDistribution(financialData.mainAggregates, prevPeriod, indic, prevProductionGrossImpacts);
   
     const prevData = {
+      label: getLabelPeriod(prevPeriod),
       data: [
         prevGrossImpactsDistribution.intermediateConsumptions,
         prevGrossImpactsDistribution.fixedCapitalConsumptions,
@@ -132,6 +134,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   const grossImpactsDistribution = getGrossImpactsDistribution(financialData.mainAggregates, period, indic, productionGrossImpacts);
 
   const currentPeriod = {
+    label: getLabelPeriod(period),
     data: [
       grossImpactsDistribution.intermediateConsumptions,
       grossImpactsDistribution.fixedCapitalConsumptions,
@@ -202,18 +205,48 @@ const buildChartOptions = (printOptions) =>
     maintainAspectRatio: printMode ? false : true,
     plugins: {
       legend: {
-        display: false,
+        display:  printMode ? false : true,
+        position: "bottom",
+        labels: {
+          boxWidth: 10,
+          color : colors.textColor,
+          font: {
+            size: 10,
+            family: "Roboto",
+          },
+          generateLabels: (chart) => {
+            const labels = [];
+            const dataset = chart.data.datasets.length > 1? chart.data.datasets[1] :chart.data.datasets[0];  
+            chart.data.labels.forEach((label,index) => {
+              labels.push({
+                text: chart.data.labels[index],
+                fillStyle: dataset.backgroundColor[index],
+                strokeStyle: dataset.backgroundColor[index],
+                lineWidth: 0,
+                hidden: false,
+                boxWidth: 10,
+              });
+                    
+            })
+        
+            return labels;
+          },
+       
+        },
       },
       datalabels: {
-        color: "#FFFFFF",
+        align : "top",
+        backgroundColor : colors.lightBackground,
+        borderRadius: 5,
+        color : colors.textColor,
         font: {
-          size: printMode ? 24 : 10,
-          family: "Raleway",
-          weight: "bold",
+          size: 10,
+          family: "Roboto",
         },
+        borderRadius: 5,
         formatter: (value) => {
           if (value !== 0) {
-            return value + "%";
+            return `${value}%`;
           } else {
             return null;
           }
@@ -221,28 +254,22 @@ const buildChartOptions = (printOptions) =>
       },
       tooltip: {
         backgroundColor: tooltips.backgroundColor,
-        padding : tooltips.padding,
-        cornerRadius : tooltips.cornerRadius,
-        usePointStyle: true,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         callbacks: {
-          label: function (context) {
-            let label = context.label;
-            if (context.datasetIndex === 0) {
-              label += " (N-1)"; 
-            }
-            return label;
+          label: (context) => {
+            const value = context.parsed;
+            return `Empreinte  ${value}%`;
           },
+          title: (context) => {
+            return context[0]?.dataset.label
+          },
+
         },
       },
       
     },
-    layout: {
-      padding: {
-        left: printMode? 0 : 50,
-        right: printMode ? 0 : 50,
-        top : 0
-      },
-    },
+    
   };
 
   return chartOptions;

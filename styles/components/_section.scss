@@ -375,7 +375,6 @@ section {
   }
 }
 .impactful-expenses {
-  padding: 0 1rem;
   h5 {
     font-size: 0.8rem;
   }
@@ -383,9 +382,8 @@ section {
     font-size: 0.8rem;
     margin-bottom:  0.75rem; 
     .percentage-box {
-      width: 150px;
-      height: 30px;
-      background-color: $bg-light;
+      width: 7vw;
+      height:  1.8vw;
       border : 1px solid $light;
       font-weight: bold;
       display: flex;
