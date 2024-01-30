@@ -7,6 +7,7 @@ import { Button, Modal, Tab, Tabs } from "react-bootstrap";
 // Components
 import { SocialStatementsTab } from "./SocialStatementsTab";
 import { IndividualsDataTab } from "./IndividualsDataTab";
+import { ExecutivesDataTab } from "./ExecutivesDataTab";
 
 // Utils
 import {
@@ -106,6 +107,7 @@ const AssessmentDSN = ({
 
   // ----------------------------------------------------------------------------------------------------
 
+  console.log(impactsData);
   return (
     <>
       <Button
@@ -145,6 +147,14 @@ const AssessmentDSN = ({
                 individualsData={individualsData}
                 onUpdateIndividualsData={handleIndividualsData}
                 resetIndividualsData={resetIndividualsData}
+              />
+            </Tab>
+            <Tab eventKey="executiveData" title="Dirigeants">
+              <ExecutivesDataTab
+                individualsData={individualsData}
+                onUpdateIndividualsData={handleIndividualsData}
+                resetIndividualsData={resetIndividualsData}
+                personnelExpenses={impactsData.FECData.personnelExpenses}
               />
             </Tab>
           </Tabs>

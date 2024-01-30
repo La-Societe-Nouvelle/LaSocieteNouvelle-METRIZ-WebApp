@@ -245,8 +245,10 @@ export const FinancialDataForm = ({
       impactsDataOnFinancialPeriod.netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[financialPeriod.periodKey].amount;
       impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = roundValue(accountingData.KNWData.apprenticeshipTax, 2);
       impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = roundValue(accountingData.KNWData.vocationalTrainingTax, 2);
+      impactsDataOnFinancialPeriod.FECData.personnelExpenses = accountingData.personnelExpenses
+        .map((expense) => ({ ...expense, accountLib: accountingData.accounts[expense.accountNum]}));
 
-        // FEC id
+      // FEC id
       session.id = FECData.id; // anonymisation id
 
       // console logs
