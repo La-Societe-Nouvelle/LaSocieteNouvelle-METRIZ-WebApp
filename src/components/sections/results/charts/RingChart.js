@@ -64,9 +64,9 @@ const buildChartData = (session, datasetOptions) => {
   const indicColor = metaIndics[indic].color;
   const branchIndicColor = changeOpacity(indicColor, 0.3);
 
-
+  const periodLabel = getLabelPeriod(period);
   const datasets = [];
-
+  const labels = ["Branche", periodLabel];
   // --------------------------------------------------
   // Branch
 
@@ -88,7 +88,7 @@ const buildChartData = (session, datasetOptions) => {
   datasets.push({
     data: [legalUnitFpt, roundValue(100 - legalUnitFpt, 2)],
     backgroundColor: [indicColor, colors.lightBackground],
-    label: getLabelPeriod(period),
+    label: "Unité Légale",
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
   });
@@ -97,6 +97,7 @@ const buildChartData = (session, datasetOptions) => {
 
   const chartData = {
     datasets,
+    labels
   };
 
   return chartData;
@@ -155,15 +156,14 @@ const buildChartOptions = (printOptions) => {
         },
       },
       tooltip: {
-        filter: function (tooltipItem) {
-          return tooltipItem.dataIndex === 0; // show first value only
-        },
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,
         callbacks: {
           label: (context) => {
-            const value = context.parsed;
+            const datasets = context.chart.data.datasets;
+            const index = context.datasetIndex;
+            const value = datasets[index].data[0] ;
             return `Empreinte de la production: ${value}%`;
           },
           title: (context) => {
@@ -183,21 +183,18 @@ const buildChartOptions = (printOptions) => {
           },
           generateLabels: (chart) => {
             const labels = [];
-            const uniqueIndicators = new Set();
-            chart.data.datasets.forEach((dataset) => {
-              const indicator = dataset.label;
-              if (!uniqueIndicators.has(indicator)) {
-                uniqueIndicators.add(indicator);
+            chart.data.datasets.forEach((dataset,index) => {
+              const label = chart.data.labels[index];
                 const backgroundColor = dataset.backgroundColor[0];
                 labels.push({
-                  text: indicator,
+                  text: label,
                   fillStyle: backgroundColor,
                   strokeStyle: backgroundColor,
                   lineWidth: 0,
                   hidden: false,
                   boxWidth: 10,
                 });
-              }
+             
             });
             return labels;
           },

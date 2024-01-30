@@ -89,7 +89,6 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     showDivisionData,
     showTargetData,
     useIndicColors,
-    label
   } = printOptions;
 
   const datasets = [];
@@ -98,12 +97,12 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     showDivisionData,
     period
   );
-
+    console.log(labels);
   // --------------------------------------------------
   // footprint dataset
 
   const footprintDataset = {
-    label: getLabelPeriod(period),
+    label: "Empreinte",
     data: buildFootprintData(
       comparativeData,
       aggregate,
@@ -306,9 +305,10 @@ const buildChartOptions = (
 ) => {
 
   const {
-    indic
+    indic,
+    period,
   } = datasetOptions;
-
+  console.log('options',datasetOptions);
   const {
     printMode,
     showLegend,
@@ -322,6 +322,8 @@ const buildChartOptions = (
 
   // Determine Y-Axis Max
   const maxY = unit === "%" ? getMaxY(chartData.datasets) : null;
+
+  // Custom Title 
 
   const chartOptions = {
     aspectRatio: aspectRatio,
@@ -425,8 +427,15 @@ const buildChartOptions = (
         callbacks: {
           label: function (context) {
             return (
-              `${context.dataset.label} : ${ printValue(context.raw, nbDecimals)}${unit}`
+              `${context?.dataset.label} : ${ printValue(context?.raw, nbDecimals)}${unit}`
             );
+          },
+          title: (context) => {
+
+            const periodLabel = getLabelPeriod(period);
+            const customTitle = context[0].label == periodLabel ? "Unité Légale" : context[0].label;
+            
+            return customTitle
           },
         },
       },

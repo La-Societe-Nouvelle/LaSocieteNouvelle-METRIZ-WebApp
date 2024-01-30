@@ -202,15 +202,14 @@ const buildChartOptions = (
         ],
       },
       tooltip: {
-        filter: function (tooltipItem) {
-          return tooltipItem.dataIndex === 0; // show first value only
-        },
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,
         callbacks: {
           label: (context) => {
-            const value = context.parsed;
+            const datasets = context.chart.data.datasets;
+            const index = context.datasetIndex;
+            const value = datasets[index].data[0] ;
             return `Empreinte  ${value}%`;
           },
           title: (context) => {
