@@ -259,8 +259,7 @@ const buildChartOptions = (printOptions) =>
         cornerRadius: tooltips.cornerRadius,
         callbacks: {
           label: (context) => {
-            const value = context.parsed;
-            return `Empreinte  ${value}%`;
+            return `${context.label} : ${context.parsed}%`;
           },
           title: (context) => {
             return context[0]?.dataset.label
