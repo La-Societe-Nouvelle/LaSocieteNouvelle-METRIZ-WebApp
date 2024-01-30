@@ -10,7 +10,7 @@ import metaIndics from "/lib/indics";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
-import { getMaxY, changeOpacity } from "./chartsUtils";
+import { changeOpacity } from "./chartsUtils";
 import { getLabelPeriod } from "../../../../utils/periodsUtils";
 
 // Styles
@@ -97,7 +97,6 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     showDivisionData,
     period
   );
-    console.log(labels);
   // --------------------------------------------------
   // footprint dataset
 
@@ -308,20 +307,18 @@ const buildChartOptions = (
     indic,
     period,
   } = datasetOptions;
-  console.log('options',datasetOptions);
   const {
     printMode,
     showLegend,
     showXlabels,
-    aspectRatio
+    aspectRatio,
+    maxYAxis
   } = printOptions;
   const {
     unit,
     nbDecimals
   } = metaIndics[indic];
 
-  // Determine Y-Axis Max
-  const maxY = unit === "%" ? getMaxY(chartData.datasets) : null;
 
   // Custom Title 
 
@@ -340,7 +337,7 @@ const buildChartOptions = (
       y: {
         display: true,
         min: 0,
-        max: maxY,
+        suggestedMax: maxYAxis,
         ticks: {
           color: colors.textColor,
           font: {

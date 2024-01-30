@@ -2,6 +2,7 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
 import { VerticalBarChart } from "../charts/VerticalBarChart";
+import { getMaxFootprintValue } from "../charts/chartsUtils";
 
 export const ComparativeDataContainer = ({
   session,
@@ -17,10 +18,13 @@ export const ComparativeDataContainer = ({
     netValueAdded: "Valeur ajoutée nette",
   };
 
+  const maxFootprintValue = getMaxFootprintValue(session, period, indic);
+
   return (
     <div className="mb-4">
       <h4>Comparaison par activité</h4>
       <Row>
+ 
         {Object.keys(aggregates).map((aggregate) => (
           <React.Fragment key={aggregate}>
             <Col sm={3} xl={3} lg={3} md={3}>
@@ -43,6 +47,7 @@ export const ComparativeDataContainer = ({
                   showLegend : false,
                   showXlabels : true,
                   aspectRatio : 1.5,
+                  maxYAxis : maxFootprintValue,
                   label: "Empreinte"
                 }}
               />

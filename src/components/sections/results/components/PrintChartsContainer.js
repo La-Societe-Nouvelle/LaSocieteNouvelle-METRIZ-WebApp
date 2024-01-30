@@ -15,6 +15,7 @@ import { HorizontalBarChart } from "../charts/HorizontalBarChart";
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getPrevDate } from "../../../../utils/periodsUtils";
 import { VerticalBarChart } from "../charts/VerticalBarChart";
+import { getMaxFootprintValue } from "../charts/chartsUtils";
 
 /* ---------- CHARTS CONTAINER ---------- */
 
@@ -162,6 +163,9 @@ const renderComparativeCharts = ({
   aggregate,
   indic
 }) => {
+
+  const maxFootprintValue = getMaxFootprintValue(session, period, indic);
+
   return (
     <div key={chartId} className={"comparative-chart-container"}>
       <VerticalBarChart
@@ -181,6 +185,7 @@ const renderComparativeCharts = ({
           showLegend : false,
           showXlabels : true,
           aspectRatio : 1,
+          maxYAxis : maxFootprintValue,
           label: "Production"
         }}
       />
