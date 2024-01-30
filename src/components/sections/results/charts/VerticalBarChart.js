@@ -401,18 +401,23 @@ const buildChartOptions = (
       
       datalabels: {
         display: printMode ? false : true,
+        overlap: 'auto',
         anchor: "end",
-        align: "top",
+        align : "top",
+        textAlign : "center",
         formatter: function (value) {
           if (value) {
-            return `${printValue(value, nbDecimals)} ${unit}`;
+            return `${printValue(value, nbDecimals)}\n${unit}`;
           }
         },
-        color: "#191558",
+        color : colors.textColor,
         font: {
           size: printMode ? 10 : 9,
           family: "Roboto",
         },
+        padding: {
+          bottom: 5, 
+      },
       },
       title: {
         display: false,
