@@ -352,7 +352,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: 10,
+            size: printMode ? 8 : 10,
           },
         },
         grid: {
