@@ -100,7 +100,7 @@ const buildChartData = (session,datasetOptions) =>
   );
 
   const lastItemIndex = legalUnitData.length - 1;
-
+    console.log(legalUnitData.length)
   const legalunitEvolutionDataset = {
     label : "Unité légale",
     data: legalUnitData,
@@ -112,13 +112,14 @@ const buildChartData = (session,datasetOptions) =>
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
     pointBorderColor: (context) => {
-      return context.dataIndex !== lastItemIndex ? trendChartColors.legalunit : trendChartColors.previous;
+      console.log(context)
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.legalunit : trendChartColors.previous;
     },
     backgroundColor: (context) => {
-      return context.dataIndex !== lastItemIndex ?  trendChartColors.legalunit :  trendChartColors.previous;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ?  trendChartColors.legalunit :  trendChartColors.previous;
     },
     pointRadius: (context) => {
-      return context.dataIndex !== lastItemIndex ?  6 :  4;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  6 :  4;
     },
  
   };
