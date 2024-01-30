@@ -435,7 +435,7 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
     {
       image:
       chartImages[`comparative-chart-production-${indic}-print`],
-      width: 130,
+      width: 140,
       alignment: "center", 
     },
     {

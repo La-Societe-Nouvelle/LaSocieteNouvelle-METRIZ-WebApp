@@ -42,7 +42,6 @@ export const VerticalBarChart = ({
   printOptions
 }) => {
 
-  console.log(id);
 
   // --------------------------------------------------
   // Data
@@ -55,7 +54,6 @@ export const VerticalBarChart = ({
   const chartOptions = buildChartOptions(
     datasetOptions,
     printOptions,
-    chartData
   );
 
   // --------------------------------------------------
@@ -300,7 +298,7 @@ const buildLabels = (
 const buildChartOptions = (
   datasetOptions,
   printOptions,
-  chartData
+
 ) => {
 
   const {

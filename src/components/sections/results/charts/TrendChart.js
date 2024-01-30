@@ -100,7 +100,6 @@ const buildChartData = (session,datasetOptions) =>
   );
 
   const lastItemIndex = legalUnitData.length - 1;
-    console.log(legalUnitData.length)
   const legalunitEvolutionDataset = {
     label : "Unité légale",
     data: legalUnitData,
@@ -112,7 +111,6 @@ const buildChartData = (session,datasetOptions) =>
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
     pointBorderColor: (context) => {
-      console.log(context)
       return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.legalunit : trendChartColors.previous;
     },
     backgroundColor: (context) => {
