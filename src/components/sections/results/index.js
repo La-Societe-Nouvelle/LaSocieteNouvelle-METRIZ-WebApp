@@ -22,6 +22,7 @@ import { buildStandardReport } from "./exports/reports/standardReportGenerator";
 import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
 import { buildCompleteFile } from "./exports/completeFileGenerator";
 import { LegalUnitInfo } from "./components/LegalUnitInfo";
+import { getYearPeriod } from "../../../utils/periodsUtils";
 
 /* ---------- RESULTS SECTION ---------- */
 
@@ -52,13 +53,13 @@ const Results = ({ session, period, publish, goBack }) => {
 
   const handleDownload = async (selectedFiles) => {
     setIsGenerating(true);
-
     try {
-      await buildDownloadableFiles(session, period, showedView, selectedFiles);
+     await buildDownloadableFiles(session, period, showedView, selectedFiles);
     } catch (error) {
       setIsGenerating(false);
+    } finally {
+      setIsGenerating(false);
     }
-    setIsGenerating(false);
   };
 
   useEffect(() => {
@@ -67,6 +68,9 @@ const Results = ({ session, period, publish, goBack }) => {
       setShowedView(validations[0]);
     }
   }, []);
+
+
+
 
   return (
     <div className="results">
@@ -128,8 +132,8 @@ const Results = ({ session, period, publish, goBack }) => {
       </div>
 
       <View viewCode={showedView} period={period} session={session} />
-
-      {!isLoading && <PrintChartsContainer session={session} period={period} />}
+       
+      {!isLoading  && <PrintChartsContainer session={session} period={period}  />}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
       {isLoading && (
@@ -265,7 +269,8 @@ const buildDownloadableFiles = async (
 ) => {
   const legalUnit = session.legalUnit.corporateName;
 
-  const year = period.periodKey.slice(2);
+  const year = getYearPeriod(period);
+
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
 
   const showAnalyses = selectedFiles.includes("with-analyses");
