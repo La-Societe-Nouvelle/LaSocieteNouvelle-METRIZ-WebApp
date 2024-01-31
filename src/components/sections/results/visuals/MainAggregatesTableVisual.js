@@ -50,11 +50,12 @@ export const MainAggregatesTableVisual = ({ session, period, indic }) => {
         </Tab>
       </Tabs>
 
+      {/*
+      //Pending--------------------------------------------
       <Accordion className="mt-3 chart-accordion" >
         <Accordion.Item eventKey="0">
           <Accordion.Header as="h5">
             <i className="bi bi-bar-chart-steps me-2"></i>
-            {/* TO DO : Change Label */}
             Visualisation 
           </Accordion.Header>
           <Accordion.Body>
@@ -76,6 +77,9 @@ export const MainAggregatesTableVisual = ({ session, period, indic }) => {
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
+ */}
+
+
     </div>
   );
 };

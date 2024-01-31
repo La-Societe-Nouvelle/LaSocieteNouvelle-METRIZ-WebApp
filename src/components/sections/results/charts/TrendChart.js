@@ -305,6 +305,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
     pointRadius: 0,
     scales: {
       y: {
+        offset: true,
         min: 0,
         max: maxY,
         title: {
@@ -337,7 +338,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         time: {
           unit: "year",
           displayFormats: {
-            year: "YYYY", 
+            year: "YYYY",
           },
         },
       },
@@ -418,12 +419,21 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         intersect: false,
         callbacks: {
           title: (context) => {
-            return context[0]?.dataset.label;
+            if (context[0].datasetIndex == 0) {
+              return context[0]?.dataset.label;
+            } else {
+              return `${context[0]?.dataset.label} - Branche`;
+            }
           },
           label: function (context) {
-      
+
+   
             if (context.dataIndex !== 0 || context.datasetIndex == 0) {
-              return `${context.raw.x} : ${context.raw.y} ${unit}`;
+              if (context.datasetIndex == 0) {
+                return `Exercice ${context.raw.x} : ${context.raw.y} ${unit}`;
+              } else {
+                return `${context.raw.x} : ${context.raw.y} ${unit}`;
+              }
             } else {
               return null;
             }

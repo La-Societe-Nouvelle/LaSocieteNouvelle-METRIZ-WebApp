@@ -267,9 +267,9 @@ const buildChartOptions = (printOptions) =>
 
         },
       },
-      
+
     },
-    
+
   };
 
   return chartOptions;

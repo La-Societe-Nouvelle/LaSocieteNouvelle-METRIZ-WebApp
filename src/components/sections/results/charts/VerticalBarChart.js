@@ -11,10 +11,11 @@ import metaIndics from "/lib/indics";
 // Utils
 import { printValue } from "/src/utils/formatters";
 import { changeOpacity } from "./chartsUtils";
-import { getLabelPeriod } from "../../../../utils/periodsUtils";
+import { getLabelPeriod, getYearPeriod } from "../../../../utils/periodsUtils";
 
 // Styles
 import { colors, comparativeChartColors, tooltips } from "../../../../constants/chartColors";
+import { getLatestYear } from "../utils";
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
@@ -51,10 +52,13 @@ export const VerticalBarChart = ({
   // --------------------------------------------------
   // Options
 
-  const chartOptions = buildChartOptions(
-    datasetOptions,
-    printOptions,
-  );
+    const yearsLabelsTooltips = getYearsLabelsTooltips(session,datasetOptions);
+
+    const chartOptions = buildChartOptions(
+      datasetOptions,
+      printOptions,
+      yearsLabelsTooltips
+    );
 
   // --------------------------------------------------
 
@@ -109,7 +113,6 @@ const buildChartData = (session,datasetOptions,printOptions) =>
       mainAggregates,
       period,
     ),
-    skipNull: true,
     backgroundColor: buildFootprintBackgroundColors(
       indic,
       useIndicColors,
@@ -119,7 +122,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     borderWidth: 0,
     type: "bar",
     barPercentage: 0.6,
-    categoryPercentage: 0.6,
+    categoryPercentage: 0.9,
     minBarLength: 2,
   };
 
@@ -131,7 +134,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
   if (showTargetData)
   {
     const targetDataset = {
-      label: "Objectif 2030",
+      label: "Objectif",
       data: buildTargetData(
         comparativeData,
         aggregate,
@@ -145,8 +148,8 @@ const buildChartData = (session,datasetOptions,printOptions) =>
         showDivisionData
       ),
       borderWidth: 0,
-      barPercentage: 0.6,
-      categoryPercentage: 0.6,
+      barPercentage: 0.5,
+      categoryPercentage: 0.9,
       minBarLength: 2,
     }
 
@@ -263,7 +266,7 @@ const buildTargetBackgroundColors = (
   } 
 
   // Target legal unit
-  backgroundColors.push(null);
+  backgroundColors.push(colors.transparent);
 
   // Target division
   if (showDivisionData) {
@@ -293,13 +296,44 @@ const buildLabels = (
   return labels;
 }
 
+const getYearsLabelsTooltips = (session, datasetOptions) => {
+const {period,aggregate,indic} = datasetOptions;
+
+  const branchData = session.comparativeData[aggregate].division.history.data[indic] ?? [];
+  const targetData = session.comparativeData[aggregate].division.target.data[indic] ?? [];
+  const areaData = session.comparativeData[aggregate].area.history.data[indic] ?? [];
+  const areaTargetData = session.comparativeData[aggregate].area.target.data[indic] ?? [];
+
+  const branchValueYear = getLatestYear(branchData);
+  const targetValueYear = getLatestYear(targetData);
+  const areaValueYear = getLatestYear(areaData);
+  const areaTargetValueYear = getLatestYear(areaTargetData);
+  const legalUnitYear = getYearPeriod(period)
+  return {
+    branchValueYear,
+    targetValueYear,
+    areaValueYear,
+    areaTargetValueYear,
+    legalUnitYear
+  };
+}
+
+
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (
   datasetOptions,
   printOptions,
-
+ yearsLabelsTooltips
 ) => {
+
+  const {
+    branchValueYear,
+    targetValueYear,
+    areaValueYear,
+    areaTargetValueYear,
+    legalUnitYear
+  } = yearsLabelsTooltips;
 
   const {
     indic,
@@ -404,7 +438,7 @@ const buildChartOptions = (
         align : "top",
         textAlign : "center",
         formatter: function (value) {
-          if (value) {
+          if (value || value == 0) {
             return `${printValue(value, nbDecimals)}\n${unit}`;
           }
         },
@@ -424,18 +458,44 @@ const buildChartOptions = (
         backgroundColor: tooltips.backgroundColor,
         padding : tooltips.padding,
         cornerRadius : tooltips.cornerRadius,
+        filter: function (tooltipItem) {
+          // Hide tooltip for null value
+          return tooltipItem.raw ;
+      },
         callbacks: {
           label: function (context) {
-            return (
-              `${context?.dataset.label} : ${ printValue(context?.raw, nbDecimals)}${unit}`
-            );
+
+            const datasetLabel = context?.dataset.label;
+            const rawValue = printValue(context?.raw, nbDecimals);
+            const unitLabel = `${unit}`;
+            // Area dataset
+            if (context.dataIndex === 0) {
+              return (
+                `${datasetLabel} (${context.datasetIndex === 0 ? areaValueYear : areaTargetValueYear}) : ${rawValue}${unitLabel}`
+              );
+            }
+          
+            // Legal Unit dataset
+            if (context.dataIndex === 1) {
+              return (
+                `${datasetLabel} (${legalUnitYear}): ${rawValue}${unitLabel}`
+              );
+            }
+          
+            // Target dataset
+            if (context.dataIndex === 2) {
+              return (
+                `${datasetLabel} (${context.datasetIndex === 0 ? branchValueYear : targetValueYear}) : ${rawValue}${unitLabel}`
+              );
+            }
           },
+          
           title: (context) => {
 
             const periodLabel = getLabelPeriod(period);
-            const customTitle = context[0].label == periodLabel ? "Unité Légale" : context[0].label;
+            const customTitle = context[0]?.label == periodLabel ? "Unité Légale" : context[0]?.label;
             
-            return customTitle
+            return customTitle;
           },
         },
       },

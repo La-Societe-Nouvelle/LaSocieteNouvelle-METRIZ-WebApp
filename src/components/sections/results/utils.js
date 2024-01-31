@@ -27,6 +27,24 @@ export const getClosestYearData = (data, currentYear) =>
   }
 }
 
+export const getLatestYear = (values) => {
+  if (values.length === 0) {
+    return null;
+  }
+
+  const latestYear = values.reduce((maxYear, object) => {
+    const objectYear = parseInt(object.year, 10); // Convert year to integer
+
+    // Compare the years and update if the current year is more recent
+    return objectYear > maxYear ? objectYear : maxYear;
+  }, parseInt(values[0].year, 10)); 
+
+  return latestYear.toString();
+}
+
+
+
+
 // --------------------------------------------------
 
 // trigger download chart image

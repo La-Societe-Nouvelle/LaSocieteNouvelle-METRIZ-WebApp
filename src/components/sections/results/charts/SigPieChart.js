@@ -183,7 +183,34 @@ const buildChartOptions = (
     },
     plugins: {
       legend: {
-        display: false,
+        display: printMode ? false : true,
+        position: "bottom",
+        align: "left",
+        labels: {
+          boxWidth: 10,
+          color : colors.textColor,
+
+          font: {
+            size: 10,
+            textAlign : "left"
+          },
+          generateLabels: (chart) => {
+            const labels = [];
+            chart.data.datasets.forEach((dataset,index) => {
+              const label = chart.data.datasets[index].label;
+              console.log(chart.data.datasets)
+                const backgroundColor = dataset.backgroundColor[0];
+                labels.push({
+                  text: label,
+                  fillStyle: backgroundColor,
+                  strokeStyle: backgroundColor,
+                  lineWidth: 0,
+                });
+             
+            });
+            return labels;
+          },
+        },
       },
       annotation: {
         annotations: [
