@@ -2,7 +2,7 @@
 
 // React
 import React, { useState } from "react";
-import { Table } from "react-bootstrap";
+import { Badge, Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
@@ -125,7 +125,10 @@ export const ProvidersTable = ({ session, period, indic }) => {
       <tbody>
         {providers
           .filter((provider) => !provider.isDefaultProviderAccount)
-          .filter((provider) => provider.footprintStatus == 200 && provider.footprint.isValid())
+          .filter(
+            (provider) =>
+              provider.footprintStatus == 200 && provider.footprint.isValid()
+          )
           .filter((provider) =>
             provider.periodsData.hasOwnProperty(period.periodKey)
           )
@@ -147,7 +150,12 @@ export const ProvidersTable = ({ session, period, indic }) => {
                     nbDecimals
                   )}
                 </td>
-                <td className="text-end">{footprint.indicators[indic].flag}</td>
+                <td className="text-end">
+                  <Badge bg={flagData[footprint.indicators[indic].flag].color}>
+                    {footprint.indicators[indic].flag}
+                    {/* {flagData[footprint.indicators[indic].flag].label} */}
+                  </Badge>
+                </td>
                 <td className="text-end uncertainty">
                   <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
@@ -168,9 +176,9 @@ export const ProvidersTable = ({ session, period, indic }) => {
       </tbody>
       <caption className="legend  text-end">
         {Object.keys(flagData).map((flagCode) => (
-          <span key={flagCode} className="ms-3 border-right">
-            {flagCode} : {flagData[flagCode]}
-          </span>
+          <Badge bg={flagData[flagCode].color}className="ms-2">
+            {flagCode} : {flagData[flagCode].label}
+          </Badge>
         ))}
       </caption>
     </Table>
