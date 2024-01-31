@@ -59,7 +59,8 @@ export const initIndividualData = (id) =>
     hourlyRate: null,
     trainingHours: null,
     trainingContract: false,
-    apprenticeshipHours: null
+    apprenticeshipHours: null,
+    isDirector: false
     
   };
   return individualData;

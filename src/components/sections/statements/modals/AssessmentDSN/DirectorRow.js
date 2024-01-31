@@ -5,11 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { isValidInput, isValidNumber, roundValue } from '../../../../../utils/Utils';
 
-const ExecutiveRow = ({
+const DirectorRow = ({
   individualData,
   onUpdate
 }) => {
-
+  
   const [name, setName] = useState(individualData.name || "");
   const [sex, setSex] = useState(individualData.sex || "");
   const [wage, setWage] = useState(individualData.wage || "");
@@ -29,7 +29,7 @@ const ExecutiveRow = ({
     if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
     if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
 
-  }, [individualData]);
+  }, [individualData.wage,individualData]);
 
   // from inside
   useEffect(() => 
@@ -170,7 +170,6 @@ const ExecutiveRow = ({
           className="form-control-sm"
           type="text"
           value={apprenticeshipHours}
-          disabled={apprenticeshipContract}
           onChange={handleApprenticeshipHoursChange}
           isInvalid={!isValidInput(apprenticeshipHours,0,workingHours)}
         />
@@ -179,4 +178,4 @@ const ExecutiveRow = ({
   );
 };
 
-export default ExecutiveRow;
+export default DirectorRow;

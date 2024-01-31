@@ -246,7 +246,7 @@ export const FinancialDataForm = ({
       impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = roundValue(accountingData.KNWData.apprenticeshipTax, 2);
       impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = roundValue(accountingData.KNWData.vocationalTrainingTax, 2);
       impactsDataOnFinancialPeriod.FECData.personnelExpenses = accountingData.personnelExpenses
-        .map((expense) => ({ ...expense, accountLib: accountingData.accounts[expense.accountNum]}));
+        .map((expense) => ({ ...expense, accountLib: accountingData.accounts[expense.accountNum].accountLib}));
 
       // FEC id
       session.id = FECData.id; // anonymisation id

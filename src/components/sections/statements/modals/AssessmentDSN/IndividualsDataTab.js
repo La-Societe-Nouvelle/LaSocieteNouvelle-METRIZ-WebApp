@@ -84,6 +84,7 @@ export const IndividualsDataTab = ({
         </thead>
         <tbody>
           {individualsData
+            .filter((individualData) => !individualData.isDirector)
             .map((individualData) => (
               <tr key={individualData.id}>
                 <td>
