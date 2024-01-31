@@ -51,7 +51,15 @@ export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
   return (
     <div className="box">
       <Row>
-        <Col lg="3" className="border-right border-2">
+        <Col className="border-right">
+          <Row className="align-items-center h-100">
+            {renderChart(production, "prd-" + indic)}
+            {renderChart(intermediateConsumptions, "ic-" + indic)}
+            {renderChart(fixedCapitalConsumptions, "ccf-" + indic)}
+            {renderChart(netValueAdded, "nva-" + indic)}
+          </Row>
+        </Col>
+        <Col lg="3">
           <h5 className="text-center mb-4">Répartition de la valeur</h5>
           <ValueDistributionChart
             id={"part-" + indic}
@@ -64,14 +72,6 @@ export const MainAggregatesFootprintsVisual = ({ session, period, indic }) => {
               printMode: false
             }}
           />
-        </Col>
-        <Col>
-          <Row className="align-items-center h-100">
-            {renderChart(production, "prd-" + indic)}
-            {renderChart(intermediateConsumptions, "ic-" + indic)}
-            {renderChart(fixedCapitalConsumptions, "ccf-" + indic)}
-            {renderChart(netValueAdded, "nva-" + indic)}
-          </Row>
         </Col>
       </Row>
     </div>
