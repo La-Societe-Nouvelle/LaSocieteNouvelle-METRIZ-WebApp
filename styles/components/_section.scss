@@ -306,6 +306,7 @@ section {
     .dropdown-menu {
       border: 2px solid $light;
       border-radius: 1rem;
+      overflow: hidden;
     }
 
     .global-view-item {
@@ -320,7 +321,23 @@ section {
       &:focus,
       &:active {
         background-color: $bg-light;
+        overflow: hidden;
       }
+
+    }
+
+    .dropdown-item.active {
+
+      background-color: $light-secondary;
+      color: $secondary;
+      font-weight: 600;
+
+    }
+
+    .dropdown-item-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $primary;
     }
   }
 
@@ -374,17 +391,20 @@ section {
     padding: 0 2rem;
   }
 }
+
 .impactful-expenses {
   h5 {
     font-size: 0.8rem;
   }
+
   .impactful-expense {
     font-size: 0.8rem;
-    margin-bottom:  0.75rem; 
+    margin-bottom: 0.75rem;
+
     .percentage-box {
       width: 7vw;
-      height:  1.8vw;
-      border : 1px solid $light;
+      height: 1.8vw;
+      border: 1px solid $light;
       font-weight: bold;
       display: flex;
       justify-content: center;

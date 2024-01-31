@@ -50,7 +50,6 @@ export const RingChart = ({ id, session, datasetOptions, printOptions }) => {
 
   // --------------------------------------------------
 
-  console.log(chartData);
   return <Doughnut id={id} data={chartData} options={chartOptions} />;
 };
 

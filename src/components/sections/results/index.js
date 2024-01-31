@@ -4,6 +4,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Dropdown, DropdownButton, Image } from "react-bootstrap";
 
+// Libs
+import indicators from "/lib/indics";
+
 // Views
 import viewsData from "./views";
 import { IndicatorView } from "./views/IndicatorView";
@@ -54,7 +57,7 @@ const Results = ({ session, period, publish, goBack }) => {
   const handleDownload = async (selectedFiles) => {
     setIsGenerating(true);
     try {
-     await buildDownloadableFiles(session, period, showedView, selectedFiles);
+      await buildDownloadableFiles(session, period, showedView, selectedFiles);
     } catch (error) {
       setIsGenerating(false);
     } finally {
@@ -69,9 +72,52 @@ const Results = ({ session, period, publish, goBack }) => {
     }
   }, []);
 
+  const categories = [
+    "Création de la valeur",
+    "Empreinte sociale",
+    "Empreinte environnementale",
+  ];
 
+  const buildCategoryDropdownItems = (category) => {
+    return Object.entries(viewsData.views)
+      .filter(
+        ([key, view]) =>
+          key !== "default" &&
+          view.validations.every(
+            (indic) =>
+              session.validations[period.periodKey].includes(indic) &&
+              indicators[indic].category === category
+          )
+      )
+      .map(([code, view]) => (
+        <Dropdown.Item
+          key={code}
+          onClick={() => handleViewChange(code)}
+          active={view.validations[0] == showedView}
+        >
+          <Image className="me-2" src={view.icon} alt={code} height={20} /> {view.label}
+        </Dropdown.Item>
+      ));
+  };
 
+  const buildDefaultDropdownItem = (viewsData) => {
+    const defaultView = viewsData.views.default;
 
+    return (
+      <>
+        <Dropdown.ItemText>Vue globale</Dropdown.ItemText>
+        <Dropdown.Item
+          key="default"
+          active={showedView == "default"}
+          onClick={() => handleViewChange("default")}
+          className="global-view-item"
+        >
+          {defaultView.label}
+        </Dropdown.Item>
+        <Dropdown.Divider />
+      </>
+    );
+  };
   return (
     <div className="results">
       <div className="box">
@@ -101,39 +147,23 @@ const Results = ({ session, period, publish, goBack }) => {
               id="dropdown-indics-button"
               title={getViewLabel(showedView)}
             >
-              {Object.entries(viewsData.views)
-                .filter(([_, view]) =>
-                  view.validations.every(
-                    (indic) =>
-                      session.validations[period.periodKey].includes(indic) &&
-                      indic !== showedView
-                  )
-                )
-                .map(([code, view]) => (
-                  <Dropdown.Item
-                    key={code}
-                    onClick={() => handleViewChange(code)}
-                    className={!view.icon ? "global-view-item" : ""}
-                  >
-                    {view.icon && (
-                      <Image
-                        className="me-2"
-                        src={view.icon}
-                        alt={code}
-                        height={20}
-                      />
-                    )}
-                    {view.label}
-                  </Dropdown.Item>
-                ))}
+              {/* Home view */}
+              {buildDefaultDropdownItem(viewsData)}
+               {/* Indicator view */}
+              {categories.map((category) => (
+                <div key={category}>
+                  <Dropdown.ItemText>{category}</Dropdown.ItemText>
+                  {buildCategoryDropdownItems(category)}
+                </div>
+              ))}
             </DropdownButton>
           </div>
         </div>
       </div>
 
       <View viewCode={showedView} period={period} session={session} />
-       
-      {!isLoading  && <PrintChartsContainer session={session} period={period}  />}
+
+      {!isLoading && <PrintChartsContainer session={session} period={period} />}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
       {isLoading && (
