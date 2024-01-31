@@ -26,19 +26,27 @@ import { isValidInput } from "../../../../../utils/Utils";
 
 const knwItems = {
   "apprenticeshipTax": { 
-    label: "Taxe d'apprentissage" 
+    label: "Taxe d'apprentissage",
+    showAssessmentOption: false
   },
   "vocationalTrainingTax": { 
     label: "Participation à la formation professionnelle continue" 
   },
   "apprenticesRemunerations": {
-    label: "Rémunérations liées à des contrats de formation (stage, alternance, etc.)"
+    label: "Rémunérations liées à des contrats d'alternance et de profesionnalisation",
+    showAssessmentOption: false
+  },
+  "internshipsRemunerations": {
+    label: "Indemnités de stage",
+    showAssessmentOption: false
   },
   "employeesTrainingsCompensations": {
-    label: "Rémunérations liées à des heures de suivi d'une formation"
+    label: "Rémunérations liées à des heures de suivi d'une formation",
+    showAssessmentOption: true
   },
   "researchPersonnelRemunerations": {
-    label: "Rémunérations liées à des activités de recherche ou de formation"
+    label: "Rémunérations liées à des activités de recherche ou de formation",
+    showAssessmentOption: true
   }
 }
 
@@ -54,10 +62,10 @@ export const AssessmentKNW = ({
     impactsData.knwDetails = knwDetails;
   }, [knwDetails]);
 
-  const updateKnwDetails = (itemKey, nextValue) => {
+  const updateKnwDetails = (itemKey, itemData) => {
     setKnwDetails({ 
       ...knwDetails, 
-      [itemKey]: nextValue 
+      [itemKey]: itemData 
     });
   }
 
@@ -79,7 +87,9 @@ export const AssessmentKNW = ({
         <thead>
           <tr>
             <td>Libellé</td>
-            <td >Valeur</td>
+            <td>Option</td>
+            <td>Heures</td>
+            <td>Montant</td>
           </tr>
         </thead>
         <tbody>
@@ -89,25 +99,25 @@ export const AssessmentKNW = ({
               key={itemKey}
               itemKey={itemKey}
               itemProps={itemProps}
-              itemValue={knwDetails[itemKey]}
+              itemData={knwDetails[itemKey]}
               onUpdate={updateKnwDetails}
             />
           )}
 
           <tr className="with-top-line">
-            <td>Total</td>
+            <td colSpan={"3"}>Total</td>
             <td className="column_value">
               {printValue(knwContribution, 0)} &euro;
             </td>
           </tr>
           <tr>
-            <td>Valeur ajoutée nette</td>
+            <td colSpan={"3"}>Valeur ajoutée nette</td>
             <td className="column_value">
               {printValue(impactsData.netValueAdded, 0)} &euro;
             </td>
           </tr>
           <tr className="with-top-line with-bottom-line">
-            <td>Contribution directe liée à la valeur ajoutée</td>
+            <td colSpan={"3"}>Contribution directe liée à la valeur ajoutée</td>
             <td className="column_value">
               {printValue(knwContributionRate, 1)}
               %
@@ -133,31 +143,86 @@ export const AssessmentKNW = ({
 
 const RowAssessmentKNW = ({
   itemKey,
-  itemValue,
+  itemData,
   itemProps,
   onUpdate
 }) => {
 
-  const [value, setValue] = useState(itemValue || "");
+  const [assessmentOption, setAssessmentOption] = useState(itemData?.assessmentOption || "assessment_amount");
+  const [hours, setHours] = useState(itemData?.hours || "");
+  const [amount, setAmount] = useState(itemData?.amount || "");
+
+  const [knwDetail, setKnwDetail] = useState(itemData || {});
 
   const updateValue = (nextValue) => {
-    setValue(nextValue);
+    setAmount(nextValue);
   }
 
   useEffect(() => {
-    itemValue = value;
-    onUpdate(itemKey,value);
-  }, [value])
+    itemData = amount;
+    onUpdate(itemKey,amount);
+  }, [amount])
+
+  // on change
+  useEffect(() => 
+  {
+    // itemData props
+    knwDetail.assessmentOption = assessmentOption;
+    knwDetail.hours = hours;
+    knwDetail.amount = amount;
+
+    setKnwDetail(knwDetail);
+    
+    // trigger onUpdate
+    onUpdate(itemKey,knwDetail);
+
+  }, [amount,hours,assessmentOption])
+
+  // ----------------------------------------------------------------------------------------------------
+
+  // Assessment option
+  const updateAssessmentOption = (event) => 
+  {
+    const nextAssessmentOption = event.target.value
+    console.log(nextAssessmentOption);
+    setAssessmentOption(nextAssessmentOption);
+    
+  };
 
   return(
     <tr>
-      <td>{itemProps.label}</td>
+      <td colSpan={itemProps.showAssessmentOption ? "1" : "3"}>{itemProps.label}</td>
+      {itemProps.showAssessmentOption &&
+        <>
+          <td>
+            <select
+                className="form-select form-select-sm"
+                value={assessmentOption || ""}
+                onChange={updateAssessmentOption}
+              >
+                <option key="assessment_amount" value="assessment_amount">Montant total</option>
+                <option key="assessment_hours" value="assessment_hours">Heures</option>
+                <option key="assessment_dsn" value="assessment_dsn">Données sociales</option>
+            </select>
+          </td>
+          <td>
+            <InputNumber
+              value={hours}
+              onUpdate={updateValue}
+              placeholder="h"
+              isInvalid={!isValidInput(hours,0)}
+              disabled={assessmentOption != "assessment_hours"}
+            />
+          </td>
+        </>
+      }
       <td>
         <InputNumber
-          value={value}
+          value={amount}
           onUpdate={updateValue}
           placeholder="&euro;"
-          isInvalid={!isValidInput(value,0)}
+          isInvalid={!isValidInput(amount,0)}
+          disabled={assessmentOption != "assessment_amount"}
         />
       </td>
     </tr>
