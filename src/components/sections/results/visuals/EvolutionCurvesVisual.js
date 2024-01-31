@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Select from "react-select";
 
@@ -48,6 +48,11 @@ export const EvolutionCurvesVisual = ({
 
   const [showedAggregate, setShowedAggregate] = useState("production");
 
+  useEffect(() => {
+
+    setShowedAggregate("production");
+  }, [indic]);
+
   // --------------------------------------------------
 
   const changeShowedAggregate = (selectedOption) => {
@@ -60,14 +65,13 @@ export const EvolutionCurvesVisual = ({
 
   return (
     <Row>
-
       <Col lg={8}>
         <div id="evolution" className="box ">
           <h4>Courbes d'évolution</h4>
           <Select
             styles={customSelectStyles}
             className="mb-4"
-            defaultValue={graphOptions.find((option) => option.value==showedAggregate)}
+            value={graphOptions.find((option) => option.value==showedAggregate)}
             options={graphOptions}
             onChange={changeShowedAggregate}
           />

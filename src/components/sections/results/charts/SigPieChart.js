@@ -171,7 +171,6 @@ const buildChartOptions = (
   const {
     printMode
   } = printOptions;
-  console.log(printMode)
   const chartOptions = {
     scales: {
       x: {
@@ -198,7 +197,6 @@ const buildChartOptions = (
             const labels = [];
             chart.data.datasets.forEach((dataset,index) => {
               const label = chart.data.datasets[index].label;
-              console.log(chart.data.datasets)
                 const backgroundColor = dataset.backgroundColor[0];
                 labels.push({
                   text: label,

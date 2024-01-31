@@ -6,20 +6,25 @@ import { ExpensesTable } from "../tables/ExpensesTable";
 import { ProvidersTable } from "../tables/ProvidersTable";
 import { getPrevDate } from "../../../../utils/periodsUtils";
 import { StackedHorizontalBarChart } from "../charts/StackedHorizontalBarChart";
+import { useEffect, useState } from "react";
 
 export const MainAggregatesTableVisual = ({ session, period, indic }) => {
-  // Prev period
+  const [activeKey, setActiveKey] = useState("mainAggregates");
 
+  // Prev period
   const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod =
-    session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
-    false;
+  const prevPeriod = session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) || false;
+
+  useEffect(() => {
+    setActiveKey("mainAggregates");
+  }, [indic]);
 
   return (
     <div id="rapport" className="box">
       <h4>Rapport - Analyse extra-financière</h4>
       <Tabs
-        defaultActiveKey="mainAggregates"
+        activeKey={activeKey}
+        onSelect={(key) => setActiveKey(key)}
         transition={false}
         id="noanim-tab-example"
       >
@@ -78,8 +83,6 @@ export const MainAggregatesTableVisual = ({ session, period, indic }) => {
         </Accordion.Item>
       </Accordion>
  */}
-
-
     </div>
   );
 };
