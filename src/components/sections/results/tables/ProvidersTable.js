@@ -110,7 +110,7 @@ export const ProvidersTable = ({ session, period, indic }) => {
           <td className="text-end">
             Empreinte <span className="tw-normal small d-block">{unit}</span>
           </td>
-          <td className="text-end">Flag</td>
+          <td className="text-center" >Flag</td>
           <td className="text-end">
             Incertitude <span className="tw-normal small d-block">%</span>
           </td>
@@ -150,10 +150,9 @@ export const ProvidersTable = ({ session, period, indic }) => {
                     nbDecimals
                   )}
                 </td>
-                <td className="text-end">
+                <td className="text-center">
                   <Badge bg={flagData[footprint.indicators[indic].flag].color}>
-                    {footprint.indicators[indic].flag}
-                    {/* {flagData[footprint.indicators[indic].flag].label} */}
+                    {flagData[footprint.indicators[indic].flag].label}
                   </Badge>
                 </td>
                 <td className="text-end uncertainty">
@@ -174,13 +173,7 @@ export const ProvidersTable = ({ session, period, indic }) => {
             );
           })}
       </tbody>
-      <caption className="legend  text-end">
-        {Object.keys(flagData).map((flagCode) => (
-          <Badge bg={flagData[flagCode].color}className="ms-2">
-            {flagCode} : {flagData[flagCode].label}
-          </Badge>
-        ))}
-      </caption>
+ 
     </Table>
   );
 };
