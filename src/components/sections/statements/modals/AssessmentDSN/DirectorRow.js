@@ -3,6 +3,8 @@
 // React
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
+
+// Utils
 import { isValidInput, isValidNumber, roundValue } from '../../../../../utils/Utils';
 
 const DirectorRow = ({
@@ -29,7 +31,7 @@ const DirectorRow = ({
     if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
     if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
 
-  }, [individualData.wage,individualData]);
+  }, [individualData]);
 
   // from inside
   useEffect(() => 
@@ -41,7 +43,7 @@ const DirectorRow = ({
     individualData.hourlyRate = hourlyRate;
     individualData.apprenticeshipHours = apprenticeshipHours;
 
-    onUpdate();
+    onUpdate(individualData);
   }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours]);
 
   // ----------------------------------------------------------------------------------------------------
@@ -116,6 +118,7 @@ const DirectorRow = ({
 
   /* -------------------- CHECK IF ALL DATA OK -------------------- */
   
+  console.log(individualData);
   return (
     <>
       <td>

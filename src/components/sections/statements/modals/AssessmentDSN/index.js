@@ -81,6 +81,12 @@ const AssessmentDSN = ({
     checkIndividualsData(individualsData);
   }
 
+  const handleDirectorRemunerationAccounts = async (directorRemunerationAccounts) =>
+  {
+    // update impacts data
+    impactsData.FECData.directorRemunerationAccounts = directorRemunerationAccounts;
+  }
+
   const checkIndividualsData = (individualsData) => {
     // check if every items set
     let isIndividualsDataValid = individualsData.every((individualData) => checkIndividualData(individualData));
@@ -107,7 +113,6 @@ const AssessmentDSN = ({
 
   // ----------------------------------------------------------------------------------------------------
 
-  console.log(impactsData);
   return (
     <>
       <Button
@@ -153,8 +158,8 @@ const AssessmentDSN = ({
               <DirectorsDataTab
                 individualsData={individualsData}
                 onUpdateIndividualsData={handleIndividualsData}
-                resetIndividualsData={resetIndividualsData}
-                personnelExpenses={impactsData.FECData.personnelExpenses}
+                onUpdateDirectorRemunerationAccounts={handleDirectorRemunerationAccounts}
+                directorRemunerationAccounts={impactsData.FECData.directorRemunerationAccounts}
               />
             </Tab>
           </Tabs>

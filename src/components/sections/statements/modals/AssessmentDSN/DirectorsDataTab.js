@@ -20,34 +20,15 @@ import { DirectorRemunerationAccountsTable } from "./DirectorRemunerationAccount
 export const DirectorsDataTab = ({ 
   individualsData: individualsDataInModal, 
   onUpdateIndividualsData,
-  personnelExpenses
+  onUpdateDirectorRemunerationAccounts,
+  directorRemunerationAccounts
 }) => {
   
   // executives data
   const [individualsData, setIndividualsData] = useState(individualsDataInModal);
-  const [accountingData, setAccountingData] = useState({});
+  const [accountsData, setAccountsData] = useState(directorRemunerationAccounts);
   
   // ----------------------------------------------------------------------------------------------------
-  
-  // initi accountingData
-  useEffect(async () => {
-    const accountingData = {};
-    personnelExpenses
-      .filter((expense) => /^644/.test(expense.accountNum))
-      .forEach((expense) => {
-        if (!accountingData.hasOwnProperty(expense.accountNum)) {
-          accountingData[expense.accountNum] = {
-            accountNum: expense.accountNum,
-            accountLib: expense.accountLib,
-            amount: 0,
-            allocation: "all"
-          };
-        }
-        accountingData[expense.accountNum].amount =
-          roundValue(accountingData[expense.accountNum].amount + expense.amount, 2);
-      });
-    setAccountingData(accountingData);
-  }, []);
 
   // when props update
   useEffect(() => 
@@ -62,10 +43,16 @@ export const DirectorsDataTab = ({
     didUpdate();
   }, [individualsData]);
 
+  useEffect(() => {
+    onUpdateDirectorRemunerationAccounts(accountsData);
+  }, [accountsData]);
+
   // ----------------------------------------------------------------------------------------------------
 
   const removeAll = () => {
-    setIndividualsData([]);
+    const nextIndividualsData = individualsData
+      .filter((individualData) => !individualData.isDirector);
+    setIndividualsData([...nextIndividualsData]);
   };
 
   const removeIndividual = (id) => {
@@ -97,7 +84,7 @@ export const DirectorsDataTab = ({
     individualsData
       .filter((individual) => individual.isDirector)
       .forEach((individual) => {
-        let nextWage = getSumItems(Object.values(accountingData)
+        let nextWage = getSumItems(Object.values(accountsData)
           .map((accountData) => {
             switch(accountData.allocation) {
               case individual.id : return accountData.amount;
@@ -113,15 +100,15 @@ export const DirectorsDataTab = ({
         }
       });
 
-    setIndividualsData([...individualsData]);
+    setIndividualsData(individualsData.slice());
     onUpdateIndividualsData(individualsData);
   }
 
   const onAccountingDataUpdate = (accountData) => {
-    // setAccountingData({
-    //   ...accountingData,
-    //   accountData
-    // });
+    setAccountsData({
+      ...accountsData,
+      [accountData.accountNum]: accountData
+    });
   }
 
   const didUpdate = () => 
@@ -130,6 +117,7 @@ export const DirectorsDataTab = ({
     onUpdateIndividualsData(individualsData);
   }
   
+  console.log(individualsData);
   return (
     <div className="assessment">
       <Table>
@@ -181,15 +169,15 @@ export const DirectorsDataTab = ({
           </Accordion.Header>
           <Accordion.Body className="chart-accordion bg-white p-0">
             <DirectorRemunerationAccountsTable
-              accountingData={accountingData}
+              accountingData={accountsData}
               individualsData={individualsData}
               onUpdate={onAccountingDataUpdate}
             />
-            <div className="p-3">
+            {/* <div className="p-3">
               <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
                 <i className="bi bi-arrow-repeat"></i> Attribuer les rémunérations
               </button>
-            </div>
+            </div> */}
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

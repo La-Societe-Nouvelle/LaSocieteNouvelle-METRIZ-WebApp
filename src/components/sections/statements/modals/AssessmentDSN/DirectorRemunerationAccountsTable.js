@@ -38,21 +38,21 @@ export const DirectorRemunerationAccountsTable = ({
 
   }, [individualsData]);
 
-  useEffect(() => {
-    onUpdate(accountsData);
-  }, [accountsData]);
+  // useEffect(() => {
+  //   onUpdate(accountsData);
+  // }, [accountsData]);
 
-  useEffect(() => {
-    setAccountsData({...accountingData});
-  }, [accountingData])
+  // useEffect(() => {
+  //   setAccountsData({...accountingData});
+  // }, [accountingData])
 
   // ----------------------------------------------------------------------------------------------------
 
   const onAccountDataUpdate = (accountData) => {
-    setAccountsData({
-      ...accountsData,
-      [accountData.accountNum]: accountData
-    });
+    // setAccountsData({
+    //   ...accountsData,
+    //   [accountData.accountNum]: accountData
+    // });
   }
 
   // ----------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ export const DirectorRemunerationAccountsTable = ({
           <td>Compte</td>
           <td>Libellé</td>
           <td>Montant</td>
-          <td>Traitement</td>
+          {/* <td>Traitement</td> */}
         </tr>
       </thead>
       <tbody>
@@ -87,7 +87,7 @@ export const DirectorRemunerationAccountsTable = ({
           <td className="column_value">
             {printValue(totalRemuneration, 0)} &euro;
           </td>
-          <td></td>
+          {/* <td></td> */}
         </tr>
       </tbody>
     </Table>
@@ -135,7 +135,7 @@ const DirectorDataRow = ({
       <td>{accountData.accountNum}</td>
       <td>{accountData.accountLib}</td>
       <td className="column_value">{printValue(accountData.amount,0)} €</td>
-      <td>
+      {/* <td>
         <select
           className="form-select form-select-sm"
           value={accountData.allocation}
@@ -149,7 +149,7 @@ const DirectorDataRow = ({
               <option key={individual.id} value={individual.id}>Attribué à {individual.name}</option>
             )}
         </select>
-      </td>
+      </td> */}
     </tr>
   )
 }
