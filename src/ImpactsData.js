@@ -28,6 +28,7 @@ export class ImpactsData  {
     this.employees = props.employees || [];
     this.socialStatements = props.socialStatements || [];
     this.individualsData = props.individualsData || [];
+    this.personn
 
     this.interdecileRange = props.interdecileRange !== undefined ? props.interdecileRange : null;
     this.wageGap =  props.wageGap !== undefined ? props.wageGap : null;
@@ -65,6 +66,10 @@ export class ImpactsData  {
     this.waterConsumption =  props.waterConsumption !== undefined ? props.waterConsumption : null;
     this.waterConsumptionUnit = props.waterConsumptionUnit !== undefined ? props.waterConsumptionUnit : "m³";
     this.waterConsumptionUncertainty =  props.waterConsumptionUncertainty !== undefined ? props.waterConsumptionUncertainty : null;
+
+    /* --- Data from FEC --- */
+
+    this.FECData = props.FECData || {};
 
     /* --- Commentaires --- */
 

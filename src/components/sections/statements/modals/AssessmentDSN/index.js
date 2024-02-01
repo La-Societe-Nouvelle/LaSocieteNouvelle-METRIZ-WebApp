@@ -7,6 +7,7 @@ import { Button, Modal, Tab, Tabs } from "react-bootstrap";
 // Components
 import { SocialStatementsTab } from "./SocialStatementsTab";
 import { IndividualsDataTab } from "./IndividualsDataTab";
+import { DirectorsDataTab } from "./DirectorsDataTab";
 
 // Utils
 import {
@@ -80,6 +81,12 @@ const AssessmentDSN = ({
     checkIndividualsData(individualsData);
   }
 
+  const handleDirectorRemunerationAccounts = async (directorRemunerationAccounts) =>
+  {
+    // update impacts data
+    impactsData.FECData.directorRemunerationAccounts = directorRemunerationAccounts;
+  }
+
   const checkIndividualsData = (individualsData) => {
     // check if every items set
     let isIndividualsDataValid = individualsData.every((individualData) => checkIndividualData(individualData));
@@ -145,6 +152,14 @@ const AssessmentDSN = ({
                 individualsData={individualsData}
                 onUpdateIndividualsData={handleIndividualsData}
                 resetIndividualsData={resetIndividualsData}
+              />
+            </Tab>
+            <Tab eventKey="executiveData" title="Dirigeants">
+              <DirectorsDataTab
+                individualsData={individualsData}
+                onUpdateIndividualsData={handleIndividualsData}
+                onUpdateDirectorRemunerationAccounts={handleDirectorRemunerationAccounts}
+                directorRemunerationAccounts={impactsData.FECData.directorRemunerationAccounts}
               />
             </Tab>
           </Tabs>
