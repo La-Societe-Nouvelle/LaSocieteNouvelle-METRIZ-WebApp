@@ -18,20 +18,13 @@ import { TableHeaderRow, TableHeaderRowUnits } from "./utils";
  *
  */
 
-export const ExpensesTable = ({ session, period, indic }) => {
+export const ExpensesTable = ({ session, period, prevPeriod, indic }) => {
   const { financialData } = session;
 
   const externalExpensesAccounts = financialData.externalExpensesAccounts;
 
   const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
-
-  // Prev period
-
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
-
+  
   const [showColumn, setShowColumn] = useState(false);
 
   const toggleColumn = () => {

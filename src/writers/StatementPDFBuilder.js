@@ -1,24 +1,29 @@
 // La Société Nouvelle
 
-// Modules
+// Utils
 import { printValue } from "/src/utils/formatters";
+import { getShortCurrentDateString } from "../utils/periodsUtils";
+import { loadFonts } from "../utils/exportsUtils";
 
 // Libraries
 import metaIndics from "/lib/indics";
-import { getDateFormatted, loadFonts } from "./deliverables/utils/utils";
 
 // PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-loadFonts();
 
 /** STATEMENT PDF GENERATOR
- * 
- * 
+ *  
+ *  Description : file with summary of published information (footprint, etc.)
+ *  Use : builder triggered in publish statement section
  */
 
-export const getStatementPDF = (
+// fonts
+loadFonts();
+
+export const buildStatementPDF = (
   siren,
   denomination,
   year,
@@ -28,33 +33,26 @@ export const getStatementPDF = (
   legalUnitFootprint,
   comments
 ) => {
-  // date
-  const today = new Date();
 
   // document definition
-  const documentDefinition = {
-    content: [
-      {
+  const documentDefinition = 
+  {
+    // ----------------------------------------------------------------------------------------------------
+    // Content
+
+    content: [{
         text: "DECLARATION - EMPREINTE SOCIETALE",
-        style: "header",
-      },
-      {
+        style: "header"
+      }, {
         text: ["Unité légale : ", { text: siren, bold: true }],
-      },
-      {
-        text: [
-          "Dénomination : ",
-          { text: (denomination || "").toUpperCase(), bold: true },
-        ],
-      },
-      {
+      }, {
+        text: ["Dénomination : ", { text: (denomination || "").toUpperCase(), bold: true }],
+      }, {
         text: ["Année : ", { text: year, bold: true }],
-      },
-      {
+      }, {
         text: "Données publiées",
-        style: "subheader",
-      },
-      {
+        style: "subheader"
+      }, {
         table: {
           widths: ["*", "auto", "auto", "auto"],
           headerRows: 1,
@@ -63,132 +61,55 @@ export const getStatementPDF = (
               { text: "Indicateur", style: "tableHeader" },
               { text: "Valeur", style: "tableHeader", colSpan: 2 },
               {},
-              {
-                text: "Incertitude",
-                style: "tableHeader",
-                alignment: "center",
-              },
+              { text: "Incertitude", style: "tableHeader", alignment: "center" },
             ],
             ...Object.entries(legalUnitFootprint).flatMap(
               ([key, indicator]) => {
-                const indicatorRow = [
-                  {
-                    text: metaIndics[key].libelle,
-                    style: "tableCell",
-                  },
-                  {
-                    text: printValue(indicator.value, metaIndics[key].nbDecimals),
-                    alignment: "right",
-                    style: "tableCell",
-                  },
-                  {
-                    text: metaIndics[key].unit,
-                    style: "tableCell",
-                  },
-                  {
-                    text: printValue(indicator.uncertainty, 0) + " %",
-                    fontSize: 6,
-                    alignment: "right",
-                    style: "tableCell",
-                  },
-                ];
-
-                const commentRow = comments[key]
-                  ? [
-                      {
-                        text: "Commentaire : " + comments[key],
-                        colSpan: 4,
-                        fontSize: 6,
-                        style: "tableCell",
-                        fillColor: "#F0F0F8",
-                      },
-                    ]
-                  : [
-                      {
-                        text: "Commentaire : -",
-                        colSpan: 4,
-                        fontSize: 6,
-                        style: "tableCell",
-                        fillColor: "#F0F0F8",
-                      },
-                    ];
-
+                const indicatorRow = getIndicatorRow(key,indicator);
+                const commentRow = getCommentRow(key,comments);
                 return [indicatorRow, commentRow];
               }
-            ),
-          ],
+            )
+          ]
         },
-        layout: {
-          hLineWidth: function (i, node) {
-            return i === 0 || i === node.table.body.length ? 1 : 0;
-          },
-          vLineWidth: function (i, node) {
-            return i === 0 || i === node.table.widths.length ? 1 : 1;
-          },
-          hLineColor: function (i, node) {
-            return i === 0 || i === node.table.body.length
-              ? "#191558"
-              : "#F0F0F8";
-          },
-          vLineColor: function (i, node) {
-            return i === 0 || i === node.table.widths.length
-              ? "#191558"
-              : "#F0F0F8";
-          },
-          paddingLeft: function (i, node) {
-            return 4;
-          },
-          paddingRight: function (i, node) {
-            return 4;
-          },
-          paddingTop: function (i, node) {
-            return 3;
-          },
-          paddingBottom: function (i, node) {
-            return 3;
-          },
-        },
+        layout: getTableLayout(),
+      },
+      {
+        text: ["Edité le : ", { text: getShortCurrentDateString(), bold: true }],
+        margin: [0, 10, 0, 0],
+      },
+      {
+        text: ["Déclaration faite par : ", { text: declarant || "", bold: true }],
       },
 
-      {
-        margin: [0, 10, 0, 0],
-        text: ["Edité le : ", { text: getDateFormatted(today), bold: true }],
-      },
-      {
-        text: [
-          "Déclaration faite par : ",
-          { text: declarant || "", bold: true },
-        ],
-      },
+      // --------------------------------------------------
+      // if statement by a third party
+
       declarantOrganisation && {
-        text: [
-          "Structure déclarante : ",
-          { text: declarantOrganisation, bold: true },
-        ],
+        text: [ "Structure déclarante : ", { text: declarantOrganisation, bold: true }],
       },
+
+      // --------------------------------------------------
+
       {
         text: "Informations relatives à la publication",
         style: "subheader",
-      },
-      {
-        text: [
-          "Le coût de la formalité est de ",
-          { text: price || " - ", bold: true },
-          " €",
-        ],
-      },
-      {
+      }, {
+        text: ["Le coût de la formalité est de ", { text: price || " - ", bold: true }, " €"],
+      }, {
         text: "Le délai de publication des données est de 7 jours. Un mail de confirmation vous sera envoyé.",
-      },
-      {
+      }, {
         text: "Les données sont modifiables sur simple demande via l'adresse admin@lasocietenouvelle.org",
-      },
-      {
+      }, {
         text: "La Société Nouvelle - Société immatriculée au RCS de Lille Métropole - 889 182 770",
         absolutePosition: { x: 40, y: 780 },
         style: "footer",
       },
     ],
+
+    // ----------------------------------------------------------------------------------------------------
+    // Styles
+
     defaultStyle: {
       fontSize: 8,
       color: "#000",
@@ -216,11 +137,94 @@ export const getStatementPDF = (
         bold: true,
         margin: [0, 5],
       },
-    },
+    }
+
+    // ----------------------------------------------------------------------------------------------------
   };
 
-  // generator pdf
+  // create pdf
   const statementPDF = pdfMake.createPdf(documentDefinition);
 
   return statementPDF;
+}
+
+// ################################################## UTILS ##################################################
+
+// --------------------------------------------------
+// Table rows
+//  IndicatorRow  -> Row with values
+//  CommentRow    -> Row with comments (if set)
+
+const getIndicatorRow = (key,indicator) => 
+{
+  const indicatorRow = [
+    {
+      text: metaIndics[key].libelle,
+      style: "tableCell",
+    },
+    {
+      text: printValue(indicator.value, metaIndics[key].nbDecimals),
+      alignment: "right",
+      style: "tableCell",
+    },
+    {
+      text: metaIndics[key].unit,
+      style: "tableCell",
+    },
+    {
+      text: printValue(indicator.uncertainty, 0) + " %",
+      fontSize: 6,
+      alignment: "right",
+      style: "tableCell",
+    },
+  ];
+
+  return indicatorRow;
+}
+
+const getCommentRow = (key,comments) =>
+{
+  // with comment
+  if (comments[key]) {
+    const commentRow = [
+      {
+        text: "Commentaire : " + comments[key],
+        colSpan: 4,
+        fontSize: 6,
+        style: "tableCell",
+        fillColor: "#F0F0F8",
+      },
+    ];
+    return commentRow;
+  } 
+  // without comment
+  else {
+    const commentRow = [
+      {
+        text: "Commentaire : -",
+        colSpan: 4,
+        fontSize: 6,
+        style: "tableCell",
+        fillColor: "#F0F0F8",
+      },
+    ]; 
+    return commentRow;
+  }
+}
+
+// --------------------------------------------------
+// Table layout
+
+const getTableLayout = () => 
+{
+  return({
+    hLineWidth:    (i, node) => i === 0 || i === node.table.body.length ? 1 : 0,
+    vLineWidth:    (i, node) => i === 0 || i === node.table.widths.length ? 1 : 1,
+    hLineColor:    (i, node) => i === 0 || i === node.table.body.length ? "#191558" : "#F0F0F8",
+    vLineColor:    (i, node) => i === 0 || i === node.table.widths.length ? "#191558" : "#F0F0F8",
+    paddingLeft:   (i, node) => 4,
+    paddingRight:  (i, node) => 4,
+    paddingTop:    (i, node) => 3,
+    paddingBottom: (i, node) => 3,
+  })
 }

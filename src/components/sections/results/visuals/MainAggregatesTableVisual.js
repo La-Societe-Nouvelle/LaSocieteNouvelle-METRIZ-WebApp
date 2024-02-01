@@ -1,21 +1,30 @@
 // La Société Nouvelle
 
-import { Tab, Tabs } from "react-bootstrap";
+import { Accordion, Col, Row, Tab, Tabs } from "react-bootstrap";
 import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
 import { ProvidersTable } from "../tables/ProvidersTable";
+import { getPrevDate } from "../../../../utils/periodsUtils";
+import { StackedHorizontalBarChart } from "../charts/StackedHorizontalBarChart";
+import { useEffect, useState } from "react";
 
-export const MainAggregatesTableVisual = ({
-  session,
-  period,
-  indic
-}) => {
+export const MainAggregatesTableVisual = ({ session, period, indic }) => {
+  const [activeKey, setActiveKey] = useState("mainAggregates");
+
+  // Prev period
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod = session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) || false;
+
+  useEffect(() => {
+    setActiveKey("mainAggregates");
+  }, [indic]);
 
   return (
     <div id="rapport" className="box">
       <h4>Rapport - Analyse extra-financière</h4>
       <Tabs
-        defaultActiveKey="mainAggregates"
+        activeKey={activeKey}
+        onSelect={(key) => setActiveKey(key)}
         transition={false}
         id="noanim-tab-example"
       >
@@ -26,16 +35,15 @@ export const MainAggregatesTableVisual = ({
           <IndicatorMainAggregatesTable
             session={session}
             period={period}
+            prevPeriod={prevPeriod}
             indic={indic}
           />
         </Tab>
-        <Tab
-          eventKey="expensesAccounts"
-          title=" Détails - Comptes de charges"
-        >
+        <Tab eventKey="expensesAccounts" title=" Détails - Comptes de charges">
           <ExpensesTable
             session={session}
             period={period}
+            prevPeriod={prevPeriod}
             indic={indic}
           />
         </Tab>
@@ -43,13 +51,38 @@ export const MainAggregatesTableVisual = ({
           eventKey="providers"
           title=" Détails - Fournisseurs (charges externes)"
         >
-          <ProvidersTable
-            session={session}
-            period={period}
-            indic={indic}
-          />
+          <ProvidersTable session={session} period={period} indic={indic} />
         </Tab>
       </Tabs>
+
+      {/*
+      //Pending--------------------------------------------
+      <Accordion className="mt-3 chart-accordion" >
+        <Accordion.Item eventKey="0">
+          <Accordion.Header as="h5">
+            <i className="bi bi-bar-chart-steps me-2"></i>
+            Visualisation 
+          </Accordion.Header>
+          <Accordion.Body>
+            <Row>
+              <Col sm="6">
+                <StackedHorizontalBarChart
+                  id={""}
+                  session={session}
+                  datasetOptions={{
+                    period,
+                    indic
+                  }}
+                  printOptions={{
+                    showPreviousPeriod: true
+                  }}
+                />
+              </Col>
+            </Row>
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+ */}
     </div>
   );
 };

@@ -1,5 +1,14 @@
 {
-    "d": "Valeur par défaut",
-    "p": "Valeur publiée",
-    "e": "Valeur estimée"
+    "d":{
+      "label" :  "Valeur par défaut",
+      "color" : "primary"
+    },
+    "p":{
+      "label" :  "Valeur publiée",
+      "color" : "success"
+    },
+    "e":{
+      "label" :  "Valeur estimée",
+      "color" : "success"
+    }
   }

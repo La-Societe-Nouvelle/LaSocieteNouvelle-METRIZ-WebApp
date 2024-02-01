@@ -17,6 +17,7 @@ import { buildSummaryReportIndexIndic } from "./reports/summaryReportGeneratorIn
 
 import { generateFootprintPDF } from "../../../../writers/Export";
 import { buildDataFile } from "./dataFiles/dataFileGenerator";
+import { getYearPeriod } from "../../../../utils/periodsUtils";
 
 /* ---------- DOWNLOADABLES FILES ---------- */
 
@@ -37,7 +38,7 @@ export async function buildCompleteFile({
   const legalUnit = session.legalUnit.corporateName;
   const validations = session.validations[period.periodKey];
   
-  const year = period.periodKey.slice(2); // dangerous
+  const year = getYearPeriod(period);
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
   
   // Build zip ----------------------------------------

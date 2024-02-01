@@ -1,7 +1,8 @@
 // ComparativeDataCharts.js
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import { ComparativeChart } from "../charts/ComparativeChart";
+import { VerticalBarChart } from "../charts/VerticalBarChart";
+import { getMaxFootprintValue } from "../charts/chartsUtils";
 
 export const ComparativeDataContainer = ({
   session,
@@ -17,22 +18,40 @@ export const ComparativeDataContainer = ({
     netValueAdded: "Valeur ajoutée nette",
   };
 
+  const maxFootprintValue = getMaxFootprintValue(session, period, indic);
+
   return (
-    <div className="charts-container">
+    <div className="mb-4">
       <h4>Comparaison par activité</h4>
-      <Row className="charts">
+      <Row>
+ 
         {Object.keys(aggregates).map((aggregate) => (
           <React.Fragment key={aggregate}>
             <Col sm={3} xl={3} lg={3} md={3}>
               <h5 className="mb-4">{aggregates[aggregate]}</h5>
-              <ComparativeChart
+              
+              <VerticalBarChart
                 id={`${aggregate}-${indic}`}
                 session={session}
-                period={period}
-                indic={indic}
-                aggregate={aggregate}
-                isPrinting={false}
+                datasetOptions={{
+                  period,
+                  aggregate,
+                  indic
+                }}
+                printOptions={{
+                  printMode: false,
+                  showDivisionData: true,
+                  showAreaData: true,
+                  showTargetData: true,
+                  useIndicColors: false,
+                  showLegend : false,
+                  showXlabels : true,
+                  aspectRatio : 1.5,
+                  maxYAxis : maxFootprintValue,
+                  label: "Empreinte"
+                }}
               />
+
             </Col>
           </React.Fragment>
         ))}
