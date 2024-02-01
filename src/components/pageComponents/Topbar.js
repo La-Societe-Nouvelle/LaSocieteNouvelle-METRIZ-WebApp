@@ -21,22 +21,25 @@ import { getLabelPeriod } from "../../utils/periodsUtils";
 
 export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
   
-  const [selectedPeriod, setSelectedPeriod] = useState(period.periodKey);
+  const [selectedPeriod, setSelectedPeriod] = useState(period);
 
   const handlePeriodChange = (newSelectedPeriodKey) => {
     const newPeriodKey = newSelectedPeriodKey.value;
-    setSelectedPeriod(newPeriodKey);
     let newSelectedPeriod = session.availablePeriods.find(period => period.periodKey == newPeriodKey);
+    setSelectedPeriod(newSelectedPeriod);
     onSelectPeriod(newSelectedPeriod);
   };
 
   useEffect(() => {
-    if (period.periodKey != selectedPeriod) {
-      setSelectedPeriod(period.periodKey);
+    console.log("use effect");
+    if (period && !selectedPeriod) {
+      setSelectedPeriod(period);
+    } else if (period && period.periodKey != selectedPeriod.periodKey) {
+      setSelectedPeriod(period);
     }
   }, [period]);
 
-  const showInfo = (progression > 1) || (selectedPeriod && session?.financialData?.status?.[selectedPeriod]?.isLoaded);
+  const showInfo = (progression > 1) || (selectedPeriod && session?.financialData?.status?.[selectedPeriod.periodKey]?.isLoaded);
 
   return (
     <div className="top-bar">
@@ -80,13 +83,13 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
                     styles={periodSelectStyles()}
                     options={session.availablePeriods.map((period) => {
                       return {
-                        label: getLabelPeriod(period.periodKey),
+                        label: getLabelPeriod(period),
                         value: period.periodKey,
                       };
                     })}
                     value={{
                       label: getLabelPeriod(selectedPeriod),
-                      value: selectedPeriod,
+                      value: selectedPeriod.periodKey,
                     }}
                     onChange={handlePeriodChange}
                     placeholder="Choisissez une division"

@@ -10,7 +10,7 @@ export const ComparisonsVisual = ({
   indic
 }) => {
 
-const isTargetDataAvailable  = hasComparativeData(session,'division','target',indic);
+  const isTargetDataAvailable  = hasComparativeData(session,'division','target',indic);
 
   return (
     <div id="comparaisons" className="box">

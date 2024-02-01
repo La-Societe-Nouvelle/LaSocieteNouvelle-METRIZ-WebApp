@@ -42,7 +42,7 @@ const DirectImpacts = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
- 
+    
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -52,17 +52,27 @@ const DirectImpacts = ({
     let emptyStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status=="incomplete")
       .map(([indic,_]) => indic);
-    
+
     // update session
     session.validations[period.periodKey] = selectedStatements;
+
     // update state
     setSelectedStatements(selectedStatements);
     setInvalidStatements(invalidStatements);
     setEmptyStatements(emptyStatements);
 
-    sessionDidUpdate();
+  }, [statementsStatus]);
 
-  }, [statementsStatus])
+  const updateSession = () => {
+ 
+    let selectedStatements = Object.entries(statementsStatus)
+      .filter(([_,status]) => status.status!="unselect")
+      .map(([indic,_]) => indic);
+    
+    // update session
+    session.validations[period.periodKey] = selectedStatements;
+    sessionDidUpdate();
+  };
 
   // on submit
   const handleSubmitStatements = async () => 
@@ -84,14 +94,19 @@ const DirectImpacts = ({
     submit();
   };
 
-  const onStatementUpdate = (indic, status) => {
+  const onStatementUpdate = (indic, status) =>
+  {
     setStatementsStatus(prevStatementsStatus => {return({
       ...prevStatementsStatus,
       [indic]: status
     })});
 
-    if (["error","incomplete"].includes(status.status) // re-init if unselect, error or incomplete
-     || (status.status=="ok" && statementsStatus[indic].status=="ok")) { // re-init if changes
+    if (["error","incomplete","ok"].includes(status.status)) {
+      session.initNetValueAddedIndicator(indic,period);
+      updateSession();
+    } else { // unselect
+      let validatedIndics = session.validations[period.periodKey];
+      session.validations[period.periodKey] = validatedIndics.filter(validatedIndic => validatedIndic != indic);
       session.initNetValueAddedIndicator(indic,period);
     }
   };
@@ -226,15 +241,10 @@ const DirectImpacts = ({
 };
 
 function isNextStepAvailable(emptyStatements, invalidStatements, selectedStatements) {
-  console.log('emptyStatements:', emptyStatements);
-  console.log('invalidStatements:', invalidStatements);
-  console.log('selectedStatements:', selectedStatements);
-
-  const isAvailable = emptyStatements.length === 0 && invalidStatements.length === 0 && selectedStatements.length > 0;
-  console.log('isAvailable:', isAvailable);
-
+  const isAvailable = emptyStatements.length === 0 
+    && invalidStatements.length === 0 
+    && selectedStatements.length > 0;
   return isAvailable;
 }
-
 
 export default DirectImpacts;

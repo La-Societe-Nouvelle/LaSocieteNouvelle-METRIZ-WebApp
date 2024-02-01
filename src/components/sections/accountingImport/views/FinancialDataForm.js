@@ -240,13 +240,33 @@ export const FinancialDataForm = ({
         periods
       );
 
-      // impacts data
+      // --------------------------------------------------
+      // Impacts data
+
       let impactsDataOnFinancialPeriod = session.impactsData[financialPeriod.periodKey];
       impactsDataOnFinancialPeriod.netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[financialPeriod.periodKey].amount;
+
+      // knw details
       impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = roundValue(accountingData.KNWData.apprenticeshipTax, 2);
       impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = roundValue(accountingData.KNWData.vocationalTrainingTax, 2);
 
-        // FEC id
+      // fec data
+      impactsDataOnFinancialPeriod.FECData.directorRemunerationAccounts = accountingData.personnelExpenses
+        .filter((expense) => /^644/.test(expense.accountNum))
+        .reduce((prev,{accountNum,amount}) => {
+          if (!prev.hasOwnProperty(accountNum)) {
+            prev[accountNum] = {
+              ...accountingData.accounts[accountNum],
+              amount: 0,
+              allocation: "none"
+            };
+          }
+          prev[accountNum].amount = roundValue(prev[accountNum].amount + amount, 2);
+          return prev;
+        }, {});
+
+      // --------------------------------------------------
+      // FEC id
       session.id = FECData.id; // anonymisation id
 
       // console logs

@@ -2,7 +2,7 @@
 
 import { Button } from "react-bootstrap";
 import { downloadChartImage } from "../utils";
-import ComparativeHorizontalBarChart from "../charts/ComparativeHorizontalBarChart";
+import { ComparativeHorizontalBarChart } from "../charts/ComparativeHorizontalBarChart";
 
 export const ComparativeHorizontalBarChartVisual = ({
   session,
@@ -27,8 +27,12 @@ export const ComparativeHorizontalBarChartVisual = ({
         </Button>
       </div>
       <ComparativeHorizontalBarChart
+        id={""}
         session={session}
-        period={period}
+        datasetOptions={
+          period
+        }
+        printOptions={""}
       />
     </div>
   );

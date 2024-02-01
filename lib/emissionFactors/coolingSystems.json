@@ -1,4 +1,15 @@
 {
+  "coolSys0": {
+    "label": "Fuite de fluide réfrigérant",
+    "group": " Tous systèmes",
+    "fluidQty": 1.0,
+    "units": {
+      "kg": {"unit": "kg", "coefGHG": 1.0, "coefGHGUncertainty": 50}
+    },
+    "unit": "kg",
+    "annualLeak": 1.0,
+    "annualLeakUncertainty": 0
+  },
   "coolSys1": {
     "label": "Réfrigération commerciale - meuble autonome - charge moyenne",
     "group": "Réfrigération commerciale",

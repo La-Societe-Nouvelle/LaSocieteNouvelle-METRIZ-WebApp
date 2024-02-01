@@ -10,7 +10,7 @@ import ExpenseAccountsTable from "./ExpenseAccountsTable";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
-import { getMappingFromChatGPT, getSignificativeAccounts, getSignificativeUnidentifiedProviders } from "./utils";
+import { getMappingFromChatGPT, getSignificativeAccounts, getSignificativeAccountsFromFlows, getSignificativeUnidentifiedProviders } from "./utils";
 import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 
 // Modals
@@ -142,9 +142,21 @@ const UnidentifiedProviders = ({
   // update significative accounts
   const updateSignificativeAccounts = async () => 
   {
+    // const significativeAccounts =
+    //   await getSignificativeAccounts(
+    //     accounts,
+    //     minFpt,
+    //     maxFpt,
+    //     financialPeriod
+    //   );
+
+    const expensesOnPeriod = financialData.externalExpenses
+        .filter(expense => financialPeriod.regex.test(expense.date));
     const significativeAccounts =
-      await getSignificativeAccounts(
+      await getSignificativeAccountsFromFlows(
+        expensesOnPeriod,
         accounts,
+        financialData.providers,
         minFpt,
         maxFpt,
         financialPeriod
@@ -166,7 +178,7 @@ const UnidentifiedProviders = ({
   // Event handlers
 
   const handleViewChange = (e) => {
-    setState((prevState) => ({ ...prevState, currentView: e.target.value }));
+    setState((prevState) => ({ ...prevState, currentView: e.target.value , currentPage : 1}));
   };
 
   const handleItemsPerPageChange = (e) => {

@@ -1,10 +1,11 @@
 import { printValue } from "/src/utils/formatters";
 
 export function sortAccountsByFootprint(accounts, period, indicator, order) {
-
   const sortedAccounts = accounts.sort((a, b) => {
-    const valueA = a.periodsData[period.periodKey].footprint.indicators[indicator].value;
-    const valueB = b.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    const valueA =
+      a.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    const valueB =
+      b.periodsData[period.periodKey].footprint.indicators[indicator].value;
     if (order === "asc") {
       return valueA - valueB;
     } else {
@@ -15,39 +16,40 @@ export function sortAccountsByFootprint(accounts, period, indicator, order) {
   return sortedAccounts;
 }
 
-export function sortProvidersByImpact(expensesAccounts, indicator, order) {
-
-  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
-    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
-
-    if (order === "asc") {
-      return valueA - valueB;
-    } else {
-      return valueB - valueA;
-    }
+export function filterProvidersByPeriod(financialData, period) {
+  return financialData.providers.filter((provider) => {
+    return Object.keys(provider.periodsData).some(
+      (key) => key === period.periodKey
+    );
   });
-
-  return sortedExpensesAccounts;
 }
+export function sortProvidersByContrib(
+  periodKey,
+  expensesAccounts,
+  indicator,
+  order
+) {
+  const sortedExpensesAccounts = expensesAccounts
+    .sort((a, b) => {
+      const valueA = a.footprint.indicators[indicator].getGrossImpact(
+        a.periodsData[periodKey].amount
+      );
+      const valueB = b.footprint.indicators[indicator].getGrossImpact(
+        b.periodsData[periodKey].amount
+      );
 
-export function sortProvidersByContrib(periodKey,expensesAccounts, indicator, order) {
-  
-  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
-    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
-  
-    if (order === "asc") {
-      return valueA - valueB;
-    } else {
-      return valueB - valueA;
-    }
-  }).slice(0, 4).sort((a, b) => {
-    let sortedAccountA = 100 - a.footprint.indicators[indicator].value;
-    let sortedAccountB = 100 - b.footprint.indicators[indicator].value;
-    return sortedAccountB - sortedAccountA;
-  });
-  
+      if (order === "asc") {
+        return valueA - valueB;
+      } else {
+        return valueB - valueA;
+      }
+    })
+    .slice(0, 4)
+    .sort((a, b) => {
+      let sortedAccountA = 100 - a.footprint.indicators[indicator].value;
+      let sortedAccountB = 100 - b.footprint.indicators[indicator].value;
+      return sortedAccountB - sortedAccountA;
+    });
 
   return sortedExpensesAccounts;
 }
@@ -76,7 +78,27 @@ export function getIndicDescription(indic) {
       description =
         "L'indicateur informe sur la quantité de gaz à effet de serre liée à la production de l'entreprise avec pour objectif d'identifier les entreprises les plus performantes.";
       break;
-    case "geq":
+    case "mat":
+      description =
+        "L’indicateur informe sur le recours à l’extraction de ressources naturelles. L’objectif est de réduire l’extraction de matières premières et de favoriser la réutilisation et l’économie circulaire.";
+      break;
+    case "haz":
+      description =
+        "L'indicateur informe sur le degré d'utilisation de produits pouvant entraîner des conséquences néfastes sur la santé et/ou l'environnement. Son objectif est de diminuer le recours à ces catégories de produits.";
+      break;
+    case "nrg":
+      description =
+        "L'indicateur mesure la consommation d'énergie, directement liée à la consommation de ressources naturelles ou aux émissions de gaz à effet de serre. Il informe ainsi sur la pression exercée sur l'environnement.";
+      break;
+    case "was":
+      description =
+        " L'indicateur informe sur la quantité de déchets produite, avec pour objectif de la réduire. Il n'informe cependant pas sur le traitement des déchets (recyclages, destruction, etc.) et leur dangerosité.";
+      break;
+    case "wat" :
+      description =
+    "L'indicateur informe sur l'utilisation de la ressource en eau, contribuant ainsi à la volonté de gestion globale des ressources naturelles qui sont en constante diminution.";
+      break;
+      case "geq":
       description =
         "L’indicateur informe sur les écarts de salaires entre les femmes et les hommes au sein des entreprises ayant contribué à la production de la valeur.";
       break;
@@ -107,36 +129,6 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
   return description;
 }
 
-export function getKeySuppliers(companies, indic, unit, precision) {
-  const keySuppliers = [];
-  companies
-    .filter((company) => !company.isDefaultAccount)
-    .filter((company) => company.footprintStatus == 200 && company.footprint.isValid())
-    .map((company) =>
-      keySuppliers.push({
-        stack: [
-          {
-            text: cutString(company.providerLib, 40),
-            fontSize: 8,
-            bold: true,
-          },
-          {
-            text:
-              indic == "idr"
-                ? "Rapport interdécile : " +
-                  company.footprint.indicators[indic].value.toFixed(precision)
-                : company.footprint.indicators[indic].value.toFixed(precision) +
-                  " " +
-                  unit,
-            fontSize: 7,
-          },
-        ],
-      })
-    );
-
-  return keySuppliers;
-}
-
 export function getIntensKeyProviders(
   providers,
   indic,
@@ -150,7 +142,10 @@ export function getIntensKeyProviders(
   const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
   providers
     .filter((provider) => !provider.isDefaultAccount)
-    .filter((provider) => provider.footprintStatus==200 && provider.footprint.isValid())
+    .filter(
+      (provider) =>
+        provider.footprintStatus == 200 && provider.footprint.isValid()
+    )
     .map((provider) =>
       keySuppliers.push({
         stack: [
@@ -185,7 +180,8 @@ export function getIntensKeyProviders(
 }
 
 export const getMostImpactfulExpenseAccountRows = (
-  mostImpactfulExpenseAccountsPart
+  mostImpactfulExpenseAccountsPart,
+  bgColor
 ) => {
   let rows = [];
 
@@ -195,9 +191,9 @@ export const getMostImpactfulExpenseAccountRows = (
     row.push(
       {
         text: item.impactPercentage + " %",
-        fillColor: "#191558",
+        fillColor: bgColor,
         color: "#FFFFFF",
-        fontSize: 7,
+        fontSize: 5,
         borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
         alignment: "right",
         bold: true,
@@ -215,7 +211,6 @@ export const getMostImpactfulExpenseAccountRows = (
 };
 
 export function cutString(str, nbChar) {
-
   if (str.length <= nbChar) return str;
   return str.substring(0, nbChar) + "...";
 }
@@ -226,14 +221,17 @@ export function targetAnnualReduction(data) {
   let yearsCount = data.length - 1;
   let totalReduction = firstYearValue - lastYearValue;
   let annualReduction = totalReduction / firstYearValue / yearsCount;
-  let percentageReduction = (annualReduction * 100).toFixed(0);
+  let percentageReduction = (annualReduction * 100).toFixed(1);
 
-  isNaN(percentageReduction)
-    ? (percentageReduction = undefined)
-    : (percentageReduction = "- " + percentageReduction);
+  if (!isNaN(percentageReduction)) {
+    percentageReduction = percentageReduction < 0 ? " + " + Math.abs(percentageReduction) : "- " + percentageReduction;
+  } else {
+    percentageReduction = undefined;
+  }
 
   return percentageReduction;
 }
+
 
 export function calculateAverageEvolutionRate(data) {
   let evolutionRates = [];
@@ -285,3 +283,23 @@ export function loadFonts() {
     },
   };
 }
+
+export const addUncertaintyText = (
+  uncertaintyText,
+  pdfPageSize,
+  pdfMargins,
+  defaultPosition
+) => {
+  const textOptions = {
+    text: "* " + uncertaintyText,
+    fontSize: 6,
+    italics: true,
+    font: "Roboto",
+    absolutePosition: {
+      x: defaultPosition.startX,
+      y: pdfPageSize.height - pdfMargins.bottom - 15,
+    },
+  };
+
+  return textOptions;
+};

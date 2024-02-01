@@ -26,7 +26,7 @@ section {
 
   h3 {
     margin-bottom: 1rem;
-    color : $primary;
+    color: $primary;
     margin-top: 1rem;
   }
 
@@ -34,6 +34,7 @@ section {
     font-size: 14px;
   }
 }
+
 .carousel-modal {
 
   @media (min-width: 1200px) {
@@ -41,15 +42,21 @@ section {
       max-width: 1200px;
     }
   }
-  .modal-body{
+
+  .modal-body {
     padding: 0.5rem 2.5rem 0.5rem 2.5rem;
     font-size: inherit;
   }
+
   .modal-header {
     padding: 1.5rem 1.5rem 0 0;
-    .btn-close { padding: 0.5rem;}
+
+    .btn-close {
+      padding: 0.5rem;
+    }
   }
 }
+
 .carousel {
 
   p,
@@ -137,6 +144,7 @@ section {
   }
 
 }
+
 /**
  * ==============================================
  * STEP 4 - STATEMENTS
@@ -226,19 +234,20 @@ section {
   margin-bottom: 2rem;
 
   .production-box-header {
-      background-color: $bg-light;
-      padding: 0.75rem 1.25rem;
-      margin-bottom: 1rem;
-      border-bottom: 1px solid #f0f0f8;
-      font-weight: 600;
-      font-size: 0.7rem;
-    }
+    background-color: $bg-light;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f8;
+    font-weight: 600;
+    font-size: 0.7rem;
+  }
 
   &.major {
-    border : 1.5px solid lighten($secondary,10%);
+    border: 1.5px solid lighten($secondary, 10%);
+
     .production-box-header {
       background-color: $light-secondary;
-      color :$secondary;
+      color: $secondary;
     }
   }
 
@@ -246,24 +255,24 @@ section {
     height: 50px;
   }
 
-  h5{
-    margin : 0.5rem;
+  h5 {
+    margin: 0.5rem;
     font-weight: 600;
     font-size: 0.8rem;
     text-align: center;
   }
 
- }
+}
 
-
- .box {
-  border:2px solid $light;
+.box {
+  border: 2px solid $light;
   border-radius: 1rem;
   background-color: #ffffff;
   padding: 2.5rem;
   margin-bottom: 2rem;
-  h3{
-    color : $primary;
+
+  h3 {
+    color: $primary;
   }
 
   h4 {
@@ -284,6 +293,7 @@ section {
     }
   }
 
+  // Result views menu
   .indic-result-menu {
     img {
       width: 35px;
@@ -292,14 +302,17 @@ section {
       outline: 0;
       box-shadow: 0 0 0 0.15rem rgba(250, 89, 95, 0.33);
     }
+
     .dropdown-menu {
       border: 2px solid $light;
       border-radius: 1rem;
+      overflow: hidden;
     }
 
-    .global-view-item{
+    .global-view-item {
       margin-left: 2.7rem;
     }
+
     .dropdown-item {
       font-size: 0.8rem;
       color: $primary;
@@ -308,7 +321,23 @@ section {
       &:focus,
       &:active {
         background-color: $bg-light;
+        overflow: hidden;
       }
+
+    }
+
+    .dropdown-item.active {
+
+      background-color: $light-secondary;
+      color: $secondary;
+      font-weight: 600;
+
+    }
+
+    .dropdown-item-text {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $primary;
     }
   }
 
@@ -329,15 +358,60 @@ section {
     }
   }
 
-.legal-unit-info {
-  border: 1px solid $light;
-  padding: 1rem;
-  border-radius: 1rem;
-  .btn-action {
-    background-color: $light;
-    border : 1px solid darken($light,5%);
+  .legal-unit-info {
+    border: 1px solid $light;
+    padding: 1rem;
+    border-radius: 1rem;
+
+    .btn-action {
+      background-color: $light;
+      border: 1px solid darken($light, 5%);
+    }
   }
 }
+
+
+.chart-accordion {
+  .accordion-item {
+    background-color: $bg-light;
+    overflow: hidden;
+  }
+
+  .accordion-button {
+    padding: 0.7rem;
+    font-weight: 600;
+    background-color: $bg-light;
+
+
+
+  }
+
+  .accordion-body {
+    background-color: #ffffff;
+    padding: 0 2rem;
+  }
+}
+
+.impactful-expenses {
+  h5 {
+    font-size: 0.8rem;
+  }
+
+  .impactful-expense {
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+
+    .percentage-box {
+      width: 7vw;
+      height: 1.8vw;
+      border: 1px solid $light;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 1rem;
+    }
+  }
 }
 
 // Graphs Container

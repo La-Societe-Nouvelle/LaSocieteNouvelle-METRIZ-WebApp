@@ -401,9 +401,18 @@ export async function FECDataReader(FECData) {
     await journal
       .sort((a, b) => a.CompteNum.localeCompare(b.CompteNum))
       .map(async (ligne) => {
-        try {
-          await readANouveauxEntry(data, journal, ligne);
+        try 
+        {
           // init #2 & #3 accounts
+          await readANouveauxEntry(data, journal, ligne);
+
+          // read #6 & #7 in balance forward book
+          if (/^6/.test(ligne.CompteNum))
+            await readExpenseEntry(data, journal, ligne);
+
+          if (/^7/.test(ligne.CompteNum))
+            await readProductionEntry(data, journal, ligne);
+
         } catch (error) {
           data.errors.push(error);
         }
