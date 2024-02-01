@@ -5,6 +5,7 @@ import { updater_to_1_0_2 } from "./updater_1_0_2";
 import { updater_to_1_0_6 } from "./updater_1_0_6";
 import { updater_2_0_0 } from "./updater_2_0_0";
 import { updater_to_3_0_0 } from "./updater_3_0_0";
+import { updater_to_3_0_4 } from "./updater_3_0_4";
 
 
 /* ----------------------------------------------------------------- */
@@ -44,5 +45,10 @@ export const updateVersion = async (sessionData) =>
   // to version 3.0.0
   if (/^2/.test(sessionData.version)) {
     await updater_to_3_0_0(sessionData);
+  }
+
+  // to version 3.0.4
+  if (/^3.0.[0-3]/.test(sessionData.version)) {
+    await updater_to_3_0_4(sessionData);
   }
 };
