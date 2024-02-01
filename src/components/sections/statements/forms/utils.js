@@ -92,7 +92,7 @@ export const checkStatementGEQ = (impactsData) => {
   } = impactsData;
 
   if (hasEmployees === true) {
-    if (wageGap == "" || wageGap == null) {
+    if (wageGap === "" || wageGap === null) {
       return ({ status: "incomplete", errorMessage: null });
     } else if (isValidNumber(wageGap, 0)) {
       return ({ status: "ok", errorMessage: null });
