@@ -79,7 +79,7 @@ export const RowAssessmentType_4 = ({
           ...Object.keys(emissionFactors[nextFactorId].units)].includes(consumptionUnit)) {
       const nextUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
       setConsumptionUnit(nextUnit);
-      if (!(nextUnit == "kgCO2e" || nextUnit == "tCO2e")) {
+      if (!["kgCO2e","tCO2e","kg"].includes(nextUnit)) {
         setConsumptionUncertainty(0);
       } else {
         setConsumptionUncertainty(25);
@@ -101,7 +101,7 @@ export const RowAssessmentType_4 = ({
   const updateConsumptionUnit = (event) => {
     const nextConsumptionUnit = event.target.value;
     setConsumptionUnit(nextConsumptionUnit);
-    if (!(nextConsumptionUnit == "kgCO2e" || nextConsumptionUnit == "tCO2e")) {
+    if (!["kgCO2e","tCO2e","kg"].includes(nextConsumptionUnit)) {
       setConsumptionUncertainty(0);
     }
   };
@@ -212,7 +212,7 @@ export const RowAssessmentType_4 = ({
               value={consumptionUncertainty}
               placeholder="%"
               onUpdate={updateConsumptionUncertainty}
-              disabled={!(consumptionUnit == "kgCO2e" || consumptionUnit == "tCO2e")}
+              disabled={!["kgCO2e","tCO2e","kg"].includes(consumptionUnit)}
               isInvalid={!isValidInput(consumptionUncertainty)}
             />
           </Col>
