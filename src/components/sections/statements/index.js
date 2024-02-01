@@ -41,8 +41,8 @@ const DirectImpacts = ({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateSession = () => {
- 
+  useEffect(() => {
+    
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -52,7 +52,7 @@ const DirectImpacts = ({
     let emptyStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status=="incomplete")
       .map(([indic,_]) => indic);
-    
+
     // update session
     session.validations[period.periodKey] = selectedStatements;
 
@@ -61,8 +61,17 @@ const DirectImpacts = ({
     setInvalidStatements(invalidStatements);
     setEmptyStatements(emptyStatements);
 
-    sessionDidUpdate();
+  }, [statementsStatus]);
 
+  const updateSession = () => {
+ 
+    let selectedStatements = Object.entries(statementsStatus)
+      .filter(([_,status]) => status.status!="unselect")
+      .map(([indic,_]) => indic);
+    
+    // update session
+    session.validations[period.periodKey] = selectedStatements;
+    sessionDidUpdate();
   };
 
   // on submit
@@ -92,10 +101,13 @@ const DirectImpacts = ({
       [indic]: status
     })});
 
-    if (["error","incomplete"].includes(status.status) // re-init if unselect, error or incomplete
-     || (status.status=="ok" && statementsStatus[indic].status=="ok")) { // re-init if changes
+    if (["error","incomplete","ok"].includes(status.status)) {
       session.initNetValueAddedIndicator(indic,period);
       updateSession();
+    } else { // unselect
+      let validatedIndics = session.validations[period.periodKey];
+      session.validations[period.periodKey] = validatedIndics.filter(validatedIndic => validatedIndic != indic);
+      session.initNetValueAddedIndicator(indic,period);
     }
   };
 

@@ -26,7 +26,7 @@ export const DirectorsDataTab = ({
   
   // executives data
   const [individualsData, setIndividualsData] = useState(individualsDataInModal);
-  const [accountsData, setAccountsData] = useState(directorRemunerationAccounts);
+  const [accountsData, setAccountsData] = useState(directorRemunerationAccounts || {});
   
   // ----------------------------------------------------------------------------------------------------
 
