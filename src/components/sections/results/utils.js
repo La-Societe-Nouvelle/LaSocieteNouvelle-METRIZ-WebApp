@@ -3,8 +3,6 @@
 // Libraries
 import keyIndics from "/lib/keyIndics";
 
-// --------------------------------------------------
-import keyIndics from "/lib/keyIndics";
 import regression from "regression";
 
 // get closest year data
