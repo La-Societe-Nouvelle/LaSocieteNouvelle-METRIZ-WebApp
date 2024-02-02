@@ -42,7 +42,6 @@ export const TrendChart = ({
   printOptions
 }) => {
 
-  if (datasetOptions.indic=="wat") console.log(datasetOptions);
   // --------------------------------------------------
   // Data
 
@@ -121,6 +120,7 @@ const buildChartData = (session,datasetOptions) =>
   };
   datasets.push(legalunitEvolutionDataset);
 
+
   // --------------------------------------------------
   // Division - Historical
 
@@ -196,6 +196,26 @@ const buildChartData = (session,datasetOptions) =>
     };
     datasets.push(branchTargetDataset);
   }
+
+  
+
+  const legalUnitTargetData = buildLegalUnitTargetData(comparativeData,aggregate,indic, legalUnitData);
+  if (legalUnitTargetData.length > 0){
+  const legalUnitTargetDataset = {
+    label: "Objectif Personnalisé",
+    data: legalUnitTargetData.map((data) => ({ 
+      x: data.year, 
+      y: data.value
+    })),
+    skipNull: true,
+    borderColor: trendChartColors.legalunitTarget,
+    backgroundColor: trendChartColors.legalunitTarget,
+    borderWidth: 4,
+    order: 4,
+    tension: 0.3,
+  };
+  datasets.push(legalUnitTargetDataset);
+}
 
   // --------------------------------------------------
 
@@ -275,22 +295,30 @@ const buildBranchTargetData = (
     .filter((item) => item.year > lastYearHistoricalData)
     .concat([historicalData.at(-1)])
     .sort((a, b) => a.year - b.year);
+  return data;
+}
+const buildLegalUnitTargetData = (
+  comparativeData,
+  aggregate,
+  indic,
+  legalUnitData
+) => {
+
+  let lastYearlegalUnitData = legalUnitData.at(-1).x;
+  let legalUnitTargetData = comparativeData[aggregate].legalUnit.target.data[indic] ?? []
+  let data = [];
+  if(legalUnitTargetData.length > 0) {
+
+      data = comparativeData[aggregate].legalUnit.target.data[indic]
+      .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
+      .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
+      .sort((a, b) => parseInt(a.year) - parseInt(b.year))
+
+  }
 
   return data;
 }
 
-const buildLegalUnitTargetdataset = (legalUnitTarget) => {
-
-  return {
-    label: "Objectif personnalisé",
-    data: legalUnitTarget.map((item) => ({ x: item.year, y: item.value })),
-    borderColor: trendChartColors.legalunitTarget,
-    backgroundColor: trendChartColors.legalunitTarget,
-    borderWidth: 4,
-    pointRadius: 0,
-    tension: 0.3,
-  };
-}
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (printOptions,datasetOptions,chartData) => 

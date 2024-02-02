@@ -57,7 +57,7 @@ export const determineAlignedTargetValue = (
   return currentValue >= branchValue ? targetYear : targetYear * (currentValue / branchValue);
 };
 
-export async function projectTrendValues(footprints, targetYear, targetMode, decimals) {
+export const projectTrendValues = async(footprints, targetYear, targetMode, decimals) => {
 
   const currentYear = footprints[0].year;
   const currentValue = footprints[0].value;
@@ -94,14 +94,14 @@ export async function projectTrendValues(footprints, targetYear, targetMode, dec
   return projectedValues;
 }
 
-export async function interpolateLinearValues(
+export const  interpolateLinearValues = (
   startYear,
   startValue,
   endYear,
   endValue,
   targetMode,
   decimals
-) {
+) =>  {
   const dataPoints = [
     [parseInt(startYear), startValue],
     [parseInt(endYear), parseInt(endValue)],
@@ -122,6 +122,36 @@ export async function interpolateLinearValues(
   return interpolatedValues;
 }
 
+export const interpolateGeometricValues = async (
+  startYear,
+  startValue,
+  endYear,
+  endvalue,
+  targetMode,
+  decimals
+) => {
+  const values = [];
+
+  const startYearNumber = parseInt(startYear);
+  const targetYearNumber = parseInt(endYear);
+
+  const yearsDifference = targetYearNumber - startYearNumber;
+
+  const growthFactor = Math.pow(endvalue / startValue, 1 / yearsDifference);
+
+  for (let i = 0; i <= yearsDifference; i++) {
+    const currentYear = startYearNumber + i;
+    const currentValue = startValue * Math.pow(growthFactor, i);
+
+    values.push({
+      value: currentValue.toFixed(decimals),
+      year: currentYear.toString(),
+      target: targetMode,
+    });
+  }
+
+  return values;
+};
 
 
 // --------------------------------------------------

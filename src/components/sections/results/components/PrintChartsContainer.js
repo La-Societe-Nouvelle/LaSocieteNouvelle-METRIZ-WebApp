@@ -104,24 +104,19 @@ const IndicatorCharts = ({
       </Row>
       <Row>
         <div className="trend-chart-container">
-    
-          <TrendChart
+          {/* Check If legal unit has target  */}
+          {/* <TrendChart
             id={`trend-chart-${indic}-print`}
-            unit={indicators[indic].unit}
-            historical={
-              comparativeData["production"].division.history.data[indic]
-            }
-            trend={
-              comparativeData["production"].division.trend.data[indic]
-            }
-            target={
-              comparativeData["production"].division.target.data[indic]
-            }
-            aggregate={mainAggregates.production.periodsData}
-            legalUnitTarget = {comparativeData["production"].legalUnit.target.data[indic] ?? []}
-            indic={indic}
-            isPrinting={true}
-          />
+            session={session}
+            datasetOptions={{
+              aggregate: "production",
+              indic
+            }}
+            printOptions={{
+              printMode: true
+            }}
+          /> */}
+
         </div>
       </Row>
       {(indicators[indic].type == "intensité" ||

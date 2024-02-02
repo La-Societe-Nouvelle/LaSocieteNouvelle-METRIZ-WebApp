@@ -76,10 +76,11 @@ export const graphSelectStyles = () => ({
    
     let styles = {
       ...provided,
-      fontSize: "1rem",
-      fontFamily : "Raleway",
-      fontWeight: 800,
-      borderWidth: "0px",
+      fontSize: "0.9rem",
+      fontFamily : "Roboto",
+      fontWeight: "bold",
+      borderWidth: "2px",
+      borderColor : "#ededff",
       boxShadow: "none",
       padding: "0px",
       "&:hover": {
@@ -105,7 +106,7 @@ export const graphSelectStyles = () => ({
   option: (provided, state) => ({
     ...provided,
     color: "#191558",
-    fontFamily : "Raleway",
+    fontSize: "0.8rem",
     backgroundColor: "transparent",
     background: state.isFocused ? "#dbdef1" : "",
     

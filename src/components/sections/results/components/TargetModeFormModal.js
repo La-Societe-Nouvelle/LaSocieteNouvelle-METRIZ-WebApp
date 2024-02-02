@@ -11,6 +11,7 @@ import { customSelectStyles } from "../../../../../config/customStyles";
 const TargetModeFormModal = ({
   showModal,
   showIndustryMode,
+  showExtendTargetMode,
   legalUnitTarget,
   indic,
   currentPeriod,
@@ -65,7 +66,7 @@ const TargetModeFormModal = ({
       {
         label: "Réduction annuelle similaire",
         value: "extendTarget",
-        showOption: true,
+        showOption: showExtendTargetMode,
       },
     ];
 

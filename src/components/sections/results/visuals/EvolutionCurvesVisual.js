@@ -29,7 +29,7 @@ import {
   getClosestYearData,
   getLastIndustryTargetData,
   projectTrendValues,
-  interpolateLinearValues,
+  interpolateGeometricValues,
 } from "../utils";
 
 /* ---------- EVOLUTION CURVES CONTAINER ---------- */
@@ -54,15 +54,14 @@ const graphOptions = [
 ];
 
 export const EvolutionCurvesVisual = ({ session, indic }) => {
-
   const { financialData, comparativeData, availablePeriods } = session;
   const { unit, nbDecimals } = metaIndics[indic];
-
-// Current Period
+  console.log(availablePeriods);
+  // Current Period
   const defaultPeriod = getMoreRecentYearlyPeriod(availablePeriods);
   const periodYear = getYearPeriod(defaultPeriod);
 
-// Comparative Data -------------------------------------------------------------------
+  // Comparative Data -------------------------------------------------------------------
 
   const [showedAggregate, setShowedAggregate] = useState("production");
 
@@ -72,54 +71,66 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       trend: { data: trendData },
       target: { data: targetData },
     },
-    legalUnit : {
-      target : {data : legalUnitTargetData}
-    }
+    legalUnit: {
+      target: { data: legalUnitTargetData },
+    },
   } = comparativeData[showedAggregate];
 
-//-- Aggregate
+  //-- Aggregate
   const changeShowedAggregate = (selectedOption) => {
     setShowedAggregate(selectedOption.value);
   };
 
-// Evolution Curves -------------------------------------------------------------------
+  // Evolution Curves -------------------------------------------------------------------
 
   const evolutionCurves = {
-   historical: historicalData[indic],
+    historical: historicalData[indic],
     trend: trendData[indic],
     target: targetData[indic],
     aggregate: financialData.mainAggregates[showedAggregate].periodsData,
     legalUnitTarget: legalUnitTargetData[indic] ?? [],
   };
 
-  const [evolutionCurvesData, setEvolutionCurvesData] = useState(evolutionCurves);
+  const [evolutionCurvesData, setEvolutionCurvesData] =
+    useState(evolutionCurves);
 
-// ------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------
 
   const [showFormModal, setShowFormModal] = useState(false);
 
-// Handle Legal Unit Custom Target Mode  ----------------------------------------------
+  // Handle Legal Unit Custom Target Mode  ----------------------------------------------
 
   const handleTargetFormSubmit = async (
     targetMode,
     targetYear,
     targetValue
   ) => {
+    const currentFootprint =
+      financialData.mainAggregates[showedAggregate].periodsData[
+        defaultPeriod.periodKey
+      ].footprint.indicators[indic].value;
 
-    const currentFootprint = financialData.mainAggregates[showedAggregate].periodsData[defaultPeriod.periodKey].footprint.indicators[indic].value
-    
-    console.log(currentFootprint)
+    console.log(targetMode);
 
-  // Switch based on the selected target mode
+    // Switch based on the selected target mode
     switch (targetMode) {
       case "personalTarget":
-        await handlePersonnalTarget(targetValue, targetYear, targetMode, currentFootprint);
+        await handlePersonnalTarget(
+          targetValue,
+          targetYear,
+          targetMode,
+          currentFootprint
+        );
         break;
       case "industryTarget":
         await handleIndustryTarget(currentFootprint, periodYear, targetMode);
         break;
       case "alignedIndustryTarget":
-        await handleAlignedIndustryTarget(currentFootprint, periodYear, targetMode);
+        await handleAlignedIndustryTarget(
+          currentFootprint,
+          periodYear,
+          targetMode
+        );
         break;
       case "extendTarget":
         await handleExtendTarget(targetYear, targetMode);
@@ -127,19 +138,18 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       default:
         break;
     }
-  
+
     setShowFormModal(false);
   };
-//-- Target modes  
+  //-- Target modes
 
   const handlePersonnalTarget = async (
     targetValue,
     targetYear,
     targetMode,
-    currentFootprint,
+    currentFootprint
   ) => {
-
-    const values = await interpolateLinearValues(
+    const values = await interpolateGeometricValues(
       periodYear,
       currentFootprint,
       targetYear,
@@ -156,10 +166,13 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     periodYear,
     targetMode
   ) => {
+    const targetData = evolutionCurves.target.filter(
+      (item) => item.path == "GEO"
+    );
+    const { lastTargetValue, lastTargetYear } =
+      getLastIndustryTargetData(targetData);
 
-    const { lastTargetValue, lastTargetYear } = getLastIndustryTargetData(evolutionCurves.target);
-
-    const values = await interpolateLinearValues(
+    const values = await interpolateGeometricValues(
       periodYear,
       currentFootprint,
       lastTargetYear,
@@ -167,7 +180,6 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       targetMode,
       nbDecimals
     );
-
     updateLegalUnitTarget(values);
   };
 
@@ -176,15 +188,16 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     periodYear,
     targetMode
   ) => {
-    
     const industryHistorical = getClosestYearData(
       evolutionCurves.historical,
       periodYear
     );
-
-    const { lastTargetValue, lastTargetYear } = getLastIndustryTargetData(
-      evolutionCurves.target
+    const targetData = evolutionCurves.target.filter(
+      (item) => item.path == "GEO"
     );
+
+    const { lastTargetValue, lastTargetYear } =
+      getLastIndustryTargetData(targetData);
 
     const similarEffortTarget = determineAlignedTargetValue(
       currentFootprint,
@@ -192,7 +205,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       lastTargetValue
     );
 
-    const values = await interpolateLinearValues(
+    const values = await interpolateGeometricValues(
       periodYear,
       currentFootprint,
       lastTargetYear,
@@ -205,24 +218,28 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
   };
 
   const handleExtendTarget = async (targetYear, targetMode) => {
-    
     const footprints = availablePeriods.map((period) => {
-     
       let footprint = {};
-      footprint.value = evolutionCurves.aggregate[period.periodKey].footprint.indicators[indic].value
+      footprint.value =
+        evolutionCurves.aggregate[period.periodKey].footprint.indicators[
+          indic
+        ].value;
       footprint.year = getYearPeriod(period);
       return footprint;
     });
 
-
-    const values = await projectTrendValues(footprints, targetYear, targetMode, nbDecimals);
+    const values = await projectTrendValues(
+      footprints,
+      targetYear,
+      targetMode,
+      nbDecimals
+    );
 
     updateLegalUnitTarget(values);
-
   };
-// ------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------
 
-// Update legal unit target with the provided values
+  // Update legal unit target with the provided values
   const updateLegalUnitTarget = (targetValues) => {
     comparativeData[showedAggregate].legalUnit.target.data = {
       ...comparativeData[showedAggregate].legalUnit.target.data,
@@ -236,7 +253,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
 
     setEvolutionCurvesData(updatedEvolutionCurvesData);
   };
-// ------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------
 
   return (
     <Row>
@@ -253,24 +270,26 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
               options={graphOptions}
               onChange={changeShowedAggregate}
             />
-          </div>
+        </div>
 
           <TargetModeFormModal
             showModal={showFormModal}
             showIndustryMode={evolutionCurves.target.length > 0}
             legalUnitTarget={evolutionCurves.legalUnitTarget}
+            showExtendTargetMode={availablePeriods.length > 1}
             onClose={() => setShowFormModal(false)}
             currentPeriod={periodYear}
             indic={indic}
             onSubmit={handleTargetFormSubmit}
           />
-  <div className="text-end mt-5">
+          <div className="text-end mt-3">
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setShowFormModal(true)}
             >
-              <i className="bi bi-graph-up-arrow"></i> Définir un objectif personnalisé
+              <i className="bi bi-graph-up-arrow"></i> Définir un objectif
+              personnalisé
             </Button>
           </div>
 
