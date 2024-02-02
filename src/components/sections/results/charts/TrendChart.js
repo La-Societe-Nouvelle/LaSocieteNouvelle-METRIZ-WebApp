@@ -130,14 +130,14 @@ const buildChartData = (session,datasetOptions) =>
     indic
   );
   const branchHistoricalDataset = {
-    label: "Historique",
+    label: "Historique - Branche",
     data: branchHistoricalData.map((item) => ({
       x: item.year,
       y: item.value,
     })),
     borderColor: trendChartColors.trend,
     backgroundColor: trendChartColors.trend,
-    order: 2,
+    order: 3,
     borderWidth: 4,
     tension: 0.3,
   };
@@ -155,7 +155,7 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTrendDataset ={
-      label: "Tendance",
+      label: "Tendance - Branche",
       data: branchTrendData.map((data) => ({ 
         x: data.year, 
         y: data.value 
@@ -164,7 +164,7 @@ const buildChartData = (session,datasetOptions) =>
       backgroundColor: trendChartColors.trend,
       borderWidth: 4,
       borderDash: [12, 6],
-      order: 3,
+      order: 4,
       tension: 0.3,
     };
     datasets.push(branchTrendDataset);
@@ -182,7 +182,7 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTargetDataset = {
-      label: "Objectif",
+      label: "Objectif - Branche",
       data: branchTargetData.map((data) => ({ 
         x: data.year, 
         y: data.value
@@ -191,7 +191,7 @@ const buildChartData = (session,datasetOptions) =>
       borderColor: trendChartColors.target,
       backgroundColor: trendChartColors.target,
       borderWidth: 4,
-      order: 4,
+      order: 5,
       tension: 0.3,
     };
     datasets.push(branchTargetDataset);
@@ -202,7 +202,7 @@ const buildChartData = (session,datasetOptions) =>
   const legalUnitTargetData = buildLegalUnitTargetData(comparativeData,aggregate,indic, legalUnitData);
   if (legalUnitTargetData.length > 0){
   const legalUnitTargetDataset = {
-    label: "Objectif Personnalisé",
+    label: "Objectif - Unité légale",
     data: legalUnitTargetData.map((data) => ({ 
       x: data.year, 
       y: data.value
@@ -211,7 +211,7 @@ const buildChartData = (session,datasetOptions) =>
     borderColor: trendChartColors.legalunitTarget,
     backgroundColor: trendChartColors.legalunitTarget,
     borderWidth: 4,
-    order: 4,
+    order: 2,
     tension: 0.3,
   };
   datasets.push(legalUnitTargetDataset);
