@@ -20,30 +20,10 @@ export const DirectorAccountingDataView = ({
   // ----------------------------------------------------------------------------------------------------
 
   // useEffect(() => {
-
-  //   const isDirectors = individualsData.some(individual => individual.isDirector);
-  //   if (!isDirectors) {
-  //     // set to none if no director
-  //     Object.values(accountsData).forEach((accountData) => accountData.allocation = "none");
-  //   } else {
-  //     const allUnallocated = Object.values(accountsData)
-  //       .every(accountData => accountData.allocation == "none");
-  //     if (allUnallocated) {
-  //       // set to all if unallocated
-  //       Object.values(accountsData).forEach((accountData) => accountData.allocation = "all");
-  //     }
-  //   }
-
-  //   setAccountsData({...accountsData});
-
-  // }, [individualsData]);
-
-  // useEffect(() => {
   //   onUpdate(accountsData);
   // }, [accountsData]);
 
   useEffect(() => {
-    console.log("triggered");
     setAccountingData({...accountingData});
   }, [accountDataProp])
 
@@ -127,7 +107,6 @@ const DirectorDataRow = ({
   // Allocation
   const updateAllocation = (event) => {
     const nextAllocation = event.target.value
-    console.log(nextAllocation);
     setAllocation(nextAllocation);
   };
 

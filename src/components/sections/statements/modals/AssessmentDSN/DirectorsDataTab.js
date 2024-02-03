@@ -18,14 +18,14 @@ import { DirectorAccountingDataView } from "./DirectorAccountingDataView";
 /* -------------------- EXECUTIVES DATA FOR SOCIAL FOOTPRINT -------------------- */
 
 export const DirectorsDataTab = ({ 
-  individualsData: individualsDataInModal, 
+  individualsData: individualsDataProp, 
   directorRemunerationAccounts,
   onUpdateIndividualsData,
   onUpdateDirectorRemunerationAccounts,
 }) => {
   
   // directors data
-  const [individualsData, setIndividualsData] = useState(individualsDataInModal);
+  const [individualsData, setIndividualsData] = useState(individualsDataProp);
   const [accountingData, setAccountingData] = useState(directorRemunerationAccounts || {});
   
   // ----------------------------------------------------------------------------------------------------
@@ -33,19 +33,16 @@ export const DirectorsDataTab = ({
   // when props update -> useless because no update from DSN
   // useEffect(() => 
   // {
-  //   console.log(individualsData !== individualsDataInModal);
-  //   if (individualsData !== individualsDataInModal) {
-  //     setIndividualsData(individualsDataInModal);
+  //   if (individualsData !== individualsDataProp) {
+  //     setIndividualsData(individualsDataProp);
   //   }
-  // }, [individualsDataInModal]);
+  // }, [individualsDataProp]);
 
   // when individuals data update (individual removed or added)
   useEffect(() => {
 
-    console.log("triggered individuals data update");
     const isDirectors = individualsData.some(individual => individual.isDirector);
     if (!isDirectors) {
-      console.log("to none");
       // set to none if no director
       Object.values(accountingData).forEach((accountData) => accountData.allocation = "none");
       setAccountingData({...accountingData});
@@ -53,7 +50,6 @@ export const DirectorsDataTab = ({
       const allUnallocated = Object.values(accountingData)
         .every(accountData => accountData.allocation == "none");
       if (allUnallocated) {
-        console.log("to all");
         // set to all if unallocated
         Object.values(accountingData).forEach((accountData) => accountData.allocation = "all");
         setAccountingData({...accountingData});
@@ -93,7 +89,7 @@ export const DirectorsDataTab = ({
 
     setIndividualsData([
       ...individualsData,
-      newIndividualData,
+      newIndividualData
     ]);
   };
 
@@ -127,13 +123,13 @@ export const DirectorsDataTab = ({
     onUpdateDirectorRemunerationAccounts(acountingData)
   }
 
-  const onIndividualDataUpdate = (individualData) => 
+  const onIndividualDataUpdate = () => 
   {
     // update impacts data
+    setIndividualsData([...individualsData]);
     onUpdateIndividualsData(individualsData);
   }
   
-  console.log(individualsData);
   return (
     <div className="assessment">
       <Table>
@@ -172,6 +168,9 @@ export const DirectorsDataTab = ({
       <button className="btn btn-primary btn-sm me-2" onClick={addDirector}>
         <i className="bi bi-plus-lg"></i> Ajouter
       </button>
+      <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
+        <i className="bi bi-shuffle"></i> Attribuer les rémunérations
+      </button>
       <button className="btn btn-secondary btn-sm" onClick={removeAll}>
         <i className="bi bi-trash3-fill" /> Supprimer tout
       </button>
@@ -180,7 +179,7 @@ export const DirectorsDataTab = ({
       <Accordion>
         <Accordion.Item eventKey="0" className="bg-white">
           <Accordion.Header as="h5">
-            <i className="bi bi-bar-chart-steps me-2"></i>
+            <i className="bi bi-list-columns-reverse me-2"></i>
             Données comptables - Rémunérations du travail de l'exploitant 
           </Accordion.Header>
           <Accordion.Body className="chart-accordion bg-white p-0">
@@ -189,11 +188,11 @@ export const DirectorsDataTab = ({
               individualsData={individualsData}
               onUpdate={onAccountingDataUpdate}
             />
-            <div className="p-3">
+            {/* <div className="p-3">
               <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
-                <i className="bi bi-arrow-repeat"></i> Attribuer les rémunérations
+                <i className="bi bi-shuffle"></i> Attribuer les rémunérations
               </button>
-            </div>
+            </div> */}
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
