@@ -24,24 +24,29 @@ const DirectorRow = ({
   // from outside
   useEffect(() => 
   {
-    if (individualData.name!=name) setName(individualData.name);
-    if (individualData.sex!=sex) setSex(individualData.sex);
-    if (individualData.wage!=wage) setWage(individualData.wage);
-    if (individualData.workingHours!=workingHours) setWorkingHours(individualData.workingHours);
-    if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
-    if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
+    console.log(individualData.wage!=wage);
+    console.log(individualData.wage);
+    console.log(wage);
+    // if (individualData.name!=name) setName(individualData.name);
+    // if (individualData.sex!=sex) setSex(individualData.sex);
+    if (individualData.wage!=wage) setWage(individualData.wage || "");
+    // if (individualData.workingHours!=workingHours) setWorkingHours(individualData.workingHours);
+    // if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
+    // if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
 
-  }, [individualData]);
+  }, [individualData.wage]);
 
   // from inside
   useEffect(() => 
   {
-    individualData.name = name;
-    individualData.sex = sex;
-    individualData.workingHours = workingHours;
+    console.log(individualData.wage);
+    console.log(wage);
+    // individualData.name = name;
+    // individualData.sex = sex;
+    // individualData.workingHours = workingHours;
     individualData.wage = wage;
-    individualData.hourlyRate = hourlyRate;
-    individualData.apprenticeshipHours = apprenticeshipHours;
+    // individualData.hourlyRate = hourlyRate;
+    // individualData.apprenticeshipHours = apprenticeshipHours;
 
     onUpdate(individualData);
   }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours]);
@@ -50,6 +55,7 @@ const DirectorRow = ({
 
   // name
   const handleNameChange = (event) => {
+    console.log("name handler");
     const nextName = event.target.value;
     setName(nextName);
   };
@@ -82,6 +88,7 @@ const DirectorRow = ({
   // wage
   const handleWageChange = (event) => 
   {
+    console.log("wage handler");
     const input = event.target.value;
     const nextWage = parseFloat(input);
 

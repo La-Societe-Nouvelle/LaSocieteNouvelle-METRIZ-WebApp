@@ -12,40 +12,59 @@ import { initIndividualData } from "./utils";
 
 // Components
 import DirectorRow from "./DirectorRow";
-import { DirectorRemunerationAccountsTable } from "./DirectorRemunerationAccountsTable";
+import { DirectorAccountingDataView } from "./DirectorAccountingDataView";
 
 
 /* -------------------- EXECUTIVES DATA FOR SOCIAL FOOTPRINT -------------------- */
 
 export const DirectorsDataTab = ({ 
   individualsData: individualsDataInModal, 
+  directorRemunerationAccounts,
   onUpdateIndividualsData,
   onUpdateDirectorRemunerationAccounts,
-  directorRemunerationAccounts
 }) => {
   
-  // executives data
+  // directors data
   const [individualsData, setIndividualsData] = useState(individualsDataInModal);
-  const [accountsData, setAccountsData] = useState(directorRemunerationAccounts || {});
+  const [accountingData, setAccountingData] = useState(directorRemunerationAccounts || {});
   
   // ----------------------------------------------------------------------------------------------------
 
-  // when props update
-  useEffect(() => 
-  {
-    if (individualsData !== individualsDataInModal) {
-      setIndividualsData(individualsDataInModal);
-    }
-  }, [individualsDataInModal]);
+  // when props update -> useless because no update from DSN
+  // useEffect(() => 
+  // {
+  //   console.log(individualsData !== individualsDataInModal);
+  //   if (individualsData !== individualsDataInModal) {
+  //     setIndividualsData(individualsDataInModal);
+  //   }
+  // }, [individualsDataInModal]);
 
   // when individuals data update (individual removed or added)
   useEffect(() => {
-    didUpdate();
+
+    console.log("triggered individuals data update");
+    const isDirectors = individualsData.some(individual => individual.isDirector);
+    if (!isDirectors) {
+      console.log("to none");
+      // set to none if no director
+      Object.values(accountingData).forEach((accountData) => accountData.allocation = "none");
+      setAccountingData({...accountingData});
+    } else {
+      const allUnallocated = Object.values(accountingData)
+        .every(accountData => accountData.allocation == "none");
+      if (allUnallocated) {
+        console.log("to all");
+        // set to all if unallocated
+        Object.values(accountingData).forEach((accountData) => accountData.allocation = "all");
+        setAccountingData({...accountingData});
+      }
+    }
+    //onIndividualDataUpdate();
   }, [individualsData]);
 
-  useEffect(() => {
-    onUpdateDirectorRemunerationAccounts(accountsData);
-  }, [accountsData]);
+  // useEffect(() => {
+  //   onUpdateDirectorRemunerationAccounts(accountsData);
+  // }, [accountsData]);
 
   // ----------------------------------------------------------------------------------------------------
 
@@ -84,7 +103,7 @@ export const DirectorsDataTab = ({
     individualsData
       .filter((individual) => individual.isDirector)
       .forEach((individual) => {
-        let nextWage = getSumItems(Object.values(accountsData)
+        let nextWage = getSumItems(Object.values(accountingData)
           .map((accountData) => {
             switch(accountData.allocation) {
               case individual.id : return accountData.amount;
@@ -104,14 +123,11 @@ export const DirectorsDataTab = ({
     onUpdateIndividualsData(individualsData);
   }
 
-  const onAccountingDataUpdate = (accountData) => {
-    setAccountsData({
-      ...accountsData,
-      [accountData.accountNum]: accountData
-    });
+  const onAccountingDataUpdate = (acountingData) => {
+    onUpdateDirectorRemunerationAccounts(acountingData)
   }
 
-  const didUpdate = () => 
+  const onIndividualDataUpdate = (individualData) => 
   {
     // update impacts data
     onUpdateIndividualsData(individualsData);
@@ -146,7 +162,7 @@ export const DirectorsDataTab = ({
                 <DirectorRow
                   individualData={individualData}
                   isNewEmployeeRow={false}
-                  onUpdate={didUpdate}
+                  onUpdate={onIndividualDataUpdate}
                 />
               </tr>
           ))}
@@ -168,16 +184,16 @@ export const DirectorsDataTab = ({
             Données comptables - Rémunérations du travail de l'exploitant 
           </Accordion.Header>
           <Accordion.Body className="chart-accordion bg-white p-0">
-            <DirectorRemunerationAccountsTable
-              accountingData={accountsData}
+            <DirectorAccountingDataView
+              accountingData={accountingData}
               individualsData={individualsData}
               onUpdate={onAccountingDataUpdate}
             />
-            {/* <div className="p-3">
+            <div className="p-3">
               <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
                 <i className="bi bi-arrow-repeat"></i> Attribuer les rémunérations
               </button>
-            </div> */}
+            </div>
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
