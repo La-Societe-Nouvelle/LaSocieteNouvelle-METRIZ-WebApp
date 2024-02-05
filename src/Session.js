@@ -224,18 +224,7 @@ export class Session
     Object.values(this.financialData.productionAggregates)
       .forEach((aggregate) => aggregate.periodsData[period.periodKey] = new SocialFootprint());
   }
-
-  /* -------------------- FOOTPRINT CHECK -------------------- */
-
-  isSocialFootprintComputed = (period) => 
-  {
-    // production footprint
-    const socialFootprint = this.financialData.mainAggregates.production.periodsData[period.periodKey].footprint;
-
-    const isComputed = Object.values(socialFootprint.indicators).any((indicator) => indicator.isValid());
-    return isComputed;
-  }
-
+  
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
   updateNetValueAddedFootprint = async (period) => 
