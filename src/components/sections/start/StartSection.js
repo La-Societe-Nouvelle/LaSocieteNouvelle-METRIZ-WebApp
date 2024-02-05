@@ -77,7 +77,10 @@ export const StartSection = ({ initSession, resumeSession }) =>
 
       // re-compute footprints
       for (let period of session.availablePeriods) {
-        await session.updateFootprints(period);
+        // update fpt if already computed
+        if (session.isSocialFootprintComputed(period)) {
+          await session.updateFootprints(period);
+        }
       }
 
       // Public logs
