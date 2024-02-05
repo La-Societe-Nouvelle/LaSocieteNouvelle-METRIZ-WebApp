@@ -52,13 +52,16 @@ export const Metriz = () =>
 
   const currentDate = new Date();
 
-  useEffect(() => {
+  useEffect(async () => {
+    // bakc to top of the page
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: "instant",
     });
-    sessionDidUpdate();
+    // update step max
+    let progression = await getProgression(session,selectedPeriod);
+    setStepMax(progression);
   }, [step]); 
 
 
@@ -77,12 +80,16 @@ export const Metriz = () =>
     setSessionSaved(true);
   };
 
-  const sessionDidUpdate = async () => {
+  const sessionDidUpdate = async () => 
+  {
+    // update footprints
+    await session.updateFootprints(selectedPeriod);
+
+    // block step max (will be update with setStep, triggered on submit)
     let progression = await getProgression(session,selectedPeriod);
-    if (selectedPeriod.periodKey && progression<5) {
-      session.initNetValueAddedFootprint(selectedPeriod);
+    if (stepMax>=progression) {
+      setStepMax(progression);
     }
-    setStepMax(progression);
   }
 
   // Init session -------------------------------------
