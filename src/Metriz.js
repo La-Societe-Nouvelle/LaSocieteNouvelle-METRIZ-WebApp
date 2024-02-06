@@ -85,11 +85,8 @@ export const Metriz = () =>
     // update footprints
     await session.updateFootprints(selectedPeriod);
 
-    // block step max (will be update with setStep, triggered on submit)
-    let progression = await getProgression(session,selectedPeriod);
-    if (stepMax>=progression) {
-      setStepMax(progression);
-    }
+    // set the current step as step max
+    setStepMax(step);
   }
 
   // Init session -------------------------------------
