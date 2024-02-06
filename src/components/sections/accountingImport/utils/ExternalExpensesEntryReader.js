@@ -21,23 +21,28 @@ const checkBalance = (lines) => {
 
 const getProviderData = (ligneCourante,ligneFournisseur,data) => 
 {
-  if (data.useAccountAux && ligneFournisseur.CompAuxNum) {
+  // provider found & useAccount
+  if (ligneFournisseur && !data.useAccountAux) {
+    return ({
+      providerNum: ligneFournisseur.CompteNum,
+      providerLib: ligneFournisseur.CompteLib,
+      isDefaultProviderAccount: false
+    });
+  } 
+  // provider found & useAccountAux (and accountAux defined)
+  else if (ligneFournisseur && data.useAccountAux && ligneFournisseur.CompAuxNum) {
     return ({
       providerNum: ligneFournisseur.CompAuxNum,
       providerLib: ligneFournisseur.CompAuxLib,
       isDefaultProviderAccount: false
     });
-  } else if (data.useAccountAux) {
+  } 
+  // else default provider
+  else {
     return ({
       providerNum: "_"+ligneCourante.CompteNum,
-      providerLib: "FOURNISSEUR "+ligneFournisseur.CompteLib,
+      providerLib: "FOURNISSEUR "+ligneCourante.CompteLib,
       isDefaultProviderAccount: true
-    });
-  } else {
-    return ({
-      providerNum: ligneFournisseur.CompteNum,
-      providerLib: ligneFournisseur.CompteLib,
-      isDefaultProviderAccount: false
     });
   }
 }
@@ -171,7 +176,7 @@ const readExternalExpenses = (lignes,data) =>
     res.message = "OK";
 
     // ligne relative au compte fournisseur
-    let ligneFournisseur = lignesFournisseurs[0] || {};
+    let ligneFournisseur = lignesFournisseurs[0];
 
     // build data
     lignesComptesCharges.forEach((ligneCompteCharges) => 
@@ -192,7 +197,7 @@ const readExternalExpenses = (lignes,data) =>
 
       // push data
       res.expensesData.push(expenseData);
-      if (expenseData.isDefaultProviderAccount) {
+      if (providerData.isDefaultProviderAccount) {
         res.defaultProviders.push(expenseData.providerNum);
       }
     });

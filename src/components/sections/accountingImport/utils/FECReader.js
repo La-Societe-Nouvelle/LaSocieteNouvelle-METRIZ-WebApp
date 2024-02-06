@@ -919,7 +919,7 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
     else 
     {
       // get provider account data
-      let ligneFournisseur = lignesFournisseur[0] || {};
+      let ligneFournisseur = lignesFournisseur[0];
       let providerData = getProviderData(ligneCourante,ligneFournisseur,data);
       // expense data
       let expenseData = {
@@ -934,7 +934,7 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
       };
       // push data
       data.externalExpenses.push(expenseData);
-      if (!ligneFournisseur.CompAuxNum) {
+      if (providerData.isDefaultProviderAccount) {
         data.defaultProviders.push(expenseData.providerNum);
       }
     }
@@ -1175,23 +1175,28 @@ const readAddtionalDataEntry = async (data, journal, ligneCourante) => {
 
 const getProviderData = (ligneCourante,ligneFournisseur,data) => 
 {
-  if (data.useAccountAux && ligneFournisseur.CompAuxNum) {
+  // provider found & useAccount
+  if (ligneFournisseur && !data.useAccountAux) {
+    return ({
+      providerNum: ligneFournisseur.CompteNum,
+      providerLib: ligneFournisseur.CompteLib,
+      isDefaultProviderAccount: false
+    });
+  } 
+  // provider found & useAccountAux (and accountAux defined)
+  else if (ligneFournisseur && data.useAccountAux && ligneFournisseur.CompAuxNum) {
     return ({
       providerNum: ligneFournisseur.CompAuxNum,
       providerLib: ligneFournisseur.CompAuxLib,
       isDefaultProviderAccount: false
     });
-  } else if (data.useAccountAux) {
+  } 
+  // else default provider
+  else {
     return ({
       providerNum: "_"+ligneCourante.CompteNum,
       providerLib: "FOURNISSEUR "+ligneCourante.CompteLib,
       isDefaultProviderAccount: true
-    });
-  } else {
-    return ({
-      providerNum: ligneFournisseur.CompteNum,
-      providerLib: ligneFournisseur.CompteLib,
-      isDefaultProviderAccount: false
     });
   }
 }
