@@ -382,6 +382,7 @@ export async function FECDataReader(FECData) {
     apprenticeshipTax: 0,
     vocationalTrainingTax: 0,
   };
+  data.dividends = []; 
 
   // ----------------------------------------------------------------------------------------------------//
 
@@ -454,7 +455,7 @@ export async function FECDataReader(FECData) {
             await readProductionEntry(data, journal, ligne);
 
           // Lecture d'informations supplémentaires
-          if (/^63/.test(ligne.CompteNum))
+          if (/^(63|45)/.test(ligne.CompteNum))
             await readAddtionalDataEntry(data, journal, ligne);
 
           // -------------------------------------------------- //
@@ -1168,6 +1169,18 @@ const readAddtionalDataEntry = async (data, journal, ligneCourante) => {
     data.KNWData.vocationalTrainingTax = data.KNWData.vocationalTrainingTax +
       parseAmount(ligneCourante.Debit) -
       parseAmount(ligneCourante.Credit);
+  }
+
+  // Dividends ---------------------------------------------------------------------------------------- //
+
+  // ...dividendes
+  if (/^45(5|7)/.test(ligneCourante.CompteNum)) 
+  {
+    data.dividends.push({
+      date: ligneCourante.EcritureDate,
+      accountNum: ligneCourante.CompteNum,
+      amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
+    });
   }
 };
 
