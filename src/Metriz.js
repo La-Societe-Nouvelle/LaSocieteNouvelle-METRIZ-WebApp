@@ -49,8 +49,7 @@ export const Metriz = () =>
   const [stepMax, setStepMax] = useState(0);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false); 
-
-  const currentDate = new Date();
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(() => {
     window.scrollTo({
@@ -61,6 +60,31 @@ export const Metriz = () =>
     sessionDidUpdate();
   }, [step]); 
 
+
+// Smoothly scroll to the top of the page -----------------
+
+  useEffect(() => {
+    //Handle scroll and show/hide the button accordingly
+    const handleScroll = () => {
+      const scrollThreshold = 200; 
+      setShowScrollButton(window.scrollY > scrollThreshold);
+    };
+
+    // Add event listener for scroll
+    window.addEventListener('scroll', handleScroll);
+
+    // Remove event listener when the component unmounts
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   // Update state -------------------------------------
 
@@ -308,7 +332,7 @@ export const Metriz = () =>
         )}
 
         {/* Sections */}
-        <div className={`app-container ${step === 0 ? '' : 'container-fluid'}`}>
+        <div className={`app-container ${step === 0 ? "" : "container-fluid"}`}>
           {buildSectionView(step)}
         </div>
 
@@ -321,6 +345,14 @@ export const Metriz = () =>
           handleClose={() => setShowSaveModal(false)}
         ></SaveModal>
       </ErrorBoundary>
+
+
+      {/* Scroll button */}
+      {showScrollButton  && step !== 0 && (
+        <button className="scroll-to-top-button" onClick={scrollToTop}>
+          <i className="bi bi-chevron-up"></i>
+        </button>
+      )}
 
       {/* Footer */}
       <Footer />

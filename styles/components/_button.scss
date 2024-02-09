@@ -65,3 +65,25 @@
 }
 
 
+.scroll-to-top-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: $secondary;
+  color: $light-secondary;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  transition: background-color 0.3s ease;
+  
+  i{
+    font-size: 1.5rem;
+  }
+}
+
+
+.scroll-to-top-button:hover {
+  background-color:$light-secondary;
+  color : $secondary
+}
