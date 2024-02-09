@@ -25,8 +25,10 @@ const InvoicesProvidersView = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [invoicesProviders, setInvoicesProviders] = useState();
-
+  const [updatedProvidersCount, setUpdatedProvidersCount] = useState(0);
+  
   const onInvoicesDrop = async (files) => {
     let foundIdentificationNumber = false;
 
@@ -57,6 +59,7 @@ const InvoicesProvidersView = ({
     }
     const validInvoicesData = invoicesData.filter((data) => data !== null);
     const invoicesProviders = await processInvoicesData(validInvoicesData);
+    console.log(invoicesProviders);
     setInvoicesProviders(invoicesProviders);
     setShowModal(true);
   };
@@ -210,22 +213,28 @@ const InvoicesProvidersView = ({
   };
 
   const handleInvoicesProvider = (providersMapping) => {
+    let matchingProvidersCount = 0;
+  
     for (let i = 0; i < providers.length; i++) {
       const matchingProvider = Object.values(providersMapping).find(mapping => mapping.matching === providers[i].providerNum);
+  
       if (matchingProvider) {
         providers[i].corporateId = matchingProvider.legalUnitData.siren;
         providers[i].legalUnitData = matchingProvider.legalUnitData;
         providers[i].useDefaultFootprint = false;
         providers[i].footprintStatus = 200;
         providers[i].dataFetched = true;
+  
+        matchingProvidersCount++; 
       }
     }
+  
     updateProviders([...providers]);
+    setUpdatedProvidersCount(matchingProvidersCount)
     setShowModal(false);
-  };
+    setShowSuccessModal(true)
   
-  
-  
+  }; 
 
   return (
     <div className="box flex-grow-1 ms-2">
@@ -260,6 +269,14 @@ const InvoicesProvidersView = ({
         title={"Association des comptes fournisseurs"}
         message="Aucun SIREN n'a pu être extrait des documents importés. Veuillez renseigner manuellement le numero SIREN des comptes fournisseurs. "
         onClose={() => setShowAlertModal(false)}
+      ></InfoModal>
+
+      
+      <InfoModal
+        showModal={showSuccessModal}
+        title={"Association des comptes fournisseurs"}
+        message={`${updatedProvidersCount} numéros SIREN ont pu être extrait des documents importés. Les fournisseurs ont été automatiquement synchronisés.`}
+        onClose={() => setShowSuccessModal(false)}
       ></InfoModal>
 
       {invoicesProviders && (

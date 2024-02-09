@@ -14,7 +14,11 @@ import {
 } from "../utils";
 
 // Modals
-import { ProvidersImportSuccessModal } from "../modals/ProvidersImportSuccessModal";
+import {
+  ProvidersImportSuccessModal,
+  ProvidersImportWarningModal,
+} from "../modals/ProvidersImportSuccessModal";
+
 import { ErrorFileModal } from "../../../../modals/userInfoModals";
 
 const ImportProvidersView = ({
@@ -22,34 +26,28 @@ const ImportProvidersView = ({
   updateProviders,
   handleSynchronize,
 }) => {
-  const [showErrorFileModal, setErrorFile] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-
-  const handleModalSynchronize = () => {
-    setShowModal(false);
-    handleSynchronize();
-  };
+  const [showErrorFileModal, setShowErrorFileModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [updatedProvidersCount, setUpdatedProvidersCount] = useState(0);
 
   const onDrop = async (files) => {
-    if (files.length) {
-      const file = files[0];
-      const extension = file.name.split(".").pop();
-
-      if (extension === "csv") {
-        await importCSVFile(file);
-      } else if (extension === "xlsx") {
-        await importXLSXFile(file);
-      }
-
-      setErrorFile(false);
-      setShowModal(true);
-    } else {
-      setErrorFile(true);
+    if (files.length === 0) {
+      setShowErrorFileModal(true);
+      return;
+    }
+    const file = files[0];
+    if (file.name.endsWith(".csv")) {
+      await importCSVFile(file);
+    } else if (file.name.endsWith(".xlsx")) {
+      await importXLSXFile(file);
     }
   };
-
+  
+  // Imports 
   const importCSVFile = async (file) => {
     let reader = new FileReader();
+    let updatedProvidersCount = 0;
 
     reader.onload = async () => {
       let CSVData = await CSVFileReader(reader.result);
@@ -63,14 +61,15 @@ const ImportProvidersView = ({
           ? updatedProviders.find((p) => p.providerNum === providerNum)
           : updatedProviders.find((p) => p.providerLib === corporateName);
 
-        if (provider && provider.corporateId!=corporateId) {
+        if (provider && provider.corporateId != corporateId) {
           provider.update({
-            corporateId: corporateId
-          })
+            corporateId: corporateId,
+          });
+          updatedProvidersCount++;
         }
       }
 
-      updateProviders(updatedProviders);
+      handleUpdateAndModal(updatedProvidersCount, updatedProviders);
     };
 
     reader.readAsText(file);
@@ -78,30 +77,35 @@ const ImportProvidersView = ({
 
   const importXLSXFile = async (file) => {
     let reader = new FileReader();
+    let updatedProvidersCount = 0;
 
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
       let updatedProviders = [...providers];
+
       XLSXData.forEach(
-        ({ accountNum, accountLib, denomination, siren, account }) => {
+        ({ accountNum, accountLib, corporateName, siren, account }) => {
           if (account && !accountNum) accountNum = account;
           let provider = updatedProviders.find(
             (p) => p.providerNum === accountNum || p.providerLib === accountLib
           );
           if (provider) {
             provider.update({
-              corporateId: siren
-            })
+              corporateId: siren,
+            });
+            updatedProvidersCount++;
           }
         }
       );
 
-      updateProviders(updatedProviders);
+      handleUpdateAndModal(updatedProvidersCount, updatedProviders);
     };
 
     reader.readAsArrayBuffer(file);
   };
+  // --------------------------------------------------
 
+  // Export
   const exportXLSXFile = async (providers) => {
     // Prepare data for export
     let jsonContent = providers
@@ -129,6 +133,22 @@ const ImportProvidersView = ({
     link.href = URL.createObjectURL(blob);
     link.download = "fournisseurs.xlsx";
     link.click();
+  };
+
+  // --------------------------------------------------
+  const handleModalSynchronize = () => {
+    setShowSuccessModal(false);
+    handleSynchronize();
+  };
+
+  const handleUpdateAndModal = (updatedProvidersCount, updatedProviders) => {
+    if (updatedProvidersCount > 0) {
+      updateProviders(updatedProviders);
+      setUpdatedProvidersCount(updatedProvidersCount);
+      setShowSuccessModal(true);
+    } else {
+      setShowWarningModal(true);
+    }
   };
 
   return (
@@ -173,14 +193,22 @@ const ImportProvidersView = ({
             errorMessage={
               "Format de fichier incorrect. Veuillez importer un fichier au format .xslx ou .csv"
             }
-            onClose={() => setErrorFile(false)}
+            onClose={() => setShowErrorFileModal(false)}
           />
         )}
       </div>
+
+      <ProvidersImportWarningModal
+        showModal={showWarningModal}
+        onClose={() => setShowWarningModal(false)}
+      />
+
       <ProvidersImportSuccessModal
-        showModal={showModal}
+        showModal={showSuccessModal}
+        totalProviders={providers.length}
+        updatedProvidersCount={updatedProvidersCount}
         onSynchronise={handleModalSynchronize}
-        onClose={() => setShowModal(false)}
+        onClose={() => setShowSuccessModal(false)}
       />
     </>
   );
