@@ -55,8 +55,7 @@ const graphOptions = [
 
 export const EvolutionCurvesVisual = ({ session, indic }) => {
   const { financialData, comparativeData, availablePeriods } = session;
-  const { unit, nbDecimals } = metaIndics[indic];
-  console.log(availablePeriods);
+  const { nbDecimals } = metaIndics[indic];
   // Current Period
   const defaultPeriod = getMoreRecentYearlyPeriod(availablePeriods);
   const periodYear = getYearPeriod(defaultPeriod);

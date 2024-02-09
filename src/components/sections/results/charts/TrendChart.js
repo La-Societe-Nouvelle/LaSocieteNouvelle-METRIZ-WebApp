@@ -460,7 +460,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
             if (context[0].datasetIndex == 0) {
               return context[0]?.dataset.label;
             } else {
-              return `${context[0]?.dataset.label} - Branche`;
+              return `${context[0]?.dataset.label}`;
             }
           },
           label: function (context) {
