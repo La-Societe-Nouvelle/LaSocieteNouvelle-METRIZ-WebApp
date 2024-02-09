@@ -30,7 +30,7 @@ La Notice d'utilisation est organisée selon le menu de navigation (à gauche).
 &nbsp;
 ### UNITÉ LÉGALE
 
-Le **numéro de siren** (numéro à 9 chiffres fournit par l'INSEE) est indispensable pour la publication des résultats au sein de la base de données puisqu'il correspond actuellement au numéro d'identification de l'Empreinte Sociétale d'une Entreprise.
+Le **numéro SIREN** (numéro à 9 chiffres fournit par l'INSEE) est indispensable pour la publication des résultats au sein de la base de données puisqu'il correspond actuellement au numéro d'identification de l'Empreinte Sociétale d'une Entreprise.
 Il permet également de récupérer des valeurs comparatives liées à la branche d'activités pour une meilleure appréciation des résultats obtenus.
 
 L'**année de fin de l'exercice** permettra d'assurer un suivi annuel de la performance de l'entreprise et l'utilisation de la bonne valeur pour estimer les impacts de dépenses passées.
@@ -58,7 +58,7 @@ Dès que des données le permettent, les valeurs sont issues de l'exercice coura
 &nbsp;
 ### FOURNISSEURS
 
-Cette section se met automatiquement à jour à partir des données comptables, et a pour objectif de faire le lien entre les comptes fournisseurs et le numéro de siren de l'entreprise. Il est possible de compléter les numéros de siren l'import d'un fichier .csv ou.xlsx (dont le modèle, pré-rempli, est téléchargeable).
+Cette section se met automatiquement à jour à partir des données comptables, et a pour objectif de faire le lien entre les comptes fournisseurs et le numéro SIREN de l'entreprise. Il est possible de compléter les numéros de siren l'import d'un fichier .csv ou.xlsx (dont le modèle, pré-rempli, est téléchargeable).
 
 Lorsque les charges ne sont pas rattachées à un compte fournisseur auxiliaire, un compte "DEPENSES - " est créé.
 
@@ -85,7 +85,7 @@ Exemple :
 | 3 | Fournisseur2 | 759647854 |
 
 
-La colonne *siren* est de couleur verte lorsque les données sont synchronisées à partir du numéro de siren. Dès lors qu'elles sont obtenues à partir d'une localisation et d'une division économique, le fond devient vert pour ces deux champs. En l'absence de couleur, aucune donnée n'est associée au fournisseur.
+La colonne *siren* est de couleur verte lorsque les données sont synchronisées à partir du numéro SIREN. Dès lors qu'elles sont obtenues à partir d'une localisation et d'une division économique, le fond devient vert pour ces deux champs. En l'absence de couleur, aucune donnée n'est associée au fournisseur.
 
 Le bouton *synchroniser les données* permet de mettre à jour les données associées pour l'ensemble des fournisseurs à partir des informations disponibles.
 
@@ -120,7 +120,7 @@ Cette section affiche un tableau récapitulatif des valeurs de l'indicateur pour
 
 Il est possible d'exporter un rapport (format PDF) relatif à l'indicateur en cliquant sur *Editer rapport*. Le contenu du rapport est en cours d'évolution, n'hésitez pas à transmettre vos remarques et souhaits.
 
-Les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro de siren OU activités et localisation.
+Les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro SIREN OU activités et localisation.
 
 A venir : Les boutons *Détail des dépenses* et *Détail des ammortissements* renvoient respectivement à la section *Détails des impacts indirects des consommations* et *Détails des impacts indirects des immobilisations*. Il est possible d'y modifier les données par fournisseur si une valeur plus pertinente est connue.
   

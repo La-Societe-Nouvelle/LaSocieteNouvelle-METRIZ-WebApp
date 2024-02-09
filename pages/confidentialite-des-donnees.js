@@ -56,7 +56,7 @@ export default function Page() {
               Seulement en cas de demande de publication, des informations nominatives
               nous sont transmises. Elles concernent:{" "}
               <ul className="mt-1">
-                <li>Le numéro de siren de l’unité légale</li>
+                <li>Le numéro SIREN de l’unité légale</li>
                 <li>Le nom et prénom du déclarant</li>
                 <li>L’adresse mail du déclarant </li>
                 <li>
@@ -100,7 +100,7 @@ export default function Page() {
                 <li>L’adresse mail du déclarant</li>
                 <li>
                   L’unité légale au sein de laquelle évolue le déclarant (via son
-                  numéro de siren ou sa dénomination)
+                  numéro SIREN ou sa dénomination)
                 </li>
               </ul>
             </p>

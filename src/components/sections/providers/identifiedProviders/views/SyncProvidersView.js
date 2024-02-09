@@ -125,7 +125,7 @@ const SyncProvidersView = ({
               Tous les comptes externes
             </option>
             <option key="2" value="notDefined">
-              Comptes sans numéro de siren
+              Comptes sans numéro SIREN
             </option>
             <option key="3" value="unsync">
               Comptes non synchronisés
