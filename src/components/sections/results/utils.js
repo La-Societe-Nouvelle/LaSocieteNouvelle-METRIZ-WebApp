@@ -136,8 +136,11 @@ export const interpolateGeometricValues = async (
   const targetYearNumber = parseInt(endYear);
 
   const yearsDifference = targetYearNumber - startYearNumber;
+  
+  let newValue = parseFloat(endvalue);
+  newValue = newValue === 0 ? 0.1 : newValue;
 
-  const growthFactor = Math.pow(endvalue / startValue, 1 / yearsDifference);
+  const growthFactor = Math.pow(newValue / startValue, 1 / yearsDifference);
 
   for (let i = 0; i <= yearsDifference; i++) {
     const currentYear = startYearNumber + i;
