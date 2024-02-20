@@ -12,40 +12,55 @@ import { initIndividualData } from "./utils";
 
 // Components
 import DirectorRow from "./DirectorRow";
-import { DirectorRemunerationAccountsTable } from "./DirectorRemunerationAccountsTable";
+import { DirectorAccountingDataView } from "./DirectorAccountingDataView";
 
 
 /* -------------------- EXECUTIVES DATA FOR SOCIAL FOOTPRINT -------------------- */
 
 export const DirectorsDataTab = ({ 
-  individualsData: individualsDataInModal, 
+  individualsData: individualsDataProp, 
+  directorRemunerationAccounts,
   onUpdateIndividualsData,
   onUpdateDirectorRemunerationAccounts,
-  directorRemunerationAccounts
 }) => {
   
-  // executives data
-  const [individualsData, setIndividualsData] = useState(individualsDataInModal);
-  const [accountsData, setAccountsData] = useState(directorRemunerationAccounts || {});
+  // directors data
+  const [individualsData, setIndividualsData] = useState(individualsDataProp);
+  const [accountingData, setAccountingData] = useState(directorRemunerationAccounts || {});
   
   // ----------------------------------------------------------------------------------------------------
 
-  // when props update
+  // when props update -> useless because no update from DSN
   useEffect(() => 
   {
-    if (individualsData !== individualsDataInModal) {
-      setIndividualsData(individualsDataInModal);
+    if (individualsData !== individualsDataProp) {
+      setIndividualsData(individualsDataProp);
     }
-  }, [individualsDataInModal]);
+  }, [individualsDataProp]);
 
   // when individuals data update (individual removed or added)
   useEffect(() => {
-    didUpdate();
+
+    const isDirectors = individualsData.some(individual => individual.isDirector);
+    if (!isDirectors) {
+      // set to none if no director
+      Object.values(accountingData).forEach((accountData) => accountData.allocation = "none");
+      setAccountingData({...accountingData});
+    } else {
+      const allUnallocated = Object.values(accountingData)
+        .every(accountData => accountData.allocation == "none");
+      if (allUnallocated) {
+        // set to all if unallocated
+        Object.values(accountingData).forEach((accountData) => accountData.allocation = "all");
+        setAccountingData({...accountingData});
+      }
+    }
+    //onIndividualDataUpdate();
   }, [individualsData]);
 
-  useEffect(() => {
-    onUpdateDirectorRemunerationAccounts(accountsData);
-  }, [accountsData]);
+  // useEffect(() => {
+  //   onUpdateDirectorRemunerationAccounts(accountsData);
+  // }, [accountsData]);
 
   // ----------------------------------------------------------------------------------------------------
 
@@ -74,7 +89,7 @@ export const DirectorsDataTab = ({
 
     setIndividualsData([
       ...individualsData,
-      newIndividualData,
+      newIndividualData
     ]);
   };
 
@@ -82,21 +97,22 @@ export const DirectorsDataTab = ({
   {
     const nbDirectors = individualsData.filter(individual => individual.isDirector).length;
     individualsData
-      .filter((individual) => individual.isDirector)
       .forEach((individual) => {
-        let nextWage = getSumItems(Object.values(accountsData)
-          .map((accountData) => {
-            switch(accountData.allocation) {
-              case individual.id : return accountData.amount;
-              case "all" : return accountData.amount/nbDirectors;
-              default : return 0;
-            }
-          })
-        , 0);
-        individual.wage = nextWage;
-        if (isValidNumber(nextWage,0)
-          && isValidNumber(individual.workingHours,0) && individual.workingHours>0) {
-            individual.hourlyRate = roundValue(nextWage / individual.workingHours, 2);
+        if (individual.isDirector) {
+          let nextWage = getSumItems(Object.values(accountingData)
+            .map((accountData) => {
+              switch(accountData.allocation) {
+                case individual.id : return accountData.amount;
+                case "all" : return accountData.amount/nbDirectors;
+                default : return 0;
+              }
+            })
+          , 0);
+          individual.wage = nextWage;
+          if (isValidNumber(nextWage,0)
+            && isValidNumber(individual.workingHours,0) && individual.workingHours>0) {
+              individual.hourlyRate = roundValue(nextWage / individual.workingHours, 2);
+          }
         }
       });
 
@@ -104,20 +120,17 @@ export const DirectorsDataTab = ({
     onUpdateIndividualsData(individualsData);
   }
 
-  const onAccountingDataUpdate = (accountData) => {
-    setAccountsData({
-      ...accountsData,
-      [accountData.accountNum]: accountData
-    });
+  const onAccountingDataUpdate = (acountingData) => {
+    onUpdateDirectorRemunerationAccounts(acountingData)
   }
 
-  const didUpdate = () => 
+  const onIndividualDataUpdate = () => 
   {
     // update impacts data
+    setIndividualsData([...individualsData]);
     onUpdateIndividualsData(individualsData);
   }
-  
-  console.log(individualsData);
+    
   return (
     <div className="assessment">
       <Table>
@@ -146,7 +159,7 @@ export const DirectorsDataTab = ({
                 <DirectorRow
                   individualData={individualData}
                   isNewEmployeeRow={false}
-                  onUpdate={didUpdate}
+                  onUpdate={onIndividualDataUpdate}
                 />
               </tr>
           ))}
@@ -156,6 +169,9 @@ export const DirectorsDataTab = ({
       <button className="btn btn-primary btn-sm me-2" onClick={addDirector}>
         <i className="bi bi-plus-lg"></i> Ajouter
       </button>
+      <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
+        <i className="bi bi-shuffle"></i> Attribuer les rémunérations
+      </button>
       <button className="btn btn-secondary btn-sm" onClick={removeAll}>
         <i className="bi bi-trash3-fill" /> Supprimer tout
       </button>
@@ -164,20 +180,20 @@ export const DirectorsDataTab = ({
       <Accordion>
         <Accordion.Item eventKey="0" className="bg-white">
           <Accordion.Header as="h5">
-            <i className="bi bi-bar-chart-steps me-2"></i>
+            <i className="bi bi-list-columns-reverse me-2"></i>
             Données comptables - Rémunérations du travail de l'exploitant 
           </Accordion.Header>
           <Accordion.Body className="chart-accordion bg-white p-0">
-            <DirectorRemunerationAccountsTable
-              accountingData={accountsData}
+            <DirectorAccountingDataView
+              accountingData={accountingData}
               individualsData={individualsData}
               onUpdate={onAccountingDataUpdate}
             />
-            {/* <div className="p-3">
+            <div className="p-3">
               <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
-                <i className="bi bi-arrow-repeat"></i> Attribuer les rémunérations
+                <i className="bi bi-shuffle"></i> Attribuer les rémunérations
               </button>
-            </div> */}
+            </div>
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>

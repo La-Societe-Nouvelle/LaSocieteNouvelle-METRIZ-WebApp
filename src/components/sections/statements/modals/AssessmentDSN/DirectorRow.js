@@ -22,16 +22,9 @@ const DirectorRow = ({
   // ----------------------------------------------------------------------------------------------------
    
   // from outside
-  useEffect(() => 
-  {
-    if (individualData.name!=name) setName(individualData.name);
-    if (individualData.sex!=sex) setSex(individualData.sex);
-    if (individualData.wage!=wage) setWage(individualData.wage);
-    if (individualData.workingHours!=workingHours) setWorkingHours(individualData.workingHours);
-    if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
-    if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
-
-  }, [individualData]);
+  useEffect(() => {
+    if (individualData.wage!=wage) setWage(individualData.wage || "");
+  }, [individualData.wage]);
 
   // from inside
   useEffect(() => 
@@ -39,12 +32,22 @@ const DirectorRow = ({
     individualData.name = name;
     individualData.sex = sex;
     individualData.workingHours = workingHours;
-    individualData.wage = wage;
     individualData.hourlyRate = hourlyRate;
     individualData.apprenticeshipHours = apprenticeshipHours;
 
-    onUpdate(individualData);
-  }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours]);
+    //onUpdate(individualData);
+  }, [name, sex, workingHours, hourlyRate, apprenticeshipHours]);
+
+  useEffect(() => 
+  {
+    if (isValidNumber(wage,0)
+     && isValidNumber(workingHours,0) && workingHours>0) {
+      setHourlyRate(roundValue(wage / workingHours, 2));
+    }
+
+    //individualData.wage = wage;
+    //onUpdate(individualData);
+  }, [wage]);
 
   // ----------------------------------------------------------------------------------------------------
 
@@ -86,11 +89,6 @@ const DirectorRow = ({
     const nextWage = parseFloat(input);
 
     isNaN(nextWage) ? setWage(input) : setWage(nextWage);
-
-    if (isValidNumber(nextWage,0)
-     && isValidNumber(workingHours,0) && workingHours>0) {
-      setHourlyRate(roundValue(nextWage / workingHours, 2));
-    }
   };
 
   // hourly rate
@@ -118,7 +116,6 @@ const DirectorRow = ({
 
   /* -------------------- CHECK IF ALL DATA OK -------------------- */
   
-  console.log(individualData);
   return (
     <>
       <td>

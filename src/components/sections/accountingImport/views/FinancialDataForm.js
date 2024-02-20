@@ -264,6 +264,18 @@ export const FinancialDataForm = ({
           prev[accountNum].amount = roundValue(prev[accountNum].amount + amount, 2);
           return prev;
         }, {});
+      impactsDataOnFinancialPeriod.FECData.dividends = accountingData.dividends
+        .reduce((prev,{accountNum,amount}) => {
+          if (!prev.hasOwnProperty(accountNum)) {
+            prev[accountNum] = {
+              ...accountingData.accounts[accountNum],
+              amount: 0,
+              allocation: "none"
+            };
+          }
+          prev[accountNum].amount = roundValue(prev[accountNum].amount + amount, 2);
+          return prev;
+        }, {});
 
       // --------------------------------------------------
       // FEC id

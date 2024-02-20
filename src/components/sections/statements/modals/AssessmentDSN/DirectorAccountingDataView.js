@@ -9,55 +9,36 @@ import { getSumItems } from "../../../../../utils/Utils";
 import { printValue } from "/src/utils/formatters";
 
 
-export const DirectorRemunerationAccountsTable = ({
-  accountingData,
+export const DirectorAccountingDataView = ({
+  accountingData: accountDataProp,
   individualsData,
   onUpdate
 }) => {
 
-  const [accountsData, setAccountsData] = useState(accountingData);
+  const [accountingData, setAccountingData] = useState(accountDataProp);
 
   // ----------------------------------------------------------------------------------------------------
-
-  useEffect(() => {
-
-    const isDirectors = individualsData.some(individual => individual.isDirector);
-    if (!isDirectors) {
-      // set to none if no director
-      Object.values(accountsData).forEach((accountData) => accountData.allocation = "none");
-    } else {
-      const allUnallocated = Object.values(accountsData)
-        .every(accountData => accountData.allocation == "none");
-      if (allUnallocated) {
-        // set to all if unallocated
-        Object.values(accountsData).forEach((accountData) => accountData.allocation = "all");
-      }
-    }
-
-    setAccountsData({...accountsData});
-
-  }, [individualsData]);
 
   // useEffect(() => {
   //   onUpdate(accountsData);
   // }, [accountsData]);
 
-  // useEffect(() => {
-  //   setAccountsData({...accountingData});
-  // }, [accountingData])
+  useEffect(() => {
+    setAccountingData({...accountingData});
+  }, [accountDataProp])
 
   // ----------------------------------------------------------------------------------------------------
 
   const onAccountDataUpdate = (accountData) => {
-    // setAccountsData({
-    //   ...accountsData,
-    //   [accountData.accountNum]: accountData
-    // });
+    setAccountingData({
+      ...accountingData,
+      [accountData.accountNum]: accountData
+    });
   }
 
   // ----------------------------------------------------------------------------------------------------
 
-  const totalRemuneration = getSumItems(Object.values(accountsData)
+  const totalRemuneration = getSumItems(Object.values(accountingData)
     .filter((accountData) => accountData.allocation != "none")
     .map((accountData) => accountData.amount));
 
@@ -68,11 +49,11 @@ export const DirectorRemunerationAccountsTable = ({
           <td>Compte</td>
           <td>Libellé</td>
           <td>Montant</td>
-          {/* <td>Traitement</td> */}
+          <td>Traitement</td>
         </tr>
       </thead>
       <tbody>
-        {Object.values(accountsData)
+        {Object.values(accountingData)
           .sort((a,b) => a.accountNum.localeCompare(b.accountNum))
           .map((accountData) =>
           <DirectorDataRow
@@ -87,7 +68,7 @@ export const DirectorRemunerationAccountsTable = ({
           <td className="column_value">
             {printValue(totalRemuneration, 0)} &euro;
           </td>
-          {/* <td></td> */}
+          <td></td>
         </tr>
       </tbody>
     </Table>
@@ -103,19 +84,20 @@ const DirectorDataRow = ({
   onUpdate,       // trigger
 }) => {
 
-  // variables
+  // state
   const [allocation, setAllocation] = useState(accountData.allocation);
 
   // ----------------------------------------------------------------------------------------------------
 
-  // on change
+  // on change (state)
   useEffect(() => {    
     accountData.allocation = allocation;
     onUpdate(accountData);
   }, [allocation]);
 
+  // on change (props)
   useEffect(() => {
-    if (accountData.allocation != allocation) {
+    if (accountData.allocation !== allocation) {
       setAllocation(accountData.allocation);
     }
   }, [accountData.allocation])
@@ -135,10 +117,10 @@ const DirectorDataRow = ({
       <td>{accountData.accountNum}</td>
       <td>{accountData.accountLib}</td>
       <td className="column_value">{printValue(accountData.amount,0)} €</td>
-      {/* <td>
+      <td>
         <select
           className="form-select form-select-sm"
-          value={accountData.allocation}
+          value={allocation}
           onChange={updateAllocation}
         >
           <option key="none" value="none">Non attribué</option>
@@ -149,7 +131,7 @@ const DirectorDataRow = ({
               <option key={individual.id} value={individual.id}>Attribué à {individual.name}</option>
             )}
         </select>
-      </td> */}
+      </td>
     </tr>
   )
 }
