@@ -31,12 +31,12 @@ export const DirectorsDataTab = ({
   // ----------------------------------------------------------------------------------------------------
 
   // when props update -> useless because no update from DSN
-  // useEffect(() => 
-  // {
-  //   if (individualsData !== individualsDataProp) {
-  //     setIndividualsData(individualsDataProp);
-  //   }
-  // }, [individualsDataProp]);
+  useEffect(() => 
+  {
+    if (individualsData !== individualsDataProp) {
+      setIndividualsData(individualsDataProp);
+    }
+  }, [individualsDataProp]);
 
   // when individuals data update (individual removed or added)
   useEffect(() => {
@@ -97,21 +97,22 @@ export const DirectorsDataTab = ({
   {
     const nbDirectors = individualsData.filter(individual => individual.isDirector).length;
     individualsData
-      .filter((individual) => individual.isDirector)
       .forEach((individual) => {
-        let nextWage = getSumItems(Object.values(accountingData)
-          .map((accountData) => {
-            switch(accountData.allocation) {
-              case individual.id : return accountData.amount;
-              case "all" : return accountData.amount/nbDirectors;
-              default : return 0;
-            }
-          })
-        , 0);
-        individual.wage = nextWage;
-        if (isValidNumber(nextWage,0)
-          && isValidNumber(individual.workingHours,0) && individual.workingHours>0) {
-            individual.hourlyRate = roundValue(nextWage / individual.workingHours, 2);
+        if (individual.isDirector) {
+          let nextWage = getSumItems(Object.values(accountingData)
+            .map((accountData) => {
+              switch(accountData.allocation) {
+                case individual.id : return accountData.amount;
+                case "all" : return accountData.amount/nbDirectors;
+                default : return 0;
+              }
+            })
+          , 0);
+          individual.wage = nextWage;
+          if (isValidNumber(nextWage,0)
+            && isValidNumber(individual.workingHours,0) && individual.workingHours>0) {
+              individual.hourlyRate = roundValue(nextWage / individual.workingHours, 2);
+          }
         }
       });
 
@@ -129,7 +130,7 @@ export const DirectorsDataTab = ({
     setIndividualsData([...individualsData]);
     onUpdateIndividualsData(individualsData);
   }
-  
+    
   return (
     <div className="assessment">
       <Table>
@@ -188,11 +189,11 @@ export const DirectorsDataTab = ({
               individualsData={individualsData}
               onUpdate={onAccountingDataUpdate}
             />
-            {/* <div className="p-3">
+            <div className="p-3">
               <button className="btn btn-primary btn-sm me-2" onClick={applyAccountingData}>
                 <i className="bi bi-shuffle"></i> Attribuer les rémunérations
               </button>
-            </div> */}
+            </div>
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
