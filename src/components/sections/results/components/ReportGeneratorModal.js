@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 
 import metaIndics from "/lib/indics";
@@ -11,6 +11,21 @@ const ReportGeneratorModal = ({
 }) => {
   const [selectedIndicators, setSelectedIndicators] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  
+
+  useEffect(() => {
+    // Reset checkboxes when the modal view changes
+    setSelectedIndicators([]);
+    setSelectedFiles([]);
+  }, [showModal]);
+
+  useEffect(() => {
+    
+  
+   
+  }, []);
+
+  // Handle
 
   const handleCheckboxAll = (event) => {
     setSelectedIndicators(() => (event.target.checked ? [...indicators] : []));
@@ -33,18 +48,23 @@ const ReportGeneratorModal = ({
       return newSelected;
     });
   };
-  
-  
+    
   const handleOtherCheckboxes = (event, file) => {
+    const isChecked = event.target.checked;
+
     setSelectedFiles((prevSelected) => {
-      const newSelected = event.target.checked
+      let newSelected = isChecked
         ? [...prevSelected, file]
         : prevSelected.filter((id) => id !== file);
-  
+
+      // check if only "with-analyses" checkbox left
+      if (newSelected.length == 1 && newSelected.includes("with-analyses")) {
+        newSelected = [];
+      }
+
       return newSelected;
     });
   };
-
 
   const handleDownload = () => {
     onDownload({selectedIndicators, selectedFiles});
@@ -61,6 +81,7 @@ const ReportGeneratorModal = ({
 
         {indicators.map((indicator) => (
           <Form.Check
+            key={indicator}
             type="checkbox"
             className="pb-1"
             id={`checkbox-${indicator}`}
