@@ -38,7 +38,7 @@ export const SuccessFileModal = ({ showModal,message, title, closePopup }) => {
 };
 export const ErrorFileModal = ({ showModal, title, errorMessage, onClose }) => {
   return (
-    <Modal show={showModal} onHide={onClose} size="sm" centered>
+    <Modal show={showModal} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
         <Modal.Title as={"h6"}></Modal.Title>
       </Modal.Header>

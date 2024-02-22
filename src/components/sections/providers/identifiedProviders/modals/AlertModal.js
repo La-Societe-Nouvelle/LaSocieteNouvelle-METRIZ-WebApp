@@ -53,20 +53,22 @@ export const SyncSuccessModal = ({
   return (
     <Modal show={showModal} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
-        <Modal.Title as={"h6"}>Données synchronisées !</Modal.Title>
+        <Modal.Title></Modal.Title>
       </Modal.Header>
       <Modal.Body>
       <Image
           src="illus/sync-success.svg"
           alt="success image"
-          height={140}
+          height={100}
           className="mx-auto my-3 d-block"
         />
-        <p className="small">
+        <h6 className="text-center my-2">Données des fournisseurs synchronisées !</h6>
+        <p className="small text-center">
           {isAllProvidersIdentified
-            ? "Toutes les fournisseurs ont été identifiés et leurs données ont été synchronisées avec succès. Vous pouvez directement passer à la mesure de vos impacts. "
-            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez renseigner les numéros SIREN manquants ou leur associer un secteur d'activité à l'étape suivante.          "}
+            ? "Tous les fournisseurs ont été identifiés et leurs données ont été synchronisées avec succès. Vous pouvez directement passer à la mesure de vos impacts."
+            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez maintenant renseigner les numéros SIREN manquants ou associer un secteur d'activité à l'étape suivante."}
         </p>
+
         <div className="text-center">
         <Button className="me-2" onClick={() => changeView("notDefined")}>Comptes sans SIREN</Button>
           <Button variant="secondary" onClick={nextStep}>

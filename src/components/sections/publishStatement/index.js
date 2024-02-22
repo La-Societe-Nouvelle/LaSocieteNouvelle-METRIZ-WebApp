@@ -113,7 +113,7 @@ const PublishStatementSection = ({ session, period }) => {
     } else {
       const isSirenValid = await checkSirenValidity(siren);
       if (!isSirenValid) {
-        newErrors.siren = "Numéro de SIREN non reconnu.";
+        newErrors.siren = "numéro SIREN non reconnu.";
       }
     }
 

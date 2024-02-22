@@ -98,7 +98,7 @@ export default function Page() {
             fichier Excel.
           </p>
           <p>
-            Pour les comptes n'étant pas reliés à un numéro de siren, une étape
+            Pour les comptes n'étant pas reliés à un numéro SIREN, une étape
             supplémentaire permet d'associer à ces comptes des facteurs par
             défaut selon l'origine et le type de produits.
           </p>
