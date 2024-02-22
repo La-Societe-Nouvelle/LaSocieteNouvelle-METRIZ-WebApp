@@ -28,13 +28,12 @@ export const SyncErrorModal = ({ showModal, onClose, changeView }) => {
           className="mx-auto my-3 d-block"
         />
         <p className="small text-center">
-          Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de
-          siren et resynchronisez les données.
+          Certains comptes n'ont pas pu être synchronisés. Vérifiez les informations erronées et resynchronisez les données.
         </p>
 
         <p className="text-center mt-4">
           <Button variant="primary" onClick={handleViewChangeAndClose}>
-            Afficher les numéros de siren incorrects
+            Afficher les comptes avec des erreurs
           </Button>
         </p>
       </Modal.Body>

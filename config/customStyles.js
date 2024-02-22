@@ -25,6 +25,11 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
       styles.borderColor = "#98e3b9";
       styles.backgroundColor = "#e8f9ef";
     }
+
+    if (status === 500) {
+      styles.borderColor = "#f65656";
+      styles.backgroundColor = "#f7efef";
+    }
   
     if ( state.selectProps.className === "success" ) {
       styles.borderColor = "#98e3b9"; 

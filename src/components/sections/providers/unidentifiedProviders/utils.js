@@ -97,7 +97,7 @@ export function getUnidentifiedProviderStatusIcon(provider) {
       className: "bi bi-check2 text-success",
       title: "Données synchronisées",
     };
-  } else if (provider.footprintStatus === 404) {
+  } else if (provider.footprintStatus === 500 ) {
     return {
       className: "bi bi-x-lg text-danger",
       title: "Erreur lors de la synchronisation",

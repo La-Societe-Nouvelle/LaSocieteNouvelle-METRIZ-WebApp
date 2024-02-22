@@ -11,6 +11,7 @@ import {
 import { printValue } from "/src/utils/formatters";
 import { getUnidentifiedProviderStatusIcon } from "./utils";
 import { sortProviders } from "../utils";
+import { isValidNumber } from "../../../../utils/Utils";
 
 // Select Style
 import { customSelectStyles } from "/config/customStyles";
@@ -18,7 +19,6 @@ import { customSelectStyles } from "/config/customStyles";
 // Libs
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
-import { isValidNumber } from "../../../../utils/Utils";
 
 const ProvidersTable = ({
   providers,
@@ -89,7 +89,6 @@ const ProvidersTable = ({
       return("success")
     }
   }
-
   return (
     <>
       <Table>
@@ -136,6 +135,7 @@ const ProvidersTable = ({
                         title="Grand risque d'imprécision"
                       ></i>
                     )}
+                    
                   </div>
                 </td>
                 <td>{provider.providerLib}</td>
@@ -148,12 +148,7 @@ const ProvidersTable = ({
                       value: provider.defaultFootprintParams.area,
                     }}
                     placeholder={"Choisissez un espace économique"}
-                    className={
-                      provider.footprintStatus == 200 &&
-                      provider.footprint.isValid()
-                        ? "success"
-                        : ""
-                    }
+     
                     options={areasOptions}
                     onChange={(e) =>
                       setProviderDefaultFootprintParams(
@@ -179,12 +174,7 @@ const ProvidersTable = ({
                       value: provider.defaultFootprintParams.code,
                     }}
                     placeholder={"Choisissez un secteur d'activité"}
-                    className={
-                      provider.footprintStatus == 200 &&
-                      provider.footprint.isValid()
-                        ? "success"
-                        : ""
-                    }
+  
                     options={divisionsOptions}
                     onChange={(e) =>
                       setProviderDefaultFootprintParams(
