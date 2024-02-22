@@ -228,7 +228,7 @@ export const buildSummaryReportContributionIndic = async ({
       ),
       //--------------------------------------------------
       {
-        columnGap: 35,
+        columnGap: 40,
         columns: [
           // Left Box
           
@@ -440,7 +440,7 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
     },
     {
       text: "\tEmpreinte de vos achats\t",
-      style: "h3",
+      style: "h2",
       margin: [0, 30, 0, 10],
       alignment: "center",
       background: "#FFFFFF",
@@ -504,6 +504,7 @@ const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, 
         expense.accountNum + " - " + expense.accountLib,
         60
       ),
+      fontSize: 8,
     })),
 
     {
@@ -517,13 +518,14 @@ const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, 
         expense.accountNum + " - " + expense.accountLib,
         60
       ),
+      fontSize: 8,
     })),
 
     // ACTIVITES FOURNISSEURS
     {
       text: "\tFournisseurs clés\t",
       style: "h2",
-      margin: [0, 40, 0, 20],
+      margin: [0, 55, 0, 20],
     },
     ...getIntensKeyProviders(
       mostImpactfulProviders,
