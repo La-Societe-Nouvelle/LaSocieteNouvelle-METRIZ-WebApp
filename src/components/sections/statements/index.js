@@ -79,6 +79,9 @@ const DirectImpacts = ({
   {
     setIsLoading(true);
 
+    // update nva footprints
+    await session.updateNetValueAddedFootprint(period);
+
     // compute footprints
     await session.updateFootprints(period);
 
