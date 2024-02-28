@@ -8,6 +8,13 @@ import metaIndics from "/lib/indics";
 // Styles
 import { customSelectStyles } from "../../../../../config/customStyles";
 
+/** List of target options
+ *    - divisionTarget
+ *    - divisionEffortBasedTarget
+ *    - personalisedTarget
+ * 
+ */
+
 const TargetModeFormModal = ({
   showModal,
   showIndustryMode,
@@ -19,24 +26,25 @@ const TargetModeFormModal = ({
   onSubmit,
 }) => {
 
-  const [targetMode, setTargetMode] = useState(() => showIndustryMode ? "industryTarget" : "personalTarget");
+  const [targetMode, setTargetMode] = useState("divisionTarget");
   const [targetValue, setTargetValue] = useState("");
   const [targetYear, setTargetYear] = useState(2030);
   const [targetError, setTargetError] = useState("");
-
-  useEffect(() => {
+  
+  useEffect(() => 
+  {
     setTargetValue("");
     setTargetYear(2030);
-    setTargetMode(showIndustryMode ? "industryTarget" : "personalTarget");
+    setTargetMode(showIndustryMode ? "divisionTarget" : "personalisedTarget");
 
     const lastTarget = legalUnitTarget[legalUnitTarget.length - 1];
     
     if (lastTarget) {
       setTargetMode(lastTarget.target);
-      if(lastTarget.target == "personalTarget"){
+      if(lastTarget.target == "personalisedTarget"){
         setTargetValue(lastTarget.value);
       }
-      if(lastTarget.target == "personalTarget" || lastTarget.target == "extendTarget") {
+      if(lastTarget.target == "personalisedTarget") {
         setTargetYear(parseInt(lastTarget.year));
       }
     }
@@ -50,24 +58,19 @@ const TargetModeFormModal = ({
   const targetOptions = [
       {
         label: "Objectif de la branche",
-        value: "industryTarget",
+        value: "divisionTarget",
         showOption: showIndustryMode,
       },
       {
         label: "Objectif aligné sur la branche",
-        value: "alignedIndustryTarget",
+        value: "divisionEffortBasedTarget",
         showOption: showIndustryMode,
       },
       {
         label: "Objectif personnalisé",
-        value: "personalTarget",
+        value: "personalisedTarget",
         showOption: true,
-      },
-      {
-        label: "Réduction annuelle similaire",
-        value: "extendTarget",
-        showOption: showExtendTargetMode,
-      },
+      }
     ];
 
   const visibleOptions = targetOptions.filter((option) => option.showOption);
@@ -129,7 +132,7 @@ const handleTargetValueChange = (e) => {
             />
           </Col>
         </Form.Group>
-        {targetMode === "personalTarget" && (
+        {targetMode === "personalisedTarget" && (
             <Form.Group as={Row} className="mb-3">
               <Form.Label column sm={6}>
                 Valeur cible
@@ -151,7 +154,7 @@ const handleTargetValueChange = (e) => {
             </Form.Group>
         )}
 
-        {(targetMode === "personalTarget" || targetMode === "extendTarget") && (
+        {(targetMode === "personalisedTarget") && (
             <Form.Group as={Row} className="mb-3">
               <Form.Label column sm={6}>
                 Année cible
@@ -179,7 +182,7 @@ const handleTargetValueChange = (e) => {
 // Submit Form ------------------------------------------------------------------------
 
   const updateCustomTargetMode = async () => {
-    if (targetMode === "personalTarget") {
+    if (targetMode === "personalisedTarget") {
       if (!targetValue || isNaN(targetValue)) {
         setTargetError("Veuillez entrer une valeur.");
         return;

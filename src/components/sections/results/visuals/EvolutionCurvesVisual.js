@@ -43,6 +43,9 @@ import {
  *
  *  Params (in component) :
  *    - aggregate
+ * 
+ *  Other features :
+ *    - set custom target
  *
  */
 
@@ -53,16 +56,26 @@ const graphOptions = [
   { label: "Valeur ajoutée nette", value: "netValueAdded" },
 ];
 
-export const EvolutionCurvesVisual = ({ session, indic }) => {
-  const { financialData, comparativeData, availablePeriods } = session;
+export const EvolutionCurvesVisual = ({ session, indic }) => 
+{
+  const { 
+    financialData, 
+    comparativeData, 
+    availablePeriods 
+  } = session;
   const { nbDecimals } = metaIndics[indic];
+
   // Current Period
   const defaultPeriod = getMoreRecentYearlyPeriod(availablePeriods);
   const periodYear = getYearPeriod(defaultPeriod);
 
-  // Comparative Data -------------------------------------------------------------------
-
+  // Aggregate
   const [showedAggregate, setShowedAggregate] = useState("production");
+
+  // Modal
+  const [showFormModal, setShowFormModal] = useState(false);
+
+  // Comparative Data -------------------------------------------------------------------
 
   const {
     division: {
@@ -75,14 +88,9 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     },
   } = comparativeData[showedAggregate];
 
-  //-- Aggregate
-  const changeShowedAggregate = (selectedOption) => {
-    setShowedAggregate(selectedOption.value);
-  };
-
   // Evolution Curves -------------------------------------------------------------------
 
-  const evolutionCurves = {
+  const curves = {
     historical: historicalData[indic],
     trend: trendData[indic],
     target: targetData[indic],
@@ -90,168 +98,81 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
     legalUnitTarget: legalUnitTargetData[indic] ?? [],
   };
 
-  const [evolutionCurvesData, setEvolutionCurvesData] =
-    useState(evolutionCurves);
-
   // ------------------------------------------------------------------------------------
 
-  const [showFormModal, setShowFormModal] = useState(false);
+  // Showed aggregate changes
+  const changeShowedAggregate = (selectedOption) => {
+    setShowedAggregate(selectedOption.value);
+  };
 
-  // Handle Legal Unit Custom Target Mode  ----------------------------------------------
-
+  // Handle Legal Unit Custom Target Mode
   const handleTargetFormSubmit = async (
     targetMode,
     targetYear,
     targetValue
   ) => {
-    const currentFootprint =
-      financialData.mainAggregates[showedAggregate].periodsData[
-        defaultPeriod.periodKey
-      ].footprint.indicators[indic].value;
-
-    console.log(targetMode);
-
-    // Switch based on the selected target mode
-    switch (targetMode) {
-      case "personalTarget":
-        await handlePersonnalTarget(
-          targetValue,
-          targetYear,
-          targetMode,
-          currentFootprint
-        );
-        break;
-      case "industryTarget":
-        await handleIndustryTarget(currentFootprint, periodYear, targetMode);
-        break;
-      case "alignedIndustryTarget":
-        await handleAlignedIndustryTarget(
-          currentFootprint,
-          periodYear,
-          targetMode
-        );
-        break;
-      case "extendTarget":
-        await handleExtendTarget(targetYear, targetMode);
-        break;
-      default:
-        break;
-    }
-
-    setShowFormModal(false);
-  };
-  //-- Target modes
-
-  const handlePersonnalTarget = async (
-    targetValue,
-    targetYear,
-    targetMode,
-    currentFootprint
-  ) => {
-    const values = await interpolateGeometricValues(
-      periodYear,
-      currentFootprint,
+    
+    // Build target data
+    const targetValues = await buildTargetData(
+      targetMode,
       targetYear,
-      targetValue,
-      targetMode,
-      nbDecimals
+      targetValue
     );
+    console.log(targetValues);
 
-    updateLegalUnitTarget(values);
-  };
-
-  const handleIndustryTarget = async (
-    currentFootprint,
-    periodYear,
-    targetMode
-  ) => {
-    const targetData = evolutionCurves.target.filter(
-      (item) => item.path == "GEO"
-    );
-    const { lastTargetValue, lastTargetYear } =
-      getLastIndustryTargetData(targetData);
-
-    const values = await interpolateGeometricValues(
-      periodYear,
-      currentFootprint,
-      lastTargetYear,
-      lastTargetValue,
-      targetMode,
-      nbDecimals
-    );
-    updateLegalUnitTarget(values);
-  };
-
-  const handleAlignedIndustryTarget = async (
-    currentFootprint,
-    periodYear,
-    targetMode
-  ) => {
-    const industryHistorical = getClosestYearData(
-      evolutionCurves.historical,
-      periodYear
-    );
-    const targetData = evolutionCurves.target.filter(
-      (item) => item.path == "GEO"
-    );
-
-    const { lastTargetValue, lastTargetYear } =
-      getLastIndustryTargetData(targetData);
-
-    const similarEffortTarget = determineAlignedTargetValue(
-      currentFootprint,
-      industryHistorical.value,
-      lastTargetValue
-    );
-
-    const values = await interpolateGeometricValues(
-      periodYear,
-      currentFootprint,
-      lastTargetYear,
-      similarEffortTarget,
-      targetMode,
-      nbDecimals
-    );
-
-    updateLegalUnitTarget(values);
-  };
-
-  const handleExtendTarget = async (targetYear, targetMode) => {
-    const footprints = availablePeriods.map((period) => {
-      let footprint = {};
-      footprint.value =
-        evolutionCurves.aggregate[period.periodKey].footprint.indicators[
-          indic
-        ].value;
-      footprint.year = getYearPeriod(period);
-      return footprint;
-    });
-
-    const values = await projectTrendValues(
-      footprints,
-      targetYear,
-      targetMode,
-      nbDecimals
-    );
-
-    updateLegalUnitTarget(values);
-  };
-  // ------------------------------------------------------------------------------------
-
-  // Update legal unit target with the provided values
-  const updateLegalUnitTarget = (targetValues) => {
+    // update target values for indic
     comparativeData[showedAggregate].legalUnit.target.data = {
       ...comparativeData[showedAggregate].legalUnit.target.data,
       [indic]: targetValues,
     };
 
-    const updatedEvolutionCurvesData = {
-      ...evolutionCurvesData,
-      legalUnitTarget: targetValues,
-    };
-
-    setEvolutionCurvesData(updatedEvolutionCurvesData);
+    setShowFormModal(false);
   };
+
+  const buildTargetData = async (
+    targetMode,
+    targetYear,
+    targetValue
+  ) => {
+    // current footprint
+    const currentFootprint =
+      financialData.mainAggregates[showedAggregate]
+        .periodsData[defaultPeriod.periodKey]
+        .footprint.indicators[indic]
+        .value;
+
+    // Switch based on the selected target mode
+    switch (targetMode) {
+      case "personalisedTarget":
+        return await handlePersonalisedTarget(
+          periodYear,
+          currentFootprint,
+          targetYear,
+          targetValue,
+          targetMode,
+          nbDecimals
+        );
+      case "divisionTarget":
+        return await handleDivisionTarget(
+          periodYear,
+          currentFootprint,
+          targetMode,
+          curves,
+          nbDecimals
+        );
+      case "divisionEffortBasedTarget":
+        return await handleDivisionEffortBasedTarget(
+          periodYear,
+          currentFootprint,
+          targetMode,
+          curves,
+          nbDecimals
+        );
+      default:
+        return null;
+    }
+  };
+
   // ------------------------------------------------------------------------------------
 
   return (
@@ -273,8 +194,8 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
 
           <TargetModeFormModal
             showModal={showFormModal}
-            showIndustryMode={evolutionCurves.target.length > 0}
-            legalUnitTarget={evolutionCurves.legalUnitTarget}
+            showIndustryMode={curves.target.length > 0}
+            legalUnitTarget={curves.legalUnitTarget}
             showExtendTargetMode={availablePeriods.length > 1}
             onClose={() => setShowFormModal(false)}
             currentPeriod={periodYear}
@@ -336,4 +257,85 @@ export const EvolutionCurvesVisual = ({ session, indic }) => {
       </Col>
     </Row>
   );
+};
+
+// ################################################## UTILS - TARGET VALUES BUILDER ##################################################
+
+//-- Target modes
+
+// target values based on personnalised input
+const handlePersonalisedTarget = async (
+  periodYear,
+  currentFootprint,
+  targetYear,
+  targetValue,
+  targetMode,
+  nbDecimals
+) => {
+  const values = await interpolateGeometricValues(
+    periodYear,
+    currentFootprint,
+    targetYear,
+    targetValue,
+    targetMode,
+    nbDecimals
+  );
+
+  return values;
+};
+
+// target of the division
+const handleDivisionTarget = async (
+  periodYear,
+  currentFootprint,
+  targetMode,
+  curves,
+  nbDecimals
+) => {
+
+  const targetData = curves.target.filter((item) => item.path == "GEO");
+  const { lastTargetValue, lastTargetYear } = getLastIndustryTargetData(targetData);
+
+  const values = await interpolateGeometricValues(
+    periodYear,
+    currentFootprint,
+    lastTargetYear,
+    lastTargetValue,
+    targetMode,
+    nbDecimals
+  );
+
+  return values;
+};
+
+// target aligned with effort for the division 
+const handleDivisionEffortBasedTarget = async (
+  periodYear,
+  currentFootprint,
+  targetMode,
+  curves,
+  nbDecimals
+) => {
+
+  const industryHistorical = getClosestYearData(curves.historical, periodYear);
+  const targetData = curves.target.filter((item) => item.path == "GEO");
+
+  const { lastTargetValue, lastTargetYear } = getLastIndustryTargetData(targetData);
+
+  const similarEffortTarget = determineAlignedTargetValue(
+    currentFootprint,
+    industryHistorical.value,
+    lastTargetValue
+  );
+
+  const values = await interpolateGeometricValues(
+    periodYear,
+    currentFootprint,
+    lastTargetYear,
+    similarEffortTarget,
+    targetMode,
+    nbDecimals
+  );
+
+  return values;
 };
