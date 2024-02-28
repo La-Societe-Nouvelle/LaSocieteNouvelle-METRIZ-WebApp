@@ -99,6 +99,7 @@ export const ProviderNumMode = ({
             id="Gestion par  compte fournisseur auxiliaire"
             value="true"
             checked={useAccountAux === true}
+            disabled={Object.entries(accountsAuxProviders).length == 0}
             onChange={changeProviderNumRef}
           />
         </Row>
@@ -118,6 +119,7 @@ export const ProviderNumMode = ({
         <Tab
           eventKey="accountAux"
           title={"Comptes fournisseurs auxiliaires (" +generateAccountString(accountsAuxProviders) +")"}
+          disabled={Object.entries(accountsAuxProviders).length == 0}
         >
           <PaginatedTable
             data={Object.values(meta.accountsAuxProviders)}
