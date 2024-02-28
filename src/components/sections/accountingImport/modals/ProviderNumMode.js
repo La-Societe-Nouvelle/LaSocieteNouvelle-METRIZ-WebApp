@@ -25,6 +25,11 @@ export const ProviderNumMode = ({
 
   useEffect(() => {
     setUseAccountAux(true);
+    if (Object.entries(accountsAuxProviders).length > Object.entries(accountsProviders).length) {
+      setActiveKey("accountAux");
+    } else {
+      setActiveKey("account");
+    }
   }, []);
 
   useEffect(() => {
