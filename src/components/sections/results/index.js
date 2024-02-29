@@ -14,9 +14,15 @@ import { HomeView } from "./views/HomeView";
 
 // Components
 import DownloadDropdown from "./components/DownloadDropdown";
+import { PrintChartsContainer } from "./components/PrintChartsContainer";
+import ReportGeneratorModal from "./components/ReportGeneratorModal";
+import { ChartsContainer } from "./components/ChartsContainer";
+import { LegalUnitInfo } from "./components/LegalUnitInfo";
+
+// Loader
 import { Loader } from "../../modals/Loader";
 
-import { PrintChartsContainer } from "./components/PrintChartsContainer";
+// Reports Builders
 
 import { buildSummaryReportContributionIndic } from "./exports/reports/summaryReportGeneratorContribution";
 import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryReportGeneratorIntensity";
@@ -26,6 +32,11 @@ import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
 import { buildCompleteFile } from "./exports/completeFileGenerator";
 import { LegalUnitInfo } from "./components/LegalUnitInfo";
 import { getYearPeriod } from "../../../utils/periodsUtils";
+import { buildCompleteReport, buildCompleteZipFile} from "./exports/completeFileGenerator";
+
+// Utils
+import { getYearPeriod } from "../../../utils/periodsUtils";
+import { triggerFileDownload } from "../../../utils/Utils";
 
 /* ---------- RESULTS SECTION ---------- */
 
@@ -45,6 +56,7 @@ import { getYearPeriod } from "../../../utils/periodsUtils";
 
 const Results = ({ session, period, publish, goBack }) => {
   const [showedView, setShowedView] = useState("default");
+  const [showReportGeneratorModal, setShowReportGeneratorModal] = useState(false);
 
   // temp state
   const [isGenerating, setIsGenerating] = useState(false); // building files
@@ -56,10 +68,31 @@ const Results = ({ session, period, publish, goBack }) => {
 
   const handleDownload = async (selectedFiles) => {
     setIsGenerating(true);
+
     try {
       await buildDownloadableFiles(session, period, showedView, selectedFiles);
+
     } catch (error) {
+      console.error(error);
+    }
+    finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleGenerate = async ({ selectedIndicators, selectedFiles }) => {
+    setShowReportGeneratorModal(false);
+    setIsGenerating(true);
+
+    try {
+      await buildCustomizedReport(
+        session,
+        period,
+        selectedIndicators,
+        selectedFiles
+      );
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsGenerating(false);
     }
@@ -125,8 +158,24 @@ const Results = ({ session, period, publish, goBack }) => {
           <h2>Etape 5 - Empreinte Sociétale </h2>
           <div className="d-flex">
             <DownloadDropdown onDownload={handleDownload} view={showedView} />
+
+            <Button
+              variant="light"
+              className="me-2"
+              onClick={() => setShowReportGeneratorModal(true)}
+            >
+              <i className="bi bi-gear"></i> Générer un rapport
+            </Button>
+
+            <ReportGeneratorModal
+              showModal={showReportGeneratorModal}
+              onClose={() => setShowReportGeneratorModal(false)}
+              onDownload={handleGenerate}
+              indicators={session.validations[period.periodKey]}
+            />
+
             <Button variant="secondary" onClick={publish}>
-              Publier mes résultats
+              Publier mes résultats <i className="bi bi-chevron-right"></i>
             </Button>
           </div>
         </div>
@@ -300,14 +349,13 @@ const buildDownloadableFiles = async (
   const legalUnit = session.legalUnit.corporateName;
 
   const year = getYearPeriod(period);
-
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
 
   const showAnalyses = selectedFiles.includes("with-analyses");
   const PDFTitle = `${showedView}_${legalUnitNameFile}_${year}.pdf`;
 
   if (selectedFiles.includes("checkbox-all")) {
-    let ZIPFile = await buildCompleteFile({
+    let ZIPFile = await buildCompleteZipFile({
       session,
       period,
       showAnalyses,
@@ -345,17 +393,39 @@ const buildDownloadableFiles = async (
     });
     const fileName = `${showedView}_${legalUnitNameFile}_${year}.xlsx`;
 
-    const url = window.URL.createObjectURL(XLSXFile);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-
-    document.body.appendChild(a);
-    a.click();
-
-    window.URL.revokeObjectURL(url);
+    await triggerFileDownload(XLSXFile, fileName);
   }
+};
+
+const buildCustomizedReport = async (
+  session,
+  period,
+  selectedIndicators,
+  selectedFiles
+) => {
+
+  const legalUnit = session.legalUnit.corporateName;
+  const year = getYearPeriod(period);
+  const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
+
+  const PDFTitle = `Rapport-Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`;
+
+  const showStandardReports = selectedFiles.includes("standardReports");
+  const showAnalyses = selectedFiles.includes("with-analyses");
+
+  const PDFFile = await buildCompleteReport({
+    session,
+    period,
+    year,
+    indicators: selectedIndicators,
+    showStandardReports,
+    showAnalyses,
+  });
+
+  const PDFBlob = new Blob([PDFFile], { type: "application/pdf" });
+
+  // Directly Download Report
+  await triggerFileDownload(PDFBlob, PDFTitle);
 };
 
 const getViewLabel = (viewCode) => {

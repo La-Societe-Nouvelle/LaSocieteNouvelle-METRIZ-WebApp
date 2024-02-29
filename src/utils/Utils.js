@@ -2,6 +2,9 @@
 /* -------------------------------------------------- UTILS FUNCTIONS -------------------------------------------------- */
 /* --------------------------------------------------------------------------------------------------------------------- */
 
+import { getMoreRecentYearlyPeriod } from "./periodsUtils";
+
+/* -------------------------- DOWNLOADS -------------------------- */
 
   // download session (session -> JSON data)
   export const downloadSession = async (session) => {
@@ -19,8 +22,31 @@
     link.download = `${fileName}.json`;
     link.click();
   };
+
+
+  // Directly download File
+  export const triggerFileDownload = async (file, fileName) => {
+    // Create a URL object from the Blob
+    const url = URL.createObjectURL(file);
+
+    // Create an anchor element for automatic download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+
+    // Add the anchor element to the document
+    document.body.appendChild(a);
+
+    // Trigger a click on the anchor to initiate the download
+    a.click();
+
+    // Remove the anchor element from the document
+    document.body.removeChild(a);
+
+    // Revoke the URL of the Blob object
+    URL.revokeObjectURL(url);
+  };
   
-import { getMoreRecentYearlyPeriod } from "./periodsUtils";
 
 /* -------------------------- OPERATIONS FUNCTIONS -------------------------- */
 // operations on list
