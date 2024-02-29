@@ -10,6 +10,7 @@ import metaIndics from "/lib/indics.json";
 
 // Reports and dataFiles builders
 import { generateReportCover } from "./reports/reportCoverGenerator";
+import { generateReportDividerPage } from "./reports/reportDividerPageGenerator";
 import { buildStandardReport } from "./reports/standardReportGenerator";
 import { buildSummaryReportContributionIndic } from "./reports/summaryReportGeneratorContribution";
 import { buildSummaryReportIntensityIndic } from "./reports/summaryReportGeneratorIntensity";
@@ -111,7 +112,11 @@ export async function buildCompleteReport({
     // Generate standard reports and their blobs
     let standardPDFs = [];
     if (showStandardReports) {
-      standardPDFs = await generateStandardReports(session, period,indicators,showAnalyses);
+      const appendixesCoverPage = generateReportDividerPage(indicators.length > 1 ? "Annexes" : "Annexe");
+      standardPDFs = [
+        appendixesCoverPage,
+        ...await generateStandardReports(session, period,indicators,showAnalyses)
+      ];
     }
     
     // Generate summary reports and their blobs
