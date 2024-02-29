@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Image, Modal } from "react-bootstrap";
 
 import metaIndics from "/lib/indics";
 
@@ -76,6 +76,20 @@ const ReportGeneratorModal = ({
         <Modal.Title as={"h4"}>Composition du rapport</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <div className="alert-info mt-0">
+          <div className="info-icon">
+            <Image src="/info-circle.svg" alt="icon info" />
+          </div>
+          <div>
+            <p>
+              Sélectionnez les <b>plaquettes que vous souhaitez inclure</b> dans le document.
+              Chaque plaquette est liée à un indicateur.
+            </p>
+            <p className="mt-1">
+              Vous pouvez également choisir d'intégrer les annexes (détails des résultats).
+            </p>
+          </div>
+        </div>
         <h6>Plaquettes à inclure</h6>
         <Form>
 
