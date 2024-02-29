@@ -328,7 +328,7 @@ const PublishStatementSection = ({ session, period }) => {
                       value="10"
                       checked={price === "10"}
                       onChange={changePrice}
-                      label="Organise à but non lucratif : 10 €"
+                      label="Organisme à but non lucratif : 10 €"
                     />
 
                     <Form.Check
