@@ -73,10 +73,10 @@ const ReportGeneratorModal = ({
   return (
     <Modal show={showModal} onHide={onClose} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title as={"h4"}>Générer un rapport</Modal.Title>
+        <Modal.Title as={"h4"}>Composition du rapport</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h6>Indicateurs à inclure</h6>
+        <h6>Plaquettes à inclure</h6>
         <Form>
 
         {indicators.map((indicator) => (
