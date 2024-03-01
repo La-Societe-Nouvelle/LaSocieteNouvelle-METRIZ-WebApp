@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import Select from "react-select";
 
@@ -30,6 +30,7 @@ import {
   getLastIndustryTargetData,
   projectTrendValues,
   interpolateGeometricValues,
+  buildTrend,
 } from "../utils";
 
 /* ---------- EVOLUTION CURVES CONTAINER ---------- */
@@ -46,6 +47,7 @@ import {
  * 
  *  Other features :
  *    - set custom target
+ *    - build trend data
  *
  */
 
@@ -85,6 +87,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) =>
     },
     legalUnit: {
       target: { data: legalUnitTargetData },
+      trend: { data: legalUnitTrendData }
     },
   } = comparativeData[showedAggregate];
 
@@ -96,6 +99,7 @@ export const EvolutionCurvesVisual = ({ session, indic }) =>
     target: targetData[indic],
     aggregate: financialData.mainAggregates[showedAggregate].periodsData,
     legalUnitTarget: legalUnitTargetData[indic] ?? [],
+    legalUnitTrend: legalUnitTrendData[indic] ?? []
   };
 
   // ------------------------------------------------------------------------------------
@@ -118,7 +122,6 @@ export const EvolutionCurvesVisual = ({ session, indic }) =>
       targetYear,
       targetValue
     );
-    console.log(targetValues);
 
     // update target values for indic
     comparativeData[showedAggregate].legalUnit.target.data = {
@@ -172,6 +175,38 @@ export const EvolutionCurvesVisual = ({ session, indic }) =>
         return null;
     }
   };
+
+  // ------------------------------------------------------------------------------------
+
+  useEffect(async () => 
+  {
+    const historicalFootprints = availablePeriods.map((period) => {
+      let footprint = {};
+      footprint.value = curves
+        .aggregate[period.periodKey]
+        .footprint.indicators[indic]
+        .value;
+      footprint.year = getYearPeriod(period);
+      return footprint;
+    });
+    console.log(historicalFootprints);
+
+    const trendValues =  await buildTrend(
+      historicalFootprints,
+      "2030",
+      nbDecimals
+    );
+    console.log(trendValues);
+
+    // update target values for indic
+    comparativeData[showedAggregate].legalUnit.trend.data = {
+      ...comparativeData[showedAggregate].legalUnit.trend.data,
+      [indic]: trendValues,
+    };
+
+    // update state
+
+  }, [showedAggregate,indic]);
 
   // ------------------------------------------------------------------------------------
 

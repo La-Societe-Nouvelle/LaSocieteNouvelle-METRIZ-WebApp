@@ -94,6 +94,89 @@ export const projectTrendValues = async(footprints, targetYear, targetMode, deci
   return projectedValues;
 }
 
+export const buildTrend = async(historicalFootprints, maxYear, nbDecimals) => 
+{
+  const dataPoints = historicalFootprints.map((footprint) => 
+    [parseInt(footprint.year), footprint.value]
+  ).sort((a,b) => a[0] - b[0]);
+  const startYear = Math.max(...historicalFootprints.map((item) => parseInt(item.year)));
+  const endYear = parseInt(maxYear);
+
+  console.log(dataPoints);
+  if (dataPoints.length == 1) 
+  {
+    //return [];
+
+    // build values array
+    const trendValues = [];
+    for (let year = startYear; year <= endYear; year++) {
+      const trendValue  = dataPoints[0][1];
+      trendValues.push({
+        value: trendValue.toFixed(nbDecimals),
+        year: year.toString()
+      });
+    }
+    return trendValues;
+  }
+
+  else if (dataPoints.length == 2) 
+  {
+    console.log(dataPoints);
+    // regression geometric
+    const growthFactor = Math.pow(dataPoints[1][1] / dataPoints[0][1], 1 / (dataPoints[1][0] - dataPoints[0][0]));
+
+    // build values array
+    const trendValues = [];
+    for (let year = startYear; year <= endYear; year++) {
+      let i = year - startYear;
+      const trendValue = dataPoints[1][1] * Math.pow(growthFactor, i);
+      trendValues.push({
+        value: trendValue.toFixed(nbDecimals),
+        year: year.toString()
+      });
+    }
+    return trendValues;
+  }
+
+  // else if (dataPoints.length == 2) 
+  // {
+  //   // regression linear
+  //   const result = regression.linear(dataPoints);
+
+  //   // build values array
+  //   const trendValues = [];
+  //   for (let year = startYear; year <= endYear; year++) {
+  //     const trendValue  = result.predict(year)[1];
+  //     trendValues.push({
+  //       value: trendValue.toFixed(nbDecimals),
+  //       year: year.toString()
+  //     });
+  //   }
+  //   return trendValues;
+  // }
+
+  else if (dataPoints.length > 2) 
+  {
+    // regression polynomial
+    const result = regression.polynomial(dataPoints, { order: 2 });
+
+    // build values array
+    const trendValues = [];
+    for (let year = startYear; year <= endYear; year++) {
+      const trendValue  = result.predict(year)[1];
+      trendValues.push({
+        value: trendValue.toFixed(nbDecimals),
+        year: year.toString()
+      });
+    }
+    return trendValues;
+  }
+
+  else {
+    return [];
+  }
+}
+
 export const  interpolateLinearValues = (
   startYear,
   startValue,

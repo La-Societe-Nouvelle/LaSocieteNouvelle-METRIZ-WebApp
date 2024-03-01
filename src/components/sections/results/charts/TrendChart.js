@@ -108,18 +108,70 @@ const buildChartData = (session,datasetOptions) =>
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
     pointBorderColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.legalunit : trendChartColors.previous;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.previous : trendChartColors.legalunit;
     },
     backgroundColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ?  trendChartColors.legalunit :  trendChartColors.previous;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ?  trendChartColors.previous :  trendChartColors.legalunit;
     },
     pointRadius: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  6 :  4;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  4 :  6;
     },
- 
   };
   datasets.push(legalunitEvolutionDataset);
 
+  // --------------------------------------------------
+  // Legal unit - Target
+
+  const legalUnitTargetData = buildLegalUnitTargetData(
+    comparativeData,
+    aggregate,
+    indic,
+    legalUnitData
+  );
+
+  if (legalUnitTargetData.length > 0){
+    const legalUnitTargetDataset = {
+      label: "Objectif - Unité légale",
+      data: legalUnitTargetData.map((data) => ({ 
+        x: data.year, 
+        y: data.value
+      })),
+      skipNull: true,
+      borderColor: trendChartColors.legalunitTarget,
+      backgroundColor: trendChartColors.legalunitTarget,
+      borderWidth: 4,
+      order: 2,
+      tension: 0.3,
+    };
+    datasets.push(legalUnitTargetDataset);
+  }
+
+  // --------------------------------------------------
+  // Legal unit - Trend
+
+  const legalUnitTrendData = buildLegalUnitTrendData(
+    comparativeData,
+    aggregate,
+    indic,
+    legalUnitData
+  );
+
+  if (legalUnitTrendData.length > 0){
+    const legalUnitTrendDataset = {
+      label: "Tendance - Unité légale",
+      data: legalUnitTrendData.map((data) => ({ 
+        x: data.year, 
+        y: data.value
+      })),
+      skipNull: true,
+      borderColor: trendChartColors.legalunitTarget,
+      backgroundColor: trendChartColors.legalunitTarget,
+      borderWidth: 4,
+      order: 2,
+      tension: 0.3,
+    };
+    datasets.push(legalUnitTrendDataset);
+  }
 
   // --------------------------------------------------
   // Division - Historical
@@ -197,26 +249,6 @@ const buildChartData = (session,datasetOptions) =>
     datasets.push(branchTargetDataset);
   }
 
-  
-
-  const legalUnitTargetData = buildLegalUnitTargetData(comparativeData,aggregate,indic, legalUnitData);
-  if (legalUnitTargetData.length > 0){
-  const legalUnitTargetDataset = {
-    label: "Objectif - Unité légale",
-    data: legalUnitTargetData.map((data) => ({ 
-      x: data.year, 
-      y: data.value
-    })),
-    skipNull: true,
-    borderColor: trendChartColors.legalunitTarget,
-    backgroundColor: trendChartColors.legalunitTarget,
-    borderWidth: 4,
-    order: 2,
-    tension: 0.3,
-  };
-  datasets.push(legalUnitTargetDataset);
-}
-
   // --------------------------------------------------
 
   const chartData = {
@@ -246,6 +278,49 @@ const buildLegalUnitData = (
     });
   }
   
+  return data
+    .sort((a,b) => parseInt(a.x) - parseInt(b.x));
+}
+
+const buildLegalUnitTargetData = (
+  comparativeData,
+  aggregate,
+  indic,
+  legalUnitData
+) => {
+
+  let lastYearlegalUnitData = legalUnitData.at(-1).x;
+  let legalUnitTargetData = comparativeData[aggregate].legalUnit.target.data[indic] ?? []
+  let data = [];
+
+  if(legalUnitTargetData.length > 0) {
+      data = comparativeData[aggregate].legalUnit.target.data[indic]
+      .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
+      .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
+      .sort((a, b) => parseInt(a.year) - parseInt(b.year))
+  }
+
+  return data;
+}
+
+const buildLegalUnitTrendData = (
+  comparativeData,
+  aggregate,
+  indic,
+  legalUnitData
+) => {
+
+  let lastYearlegalUnitData = legalUnitData.at(-1).x;
+  let legalUnitTrendData = comparativeData[aggregate].legalUnit.trend.data[indic] ?? []
+  let data = [];
+
+  if(legalUnitTrendData.length > 0) {
+      data = comparativeData[aggregate].legalUnit.trend.data[indic]
+        .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
+        .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
+        .sort((a, b) => parseInt(a.year) - parseInt(b.year))
+  }
+
   return data;
 }
 
@@ -295,27 +370,6 @@ const buildBranchTargetData = (
     .filter((item) => item.year > lastYearHistoricalData)
     .concat([historicalData.at(-1)])
     .sort((a, b) => a.year - b.year);
-  return data;
-}
-const buildLegalUnitTargetData = (
-  comparativeData,
-  aggregate,
-  indic,
-  legalUnitData
-) => {
-
-  let lastYearlegalUnitData = legalUnitData.at(-1).x;
-  let legalUnitTargetData = comparativeData[aggregate].legalUnit.target.data[indic] ?? []
-  let data = [];
-  if(legalUnitTargetData.length > 0) {
-
-      data = comparativeData[aggregate].legalUnit.target.data[indic]
-      .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
-      .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
-      .sort((a, b) => parseInt(a.year) - parseInt(b.year))
-
-  }
-
   return data;
 }
 
