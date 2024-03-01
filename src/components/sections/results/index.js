@@ -16,7 +16,6 @@ import { HomeView } from "./views/HomeView";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { PrintChartsContainer } from "./components/PrintChartsContainer";
 import ReportGeneratorModal from "./components/ReportGeneratorModal";
-import { ChartsContainer } from "./components/ChartsContainer";
 import { LegalUnitInfo } from "./components/LegalUnitInfo";
 
 // Loader
@@ -30,8 +29,6 @@ import { buildSummaryReportIndexIndic } from "./exports/reports/summaryReportGen
 import { buildStandardReport } from "./exports/reports/standardReportGenerator";
 import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
 import { buildCompleteFile } from "./exports/completeFileGenerator";
-import { LegalUnitInfo } from "./components/LegalUnitInfo";
-import { getYearPeriod } from "../../../utils/periodsUtils";
 import { buildCompleteReport, buildCompleteZipFile} from "./exports/completeFileGenerator";
 
 // Utils
