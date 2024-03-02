@@ -100,19 +100,16 @@ const buildChartData = (session,datasetOptions) =>
   const legalunitEvolutionDataset = {
     label : "Unité légale",
     data: legalUnitData,
+    serieType: "historical",
     type: "line",
     fill: false,
     tension: 0.3,
-    borderColor : trendChartColors.previous,
+    borderColor : trendChartColors.legalunit,
     borderWidth: (context) => {
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
-    pointBorderColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.previous : trendChartColors.legalunit;
-    },
-    backgroundColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ?  trendChartColors.previous :  trendChartColors.legalunit;
-    },
+    pointBorderColor: trendChartColors.legalunit,
+    backgroundColor: trendChartColors.legalunit,
     pointRadius: (context) => {
       return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  4 :  6;
     },
@@ -131,11 +128,12 @@ const buildChartData = (session,datasetOptions) =>
 
   if (legalUnitTargetData.length > 0){
     const legalUnitTargetDataset = {
-      label: "Objectif - Unité légale",
+      label: "Unité légale - Objectif",
       data: legalUnitTargetData.map((data) => ({ 
         x: data.year, 
         y: data.value
       })),
+      serieType: "target",
       skipNull: true,
       borderColor: trendChartColors.legalunitTarget,
       backgroundColor: trendChartColors.legalunitTarget,
@@ -149,29 +147,29 @@ const buildChartData = (session,datasetOptions) =>
   // --------------------------------------------------
   // Legal unit - Trend
 
-  const legalUnitTrendData = buildLegalUnitTrendData(
-    comparativeData,
-    aggregate,
-    indic,
-    legalUnitData
-  );
+  // const legalUnitTrendData = buildLegalUnitTrendData(
+  //   comparativeData,
+  //   aggregate,
+  //   indic,
+  //   legalUnitData
+  // );
 
-  if (legalUnitTrendData.length > 0){
-    const legalUnitTrendDataset = {
-      label: "Tendance - Unité légale",
-      data: legalUnitTrendData.map((data) => ({ 
-        x: data.year, 
-        y: data.value
-      })),
-      skipNull: true,
-      borderColor: trendChartColors.legalunitTarget,
-      backgroundColor: trendChartColors.legalunitTarget,
-      borderWidth: 4,
-      order: 2,
-      tension: 0.3,
-    };
-    datasets.push(legalUnitTrendDataset);
-  }
+  // if (legalUnitTrendData.length > 0){
+  //   const legalUnitTrendDataset = {
+  //     label: "Tendance - Unité légale",
+  //     data: legalUnitTrendData.map((data) => ({ 
+  //       x: data.year, 
+  //       y: data.value
+  //     })),
+  //     skipNull: true,
+  //     borderColor: trendChartColors.legalunitTarget,
+  //     backgroundColor: trendChartColors.legalunitTarget,
+  //     borderWidth: 4,
+  //     order: 2,
+  //     tension: 0.3,
+  //   };
+  //   datasets.push(legalUnitTrendDataset);
+  // }
 
   // --------------------------------------------------
   // Division - Historical
@@ -182,11 +180,12 @@ const buildChartData = (session,datasetOptions) =>
     indic
   );
   const branchHistoricalDataset = {
-    label: "Historique - Branche",
+    label: "Branche - Historique",
     data: branchHistoricalData.map((item) => ({
       x: item.year,
       y: item.value,
     })),
+    serieType: "historical",
     borderColor: trendChartColors.trend,
     backgroundColor: trendChartColors.trend,
     order: 3,
@@ -207,11 +206,12 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTrendDataset ={
-      label: "Tendance - Branche",
+      label: "Branche - Tendance",
       data: branchTrendData.map((data) => ({ 
         x: data.year, 
         y: data.value 
       })),
+      serieType: "trend",
       borderColor: trendChartColors.trend,
       backgroundColor: trendChartColors.trend,
       borderWidth: 4,
@@ -234,11 +234,12 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTargetDataset = {
-      label: "Objectif - Branche",
+      label: "Branche - Objectif",
       data: branchTargetData.map((data) => ({ 
         x: data.year, 
         y: data.value
       })),
+      serieType: "target",
       skipNull: true,
       borderColor: trendChartColors.target,
       backgroundColor: trendChartColors.target,
@@ -455,8 +456,8 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
                 hidden: !chart.getDataVisibility(i),
                 index: i,
                 lineWidth: 3,
-                lineDashOffset: i === 1 ? 10 : 0,
-                lineDash: i === 1 ? [6, 3] : [],
+                lineDashOffset: data.serieType === "trend" ? 10 : 0,
+                lineDash: data.serieType === "trend" ? [6, 3] : [],
                 order: data.order,
                 pointStyle: "line",
                 strokeStyle: data.borderColor,
@@ -517,9 +518,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
               return `${context[0]?.dataset.label}`;
             }
           },
-          label: function (context) {
-
-   
+          label: function (context) {   
             if (context.dataIndex !== 0 || context.datasetIndex == 0) {
               if (context.datasetIndex == 0) {
                 return `Exercice ${context.raw.x} : ${context.raw.y} ${unit}`;

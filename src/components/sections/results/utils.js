@@ -102,26 +102,24 @@ export const buildTrend = async(historicalFootprints, maxYear, nbDecimals) =>
   const startYear = Math.max(...historicalFootprints.map((item) => parseInt(item.year)));
   const endYear = parseInt(maxYear);
 
-  console.log(dataPoints);
   if (dataPoints.length == 1) 
   {
-    //return [];
+    return [];
 
     // build values array
-    const trendValues = [];
-    for (let year = startYear; year <= endYear; year++) {
-      const trendValue  = dataPoints[0][1];
-      trendValues.push({
-        value: trendValue.toFixed(nbDecimals),
-        year: year.toString()
-      });
-    }
-    return trendValues;
+    // const trendValues = [];
+    // for (let year = startYear; year <= endYear; year++) {
+    //   const trendValue  = dataPoints[0][1];
+    //   trendValues.push({
+    //     value: trendValue.toFixed(nbDecimals),
+    //     year: year.toString()
+    //   });
+    // }
+    // return trendValues;
   }
 
   else if (dataPoints.length == 2) 
   {
-    console.log(dataPoints);
     // regression geometric
     const growthFactor = Math.pow(dataPoints[1][1] / dataPoints[0][1], 1 / (dataPoints[1][0] - dataPoints[0][0]));
 
@@ -137,23 +135,6 @@ export const buildTrend = async(historicalFootprints, maxYear, nbDecimals) =>
     }
     return trendValues;
   }
-
-  // else if (dataPoints.length == 2) 
-  // {
-  //   // regression linear
-  //   const result = regression.linear(dataPoints);
-
-  //   // build values array
-  //   const trendValues = [];
-  //   for (let year = startYear; year <= endYear; year++) {
-  //     const trendValue  = result.predict(year)[1];
-  //     trendValues.push({
-  //       value: trendValue.toFixed(nbDecimals),
-  //       year: year.toString()
-  //     });
-  //   }
-  //   return trendValues;
-  // }
 
   else if (dataPoints.length > 2) 
   {

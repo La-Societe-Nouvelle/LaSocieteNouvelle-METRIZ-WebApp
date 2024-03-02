@@ -177,36 +177,35 @@ export const EvolutionCurvesVisual = ({ session, indic }) =>
   };
 
   // ------------------------------------------------------------------------------------
+  // Trend curves
 
-  useEffect(async () => 
-  {
-    const historicalFootprints = availablePeriods.map((period) => {
-      let footprint = {};
-      footprint.value = curves
-        .aggregate[period.periodKey]
-        .footprint.indicators[indic]
-        .value;
-      footprint.year = getYearPeriod(period);
-      return footprint;
-    });
-    console.log(historicalFootprints);
+  // useEffect(async () => 
+  // {
+  //   const historicalFootprints = availablePeriods.map((period) => {
+  //     let footprint = {};
+  //     footprint.value = curves
+  //       .aggregate[period.periodKey]
+  //       .footprint.indicators[indic]
+  //       .value;
+  //     footprint.year = getYearPeriod(period);
+  //     return footprint;
+  //   });
 
-    const trendValues =  await buildTrend(
-      historicalFootprints,
-      "2030",
-      nbDecimals
-    );
-    console.log(trendValues);
+  //   const trendValues =  await buildTrend(
+  //     historicalFootprints,
+  //     "2030",
+  //     nbDecimals
+  //   );
 
-    // update target values for indic
-    comparativeData[showedAggregate].legalUnit.trend.data = {
-      ...comparativeData[showedAggregate].legalUnit.trend.data,
-      [indic]: trendValues,
-    };
+  //   // update target values for indic
+  //   comparativeData[showedAggregate].legalUnit.trend.data = {
+  //     ...comparativeData[showedAggregate].legalUnit.trend.data,
+  //     [indic]: trendValues,
+  //   };
 
-    // update state
+  //   // update state
 
-  }, [showedAggregate,indic]);
+  // }, [showedAggregate,indic]);
 
   // ------------------------------------------------------------------------------------
 
