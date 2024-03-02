@@ -1,7 +1,5 @@
-// La Société Nouvelle
-
-// React
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+// Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Line } from "react-chartjs-2";
@@ -44,7 +42,6 @@ export const TrendChart = ({
   printOptions
 }) => {
 
-  if (datasetOptions.indic=="wat") console.log(datasetOptions);
   // --------------------------------------------------
   // Data
 
@@ -103,25 +100,76 @@ const buildChartData = (session,datasetOptions) =>
   const legalunitEvolutionDataset = {
     label : "Unité légale",
     data: legalUnitData,
+    serieType: "historical",
     type: "line",
     fill: false,
     tension: 0.3,
-    borderColor : trendChartColors.previous,
+    borderColor : trendChartColors.legalunit,
     borderWidth: (context) => {
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
-    pointBorderColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ? trendChartColors.legalunit : trendChartColors.previous;
-    },
-    backgroundColor: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1 ?  trendChartColors.legalunit :  trendChartColors.previous;
-    },
+    pointBorderColor: trendChartColors.legalunit,
+    backgroundColor: trendChartColors.legalunit,
     pointRadius: (context) => {
-      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  6 :  4;
+      return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  4 :  6;
     },
- 
   };
   datasets.push(legalunitEvolutionDataset);
+
+  // --------------------------------------------------
+  // Legal unit - Target
+
+  const legalUnitTargetData = buildLegalUnitTargetData(
+    comparativeData,
+    aggregate,
+    indic,
+    legalUnitData
+  );
+
+  if (legalUnitTargetData.length > 0){
+    const legalUnitTargetDataset = {
+      label: "Unité légale - Objectif",
+      data: legalUnitTargetData.map((data) => ({ 
+        x: data.year, 
+        y: data.value
+      })),
+      serieType: "target",
+      skipNull: true,
+      borderColor: trendChartColors.legalunitTarget,
+      backgroundColor: trendChartColors.legalunitTarget,
+      borderWidth: 4,
+      order: 2,
+      tension: 0.3,
+    };
+    datasets.push(legalUnitTargetDataset);
+  }
+
+  // --------------------------------------------------
+  // Legal unit - Trend
+
+  // const legalUnitTrendData = buildLegalUnitTrendData(
+  //   comparativeData,
+  //   aggregate,
+  //   indic,
+  //   legalUnitData
+  // );
+
+  // if (legalUnitTrendData.length > 0){
+  //   const legalUnitTrendDataset = {
+  //     label: "Tendance - Unité légale",
+  //     data: legalUnitTrendData.map((data) => ({ 
+  //       x: data.year, 
+  //       y: data.value
+  //     })),
+  //     skipNull: true,
+  //     borderColor: trendChartColors.legalunitTarget,
+  //     backgroundColor: trendChartColors.legalunitTarget,
+  //     borderWidth: 4,
+  //     order: 2,
+  //     tension: 0.3,
+  //   };
+  //   datasets.push(legalUnitTrendDataset);
+  // }
 
   // --------------------------------------------------
   // Division - Historical
@@ -132,14 +180,15 @@ const buildChartData = (session,datasetOptions) =>
     indic
   );
   const branchHistoricalDataset = {
-    label: "Historique",
+    label: "Branche - Historique",
     data: branchHistoricalData.map((item) => ({
       x: item.year,
       y: item.value,
     })),
+    serieType: "historical",
     borderColor: trendChartColors.trend,
     backgroundColor: trendChartColors.trend,
-    order: 2,
+    order: 3,
     borderWidth: 4,
     tension: 0.3,
   };
@@ -157,16 +206,17 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTrendDataset ={
-      label: "Tendance",
+      label: "Branche - Tendance",
       data: branchTrendData.map((data) => ({ 
         x: data.year, 
         y: data.value 
       })),
+      serieType: "trend",
       borderColor: trendChartColors.trend,
       backgroundColor: trendChartColors.trend,
       borderWidth: 4,
       borderDash: [12, 6],
-      order: 3,
+      order: 4,
       tension: 0.3,
     };
     datasets.push(branchTrendDataset);
@@ -184,16 +234,17 @@ const buildChartData = (session,datasetOptions) =>
       branchHistoricalData
     );
     const branchTargetDataset = {
-      label: "Objectif",
+      label: "Branche - Objectif",
       data: branchTargetData.map((data) => ({ 
         x: data.year, 
         y: data.value
       })),
+      serieType: "target",
       skipNull: true,
       borderColor: trendChartColors.target,
       backgroundColor: trendChartColors.target,
       borderWidth: 4,
-      order: 4,
+      order: 5,
       tension: 0.3,
     };
     datasets.push(branchTargetDataset);
@@ -228,6 +279,49 @@ const buildLegalUnitData = (
     });
   }
   
+  return data
+    .sort((a,b) => parseInt(a.x) - parseInt(b.x));
+}
+
+const buildLegalUnitTargetData = (
+  comparativeData,
+  aggregate,
+  indic,
+  legalUnitData
+) => {
+
+  let lastYearlegalUnitData = legalUnitData.at(-1).x;
+  let legalUnitTargetData = comparativeData[aggregate].legalUnit.target.data[indic] ?? []
+  let data = [];
+
+  if(legalUnitTargetData.length > 0) {
+      data = comparativeData[aggregate].legalUnit.target.data[indic]
+      .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
+      .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
+      .sort((a, b) => parseInt(a.year) - parseInt(b.year))
+  }
+
+  return data;
+}
+
+const buildLegalUnitTrendData = (
+  comparativeData,
+  aggregate,
+  indic,
+  legalUnitData
+) => {
+
+  let lastYearlegalUnitData = legalUnitData.at(-1).x;
+  let legalUnitTrendData = comparativeData[aggregate].legalUnit.trend.data[indic] ?? []
+  let data = [];
+
+  if(legalUnitTrendData.length > 0) {
+      data = comparativeData[aggregate].legalUnit.trend.data[indic]
+        .filter((item) => parseInt(item.year) > parseInt(lastYearlegalUnitData))
+        .concat([{value : legalUnitData.at(-1).y, year : legalUnitData.at(-1).x}])
+        .sort((a, b) => parseInt(a.year) - parseInt(b.year))
+  }
+
   return data;
 }
 
@@ -277,7 +371,6 @@ const buildBranchTargetData = (
     .filter((item) => item.year > lastYearHistoricalData)
     .concat([historicalData.at(-1)])
     .sort((a, b) => a.year - b.year);
-
   return data;
 }
 
@@ -363,8 +456,8 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
                 hidden: !chart.getDataVisibility(i),
                 index: i,
                 lineWidth: 3,
-                lineDashOffset: i === 1 ? 10 : 0,
-                lineDash: i === 1 ? [6, 3] : [],
+                lineDashOffset: data.serieType === "trend" ? 10 : 0,
+                lineDash: data.serieType === "trend" ? [6, 3] : [],
                 order: data.order,
                 pointStyle: "line",
                 strokeStyle: data.borderColor,
@@ -422,12 +515,10 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
             if (context[0].datasetIndex == 0) {
               return context[0]?.dataset.label;
             } else {
-              return `${context[0]?.dataset.label} - Branche`;
+              return `${context[0]?.dataset.label}`;
             }
           },
-          label: function (context) {
-
-   
+          label: function (context) {   
             if (context.dataIndex !== 0 || context.datasetIndex == 0) {
               if (context.datasetIndex == 0) {
                 return `Exercice ${context.raw.x} : ${context.raw.y} ${unit}`;

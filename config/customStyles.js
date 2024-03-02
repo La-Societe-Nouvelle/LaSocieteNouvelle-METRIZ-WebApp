@@ -1,3 +1,4 @@
+
 export const customSelectStyles = (selectSize, status, hasWarning) => ({
   control: (provided, state) => {
    
@@ -65,6 +66,55 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
     color: "#191558",
     backgroundColor: "transparent",
     background: state.isFocused ? "#dbdef1" : "",
+    "&:hover": {
+      color: "#191558",
+    },
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "#191558", 
+  }),
+});
+
+export const graphSelectStyles = () => ({
+  control: (provided, state) => {
+   
+    let styles = {
+      ...provided,
+      fontSize: "0.9rem",
+      fontFamily : "Roboto",
+      fontWeight: "bold",
+      borderWidth: "2px",
+      borderColor : "#ededff",
+      boxShadow: "none",
+      padding: "0px",
+      "&:hover": {
+        borderColor: "#dbdef1",
+      },
+    };
+
+
+    return styles;
+  },
+
+  
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 9999, 
+  }),
+  indicatorSeparator: (provided) => (
+   {
+    ...provided,
+    width : 0
+  }),
+  
+  option: (provided, state) => ({
+    ...provided,
+    color: "#191558",
+    fontSize: "0.8rem",
+    backgroundColor: "transparent",
+    background: state.isFocused ? "#dbdef1" : "",
+    
     "&:hover": {
       color: "#191558",
     },

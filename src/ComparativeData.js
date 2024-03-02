@@ -8,7 +8,7 @@ import api from "/config/api";
 /** Structure :
  *  ----------------------------------------------------------------------------------------------------
  *    aggregate {}                  production, netValueAdded,...
- *       |- scale {}                area, division
+ *       |- scale {}                area, division, legalunit
  *           |- serie {}            history, trend, target
  *               |- .data {}        ...indics
  *                   |- indic []    array with data
@@ -26,7 +26,8 @@ const metaAggregates = {
 
 const metaScales = [
   "area",
-  "division"
+  "division",
+  "legalUnit"
 ];
 
 const metaSeries = {

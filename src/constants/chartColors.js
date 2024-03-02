@@ -31,6 +31,7 @@ export const trendChartColors = {
   trend:"rgba(255,182,66,1)",
   target:"rgba(255,238,200,1)",
   legalunit:"rgba(250,89,95,1)",
+  legalunitTarget : "rgba(250,89,95,0.5)",
   previous:"rgba(253, 189, 191,1)",
 };
 

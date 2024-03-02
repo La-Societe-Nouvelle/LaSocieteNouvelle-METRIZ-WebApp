@@ -104,7 +104,8 @@ const IndicatorCharts = ({
       </Row>
       <Row>
         <div className="trend-chart-container">
-          <TrendChart
+          {/* Check If legal unit has target  */}
+          {/* <TrendChart
             id={`trend-chart-${indic}-print`}
             session={session}
             datasetOptions={{
@@ -114,7 +115,8 @@ const IndicatorCharts = ({
             printOptions={{
               printMode: true
             }}
-          />
+          /> */}
+
         </div>
       </Row>
       {(indicators[indic].type == "intensité" ||
