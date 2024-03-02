@@ -264,15 +264,9 @@ const buildSummaryReport = async (props) => {
     case "default":
       return null;
     case "art":
-      return await buildSummaryReportContributionIndic({
-        ...props,
-        indic: "art",
-      });
+      return await buildSummaryReportContributionIndic({...props, indic: "art" });
     case "eco":
-      return await buildSummaryReportContributionIndic({
-        ...props,
-        indic: "eco",
-      });
+      return await buildSummaryReportContributionIndic({...props, indic: "eco" });
     case "ghg":
       return await buildSummaryReportIntensityIndic({ ...props, indic: "ghg" });
     case "geq":

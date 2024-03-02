@@ -528,6 +528,7 @@ const buildHeaderSection = (
     //--------------------------------------------------
   ];
 };
+
 const buildProductionImpactSection = (
   intermediateConsumptionsPart,
   mostImpactfulExpenseAccountsPart,
@@ -852,6 +853,7 @@ const buildBranchPerformanceSection = (
   chartImages,
   indic
 ) => {
+  
   const branchReferenceText =
     "Branche de référence : " +
     comparativeData.comparativeDivision +

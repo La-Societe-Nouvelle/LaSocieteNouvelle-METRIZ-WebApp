@@ -69,13 +69,11 @@ const IndicatorCharts = ({
     netValueAdded: "Valeur ajoutée nette",
   };
 
-    // Prev period
-
-    const prevDateEnd = getPrevDate(period.dateStart);
-    const prevPeriod =
-      session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
-      false;
-
+  // Prev period
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod =
+    session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
+    false;
       
   return (
     <div
@@ -105,7 +103,7 @@ const IndicatorCharts = ({
       <Row>
         <div className="trend-chart-container">
           {/* Check If legal unit has target  */}
-          {/* <TrendChart
+          <TrendChart
             id={`trend-chart-${indic}-print`}
             session={session}
             datasetOptions={{
@@ -115,7 +113,7 @@ const IndicatorCharts = ({
             printOptions={{
               printMode: true
             }}
-          /> */}
+          />
 
         </div>
       </Row>
