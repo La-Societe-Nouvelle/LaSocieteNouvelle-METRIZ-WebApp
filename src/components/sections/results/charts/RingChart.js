@@ -35,9 +35,8 @@ import { getLabelPeriod } from "../../../../utils/periodsUtils";
  *
  */
 
-export const RingChart = ({ id, session, datasetOptions, printOptions }) => {
-  console.log(id);
-
+export const RingChart = ({ id, session, datasetOptions, printOptions }) => 
+{
   // --------------------------------------------------
   // Data
 
