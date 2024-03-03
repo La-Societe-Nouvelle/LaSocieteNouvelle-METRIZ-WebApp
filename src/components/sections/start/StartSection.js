@@ -11,6 +11,9 @@ import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
 // Objects
 import { Session } from "/src/Session";
 
+// Utils
+import { checkResults } from "../../../utils/progressionUtils";
+
 // Updater
 import { updateVersion } from "/src/version/updateVersion";
 import FloatingActionButton from "../../pageComponents/FloatingActionButton";
@@ -67,7 +70,7 @@ export const StartSection = ({ initSession, resumeSession }) =>
 
       // Public logs
       console.log("Session (contenu brut) : ");
-      console.log(session);
+      console.log(sessionProps);
 
       // update to current version
       await updateVersion(sessionProps);
@@ -77,11 +80,15 @@ export const StartSection = ({ initSession, resumeSession }) =>
 
       // re-compute footprints
       for (let period of session.availablePeriods) {
-        await session.updateFootprints(period);
+        // update fpt if already computed
+        let resultsValid = checkResults(session,period);
+        if (resultsValid) {
+          await session.updateFootprints(period);
+        }
       }
 
       // Public logs
-      console.log("Session (après actualisation des empreintes) : ");
+      console.log("Session (après recalcul des empreintes) : ");
       console.log(session);
 
       setSession(session);

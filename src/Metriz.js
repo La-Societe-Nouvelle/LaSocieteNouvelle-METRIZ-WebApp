@@ -51,13 +51,16 @@ export const Metriz = () =>
   const [sessionSaved, setSessionSaved] = useState(false); 
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  useEffect(() => {
+  useEffect(async () => {
+    // bakc to top of the page
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: "instant",
     });
-    sessionDidUpdate();
+    // update step max
+    let progression = await getProgression(session,selectedPeriod);
+    setStepMax(progression);
   }, [step]); 
 
 
@@ -101,12 +104,13 @@ export const Metriz = () =>
     setSessionSaved(true);
   };
 
-  const sessionDidUpdate = async () => {
-    let progression = await getProgression(session,selectedPeriod);
-    if (selectedPeriod.periodKey && progression<5) {
-      session.initNetValueAddedFootprint(selectedPeriod);
-    }
-    setStepMax(progression);
+  const sessionDidUpdate = async () => 
+  {
+    // update footprints
+    await session.updateFootprints(selectedPeriod);
+
+    // set the current step as step max
+    setStepMax(step);
   }
 
   // Init session -------------------------------------

@@ -169,9 +169,9 @@ export class Session
   {
     console.log("Mise à jour des empreintes pour la période : " + period.periodKey);
 
-    // Net Value Added
-    await this.updateNetValueAddedFootprint(period);
-    console.log(" Mise à jour de l'empreinte de la valeur ajoutée nette");
+    // Net Value Added (only updated in statements section)
+    //await this.updateNetValueAddedFootprint(period);
+    //console.log(" Mise à jour de l'empreinte de la valeur ajoutée nette");
 
     // Intermediate Consumptions
     await updateIntermediateConsumptionsFootprints(this.financialData, period);
@@ -224,7 +224,7 @@ export class Session
     Object.values(this.financialData.productionAggregates)
       .forEach((aggregate) => aggregate.periodsData[period.periodKey] = new SocialFootprint());
   }
-
+  
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
   updateNetValueAddedFootprint = async (period) => 
