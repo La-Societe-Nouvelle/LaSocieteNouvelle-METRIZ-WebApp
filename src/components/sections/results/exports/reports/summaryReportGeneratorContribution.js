@@ -435,8 +435,8 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
     {
       image:
       chartImages[`comparative-chart-production-${indic}-print`],
-      width: 130,
-      alignment: "center", 
+      width: 190,
+      margin: [10, 0, 0, 5],
     },
     {
       text: "\tEmpreinte de vos achats\t",

@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import { Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 // Lib
 import indicators from "/lib/indics";
@@ -78,7 +78,7 @@ const IndicatorCharts = ({
   return (
     <div
       className={"charts-container " + indic}
-       style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
+      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
     >
       <Row className="charts">
         {Object.keys(aggregates).map((aggregate) => (
@@ -167,7 +167,8 @@ const renderComparativeCharts = ({
   const maxFootprintValue = getMaxFootprintValue(session, period, indic);
 
   return (
-    <div key={chartId} className={"comparative-chart-container"}>
+    <Col sm={6} xl={6} lg={6} md={6} key={chartId}>
+
       <VerticalBarChart
         id={chartId}
         session={session}
@@ -184,12 +185,12 @@ const renderComparativeCharts = ({
           useIndicColors: false,
           showLegend : false,
           showXlabels : true,
-          aspectRatio : 1,
+          aspectRatio : 1.5,
           maxYAxis : maxFootprintValue,
           label: "Production"
         }}
       />
-    </div>
+    </Col>
   );
 };
 {

@@ -356,6 +356,7 @@ const buildChartOptions = (
 
   const chartOptions = {
     aspectRatio: aspectRatio,
+    devicePixelRatio: printMode ? 1.5 : 1,
     layout: {
       padding: {
         left: printMode ? 0 : 10,
@@ -373,7 +374,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: 10,
+            size: printMode ? 20 : 11,
           },
         },
         grid: {
@@ -386,7 +387,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 8 : 10,
+            size: printMode ? 20 : 11,
           },
         },
         grid: {
