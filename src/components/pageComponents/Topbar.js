@@ -31,7 +31,6 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
   };
 
   useEffect(() => {
-    console.log("use effect");
     if (period && !selectedPeriod) {
       setSelectedPeriod(period);
     } else if (period && period.periodKey != selectedPeriod.periodKey) {
