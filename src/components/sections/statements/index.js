@@ -79,6 +79,9 @@ const DirectImpacts = ({
   {
     setIsLoading(true);
 
+    //
+    updateSession();
+
     // update nva footprints
     await session.updateNetValueAddedFootprint(period);
 
@@ -90,12 +93,9 @@ const DirectImpacts = ({
       await session.comparativeData.fetchComparativeData(selectedStatements);
       
     } catch (error) {
-        console.log(error)
-        // Set error
-    }
-    finally {
-      setIsLoading(false);
-
+      // Set error
+      console.log(error)
+        setIsLoading(false);
     }
 
     // fetch analysis
@@ -185,7 +185,7 @@ const DirectImpacts = ({
           </div>
         )}
       
-        {/* {isLoading && <Loader title={"Chargement en cours..."} />} */}
+        {isLoading && <Loader title={"Chargement en cours..."} />}
 
         {invalidStatements.length > 0 && (
           <Alert variant="danger" className="flex-column align-items-start">
