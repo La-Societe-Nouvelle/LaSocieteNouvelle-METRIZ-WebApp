@@ -399,26 +399,24 @@ export async function FECDataReader(FECData) {
     // -------------------------------------------------- //
 
     let journal = FECData.books[codeANouveaux];
-    await journal
-      .sort((a, b) => a.CompteNum.localeCompare(b.CompteNum))
-      .map(async (ligne) => {
-        try 
-        {
+    await Promise.all(
+      journal.map(async (ligne) => {
+        try {
+
           // init #2 & #3 accounts
           await readANouveauxEntry(data, journal, ligne);
 
           // read #6 & #7 in balance forward book
           if (/^6/.test(ligne.CompteNum))
             await readExpenseEntry(data, journal, ligne);
-
           if (/^7/.test(ligne.CompteNum))
             await readProductionEntry(data, journal, ligne);
 
         } catch (error) {
           data.errors.push(error);
         }
-        return;
-      });
+      })
+    );
 
     // -------------------------------------------------- //
   }
@@ -426,46 +424,38 @@ export async function FECDataReader(FECData) {
   /* ------------------------- OTHER BOOKS ------------------------- */
 
   // Read books (except "A Nouveaux")
-  Object.entries(FECData.meta.books)
-    .filter(([_, { type }]) => type != "ANOUVEAUX")
-    .forEach(async ([bookCode, _]) => {
 
-      // Get book
-      let journal = FECData.books[bookCode];
+  await Promise.all(
+    Object.entries(FECData.meta.books)
+      .filter(([_, { type }]) => type != "ANOUVEAUX")
+      .map(async ([bookCode, _]) => {
+        let journal = FECData.books[bookCode];
+        await Promise.all(
+          journal.map(async (ligne) => {
+            try {
+              // Lecture des lignes
+              // -------------------------------------------------- //
 
-      // Read book
-      await journal.map(async (ligne) => {
-        try {
-          
-          // Lecture des lignes
-          // -------------------------------------------------- //
-
-          // Construction des données comptables
-
-          if (/^2/.test(ligne.CompteNum))
-            await readImmobilisationEntry(data, journal, ligne);
-
-          if (/^3/.test(ligne.CompteNum))
-            await readStockEntry(data, journal, ligne);
-
-          if (/^6/.test(ligne.CompteNum))
-            await readExpenseEntry(data, journal, ligne);
-
-          if (/^7/.test(ligne.CompteNum))
-            await readProductionEntry(data, journal, ligne);
-
-          // Lecture d'informations supplémentaires
-          if (/^(63|45)/.test(ligne.CompteNum))
-            await readAddtionalDataEntry(data, journal, ligne);
-
-          // -------------------------------------------------- //
-
-        } catch (error) {
-          data.errors.push(error);
-        }
-        return;
-      });
-    });
+              // Construction des données comptables
+              if (/^2/.test(ligne.CompteNum))
+                await readImmobilisationEntry(data, journal, ligne);
+              if (/^3/.test(ligne.CompteNum))
+                await readStockEntry(data, journal, ligne);
+              if (/^6/.test(ligne.CompteNum))
+                await readExpenseEntry(data, journal, ligne);
+              if (/^7/.test(ligne.CompteNum))
+                await readProductionEntry(data, journal, ligne);
+              // Lecture d'informations supplémentaires
+              if (/^(63|45)/.test(ligne.CompteNum))
+                await readAddtionalDataEntry(data, journal, ligne);
+              // -------------------------------------------------- //
+            } catch (error) {
+              data.errors.push(error);
+            }
+          })
+        );
+      })
+  );
 
   /* ------------------------- RETURN ------------------------- */
   data.isFinancialDataLoaded = true;
@@ -909,10 +899,10 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
           data.externalExpenses.push(...entryData.expensesData);
           data.defaultProviders.push(...entryData.defaultProviders);
         } else {
-          throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : Plusieurs comptes fournisseurs détectés ");
+          throw ("Plusieurs comptes fournisseurs détectés.");
         }
       } catch (error) {
-        throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +".");
+        throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : " + error);
       }
     } 
     

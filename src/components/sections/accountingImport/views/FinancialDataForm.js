@@ -201,18 +201,18 @@ export const FinancialDataForm = ({
 
   const loadAccountingData = async () => 
   {
-    let accountingData = await FECDataReader(FECData);
+
+
+    const accountingData = await FECDataReader(FECData);
 
     // console logs
     console.log("Lecture des écritures comptables");
-    console.log("Données extraites du FEC : ")
-    console.log(accountingData);
+    console.log("Données extraites du FEC : ", accountingData)
 
     if (accountingData.errors.length > 0) 
     {
       // console logs
-      console.log("Erreur(s) de lecture : ");
-      console.log(accountingData.errors);
+      console.log("Erreur(s) de lecture : ", accountingData.errors);
       
       setShowViewsModals(false);
       setHasErrorsFEC(true);
