@@ -363,7 +363,6 @@ const buildChartOptions = (
         right: printMode ? 0 : 10,
         top: printMode ? 50 : 30,
         bottom: printMode ? 10 : 0,
-
       },
     },
     scales: {
@@ -383,7 +382,7 @@ const buildChartOptions = (
         },
       },
       x: {
-        display : showXlabels,
+        display: showXlabels,
         ticks: {
           color: colors.textColor,
           font: {
@@ -403,7 +402,7 @@ const buildChartOptions = (
         align: "center",
         labels: {
           boxWidth: 10,
-          color : colors.textColor,
+          color: colors.textColor,
           font: {
             size: 10,
             family: "Roboto",
@@ -413,88 +412,89 @@ const buildChartOptions = (
             chart.data.labels.forEach((label, labelIndex) => {
               chart.data.datasets.forEach((dataset, datasetIndex) => {
                 const backgroundColor = dataset.backgroundColor[labelIndex];
-                if(backgroundColor) {
-                    labels.push({
-                      text: datasetIndex === 0 ? label : dataset.label,
-                      fillStyle: backgroundColor,
-                      strokeStyle: backgroundColor,
-                      lineWidth: 0,
-                      hidden: false,
-                      boxWidth: 10,
-                    });
+                if (backgroundColor) {
+                  labels.push({
+                    text: datasetIndex === 0 ? label : dataset.label,
+                    fillStyle: backgroundColor,
+                    strokeStyle: backgroundColor,
+                    lineWidth: 0,
+                    hidden: false,
+                    boxWidth: 10,
+                  });
                 }
               });
             });
-          
+
             return labels;
           },
-       
         },
       },
       datalabels: {
-        display:  true,
-        overlap: 'auto',
+        display: true,
+        overlap: "auto",
         anchor: "end",
-        align : "top",
-        textAlign : "center",
+        align: "top",
+        textAlign: "center",
         formatter: function (value) {
-          if (value || value == 0) {
+          if (value || value === 0) {
+            if (Number.isInteger(value)) {
+              return `${printValue(value, 0)}\n${unit}`;
+            }
             return `${printValue(value, nbDecimals)}\n${unit}`;
           }
         },
-        color : colors.textColor,
+        color: colors.textColor,
         font: {
-          size:  printMode ? 14 : 10,
+          size: printMode ? 14 : 10,
           family: "Roboto",
         },
         padding: {
-          bottom: 5, 
-      },
+          bottom: 5,
+        },
       },
       title: {
         display: false,
       },
       tooltip: {
         backgroundColor: tooltips.backgroundColor,
-        padding : tooltips.padding,
-        cornerRadius : tooltips.cornerRadius,
+        padding: tooltips.padding,
+        cornerRadius: tooltips.cornerRadius,
         filter: function (tooltipItem) {
           // Hide tooltip for null value
-          return tooltipItem.raw ;
-      },
+          return tooltipItem.raw;
+        },
         callbacks: {
           label: function (context) {
-
             const datasetLabel = context?.dataset.label;
             const rawValue = printValue(context?.raw, nbDecimals);
             const unitLabel = `${unit}`;
             // Area dataset
             if (context.dataIndex === 0) {
-              return (
-                `${datasetLabel} (${context.datasetIndex === 0 ? areaValueYear : areaTargetValueYear}) : ${rawValue}${unitLabel}`
-              );
+              return `${datasetLabel} (${
+                context.datasetIndex === 0 ? areaValueYear : areaTargetValueYear
+              }) : ${rawValue}${unitLabel}`;
             }
-          
+
             // Legal Unit dataset
             if (context.dataIndex === 1) {
-              return (
-                `${datasetLabel} (${legalUnitYear}): ${rawValue}${unitLabel}`
-              );
+              return `${datasetLabel} (${legalUnitYear}): ${rawValue}${unitLabel}`;
             }
-          
+
             // Target dataset
             if (context.dataIndex === 2) {
-              return (
-                `${datasetLabel} (${context.datasetIndex === 0 ? branchValueYear : targetValueYear}) : ${rawValue}${unitLabel}`
-              );
+              return `${datasetLabel} (${
+                context.datasetIndex === 0 ? branchValueYear : targetValueYear
+              }) : ${rawValue}${unitLabel}`;
             }
           },
-          
-          title: (context) => {
 
+          title: (context) => {
             const periodLabel = getLabelPeriod(period);
-            const customTitle = context[0]?.label == periodLabel ? "Unité Légale" : context[0]?.label;
-            
+            const customTitle =
+              context[0]?.label == periodLabel
+                ? "Unité Légale"
+                : context[0]?.label;
+
             return customTitle;
           },
         },
