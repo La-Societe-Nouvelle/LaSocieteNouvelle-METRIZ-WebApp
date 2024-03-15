@@ -413,7 +413,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: 2,
+          lineWidth: printMode ? 0 : 1,
         },
       },
       x: {

@@ -240,7 +240,7 @@ const buildChartOptions = (printOptions) =>
         borderRadius: 5,
         color : printMode ? "#FFF" : colors.textColor,
         font: {
-          size: printMode ? 32 : 10,
+          size: printMode ? 24 : 10,
           family: "Roboto",
           weight : "bold"
         },

@@ -247,7 +247,7 @@ export const buildStandardReport = async ({
               },
               {
                 image: prodChartImage,
-                width: 150,
+                width: 200,
                 alignment: "center",
               },
             ],
@@ -262,7 +262,7 @@ export const buildStandardReport = async ({
               },
               {
                 image: valueAddedImage,
-                width: 150,
+                width: 200,
                 alignment: "center",
               },
             ],
@@ -282,7 +282,7 @@ export const buildStandardReport = async ({
               },
               {
                 image: interConsChartImage,
-                width: 150,
+                width: 200,
                 alignment: "center",
               },
               ///
@@ -414,7 +414,7 @@ export const buildStandardReport = async ({
               },
               {
                 image: fixedCapConsChartImage,
-                width: 150,
+                width: 200,
                 alignment: "center",
               },
             ],
