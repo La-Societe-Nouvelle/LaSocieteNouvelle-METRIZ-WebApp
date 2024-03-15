@@ -361,7 +361,7 @@ const buildChartOptions = (
       padding: {
         left: printMode ? 0 : 10,
         right: printMode ? 0 : 10,
-        top: printMode ? 0 : 30,
+        top: printMode ? 50 : 30,
         bottom: printMode ? 10 : 0,
 
       },
@@ -374,12 +374,12 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 20 : 11,
+            size: printMode ? 16 : 8,
           },
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: 1,
+          lineWidth: printMode ? 0 : 1,
         },
       },
       x: {
@@ -387,7 +387,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 20 : 11,
+            size: printMode ? 16 : 10,
           },
         },
         grid: {
@@ -431,9 +431,8 @@ const buildChartOptions = (
        
         },
       },
-      
       datalabels: {
-        display: printMode ? false : true,
+        display:  true,
         overlap: 'auto',
         anchor: "end",
         align : "top",
@@ -445,7 +444,7 @@ const buildChartOptions = (
         },
         color : colors.textColor,
         font: {
-          size: printMode ? 10 : 9,
+          size:  printMode ? 14 : 10,
           family: "Roboto",
         },
         padding: {

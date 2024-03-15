@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import { Col, Row } from "react-bootstrap";
+import {  Row } from "react-bootstrap";
 
 // Lib
 import indicators from "/lib/indics";
@@ -13,127 +13,94 @@ import { SigPieChart } from "../charts/SigPieChart";
 import { HorizontalBarChart } from "../charts/HorizontalBarChart";
 
 import { GrossImpactChart } from "../charts/GrossImpactChart";
-import { getPrevDate } from "../../../../utils/periodsUtils";
 import { VerticalBarChart } from "../charts/VerticalBarChart";
 import { getMaxFootprintValue } from "../charts/chartsUtils";
 
 /* ---------- CHARTS CONTAINER ---------- */
 
 /** Container for charts
- *  
+ *
  *  Props :
  *    - session
  *    - period
- * 
+ *
  *  Build charts for all indicators (to use in report)
  */
 
-export const PrintChartsContainer = ({
-  session,
-  period,
-}) => {
+export const PrintChartsContainer = ({ session, period }) => {
   return (
-    <>
-      {session.validations[period.periodKey].map(
-        (indic) => 
-        (
-          <div key={indic}>
-            <IndicatorCharts
-              session={session}
-              period={period}
-              indic={indic}
-            />
-          </div>
-        )
-      )}
-    </>
+    <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+      {session.validations[period.periodKey].map((indic) => (
+        <Row key={indic}>
+          <IndicatorCharts session={session} period={period} indic={indic} />
+        </Row>
+      ))}
+    </div>
   );
-}
+};
 
-const IndicatorCharts = ({
-  session,
-  period,
-  indic
-}) => {
-
-  const {
-    financialData,
-  } = session;
+const IndicatorCharts = ({ session, period, indic }) => {
+  const { financialData } = session;
 
   // Define the aggregates and their corresponding titles
   const mainAggregates = financialData.mainAggregates;
-  const aggregates = {
-    production: "Production",
-    intermediateConsumptions: "Consommations intermédiaires",
-    fixedCapitalConsumptions: "Consommations de capital fixe",
-    netValueAdded: "Valeur ajoutée nette",
-  };
+  const aggregates = {};
 
-  // Prev period
-  const prevDateEnd = getPrevDate(period.dateStart);
-  const prevPeriod =
-    session.availablePeriods.find((period) => period.dateEnd == prevDateEnd) ||
-    false;
-      
+  Object.keys(mainAggregates).forEach((key) => {
+    aggregates[key] = mainAggregates[key].label;
+  });
+
   return (
-    <div
-      className={"charts-container " + indic}
-      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
-    >
-      <Row className="charts">
-        {Object.keys(aggregates).map((aggregate) => (
-          <React.Fragment key={aggregate}>
-            {renderComparativeCharts({
-              chartId: `comparative-chart-${aggregate}-${indic}-print`,
-              session,
-              period,
-              aggregate,
-              indic
-            })}
-            {renderSigCharts(
-              session,
-              aggregate,
-              indic,
-              period,
-              `sig-chart-${aggregate}-${indic}-print`,
-            )}
-          </React.Fragment>
-        ))}
-      </Row>
-      <Row>
-        <div className="trend-chart-container">
-          {/* Check If legal unit has target  */}
-          <TrendChart
-            id={`trend-chart-${indic}-print`}
-            session={session}
-            datasetOptions={{
-              aggregate: "production",
-              indic
-            }}
-            printOptions={{
-              printMode: true
-            }}
-          />
+    <>
+      {Object.keys(aggregates).map((aggregate) => (
+        <React.Fragment key={aggregate}>
+          {renderComparativeCharts({
+            chartId: `comparative-chart-${aggregate}-${indic}-print`,
+            session,
+            period,
+            aggregate,
+            indic,
+          })}
+          {renderSigCharts(
+            session,
+            aggregate,
+            indic,
+            period,
+            `sig-chart-${aggregate}-${indic}-print`
+          )}
+        </React.Fragment>
+      ))}
 
-        </div>
-      </Row>
+      <div className="trend-chart-container ">
+        {/* Check If legal unit has target  */}
+        <TrendChart
+          id={`trend-chart-${indic}-print`}
+          session={session}
+          datasetOptions={{
+            aggregate: "production",
+            indic,
+          }}
+          printOptions={{
+            printMode: true,
+          }}
+        />
+      </div>
+
       {(indicators[indic].type == "intensité" ||
         indicators[indic].type == "indice") && (
-        <Row>
-          <div className="deviation-chart-container">
-            <HorizontalBarChart
-              id={`deviation-chart-${indic}-print`}
-              session={session}
-              datasetOptions={{
-                period,
-                indic
-              }}
-              printOptions={{
-                printMode: true
-              }}
-            />
-          </div>
-        </Row>
+        <div className="deviation-chart-container ">
+          <HorizontalBarChart
+            id={`deviation-chart-${indic}-print`}
+            session={session}
+            datasetOptions={{
+              period,
+              indic,
+            }}
+            printOptions={{
+              printMode: true,
+            }}
+          />
+        </div>
       )}
 
       {/* ----------Gross Impact Chart ----------  */}
@@ -144,38 +111,37 @@ const IndicatorCharts = ({
             session={session}
             datasetOptions={{
               period,
-              indic
+              indic,
             }}
             printOptions={{
-              printMode: true
+              printMode: true,
+              showPrevPeriod: true,
             }}
           />
         </div>
       )}
-    </div>
+    </>
   );
-}
+};
 
 const renderComparativeCharts = ({
   chartId,
   session,
   period,
   aggregate,
-  indic
+  indic,
 }) => {
-
   const maxFootprintValue = getMaxFootprintValue(session, period, indic);
 
   return (
-    <Col sm={6} xl={6} lg={6} md={6} key={chartId}>
-
+    <div key={chartId} className={"comparative-chart-container "}>
       <VerticalBarChart
         id={chartId}
         session={session}
         datasetOptions={{
           period,
           aggregate,
-          indic
+          indic,
         }}
         printOptions={{
           printMode: true,
@@ -183,14 +149,14 @@ const renderComparativeCharts = ({
           showAreaData: true,
           showTargetData: true,
           useIndicColors: false,
-          showLegend : false,
-          showXlabels : true,
-          aspectRatio : 1.5,
-          maxYAxis : maxFootprintValue,
-          label: "Production"
+          showLegend: false,
+          showXlabels: true,
+          aspectRatio: 1.5,
+          maxYAxis: maxFootprintValue,
+          label: "Production",
         }}
       />
-    </Col>
+    </div>
   );
 };
 {
@@ -201,18 +167,18 @@ const renderSigCharts = (session, aggregate, indic, period, id) => {
   return (
     <>
       {indicators[indic].type == "proportion" && (
-        <div key={id} className="doughnut-chart-container">
+        <div key={id} className="doughnut-chart-container ">
           <SigPieChart
             id={id}
             session={session}
             datasetOptions={{
               aggregate,
               indic,
-              period
+              period,
             }}
             printOptions={{
-              showPreviousData: false,
-              printMode: true
+              showPreviousData: true,
+              printMode: true,
             }}
           />
         </div>
@@ -220,4 +186,3 @@ const renderSigCharts = (session, aggregate, indic, period, id) => {
     </>
   );
 };
-
