@@ -148,7 +148,7 @@ export const buildSummaryReportIndexIndic = async ({
       pdfMargins.bottom,
     ],
     header: generateHeader(corporateName, currentPeriod),
-    footer: generateFooter,
+    footer: generateFooter(corporateName),
 
     background: function () {
       const canvas = [];
@@ -298,6 +298,7 @@ export const buildSummaryReportIndexIndic = async ({
           chartImages,
           indic)
       },
+
       //--------------------------------------------------
       addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins,defaultPosition), 
       ,
@@ -717,7 +718,7 @@ const buildDeviationChartSection = (chartImage) => {
           body: [
             [
               {
-                text: "Ecart par rapport à la moyenne de la branche",
+                text: "Ecart par rapport à la moyenne de la branche **",
                 fontSize: "6",
                 bold: true,
                 alignment: "center",
@@ -770,11 +771,11 @@ const buildBranchPerformanceSection = (
     columns: [
       // Left Box
       {
-        margin: [10, 0, 0, 0],
+        margin: [10, 0, 10, 0],
         width: "33%",
         stack: [
           {
-            text: "\tObjectif de la branche\t",
+            text: "\tObjectif de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
@@ -830,7 +831,7 @@ const buildBranchPerformanceSection = (
         width: "*",
         stack: [
           {
-            text: "\tEvolution de la performance de la branche\t",
+            text: "\tEvolution de la performance de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",

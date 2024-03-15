@@ -136,7 +136,7 @@ export const buildSummaryReportContributionIndic = async ({
       pdfMargins.bottom,
     ],
     header: generateHeader(corporateName, currentPeriod),
-    footer: generateFooter,
+    footer: generateFooter(corporateName),
     background: function () {
       const canvas = [];
 
@@ -427,7 +427,7 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
 
   return [
     {
-      text: "\tComparaison avec la branche d'activité\t",
+      text: "\tComparaison avec la branche d'activité **\t",
       style: "h2",
       margin: [0, 40, 0, 10],
       alignment: "center", 
@@ -463,7 +463,7 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
       style: "branchNumber",
     },
     {
-      text: "Moyenne de la branche",
+      text: "Moyenne de la branche **",
       alignment: "center",
       fontSize: 8,
       bold: true,

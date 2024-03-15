@@ -291,14 +291,22 @@ export const addUncertaintyText = (
   defaultPosition
 ) => {
   const textOptions = {
-    text: "* " + uncertaintyText,
-    fontSize: 6,
-    italics: true,
-    font: "Roboto",
+
+    stack: [
+      {
+        margin : [0,5,0,0],
+        text: "* " + uncertaintyText,
+      },
+      {
+        text: "** Source pour les données de comparaison : La Société Nouvelle",
+        margin : [0,5,0,0]
+      },
+    ],
     absolutePosition: {
       x: defaultPosition.startX,
-      y: pdfPageSize.height - pdfMargins.bottom - 15,
+      y: pdfPageSize.height - pdfMargins.bottom -  32,
     },
+    style : "legend"
   };
 
   return textOptions;

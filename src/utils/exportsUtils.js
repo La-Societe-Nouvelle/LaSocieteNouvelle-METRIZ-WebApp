@@ -84,27 +84,31 @@ export const generateHeader = (corporateName, currentPeriod) =>
       {
         text: corporateName, 
         margin: [20, 15, 0, 0], 
-        bold: true,
       }, {
         text: "Exercice  " + currentPeriod,
         alignment: "right",
         margin: [0, 15, 20, 0],
-        bold: true,
       }
     ],
+    fontSize: 7,
   };
 }
 
-export const generateFooter = () => {
+export const generateFooter = (corporateName) => {
   return {
     columns: [
       {
         text: "Edité le " + getShortCurrentDateString(),
         margin: [30, 30, 0, 0],
       },
+      {
+        width: '50%',     
+        text: corporateName,
+        margin: [0, 30, 0, 0],
+      },
     ],
     alignment: "left",
-    fontSize: 6,
+    fontSize: 7,
   };
 }
 
@@ -189,6 +193,12 @@ export function definePDFStyles()
         bold: true,
         alignment: "center",
         font: "Roboto",
+      },
+      legend : {
+        fontSize: 6,
+        italics: true,
+        font: "Roboto",
+        color : "#666671"
       },
     },
   };

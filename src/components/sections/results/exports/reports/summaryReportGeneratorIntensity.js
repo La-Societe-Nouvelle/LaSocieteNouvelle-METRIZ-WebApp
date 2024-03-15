@@ -208,7 +208,7 @@ export const buildSummaryReportIntensityIndic = async ({
       pdfMargins.bottom,
     ],
     header: generateHeader(corporateName, currentPeriod),
-    footer: generateFooter,
+    footer: generateFooter(corporateName),
     background: function (currentPage) {
       const canvas = [];
       // Background rectangles
@@ -511,7 +511,7 @@ const buildHeaderSection = (
             {
               margin: [0, 5, 0, 0],
               text: branchProductionTarget
-                ? "Objectif annuel de la branche"
+                ? "Objectif annuel de la branche **"
                 : "Aucun objectif défini pour la branche",
               fontSize: 8,
             },
@@ -811,7 +811,7 @@ const buildDeviationChartSection = (chartImage) => {
           body: [
             [
               {
-                text: "Ecart par rapport à la moyenne de la branche",
+                text: "Ecart par rapport à la moyenne de la branche **",
                 fontSize: "6",
                 bold: true,
                 alignment: "center",
@@ -869,7 +869,7 @@ const buildBranchPerformanceSection = (
         width: "33%",
         stack: [
           {
-            text: "\tObjectif de la branche\t",
+            text: "\tObjectif de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
@@ -925,7 +925,7 @@ const buildBranchPerformanceSection = (
         width: "*",
         stack: [
           {
-            text: "\tEvolution de la performance de la branche\t",
+            text: "\tEvolution de la performance de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",

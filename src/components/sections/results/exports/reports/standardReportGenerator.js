@@ -106,12 +106,16 @@ export const buildStandardReport = async ({
     ],
     header: {
       columns: [
-        { text: legalUnit.corporateName, margin: [20, 15, 0, 0], bold: true },
+        {
+          text: legalUnit.corporateName,
+          margin: [15, 15, 0, 0],
+          fontSize: 7,
+        },
         {
           text: "Exercice  " + currentPeriod,
           alignment: "right",
-          margin: [0, 15, 20, 0],
-          bold: true,
+          margin: [0, 15, 15, 0],
+          fontSize: 7,
         },
       ],
     },
@@ -119,9 +123,15 @@ export const buildStandardReport = async ({
       return {
         columns: [
           {
+            width: "50%",
             text: "Edité le " + getShortCurrentDateString(),
-            margin: [20, 25, 0, 0],
-            font: "Raleway",
+            margin: [15, 25, 0, 0],
+            fontSize: 7,
+          },
+          {
+            width: "50%",
+            text: legalUnit.corporateName,
+            margin: [0, 25, 15, 0],
             fontSize: 7,
           },
         ],
