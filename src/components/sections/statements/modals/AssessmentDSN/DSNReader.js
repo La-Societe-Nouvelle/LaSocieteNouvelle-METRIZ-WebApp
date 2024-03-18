@@ -123,7 +123,8 @@ export const DSNDataReader = async (dataDSN) =>
         sexe: bloc["S21.G00.30.005"],
         identifiantTechnique: bloc["S21.G00.30.020"],
         contrats: [],
-        versements: []
+        versements: [],
+        anciennetes: []
       };
       // add to dsn
       declaration.entreprise.etablissement.individus.push(individu);
@@ -145,7 +146,11 @@ export const DSNDataReader = async (dataDSN) =>
         uniteMesure: bloc["S21.G00.40.011"],
         quotiteCategorie: bloc["S21.G00.40.012"],
         quotite: bloc["S21.G00.40.013"],
-        modaliteTemps: bloc["S21.G00.40.014"]
+        modaliteTemps: bloc["S21.G00.40.014"],
+        conventionCollective: bloc["S21.G00.40.017"],
+        lieuTravail: bloc["S21.G00.40.019"],
+        niveauRemuneration: bloc["S21.G00.40.069"],
+        statutBoeth: bloc["S21.G00.40.072"]
       };
       // add to dsn
       let individu = getLastBloc(declaration.entreprise.etablissement.individus);
@@ -234,6 +239,21 @@ export const DSNDataReader = async (dataDSN) =>
       let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       let versement = getLastBloc(individu.versements);
       versement.revenuAutres.push(revenuAutre);
+    }
+
+    // Anciennete --------------------------------------- //
+
+    else if (blocCode=="S21.G00.86")
+    {
+      let bloc = getBloc(rows,index,blocCode);
+      let anciennete = {
+        type: bloc["S21.G00.86.001"],
+        unite: bloc["S21.G00.86.002"],
+        valeur: bloc["S21.G00.86.003"]
+      };
+      // add to dsn
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
+      individu.anciennetes.push(anciennete);
     }
 
     // -------------------------------------------------- //
