@@ -121,7 +121,9 @@ export const DSNDataReader = async (dataDSN) =>
         nomUsage: bloc["S21.G00.30.003"],
         prenoms: bloc["S21.G00.30.004"],
         sexe: bloc["S21.G00.30.005"],
+        paysNaissance: bloc["S21.G00.30.015"],
         identifiantTechnique: bloc["S21.G00.30.020"],
+        niveauFormation: bloc["S21.G00.30.024"],
         contrats: [],
         versements: [],
         anciennetes: []
