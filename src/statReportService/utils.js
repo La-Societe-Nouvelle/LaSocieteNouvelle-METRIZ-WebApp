@@ -11,21 +11,40 @@ import metaIndics from "/lib/indics.json";
 
 /** Profile
  *    - activityCode
- *    - postalCode
  *    - workforcebracket
- * 
+ *    - postalCode
+ *    - economieSocialeSolidaire
+ *    - societeMission
+ *    - nbEtablissements
+ *    - dateCreation
+ *    - inscriptionRegistreMetiers 
+ *    - categorieJuridique
  */
 
 export const buildLegalUnitProfile = async (legalUnit) =>
 {
-  const activityCode = legalUnit.activityCode;
-  const postalCode = legalUnit?.corporateHeadquarters?.match(/\((.*)\)/).pop() || "";
-  const workforceBracket = legalUnit.trancheEffectifs;
+  const activityCode  = legalUnit.activityCode;
+  const workforceBracket  = legalUnit.trancheEffectifs;
+  const postalCode = legalUnit.corporateHeadquarters?.match(/\((.*)\)/).pop() || "";
+  const economieSocialeSolidaire = legalUnit.isEconomieSocialeSolidaire; 
+  const societeMission  = legalUnit.isSocieteMission;
+  const nbEtablissements = legalUnit.nbActiveEstablishments;
+  const dateCreation = legalUnit.creationDate;
+  const inscriptionRegistreMetiers = legalUnit.hasCraftedActivities;
+  const categorieJuridique = legalUnit.legalStatusCode;
+
 
   return {
     activityCode,
     postalCode,
-    workforceBracket
+    workforceBracket,
+    postalCode,
+    economieSocialeSolidaire,
+    societeMission,
+    nbEtablissements,
+    dateCreation,
+    inscriptionRegistreMetiers,
+    categorieJuridique
   };
 }
 
@@ -43,7 +62,6 @@ export const buildStatReport = async (session, period) =>
 {
   const {
     financialData,
-    validations
   } = session;
 
   // External expenses distribution
