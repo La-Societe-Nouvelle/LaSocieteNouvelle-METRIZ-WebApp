@@ -17,7 +17,10 @@ export class LegalUnit {
 
     // Legal data
     this.corporateName = props.corporateName || null;
+    this.creationDate = props.creationDate ||null;
+    this.legalStatusCode = props.legalStatusCode ||  null;
     this.corporateHeadquarters = props.corporateHeadquarters || null;
+    this.nbActiveEstablishments = props.nbActiveEstablishments || null;
     this.areaCode = props.areaCode || null;
     this.activityCode = props.activityCode || null;
 
@@ -44,29 +47,30 @@ export class LegalUnit {
   // Fetch legal unit data
   fetchLegalUnitData = async () => 
   {
-
     // request
     await api.get("legalunitfootprint/" + this.siren).then((res) => {
       let status = res.data.header.code;
       if (status == 200) {
-        this.corporateName = res.data.legalUnit.denomination;
-        this.corporateHeadquarters =
-          res.data.legalUnit.communeSiege +
-          " (" +
-          res.data.legalUnit.codePostalSiege +
-          ")";
+        const legalUnitData = res.data.legalUnit;
+        this.corporateName = legalUnitData.denomination;
+        this.corporateHeadquarters = `${legalUnitData.communeSiege} (${legalUnitData.codePostalSiege})` || "";
+        this.creationDate = legalUnitData.datecreationunitelegale;
+        this.legalStatusCode = legalUnitData.categorieJuridiqueCode  
+        this.nbActiveEstablishments = legalUnitData.nbEtablissements;  
         this.areaCode = "FRA";
-        this.activityCode = res.data.legalUnit.activitePrincipaleCode;
-        this.isEmployeur = res.data.legalUnit.caractereEmployeur;
-        this.trancheEffectifs = res.data.legalUnit.trancheEffectifs;
-        this.isEconomieSocialeSolidaire =
-          res.data.legalUnit.economieSocialeSolidaire;
-        this.isSocieteMission = res.data.legalUnit.societeMission;
-        this.hasCraftedActivities = res.data.legalUnit.hasCraftedActivities;
+        this.activityCode = legalUnitData.activitePrincipaleCode;
+        this.isEmployeur = legalUnitData.caractereEmployeur;
+        this.trancheEffectifs = legalUnitData.trancheEffectifs;
+        this.isEconomieSocialeSolidaire = legalUnitData.economieSocialeSolidaire;
+        this.isSocieteMission = legalUnitData.societeMission;
+        this.hasCraftedActivities = legalUnitData.hasCraftedActivities;
       }
       else {
         this.corporateName = "";
         this.corporateHeadquarters = "";
+        this.creationDate = "";
+        this.legalStatusCode = "";
+        this.nbActiveEstablishments = "";
         this.areaCode = "";
         this.activityCode = "";
         this.isEmployeur = null;
