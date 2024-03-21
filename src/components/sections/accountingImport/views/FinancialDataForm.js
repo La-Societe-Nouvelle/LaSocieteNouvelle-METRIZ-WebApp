@@ -115,6 +115,13 @@ export const FinancialDataForm = ({
     session.sendStatReport = sendStatReport;
   }, [sendStatReport]);
 
+  useEffect(() => {
+    if (/^[0-9]{9}FEC/.test(fileName)) {
+      let siren = fileName.substring(0,9);
+      setSiren(siren);
+    }
+  }, [fileName]);
+
   // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
@@ -299,7 +306,7 @@ export const FinancialDataForm = ({
       isDataLoaded &&
       corporateName &&
       division &&
-      (siren === "" || /^[0-9]{9}$/.test(siren))
+      /^[0-9]{9}$/.test(siren)
     );
   };
 
@@ -318,8 +325,8 @@ export const FinancialDataForm = ({
         <Col>
           <Form className="border-left">
             <Form.Group as={Row} className="my-3">
-              <Form.Label column sm={4} className="fw-normal fst-italic">
-                Numéro SIREN <i>(optionnel)</i> :
+              <Form.Label column sm={4} className="fw-normal">
+                Numéro SIREN * :
               </Form.Label>
               <Col sm={8}>
                 <Form.Control
