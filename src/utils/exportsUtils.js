@@ -77,20 +77,24 @@ export const getChartImageData = (id) => {
 // --------------------------------------------------
 // header / footer
 
-export const generateHeader = (corporateName, currentPeriod) =>
+export const generateHeader = (corporateName,siren, currentPeriod) =>
 {
   return {
     columns: [
       {
+        text: "SIREN : " + siren, 
+      },
+      {
+        alignment: "center",
         text: corporateName, 
-        margin: [20, 15, 0, 0], 
-      }, {
+      }, 
+      {
         text: "Exercice  " + currentPeriod,
         alignment: "right",
-        margin: [0, 15, 20, 0],
       }
     ],
     fontSize: 7,
+    margin: [20, 15, 20, 0], 
   };
 }
 
