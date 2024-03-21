@@ -40,6 +40,39 @@ const DirectImpacts = ({
   const [emptyStatements, setEmptyStatements] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataFetched, setIsDataFetched] = useState(false);
+
+  // update states
+  useEffect(async() => 
+  {
+    if(!isDataFetched) {
+      setIsLoading(true);
+      await session.comparativeData.fetchComparativeData(previewIndicators);
+      await session.updateFootprints(period);
+      setIsLoading(false);
+      setIsDataFetched(true);
+    }
+
+    console.log("initialisation à partir des données légales");
+    console.log(session.legalUnit);
+
+    // init ART
+    if (session.legalUnit.hasCraftedActivities 
+        && !session.impactsData[period.periodKey].isValueAddedCrafted) {
+      session.impactsData[period.periodKey].isValueAddedCrafted = true;
+    }
+    // init SOC
+    if ((session.legalUnit.isEconomieSocialeSolidaire || session.legalUnit.isSocieteMission)
+        && !session.impactsData[period.periodKey].isValueAddedCrafted) {
+      session.impactsData[period.periodKey].hasSocialPurpose = true;
+    }
+    // init IDR & GEQ
+    if (!session.legalUnit.isEmployeur
+        && !session.impactsData[period.periodKey].hasEmployees) {
+      session.impactsData[period.periodKey].hasEmployees = false;
+    }
+  }, []);
+
 
   useEffect(() => {
     
