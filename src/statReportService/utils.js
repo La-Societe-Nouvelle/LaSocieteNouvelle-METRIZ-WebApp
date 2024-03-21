@@ -2,7 +2,7 @@
 
 // utils
 import { buildAggregateFootprint } from "/src/formulas/footprintFormulas";
-import { roundValue } from "../utils/Utils";
+import { getAmountItems, roundValue } from "../utils/Utils";
 
 // lib
 import metaIndics from "/lib/indics.json";
@@ -83,6 +83,7 @@ export const buildStatReport = async (session, period) =>
     externalExpensesDistribution,
     investementsDistribution,
     aggregateRates,
+    financialRates,
     aggregateFootprints,
   };
 };
@@ -237,24 +238,24 @@ const getFinancialRates = async (financialData,period) =>
     revenue
   } = financialData.productionAggregates;
 
-  const {
-    netValueAdded,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    production
-  } = financialData.mainAggregates;
-
   // get amounts
   const revenueAmount = revenue.periodsData[period.periodKey].amount;
   const incomeAmount = getProfit(financialData,period.periodKey);
-  const operating_surplus = 0;
+  const operatingSurplusAmount = getOperatingSurplus(financialData,period.periodKey);
+  const fixedCapitalAmount = getFixedCapitalGrossValue(financialData,period.dateEnd);
 
   // Rates
   const income_on_revenue = roundValue(incomeAmount / revenueAmount, 4);
+  const operating_surplus_on_revenue = roundValue(operatingSurplusAmount / revenueAmount, 4);
+  const revenue_on_fixed_capital = roundValue(revenue / fixedCapitalAmount, 4);
+  const income_on_fixed_capital = roundValue(incomeAmount / fixedCapitalAmount, 4);
 
   // data
   const financialRates = {
-    income_on_revenue
+    income_on_revenue,
+    operating_surplus_on_revenue,
+    revenue_on_fixed_capital,
+    income_on_fixed_capital
   };
 
   return financialRates;
@@ -304,6 +305,37 @@ const getProfit = (financialData,periodKey) =>
     - taxOnProfits;
 
   return profit
+}
+
+const getOperatingSurplus = (financialData,periodKey) => 
+{
+  // Résultat d'exploitation
+  let revenue = financialData.productionAggregates.revenue.periodsData[periodKey].amount;
+  let otherOperatingIncomes = financialData.otherFinancialData.otherOperatingIncomes.periodsData[periodKey].amount;
+  let operatingExpensesItems = financialData.externalExpensesAccounts
+    .concat(financialData.stockVariationsAccounts)
+    .concat(financialData.amortisationExpensesAccounts)
+    .filter(account => account.periodsData.hasOwnProperty(periodKey));
+  let operatingExpenses = getAmountItemsForPeriod(operatingExpensesItems, periodKey, 2)
+    + financialData.otherFinancialData.personnelExpenses.periodsData[periodKey].amount
+    + financialData.otherFinancialData.taxes.periodsData[periodKey].amount;
+  
+  let operatingSurplus = 
+      revenue 
+    + otherOperatingIncomes
+    - operatingExpenses;
+  
+  return operatingSurplus;
+}
+
+const getFixedCapitalGrossValue = (financialData,date) => 
+{
+  // Montant des immobilisations en fin d'exercice
+  let fixedCapitalAmount = getAmountItems(
+    financialData.immobilisations.map((immobilisation) => immobilisation.states[date])
+  );
+  
+  return fixedCapitalAmount;
 }
 
 // Aggregates footprints
