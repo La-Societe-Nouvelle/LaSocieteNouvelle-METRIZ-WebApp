@@ -94,11 +94,15 @@ export const getIndividualsData = async (declarations) => {
       let apprenticeshipContract = await getIndividualApprenticeshipContract(individu);
       let isExecutive = isIndividualExecutive(individu);
 
+      // stats
+      let individualProfile = getIndividualProfile(individu);
+
       let individual = individualsData.find((individual) => individual.id == id);
       if (individual != undefined) {
         individual.workingHours += workingHours;
         individual.wage += wage;
         individual.apprenticeshipHours += apprenticeshipHours;
+        individual.individualProfile = individualProfile;
       } else {
         individualsData.push({
           id,
@@ -108,6 +112,8 @@ export const getIndividualsData = async (declarations) => {
           wage,
           apprenticeshipHours,
           apprenticeshipContract,
+          isExecutive,
+          individualProfile
         });
       }
     }
@@ -629,3 +635,40 @@ export const compare = (statementA, statementB) => {
     return 0;
   }
 };
+
+/* -------------------- STATS -------------------- */
+
+const getIndividualProfile = (individu) => 
+{
+  let individualProfile = {};
+  
+  // contrat data
+  if (individu.contrats.length>0) {
+    let contrat = individu.contrats[0];
+    individualProfile.natureContrat = contrat.nature;
+    individualProfile.niveauRemuneration = contrat.niveauRemuneration;
+    individualProfile.conventionCollective = contrat.conventionCollective;
+    individualProfile.pcsEse = contrat.pcsEse;
+    individualProfile.lieuTravail = contrat.lieuTravail;
+    individualProfile.statutBoeth = contrat.statutBoeth;
+    individualProfile.statutConventionnel = contrat.statutConventionnel;
+  }
+
+  // anciennete data
+  for (let anciennete in individu.anciennetes) {
+    if (anciennete.type = "02") {
+      individualProfile.ancienneteBranche = anciennete.valeur;
+      individualProfile.ancienneteBrancheUnite = anciennete.unite;
+    } else if (anciennete.type = "07") {
+      individualProfile.ancienneteEntreprise = anciennete.valeur;
+      individualProfile.ancienneteEntrepriseUnite = anciennete.unite;
+    }
+  }
+
+  // other
+  individualProfile.sexe = individu.sexe;
+  individualProfile.paysNaissance = individu.paysNaissance;
+  individualProfile.niveauFormation = individu.niveauFormation;
+
+  return individualProfile;
+}

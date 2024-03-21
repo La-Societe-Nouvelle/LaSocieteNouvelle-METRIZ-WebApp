@@ -62,6 +62,8 @@ export const buildStatReport = async (session, period) =>
 {
   const {
     financialData,
+    validations,
+    impactsData
   } = session;
 
   // External expenses distribution
@@ -79,12 +81,16 @@ export const buildStatReport = async (session, period) =>
   // Consumptions footprints (and fixed capital formation)
   const aggregateFootprints = await getAggregateFootprints(financialData, period);
 
+  // Social stats
+  const socialStats = await getSocialStats(impactsData,period,session.id);
+
   return {
     externalExpensesDistribution,
     investementsDistribution,
     aggregateRates,
     financialRates,
     aggregateFootprints,
+    socialStats
   };
 };
 
@@ -344,7 +350,6 @@ const getFixedCapitalGrossValue = (financialData,date) =>
 //  -> fixed capital formation fpt
 //  -> net value added fpt
 
-  
 const getAggregateFootprints = async (financialData, period) => 
 {
   const {
@@ -392,4 +397,42 @@ const getNetValueAddedFpt = async (financialData, period) =>
   });
 
   return netValueAddedFptFiltered; 
+};
+
+  
+// Social stats
+
+const getSocialStats = async (impactsData,period,idSession) => 
+{
+  const impactsDataOnPeriod = impactsData[period.periodKey];
+
+  let socialStats = [];
+
+  for (let individualData in impactsDataOnPeriod.individualsData) 
+  {
+    if (individualData.individualProfile) {
+      socialStats.push({
+        id: individualData.id,
+        id_entreprise: idSession,
+        nature_contrat: individualData.individualProfile.natureContrat,
+        pcs_ese: individualData.individualProfile.pcsEse,
+        niveau_remuneration: individualData.individualProfile.niveauRemuneration,
+        convention_collective: individualData.individualProfile.conventionCollective,
+        lieu_travail: individualData.individualProfile.lienTravail,
+        statut_boeth: individualData.individualProfile.statutBoeth,
+        statut_conventionnel: individualData.individualProfile.statutConventionnel,
+        anciennete_branche: individualData.individualProfile.ancienneteBranche,
+        anciennete_branche_unite: individualData.individualProfile.ancienneteBrancheUnite,
+        anciennete_entreprise: individualData.individualProfile.ancienneteEntreprise,
+        anciennete_entreprise_unite: individualData.individualProfile.ancienneteEntrepriseUnite,
+        sexe: individualData.individualProfile.sexe,
+        pays_naissance: individualData.individualProfile.paysNaissance,
+        niveau_formation: individualData.individualProfile.niveauFormation,
+        heures: individualData.workingHours,
+        remuneration_total: individualData.wage 
+      })
+    }
+  }
+
+  return socialStats;
 };
