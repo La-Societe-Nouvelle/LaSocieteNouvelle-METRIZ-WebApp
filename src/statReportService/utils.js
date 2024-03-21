@@ -73,6 +73,9 @@ export const buildStatReport = async (session, period) =>
   // Main aggregates rates
   const aggregateRates = await getAggregateRates(financialData, period);
 
+  // Financial rates
+  const financialRates = await getFinancialRates(financialData, period);
+
   // Consumptions footprints (and fixed capital formation)
   const aggregateFootprints = await getAggregateFootprints(financialData, period);
 
@@ -221,6 +224,87 @@ const getAggregateRates = async (financialData,period) =>
 
   return aggregateRates;
 };
+
+// Financial rates
+// -> Resultat/CA
+// -> EBE/CA
+// -> CA/Capitaux fixes
+// -> Resultat/Capitaux fixes
+
+const getFinancialRates = async (financialData,period) => 
+{
+  const {
+    revenue
+  } = financialData.productionAggregates;
+
+  const {
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    production
+  } = financialData.mainAggregates;
+
+  // get amounts
+  const revenueAmount = revenue.periodsData[period.periodKey].amount;
+  const incomeAmount = getProfit(financialData,period.periodKey);
+  const operating_surplus = 0;
+
+  // Rates
+  const income_on_revenue = roundValue(incomeAmount / revenueAmount, 4);
+
+  // data
+  const financialRates = {
+    income_on_revenue
+  };
+
+  return financialRates;
+};
+
+const getProfit = (financialData,periodKey) => 
+{
+  // Résultat d'exploitation
+  let revenue = financialData.productionAggregates.revenue.periodsData[periodKey].amount;
+  let storedProduction = financialData.productionAggregates.storedProduction.periodsData[periodKey].amount;
+  let immobilisedProduction = financialData.productionAggregates.immobilisedProduction.periodsData[periodKey].amount;
+  let otherOperatingIncomes = financialData.otherFinancialData.otherOperatingIncomes.periodsData[periodKey].amount;
+  let operatingIncomes = 
+      revenue 
+    + storedProduction 
+    + immobilisedProduction 
+    + otherOperatingIncomes;
+  let operatingExpensesItems = financialData.externalExpensesAccounts
+    .concat(financialData.stockVariationsAccounts)
+    .concat(financialData.amortisationExpensesAccounts)
+    .filter(account => account.periodsData.hasOwnProperty(periodKey));
+  let operatingExpenses = getAmountItemsForPeriod(operatingExpensesItems, periodKey, 2)
+    + financialData.otherFinancialData.taxes.periodsData[periodKey].amount
+    + financialData.otherFinancialData.personnelExpenses.periodsData[periodKey].amount;
+  let operatingResult = operatingIncomes - operatingExpenses;
+
+  // Résultat financier
+  let financialIncomes = financialData.otherFinancialData.financialIncomes.periodsData[periodKey].amount;
+  let financialExpenses = financialData.otherFinancialData.financialExpenses.periodsData[periodKey].amount;
+  let financialResult = financialIncomes - financialExpenses;
+
+  // Résultat exceptionnel
+  let exceptionalIncomes = financialData.otherFinancialData.exceptionalIncomes.periodsData[periodKey].amount;
+  let exceptionalAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
+  let exceptionalExpenses = getAmountItemsForPeriod(exceptionalAmortisationExpensesAccounts, periodKey, 2) + financialData.otherFinancialData.exceptionalExpenses.periodsData[periodKey].amount;
+  let exceptionalResult = exceptionalIncomes - exceptionalExpenses;
+
+  // Taxes
+  let taxOnProfits = financialData.otherFinancialData.taxOnProfits.periodsData[periodKey].amount;
+
+  // Profit ------------------------------------------- //
+  
+  let profit = 
+      operatingResult 
+    + financialResult
+    + exceptionalResult
+    - taxOnProfits;
+
+  return profit
+}
 
 // Aggregates footprints
 //  -> intermediate consumptions fpt
