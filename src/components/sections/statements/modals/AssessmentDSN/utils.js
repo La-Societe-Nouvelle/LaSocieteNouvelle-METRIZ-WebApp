@@ -655,7 +655,7 @@ const getIndividualProfile = (individu) =>
   }
 
   // anciennete data
-  for (let anciennete in individu.anciennetes) {
+  for (let anciennete of individu.anciennetes) {
     if (anciennete.type = "02") {
       individualProfile.ancienneteBranche = anciennete.valeur;
       individualProfile.ancienneteBrancheUnite = anciennete.unite;

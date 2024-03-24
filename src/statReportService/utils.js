@@ -382,7 +382,7 @@ const getFixedCapitalFormationFpt = async (investments,period) =>
   const investmentsOnPeriod = investments
     .filter((investment) => period.regex.test(investment.date));
   const fixedCapitalFormationFpt = await buildAggregateFootprint(investmentsOnPeriod);
-  return fixedCapitalFormationFpt;
+  return {...fixedCapitalFormationFpt.indicators};
 };
 
 const getNetValueAddedFpt = async (financialData, period) => 
@@ -408,7 +408,7 @@ const getSocialStats = async (impactsData,period,idSession) =>
 
   let socialStats = [];
 
-  for (let individualData in impactsDataOnPeriod.individualsData) 
+  for (let individualData of impactsDataOnPeriod.individualsData) 
   {
     if (individualData.individualProfile) {
       socialStats.push({
