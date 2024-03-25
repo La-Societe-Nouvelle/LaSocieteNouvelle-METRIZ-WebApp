@@ -1,5 +1,7 @@
 import { isValidInput, isValidInputNumber, isValidNumber } from "../../../../../utils/Utils";
 import {  getSumItems, roundValue } from "/src/utils/Utils";
+import CryptoJS from "crypto-js";
+
 
 /* -------------------- INDIVIDUALS DATA -------------------- */
 
@@ -128,7 +130,18 @@ export const getIndividualsData = async (declarations) => {
           : null)
   );
 
+  // anonymous
+  individualsData.forEach(
+    (individualData) => (
+      individualData.id = hashString(individualData.id)
+  ));
+
+
   return individualsData;
+};
+
+const hashString = (input) => {
+  return CryptoJS.SHA1(input).toString(CryptoJS.enc.Hex);
 };
   
 /* -------------------- FORMULAS -------------------- */
