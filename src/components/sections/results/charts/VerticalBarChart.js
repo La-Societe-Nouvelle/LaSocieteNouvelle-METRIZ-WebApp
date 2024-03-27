@@ -374,7 +374,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size: 10,
+            size:  10,
           },
         },
         grid: {
@@ -386,8 +386,9 @@ const buildChartOptions = (
         display : showXlabels,
         ticks: {
           color: colors.textColor,
+          align: "center", 
           font: {
-            size: printMode ? 8 : 10,
+            size: 10,
           },
         },
         grid: {
@@ -430,8 +431,7 @@ const buildChartOptions = (
           },
        
         },
-      },
-      
+      },  
       datalabels: {
         display: printMode ? false : true,
         overlap: 'auto',
@@ -445,7 +445,7 @@ const buildChartOptions = (
         },
         color : colors.textColor,
         font: {
-          size: printMode ? 10 : 9,
+          size: 10,
           family: "Roboto",
         },
         padding: {

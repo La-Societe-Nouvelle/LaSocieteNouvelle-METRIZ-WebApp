@@ -115,6 +115,7 @@ const buildChartOptions = (printOptions) => {
   const chartOptions = {
     maintainAspectRatio: true,
     responsive: true,
+    devicePixelRatio: 2,
     onResize: handleResize,
     layout: {
       padding: {
@@ -148,14 +149,8 @@ const buildChartOptions = (printOptions) => {
           }
         },
         color : colors.textColor,
-        offset : 18,
-        anchor : (context) => {
-          if (context.datasetIndex === 0) {
-            return "end";
-          } else {
-            return "start";
-          }
-        },
+        offset : 10,
+        anchor :  "start",
         font: {
           size: 10,
           family: "Roboto",
@@ -207,7 +202,7 @@ const buildChartOptions = (printOptions) => {
         },
       },
     },
-    cutout: getCutOut(width, cutOut ?? 5),
+    cutout: getCutOut(width, cutOut ?? 8),
   };
 
   return chartOptions;

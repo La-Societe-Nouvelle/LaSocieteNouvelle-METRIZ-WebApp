@@ -172,6 +172,7 @@ const buildChartOptions = (
     printMode
   } = printOptions;
   const chartOptions = {
+    devicePixelRatio: 2,
     scales: {
       x: {
         display: false,
