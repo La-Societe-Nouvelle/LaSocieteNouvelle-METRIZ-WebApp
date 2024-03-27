@@ -19,6 +19,7 @@
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-annotation": "^2.1.2",
     "chartjs-plugin-datalabels": "^2.0.0",
+    "crypto-js": "^4.2.0",
     "fastest-levenshtein": "^1.0.12",
     "file-saver": "^2.0.5",
     "fs": "0.0.1-security",
