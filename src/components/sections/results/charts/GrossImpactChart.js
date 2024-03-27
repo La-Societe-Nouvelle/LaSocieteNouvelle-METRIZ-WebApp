@@ -202,6 +202,7 @@ const buildChartOptions = (printOptions) =>
 
   const chartOptions = {
     devicePixelRatio: 2,
+    animation: false,
     maintainAspectRatio: printMode ? false : true,
     plugins: {
       legend: {
