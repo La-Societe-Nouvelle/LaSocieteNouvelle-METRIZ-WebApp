@@ -13,9 +13,13 @@
 
 /* -------------------------- PERIOD PROPS -------------------------- */
 
-export const getLabelPeriod = (period) => {
-  if (period.periodKey.startsWith("FY")) {
-    return "Exercice "+period.periodKey.slice(2);
+export const getLabelPeriod = (period) => { 
+  
+  const label = [];
+  if (period.periodKey.startsWith("FY")) { 
+    label.push("Exercice");
+    label.push(period.periodKey.slice(2));
+    return label;
   } else {
     return period.periodKey;
   }
