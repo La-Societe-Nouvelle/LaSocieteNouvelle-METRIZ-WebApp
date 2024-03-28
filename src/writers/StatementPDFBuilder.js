@@ -31,16 +31,24 @@ export const buildStatementPDF = (
   declarantOrganisation,
   price,
   legalUnitFootprint,
-  comments
 ) => {
-
+  // date
+  const today = new Date();
   // document definition
-  const documentDefinition = 
-  {
-    // ----------------------------------------------------------------------------------------------------
-    // Content
 
-    content: [{
+  const tableData = Object.entries(legalUnitFootprint).map(([indicator, details]) => ({
+    libelle: details.libelle,
+    value: details.value,
+    unit: details.unit,
+    uncertainty : details.uncertainty,
+    comment : details.comment ?? " - "
+  }));
+
+  console.log(tableData);
+
+  const documentDefinition = {
+    content: [
+      {
         text: "DECLARATION - EMPREINTE SOCIETALE",
         style: "header"
       }, {
@@ -59,18 +67,58 @@ export const buildStatementPDF = (
           body: [
             [
               { text: "Indicateur", style: "tableHeader" },
-              { text: "Valeur", style: "tableHeader", colSpan: 2 },
-              {},
-              { text: "Incertitude", style: "tableHeader", alignment: "center" },
+              { text: "Valeur", style: "tableHeader" },
+              { text: "Unité", style: "tableHeader" },
+              { text: "Incertitude", style: "tableHeader" },
             ],
-            ...Object.entries(legalUnitFootprint).flatMap(
-              ([key, indicator]) => {
-                const indicatorRow = getIndicatorRow(key,indicator);
-                const commentRow = getCommentRow(key,comments);
-                return [indicatorRow, commentRow];
-              }
-            )
-          ]
+            ...tableData.flatMap(row => [
+              [
+                { text: row.libelle, style: "tableCell" },
+                { text: row.value, style: "tableCell" },
+                { text: row.unit, style: "tableCell" },
+                { text: row.uncertainty, style: "tableCell" },
+              ],
+              [
+                {
+                  text: `Commentaire : ${row.comment}`,
+                  colSpan: 4,
+                  fontSize: 6,
+                  style: "tableCell",
+                  fillColor: "#F0F0F8",
+                },
+              ],
+            ]),
+          ],
+        },
+        layout: {
+          hLineWidth: function (i, node) {
+            return i === 0 || i === node.table.body.length ? 1 : 0;
+          },
+          vLineWidth: function (i, node) {
+            return i === 0 || i === node.table.widths.length ? 1 : 1;
+          },
+          hLineColor: function (i, node) {
+            return i === 0 || i === node.table.body.length
+              ? "#191558"
+              : "#F0F0F8";
+          },
+          vLineColor: function (i, node) {
+            return i === 0 || i === node.table.widths.length
+              ? "#191558"
+              : "#F0F0F8";
+          },
+          paddingLeft: function (i, node) {
+            return 4;
+          },
+          paddingRight: function (i, node) {
+            return 4;
+          },
+          paddingTop: function (i, node) {
+            return 3;
+          },
+          paddingBottom: function (i, node) {
+            return 3;
+          },
         },
         layout: getTableLayout(),
       },
@@ -141,90 +189,9 @@ export const buildStatementPDF = (
 
     // ----------------------------------------------------------------------------------------------------
   };
-
-  // create pdf
+  // generator pdf
   const statementPDF = pdfMake.createPdf(documentDefinition);
 
   return statementPDF;
 }
 
-// ################################################## UTILS ##################################################
-
-// --------------------------------------------------
-// Table rows
-//  IndicatorRow  -> Row with values
-//  CommentRow    -> Row with comments (if set)
-
-const getIndicatorRow = (key,indicator) => 
-{
-  const indicatorRow = [
-    {
-      text: metaIndics[key].libelle,
-      style: "tableCell",
-    },
-    {
-      text: printValue(indicator.value, metaIndics[key].nbDecimals),
-      alignment: "right",
-      style: "tableCell",
-    },
-    {
-      text: metaIndics[key].unit,
-      style: "tableCell",
-    },
-    {
-      text: printValue(indicator.uncertainty, 0) + " %",
-      fontSize: 6,
-      alignment: "right",
-      style: "tableCell",
-    },
-  ];
-
-  return indicatorRow;
-}
-
-const getCommentRow = (key,comments) =>
-{
-  // with comment
-  if (comments[key]) {
-    const commentRow = [
-      {
-        text: "Commentaire : " + comments[key],
-        colSpan: 4,
-        fontSize: 6,
-        style: "tableCell",
-        fillColor: "#F0F0F8",
-      },
-    ];
-    return commentRow;
-  } 
-  // without comment
-  else {
-    const commentRow = [
-      {
-        text: "Commentaire : -",
-        colSpan: 4,
-        fontSize: 6,
-        style: "tableCell",
-        fillColor: "#F0F0F8",
-      },
-    ]; 
-    return commentRow;
-  }
-}
-
-// --------------------------------------------------
-// Table layout
-
-const getTableLayout = () => 
-{
-  return({
-    hLineWidth:    (i, node) => i === 0 || i === node.table.body.length ? 1 : 0,
-    vLineWidth:    (i, node) => i === 0 || i === node.table.widths.length ? 1 : 1,
-    hLineColor:    (i, node) => i === 0 || i === node.table.body.length ? "#191558" : "#F0F0F8",
-    vLineColor:    (i, node) => i === 0 || i === node.table.widths.length ? "#191558" : "#F0F0F8",
-    paddingLeft:   (i, node) => 4,
-    paddingRight:  (i, node) => 4,
-    paddingTop:    (i, node) => 3,
-    paddingBottom: (i, node) => 3,
-  })
-}

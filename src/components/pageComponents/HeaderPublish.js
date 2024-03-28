@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 
 // Bootstrap
 import { Container, Navbar } from "react-bootstrap";
@@ -28,15 +28,15 @@ export const HeaderPublish = ({
     setStepMax(progression);
   }, [step]);
   return (
-    <header>
+    <header className="overflow-hidden">
       <Topbar
         session={session}
         progression={stepMax}
         period={period}
         onSelectPeriod={onSelectPeriod}
       />
-      <Navbar expand="lg">
-        <Container fluid id="menu">
+      <Container fluid>
+        <Navbar expand="lg">
           <Navbar.Brand href="/">
             <img
               className="d-inline-block align-top"
@@ -61,8 +61,8 @@ export const HeaderPublish = ({
               <div className="step-name">Publication</div>
             </div>
           </nav>
-        </Container>
-      </Navbar>
+        </Navbar>
+      </Container>
     </header>
   );
 };
