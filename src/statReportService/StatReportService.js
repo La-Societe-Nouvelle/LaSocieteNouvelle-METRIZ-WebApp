@@ -94,6 +94,25 @@ export const saveApplicationLog = async (id, type, message) => {
     throw Error(error.message);
   }
 };
+/* -------------------------------------------------- ANALYTICS -------------------------------------------------- */
+
+export const saveMetric = async (session, type, data) => {
+
+  const source = `Metriz${process.env.NODE_ENV !== "production" ? "_LOCAL" : ""}`  ; 
+  // log data 
+  const metric = {
+    session: session,
+    event_type: type,
+    data: data,
+    source : source
+  };
+
+  try {
+    await apiStats.post(`/logs/metric/`, metric);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // PARTNERS CODE ###################################################################################### //
 
