@@ -5,12 +5,14 @@ import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 
+// Colors
+import { lighten } from "polished";
+
 // Libraries
 import metaIndics from "/lib/indics";
 
 // Utils
 import { printValue } from "/src/utils/formatters";
-import { changeOpacity } from "./chartsUtils";
 import { getLabelPeriod, getYearPeriod } from "../../../../utils/periodsUtils";
 
 // Styles
@@ -80,7 +82,6 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     comparativeData 
   } = session;
   const mainAggregates = financialData.mainAggregates;
-
   const {
     indic,
     aggregate,
@@ -99,7 +100,8 @@ const buildChartData = (session,datasetOptions,printOptions) =>
     showDivisionData,
     period
   );
-  // --------------------------------------------------
+  const hasTargetData = comparativeData[aggregate].division.target.data[indic].length > 0 ? true : false;
+  // ------------ --------------------------------------
   // footprint dataset
 
   const footprintDataset = {
@@ -130,8 +132,7 @@ const buildChartData = (session,datasetOptions,printOptions) =>
 
   // --------------------------------------------------
   // target dataset
-
-  if (showTargetData)
+  if (showTargetData && hasTargetData )
   {
     const targetDataset = {
       label: "Objectif",
@@ -218,7 +219,7 @@ const buildFootprintBackgroundColors = (
 
   // Footprint division
   if (showDivisionData) {
-    let divisionBackgroundColor = useIndicColors ? changeOpacity(indicColor, 0.3) : comparativeChartColors.branch;
+    let divisionBackgroundColor = useIndicColors ?  lighten('0.3', indicColor)   : chartsColors.branch;
     backgroundColors.push(divisionBackgroundColor);
   }
 
