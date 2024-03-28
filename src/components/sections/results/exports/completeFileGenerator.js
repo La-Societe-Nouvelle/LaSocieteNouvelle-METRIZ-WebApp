@@ -30,53 +30,53 @@ import { getYearPeriod } from "../../../../utils/periodsUtils";
  * 
  */
 
-export async function buildCompleteZipFile({
-  session,
-  period,
-  showAnalyses
-}) {
+export async function buildCompleteZipFile({ session, period, showAnalyses }) {
   // Extract necessary data from the session object
   const legalUnit = session.legalUnit.corporateName;
   const validations = session.validations[period.periodKey];
-  
+  const siren = session.legalUnit.siren;
   const year = getYearPeriod(period);
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
-  
+
   const indicators = session.validations[period.periodKey];
 
   // Build zip ----------------------------------------
-  
+
   const zip = new jsZip();
-  
+
   // PDF report (for all validated indicators)
   const pdfFile = await buildCompleteReport({
     session,
     period,
     year,
     indicators,
-    showStandardReports : true,
-    showAnalyses
+    showStandardReports: true,
+    showAnalyses,
   });
 
   // Add the full report to the ZIP file
-  zip.file(`Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`, pdfFile, {binary: true});
+  zip.file(`Rapport_Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`, pdfFile, {
+    binary: true,
+  });
 
   // PDF Report - Main aggregates footprints
   const sigPDFDoc = await buildSIGFootprintReport({
     session,
-    period
+    period,
   });
   // Add the SIG footprint PDF to the ZIP file
-  zip.file(`Empreinte-Societale_SIG_${legalUnitNameFile}_${year}.pdf`, sigPDFDoc.output("blob"));
+  zip.file(
+    `Empreinte-Societale_SIG_${legalUnitNameFile}_${year}.pdf`,
+    sigPDFDoc.output("blob")
+  );
 
   // Generate Excel (XLSX) files for each indicator and add them to the ZIP file
   const dataFolder = zip.folder("Data");
-  for (const indic of validations)
-  {
+  for (const indic of validations) {
     let indicDataSheet = await buildDataFile({
-      session, 
+      session,
       period,
-      indic
+      indic,
     });
     // add to the ZIP file
     dataFolder.file(`sig_${indic}.xlsx`, indicDataSheet);
@@ -85,8 +85,7 @@ export async function buildCompleteZipFile({
   // Add session data as a JSON file to the ZIP file
   const sessionJSON = JSON.stringify(session);
   const sessionBlob = new Blob([sessionJSON], { type: "application/json" });
-  zip.file(`session-metriz-${legalUnit.replaceAll(" ", "-")}.json`, sessionBlob);
-
+  zip.file(`${siren}_ESE_${year}.json`, sessionBlob);
 
   // Generate ZIP file containing the generated files and download the ZIP file
   let zipBlob = await zip.generateAsync({ type: "blob" });
