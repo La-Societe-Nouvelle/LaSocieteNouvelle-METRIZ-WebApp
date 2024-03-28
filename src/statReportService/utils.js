@@ -2,7 +2,7 @@
 
 // utils
 import { buildAggregateFootprint } from "/src/formulas/footprintFormulas";
-import { getAmountItems, roundValue } from "../utils/Utils";
+import { getAmountItems, getAmountItemsForPeriod, roundValue } from "../utils/Utils";
 
 // lib
 import metaIndics from "/lib/indics.json";
