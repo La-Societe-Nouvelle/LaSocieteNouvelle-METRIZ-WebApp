@@ -148,6 +148,14 @@ const buildChartOptions = (printOptions) => {
           }
         },
         color : colors.textColor,
+        offset : 18,
+        anchor : (context) => {
+          if (context.datasetIndex === 0) {
+            return "end";
+          } else {
+            return "start";
+          }
+        },
         font: {
           size: 10,
           family: "Roboto",

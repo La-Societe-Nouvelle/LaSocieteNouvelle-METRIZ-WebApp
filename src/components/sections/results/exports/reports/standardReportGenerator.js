@@ -7,13 +7,12 @@ import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
 // Utils
-import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { generateSIGtable } from "./generateSIGtable";
 
 import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 import { getStatementNote } from "/src/utils/Writers";
 
-import { loadFonts } from "../../../../../utils/exportsUtils";
+import { generateFooter, loadFonts } from "../../../../../utils/exportsUtils";
 import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
@@ -115,19 +114,7 @@ export const buildStandardReport = async ({
         },
       ],
     },
-    footer: function () {
-      return {
-        columns: [
-          {
-            text: "Edité le " + getShortCurrentDateString(),
-            margin: [20, 25, 0, 0],
-            font: "Raleway",
-            fontSize: 7,
-          },
-        ],
-      };
-    },
-
+    footer: generateFooter(),
     background: function () {
       return {
         canvas: [

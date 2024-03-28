@@ -356,6 +356,7 @@ const buildChartOptions = (
 
   const chartOptions = {
     aspectRatio: aspectRatio,
+    devicePixelRatio: 2,
     layout: {
       padding: {
         left: printMode ? 0 : 10,

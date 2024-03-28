@@ -45,7 +45,6 @@ export const HorizontalBarChart = ({
   // Options
 
   const chartOptions = buildChartOptions(
-    printOptions,
     chartData
   );
 
@@ -126,7 +125,6 @@ const buildChartData = (session,datasetOptions) =>
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (
-  printOptions,
   chartData
 ) => {
 
@@ -142,6 +140,12 @@ const buildChartOptions = (
 
   const chartOptions = {
     devicePixelRatio: 2,
+    layout: {
+      padding: {
+        left :  20,
+        right: 20,
+      },
+    },
     indexAxis: "y",
     scales: {
       y: {
