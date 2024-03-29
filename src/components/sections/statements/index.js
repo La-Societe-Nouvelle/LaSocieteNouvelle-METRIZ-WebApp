@@ -13,6 +13,8 @@ import { Loader } from "../../modals/Loader";
 // Libs
 import indicators from "/lib/indics";
 
+const previewIndicators = ['eco', 'art', 'knw', 'geq', 'ghg', 'nrg', 'wat'];
+
 const DirectImpacts = ({ 
   session,
   sessionDidUpdate,
