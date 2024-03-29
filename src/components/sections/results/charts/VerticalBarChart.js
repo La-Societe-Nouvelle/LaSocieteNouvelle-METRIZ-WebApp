@@ -219,7 +219,7 @@ const buildFootprintBackgroundColors = (
 
   // Footprint division
   if (showDivisionData) {
-    let divisionBackgroundColor = useIndicColors ?  lighten('0.3', indicColor)   : chartsColors.branch;
+    let divisionBackgroundColor = useIndicColors ?  lighten('0.3', indicColor) : comparativeChartColors.branch;
     backgroundColors.push(divisionBackgroundColor);
   }
 
@@ -360,10 +360,7 @@ const buildChartOptions = (
     devicePixelRatio: 2,
     layout: {
       padding: {
-        left: printMode ? 0 : 10,
-        right: printMode ? 0 : 10,
-        top: printMode ? 50 : 30,
-        bottom: printMode ? 10 : 0,
+        top: printMode ? 0 : 40,
       },
     },
     scales: {
