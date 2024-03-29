@@ -361,6 +361,8 @@ const buildChartOptions = (
     layout: {
       padding: {
         top: printMode ? 0 : 40,
+        left : printMode ? 0 : 10,
+        right : printMode ? 0 : 10, 
       },
     },
     scales: {

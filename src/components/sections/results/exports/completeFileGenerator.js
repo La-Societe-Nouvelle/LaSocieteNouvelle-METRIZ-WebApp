@@ -105,7 +105,7 @@ export async function buildCompleteReport({
 
 
     // Report Cover
-    const coverPage = generateReportCover(year, session.legalUnit.corporateName);
+    const coverPage = generateReportCover(year, session.legalUnit);
 
     // Generate standard reports and their blobs
     let standardPDFs = [];

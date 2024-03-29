@@ -2,12 +2,16 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 import { loadFonts } from "../../../../../utils/exportsUtils";
-import { getShortCurrentDateString } from "/src/utils/periodsUtils";
+import { loadImageAsDataURL } from "../exportsUtils";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
-export const generateReportCover = (year, legalUnit) => {
+export const generateReportCover = async (year, legalUnit) => {
+  // Illustration
+  const illuPath = "/resources/metriz_illus.png";
+  const illustration = await loadImageAsDataURL(illuPath);
+
   const margins = {
     top: 50,
     bottom: 50,
@@ -18,16 +22,6 @@ export const generateReportCover = (year, legalUnit) => {
   const pageSize = {
     width: 595.28,
     height: 841.89,
-  };
-
-  const footer = {
-    columns: [
-      {
-        text: "Edité le " + getShortCurrentDateString(),
-        margin: [20, 25, 0, 0],
-        fontSize: 7,
-      },
-    ],
   };
 
   const background = {
@@ -54,34 +48,46 @@ export const generateReportCover = (year, legalUnit) => {
 
   const content = [
     {
-      stack: [
-        { text: "\n\n\n\n\n\n\n\n\n\n" },
+      text: "Empreinte sociétale de l'entreprise",
+      alignment: "center",
+      fontSize: 24,
+      bold: true,
+      margin: [0, 100, 0, 0],
+    },
+    {
+      text: legalUnit.corporateName,
+      alignment: "center",
+      fontSize: 18,
+      bold: true,
+      color: "#fa595f",
+      margin: [0, 20, 0, 10],
+    },
+    {
+      fontSize: 12,
+      margin: [0, 10, 0, 10],
+      columnGap: 40,
+      columns: [
         {
-          text: "Empreinte sociétale de l'entreprise",
-          alignment: "center",
-          fontSize: 24,
+          text: `SIREN : ${legalUnit.siren}`,
+          alignment : "right",
         },
         {
-          text: legalUnit,
-          alignment: "center",
-          fontSize: 18,
-          bold: true,
-          margin: [0, 20, 0, 20],
-        },
-        {
-          text: "Exercice " + year,
-          alignment: "center",
-          fontSize: 12,
-          margin: [0, 10, 0, 10],
+          text: `Exercice ${year}`,
+          alignment : "left",
         },
       ],
+    },
+    {
+      image: illustration,
+      width: 350,
+      alignment: "center",
+      margin: [0, 50, 0, 0],
     },
   ];
 
   const docDefinition = {
     pageSize: pageSize,
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
-    footer: footer,
     background: background,
     info: {
       title: "",
@@ -95,7 +101,6 @@ export const generateReportCover = (year, legalUnit) => {
       color: "#191558",
       font: "Raleway",
     },
-    styles: {},
   };
 
   return new Promise((resolve) => {
