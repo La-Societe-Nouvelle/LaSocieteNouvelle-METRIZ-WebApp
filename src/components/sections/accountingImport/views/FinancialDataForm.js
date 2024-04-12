@@ -115,6 +115,18 @@ export const FinancialDataForm = ({
     session.sendStatReport = sendStatReport;
   }, [sendStatReport]);
 
+  useEffect(() => {
+    if (fileName && fileName.trim() !== "") {
+      try {
+        const siren = (fileName.match(/^([0-9]{9})/g) || [""])[0];
+        setSiren(siren);
+      } catch (error) {
+        setSiren(null);
+      }
+    }
+  }, [fileName]);
+
+
   // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
