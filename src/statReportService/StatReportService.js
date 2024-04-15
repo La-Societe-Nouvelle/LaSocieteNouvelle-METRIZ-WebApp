@@ -3,6 +3,10 @@
 // API config
 import apiStats from "../../config/api-stats";
 
+// Utils
+import { buildLegalUnitProfile, buildStatReport } from "./utils";
+import { getYearPeriod } from "../utils/periodsUtils";
+
 const currentDate = new Date();
 
 /* -------------------------------------------------- USER PROGRESS -------------------------------------------------- */
@@ -95,11 +99,6 @@ export const saveApplicationLog = async (id, type, message) => {
   }
 };
 
-// PARTNERS CODE ###################################################################################### //
-
-import { buildLegalUnitProfile, buildStatReport } from "./utils";
-import { getYearPeriod } from "../utils/periodsUtils";
-
 /* -------------------------------------------------- STATISTIC REPORT -------------------------------------------------- */
 
 /** Params
@@ -108,7 +107,7 @@ import { getYearPeriod } from "../utils/periodsUtils";
  *    legalUnitProfile
  *    stats 
  * 
- */
+*/
 
 export const sendAnonymousStatReport = async (session, selectedPeriod) => 
 {
@@ -142,5 +141,3 @@ export const sendAnonymousStatReport = async (session, selectedPeriod) =>
     console.log(error);
   }
 };
-
-// #################################################################################################### //
