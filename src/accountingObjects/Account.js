@@ -16,10 +16,14 @@ import { getAmountItems } from "../utils/Utils";
  *       builds in financial data
  * 
  *  Props :
- *    - id -> accountNum
+ *    - id (accountNum)
  *    - accountNum
  *    - accountLib
  *    - periodsData
+ *    - footprint (used for expenses footprint estimation)
+ *    - defaultFootprintParams
+ *    - dataFetched
+ *    - footprintStatus
  * 
  *  Props of periods :
  *    - periodKey
@@ -63,15 +67,13 @@ export class Account {
       aggregate: "PRD",
       accuracyMapping: 0
     };
-
-    // Updates
     this.dataFetched = dataFetched || false;                        // response received
     this.footprintStatus = footprintStatus || 0;                    // status response api
 
   // ---------------------------------------------------------------------------------------------------- //
   }
 
-  // build periods data from items, for array of periods
+  // build periods data from items (expenses, etc.), for array of periods
   buildPeriods = (items,periods) => 
   {
     this.periodsData = {};
@@ -89,8 +91,7 @@ export class Account {
 
   async update(nextProps) 
   {
-    // update default footprint params ------------------ //
-    // update params, remove footprint & update dataFetched
+    // update default footprint params
     if (nextProps.defaultFootprintParams != undefined ||
         nextProps.defaultFootprintParams !== this.defaultFootprintParams) 
     {
@@ -106,13 +107,17 @@ export class Account {
   async updateFromRemote() 
   {    
     // Fetch default data --------------------------------------------------------------------------------- //
-    let defaultFptParams = Object.entries(this.defaultFootprintParams).map(([key,value]) => key+"="+value).join("&");
-    await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
+
+    let defaultFptParams = Object.entries(this.defaultFootprintParams)
+      .map(([key,value]) => key+"="+value)
+      .join("&");
+    
+    await api.get("defaultfootprint?"+defaultFptParams)
+             .then((res) => 
     {
       let status = res.data.header.code;
       this.footprintStatus = status;
       if (status == 200) {
-        // footprint ---------------------------------------- //
         this.footprint.updateAll(res.data.footprint);
         this.dataFetched = true;
       } else {
@@ -120,9 +125,12 @@ export class Account {
         this.dataFetched = false;
       }
     }).catch((err)=>{
-      console.log("error 2 "+err.message);
+      console.log("[ERROR] Erreur lors de la récupération de l'empreinte pour le compte n°"+err.message);
+      console.log(this);
+      console.log("[ERROR] Message : "+err.message);
       throw err;
     });
+
     // ---------------------------------------------------------------------------------------------------- //
     return;
   }
