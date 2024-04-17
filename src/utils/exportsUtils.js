@@ -166,7 +166,7 @@ export function definePDFStyles()
       },
       h2: {
         fontSize: 12,
-        color: "#fa595f",
+        color: "#191558",
         bold: true,
         alignment: "center",
         background: "#FFFFFF",

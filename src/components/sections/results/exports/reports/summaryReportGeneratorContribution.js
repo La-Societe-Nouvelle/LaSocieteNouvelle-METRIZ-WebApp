@@ -16,7 +16,6 @@ import {
   cutString,
   filterProvidersByPeriod,
   getIndicDescription,
-  getIntensKeyProviders,
   getUncertaintyDescription,
   sortAccountsByFootprint,
   sortProvidersByContrib,
@@ -73,7 +72,7 @@ export const buildSummaryReportContributionIndic = async ({
   // ---------------------------------------------------------------
   // PDF Data
 
-  const {contributionPerEuro, totalRevenue} = await getFinancialData(financialData, period, indic);
+  const { totalRevenue} = await getFinancialData(financialData, period, indic);
 
   const {externalExpensesAccounts,externalExpensesContribution} = await processExternalExpenseAccounts(financialData, period,indic)
 
@@ -182,13 +181,13 @@ export const buildSummaryReportContributionIndic = async ({
       });
 
       // Empreintes SIG
-      positionY += 125; 
+      positionY += 145; 
    
       canvas.push(
-        createRectObject(defaultPosition.startX, positionY, availableWidth, 120, 1, "#f1f0f4", 10, null)
+        createRectObject(defaultPosition.startX, positionY, availableWidth, 180, 1, "#f1f0f4", 10, null)
       );
 
-      positionY += 152; 
+      positionY += 215; 
 
       // Comparaison avec la branche d'activité
       canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 170, 1, "#f1f0f4", 10, null));
@@ -196,13 +195,8 @@ export const buildSummaryReportContributionIndic = async ({
       // Comptes de charges les plus impactants
       canvas.push(createRectObject(260, positionY, 305, 170, 1, "#f1f0f4", 10, null));
 
-      positionY += 200; 
 
-      //Empreinte de vos achat
-      canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 150, 1, "#f1f0f4", 10, null));
 
-      //Fournisseurs clés
-      canvas.push(createRectObject(260, positionY, 305, 150, 1, "#f1f0f4", 10, null));
 
       return {
         canvas: canvas,
@@ -214,7 +208,8 @@ export const buildSummaryReportContributionIndic = async ({
       ...buildHeaderSection(
         libelle,
         totalRevenue,
-        contributionPerEuro,
+        production,
+        period,
         indic
       ),
 
@@ -222,8 +217,6 @@ export const buildSummaryReportContributionIndic = async ({
       // Box "Soldes Intermédiaires de Gestion"
       ...buildSigFootprintSection(
         indic,
-        production,
-        period,
         chartImages
       ),
       //--------------------------------------------------
@@ -262,14 +255,14 @@ export const buildSummaryReportContributionIndic = async ({
 }
 
 // Sections  -----------------------------------------------------------
-const buildHeaderSection = (libelle, totalRevenue, contributionPerEuro, indic) => {
+const buildHeaderSection = (libelle, totalRevenue, production, period, indic) => {
   return [
     { text: libelle, style: "header" },
     //--------------------------------------------------
     {
+      margin: [0, 25, 0, 25],
       columns: [
         {
-          margin: [0, 20, 0, 0],
           stack: [
             {
               text: printValue(totalRevenue, 0) + "€",
@@ -284,52 +277,6 @@ const buildHeaderSection = (libelle, totalRevenue, contributionPerEuro, indic) =
           ],
         },
         {
-          margin: [40, 5, 40, 15],
-          stack: [
-            {
-              text: "\tPour 1€ de chiffre d'affaires\t",
-              alignment: "center",
-              background: "#FFFFFF",
-            },
-            {
-              margin: [0, 5, 0, 0],
-              text: contributionPerEuro.toFixed(2) + " €",
-              alignment: "center",
-              style: "numbers",
-            },
-            {
-              margin: [0, 5, 10, 0],
-              text: "de " + libelle,
-              alignment: "center",
-            },
-          ],
-        },
-      ],
-    },
-    //--------------------------------------------------
-    {
-      margin: [50, 10, 50, 10],
-      text: getIndicDescription(indic),
-      alignment: "center",
-    },
-    //--------------------------------------------------
-
-  ];
-}
-const buildSigFootprintSection = (indic, production, period, chartImages) => {
-  
-
-  return [
-    // Box "Soldes Intermédiaires de Gestion"
-    {
-      text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
-      style: "h2",
-      margin: [0, 0, 0, 15],
-    },
-    {
-      columns: [
-        {
-          width: "25%",
           stack: [
             {
               text:
@@ -339,36 +286,59 @@ const buildSigFootprintSection = (indic, production, period, chartImages) => {
                   1
                 ) + "%*",
               alignment: "center",
-              style: "bigNumber",
-              fontSize: 26,
+              style: "numbers",
             },
             {
               text: "Taux de contribution de la production",
               alignment: "center",
-              bold: true,
+              margin: [0, 5, 0, 0],
             },
           ],
         },
+      ],
+    },
+    //--------------------------------------------------
+    {
+      margin: [50, 20, 50, 20],
+      text: getIndicDescription(indic),
+      alignment: "center",
+    },
+    //--------------------------------------------------
+
+  ];
+}
+const buildSigFootprintSection = (indic, chartImages) => {
+  
+
+  return [
+    // Box "Soldes Intermédiaires de Gestion"
+    {
+      text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
+      style: "h2",
+      margin: [0, 0, 0, 30],
+    },
+    {
+      columns: [
         {
           stack: [
             {
               image: chartImages[`sig-chart-intermediateConsumptions-${indic}-print`],
               alignment: "center",
-              width: 60,
-              height: 60,
+              width: 100,
+              height: 100,
             },
             {
               text: "Consommations",
               alignment: "center",
               bold: true,
-              fontSize: 8,
-              margin: [0, 5, 0, 0],
+              fontSize: 9,
+              margin: [0, 10, 0, 0],
             },
             {
               text: "intermédiaires",
               alignment: "center",
               bold: true,
-              fontSize: 8,
+              fontSize: 9,
             },
           ],
         },
@@ -377,21 +347,21 @@ const buildSigFootprintSection = (indic, production, period, chartImages) => {
             {
               image: chartImages[`sig-chart-fixedCapitalConsumptions-${indic}-print`],
               alignment: "center",
-              width: 60,
-              height: 60,
+              width: 100,
+              height: 100,
             },
             {
               text: "Consommations",
               alignment: "center",
               bold: true,
-              fontSize: 8,
-              margin: [0, 5, 0, 0],
+              fontSize: 9,
+              margin: [0, 10, 0, 0],
             },
             {
               text: "de capital fixe",
               alignment: "center",
               bold: true,
-              fontSize: 8,
+              fontSize: 9,
             },
           ],
         },
@@ -399,22 +369,22 @@ const buildSigFootprintSection = (indic, production, period, chartImages) => {
           stack: [
             {
               image: chartImages[`sig-chart-netValueAdded-${indic}-print`],
-              width: 60,
-              height: 60,
+              width: 100,
+              height: 100,
               alignment: "center",
             },
             {
               text: "Valeur ajoutée",
               alignment: "center",
               bold: true,
-              fontSize: 8,
-              margin: [0, 5, 0, 0],
+              fontSize: 9,
+              margin: [0, 10, 0, 0],
             },
             {
               text: "nette",
               alignment: "center",
               bold: true,
-              fontSize: 8,
+              fontSize: 9,
             },
           ],
         },
@@ -427,9 +397,9 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
 
   return [
     {
-      text: "\tComparaison avec la branche d'activité **\t",
+      text: "\tComparaison avec la branche**\t",
       style: "h2",
-      margin: [0, 40, 0, 10],
+      margin: [0, 40, 0, 20],
       alignment: "center", 
     },
     {
@@ -438,49 +408,7 @@ const buildLeftColumnContent = (indic,chartImages, externalExpensesContribution,
       width: 190,
       margin: [10, 0, 0, 5],
     },
-    {
-      text: "\tEmpreinte de vos achats\t",
-      style: "h2",
-      margin: [0, 30, 0, 10],
-      alignment: "center",
-      background: "#FFFFFF",
-    },
-    {
-      text: printValue(externalExpensesContribution.value, 1) + " %",
-      alignment: "center",
-      style: "bigNumber",
-      fontSize: 20,
-    },
-    {
-      text: "Taux de contribution de vos achats",
-      alignment: "center",
-      bold: true,
-      margin: [0, 0, 0, 10],
-    },
-    {
-      text: currentICdivisionData.value + " %",
-      alignment: "center",
-      style: "branchNumber",
-    },
-    {
-      text: "Moyenne de la branche **",
-      alignment: "center",
-      fontSize: 8,
-      bold: true,
-    },
-    {
-      margin: [10, 5, 0, 0],
-      fontSize: 8,
-      alignment: "center",
-      text: [
-        {
-          text: comparativeData.comparativeDivision + " - ",
-        },
-        {
-          text: cutString(divisionName, 120),
-        },
-      ],
-    },
+   
   ]
 
 }
@@ -521,20 +449,7 @@ const buildRightColumnContent = (mostImpactfulExpenses, leastImpactfulExpenses, 
       fontSize: 8,
     })),
 
-    // ACTIVITES FOURNISSEURS
-    {
-      text: "\tFournisseurs clés\t",
-      style: "h2",
-      margin: [0, 55, 0, 20],
-    },
-    ...getIntensKeyProviders(
-      mostImpactfulProviders,
-      indic,
-      unit,
-      unitAbsolute,
-      nbDecimals,
-      period
-    ),
+
   ]
 };
 
