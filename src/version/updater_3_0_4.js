@@ -27,10 +27,17 @@ export const updater_to_3_0_4 = async (session) =>
     
     // - Changes values for knwDetails
 
-    impactsData.knwDetails.apprenticesRemunerations = impactsData.knwDetails.apprenticesRemunerations;
-    impactsData.knwDetails.internshipsRemunerations = {};
-    impactsData.knwDetails.employeesTrainingsCompensations.assessmentOption = "assessment_amount";
-    impactsData.knwDetails.researchPersonnelRemunerations.assessmentOption = "assessment_amount";
+    impactsData.knwDetails.apprenticesRemunerations = {
+      amount: impactsData.knwDetails.apprenticesRemunerations
+    };
+    impactsData.knwDetails.internshipsRemunerations = {
+    };
+    impactsData.knwDetails.employeesTrainingsCompensations = {
+      assessmentOption: "assessment_amount"
+    };
+    impactsData.knwDetails.researchPersonnelRemunerations = {
+      assessmentOption: "assessment_amount"
+    };
   }
 
   // ----------------------------------------------------------------------------------------------------

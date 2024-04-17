@@ -29,7 +29,7 @@ import { SocialFootprint } from "./footprintObjects/SocialFootprint";
 // ################################################## SESSION OBJECT ##################################################
 
 // current version
-const currentVersion = "3.0.0";
+const currentVersion = "3.0.4";
 
 export class Session 
 {

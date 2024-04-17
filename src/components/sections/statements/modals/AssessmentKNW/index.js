@@ -81,6 +81,7 @@ export const AssessmentKNW = ({
   const knwContribution = getKnwContribution(knwDetails);
   const knwContributionRate = getKnwContributionRate(netValueAdded,knwContribution);
 
+  console.log(knwItems);
   return (
     <div className="assessment">
       <Table >
@@ -148,9 +149,11 @@ const RowAssessmentKNW = ({
   onUpdate
 }) => {
 
+  console.log(itemData);
   const [assessmentOption, setAssessmentOption] = useState(itemData?.assessmentOption || "assessment_amount");
   const [hours, setHours] = useState(itemData?.hours || "");
   const [amount, setAmount] = useState(itemData?.amount || "");
+  console.log(assessmentOption);
 
   const [knwDetail, setKnwDetail] = useState(itemData || {});
 
@@ -167,6 +170,7 @@ const RowAssessmentKNW = ({
   useEffect(() => 
   {
     // itemData props
+    console.log(knwDetail);
     knwDetail.assessmentOption = assessmentOption;
     knwDetail.hours = hours;
     knwDetail.amount = amount;

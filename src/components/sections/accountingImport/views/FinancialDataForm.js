@@ -243,8 +243,16 @@ export const FinancialDataForm = ({
       // impacts data
       let impactsDataOnFinancialPeriod = session.impactsData[financialPeriod.periodKey];
       impactsDataOnFinancialPeriod.netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[financialPeriod.periodKey].amount;
-      impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = roundValue(accountingData.KNWData.apprenticeshipTax, 2);
-      impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = roundValue(accountingData.KNWData.vocationalTrainingTax, 2);
+      impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax= {
+        assessmentOption: "assessment_amount",
+        amount: roundValue(accountingData.KNWData.apprenticeshipTax, 2),
+        hours: null
+      };
+      impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = {
+        assessmentOption: "assessment_amount",
+        amount: roundValue(accountingData.KNWData.vocationalTrainingTax, 2),
+        hours: null
+      };
 
         // FEC id
       session.id = FECData.id; // anonymisation id
