@@ -90,7 +90,7 @@ const buildChartData = (session,datasetOptions) =>
     let legalUnitFpt = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
     let branchFpt = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
     
-    if (branchFpt !== 0) {
+    if (branchFpt !==0 && legalUnitFpt !== null) {
       let value = Math.round((legalUnitFpt - branchFpt) / branchFpt * 100);
       data.push(value);
     } else {

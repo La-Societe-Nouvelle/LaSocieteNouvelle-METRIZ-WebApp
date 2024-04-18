@@ -61,7 +61,11 @@ export const SigPieChart = ({
 
   // --------------------------------------------------
   // Options
+  
   const value =  chartData.datasets.length > 1 ? chartData.datasets[1]?.data[0] : chartData.datasets[0]?.data[0];
+  if (value == null) {
+    value = " - ";
+  }
 
   const chartOptions = buildChartOptions(
     printOptions,
