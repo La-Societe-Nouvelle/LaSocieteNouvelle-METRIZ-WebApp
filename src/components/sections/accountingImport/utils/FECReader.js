@@ -895,11 +895,29 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
       data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
       try {
         let entryData = await readExternalExpensesFromEntry(ecriture,data);
+        // if expenses linked to provider
         if (entryData.isExpensesTracked) {
           data.externalExpenses.push(...entryData.expensesData);
           data.defaultProviders.push(...entryData.defaultProviders);
-        } else {
-          throw ("Plusieurs comptes fournisseurs détectés.");
+        } 
+        // if expenses not linked to provider -> use default /!\ warning (expenses by provider will be wrong)
+        else {
+          let lignesComptesCharges = ecriture.filter((ligne) => /^6(0[^3]|[1-2])/.test(ligne.CompteNum));
+          lignesComptesCharges.forEach((ligneCompteCharges) => 
+          {
+            let expenseData = {
+              label: ligneCompteCharges.EcritureLib.replace(/^\"/, "").replace(/\"$/,""),
+              accountNum: ligneCompteCharges.CompteNum,
+              accountLib: ligneCompteCharges.CompteLib,
+              providerNum: "_"+ligneCourante.CompteNum,
+              providerLib: "FOURNISSEUR "+ligneCourante.CompteLib,
+              isDefaultProviderAccount: true,
+              amount: parseAmount(ligneCompteCharges.Debit) - parseAmount(ligneCompteCharges.Credit),
+              date: ligneCompteCharges.EcritureDate,
+            };
+            data.externalExpenses.push(expenseData);
+            data.defaultProviders.push("_"+ligneCourante.CompteNum);
+          });
         }
       } catch (error) {
         throw ("Problème de lecture pour l'écriture "+ligneCourante.EcritureNum +" : " + error);
