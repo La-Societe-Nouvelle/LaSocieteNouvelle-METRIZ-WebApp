@@ -23,18 +23,18 @@ const DirectImpacts = ({
 }) => {
 
   const [statementsStatus, setStatementsStatus] = useState({
-    art: { status: "unselect", errorMessage: null },
-    eco: { status: "unselect", errorMessage: null },
-    soc: { status: "unselect", errorMessage: null },
-    idr: { status: "unselect", errorMessage: null },
-    geq: { status: "unselect", errorMessage: null },
-    knw: { status: "unselect", errorMessage: null },
-    ghg: { status: "unselect", errorMessage: null },
-    haz: { status: "unselect", errorMessage: null },
-    mat: { status: "unselect", errorMessage: null },
-    nrg: { status: "unselect", errorMessage: null },
-    was: { status: "unselect", errorMessage: null },
-    wat: { status: "unselect", errorMessage: null },
+    art: { status: "undefined", errorMessage: null },
+    eco: { status: "undefined", errorMessage: null },
+    soc: { status: "undefined", errorMessage: null },
+    idr: { status: "undefined", errorMessage: null },
+    geq: { status: "undefined", errorMessage: null },
+    knw: { status: "undefined", errorMessage: null },
+    ghg: { status: "undefined", errorMessage: null },
+    haz: { status: "undefined", errorMessage: null },
+    mat: { status: "undefined", errorMessage: null },
+    nrg: { status: "undefined", errorMessage: null },
+    was: { status: "undefined", errorMessage: null },
+    wat: { status: "undefined", errorMessage: null },
   })
 
   const [selectedStatements, setSelectedStatements] = useState(session.validations[period.periodKey]); 
