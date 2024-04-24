@@ -16,8 +16,7 @@ import { getShortCurrentDateString } from "../../../../utils/periodsUtils";
 import { mailToAdminWriter, mailToDeclarantWriter } from "../utils";
 
 // Writers
-import { getStatementPDF } from "/src/writers/StatementPDFBuilder";
-import { sendPublications } from "../../../../services/PublicationService";
+import { buildStatementPDF } from "../../../../writers/StatementPDFBuilder";
 
 // Services
 
@@ -29,7 +28,7 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
 
   const exportStatement = () => {
     // build pdf
-    const statementPDF = getStatementPDF(
+    const statementPDF = buildStatementPDF(
       formData.siren,
       formData.corporateName,
       formData.year,
@@ -53,15 +52,18 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
   };
   const handlePublish = async () => {
     try {
-      const publications = {
-        siren: formData.siren,
-        footprint: publishableFootprint,
-        year: formData.year,
-      };
 
-      const response = await sendPublications(publications);
-      //   // build PDF
-      const statementPDF = getStatementPDF(
+      // Temporaly comment out
+      // const publications = {
+      //   siren: formData.siren,
+      //   footprint: publishableFootprint,
+      //   year: formData.year,
+      // };
+
+      //const response = await sendPublications(publications); 
+
+      // build PDF
+      const statementPDF = buildStatementPDF(
         formData.siren,
         formData.corporateName,
         formData.year,
@@ -106,7 +108,7 @@ const SummaryModal = ({ formData, showModal, handleClose }) => {
       );
 
       if (
-        response.status == 200 &&
+        // response.status == 200 &&
         resAdmin.status == 200 &&
         resDeclarant.status == 200
       ) {

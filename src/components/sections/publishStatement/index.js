@@ -112,7 +112,6 @@ const PublishStatementSection = ({ session, period }) => {
           Valoriser votre empreinte en la publiant au sein de notre base de
           données ouverte.
         </p>
-        {console.log(formData)}
 
         <IndicatorList
           legalUnitFootprint={formData.footprint}

@@ -195,3 +195,21 @@ export const buildStatementPDF = (
   return statementPDF;
 }
 
+// ################################################## UTILS ##################################################
+
+// --------------------------------------------------
+// Table layout
+
+const getTableLayout = () => 
+{
+  return({
+    hLineWidth:    (i, node) => i === 0 || i === node.table.body.length ? 1 : 0,
+    vLineWidth:    (i, node) => i === 0 || i === node.table.widths.length ? 1 : 1,
+    hLineColor:    (i, node) => i === 0 || i === node.table.body.length ? "#191558" : "#F0F0F8",
+    vLineColor:    (i, node) => i === 0 || i === node.table.widths.length ? "#191558" : "#F0F0F8",
+    paddingLeft:   (i, node) => 4,
+    paddingRight:  (i, node) => 4,
+    paddingTop:    (i, node) => 3,
+    paddingBottom: (i, node) => 3,
+  })
+}
