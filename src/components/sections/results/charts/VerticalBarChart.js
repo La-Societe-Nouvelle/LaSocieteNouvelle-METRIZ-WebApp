@@ -360,7 +360,7 @@ const buildChartOptions = (
     devicePixelRatio: 2,
     layout: {
       padding: {
-        top: printMode ? 0 : 40,
+        top:  40,
         left : printMode ? 0 : 10,
         right : printMode ? 0 : 10, 
       },
@@ -446,11 +446,11 @@ const buildChartOptions = (
         },
         color: colors.textColor,
         font: {
-          size: printMode ? 16 : 10,
+          size: printMode ? 14 : 10,
           family: "Roboto",
         },
         padding: {
-          bottom: 5,
+          bottom: 3,
         },
       },
       title: {
