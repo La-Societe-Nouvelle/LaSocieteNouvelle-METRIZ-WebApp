@@ -36,7 +36,7 @@ export const getMoreRecentYearlyPeriod = (periods) => {
   // Filter yearly periods (FYxxxx) and Sort by end date (descending)**
   const yearlyPeriods = periods
     .filter((period) => /^FY/.test(period.periodKey))
-    .sort((a, b) => new Date(b.dateEnd) - new Date(a.dateEnd));
+    .sort((a, b) => parseDate(b.dateEnd) - parseDate(a.dateEnd));
 
   // Return the first period in the sorted array (the most recent)**
   return yearlyPeriods[0];
