@@ -10,9 +10,7 @@ import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
   targetAnnualReduction,
-  getIntensKeyProviders,
   calculateAverageEvolutionRate,
-  filterProvidersByPeriod,
   addUncertaintyText,
   getIndicDescription,
 } from "../exportsUtils";
@@ -116,19 +114,6 @@ export const buildSummaryReportIntensityIndic = async ({
   );
 
   const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
-
-  const providers = filterProvidersByPeriod(financialData, period);
-
-  const topProviders = sortByImpact(providers, indic, "desc").slice(
-    0,
-    2
-  );
-
-  const nextTopProviders = sortByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(2, 4);
 
   // Part des consommations intermédiaires
   const intermediateConsumptionsPart = getIntermediateConsumptionsPart(
@@ -254,13 +239,13 @@ export const buildSummaryReportIntensityIndic = async ({
 
         // Box Répartition des impacts de la production
 
-        positionY += 112;
+        positionY += 135;
         canvas.push(
           createRectObject(
             defaultPosition.startX,
             positionY,
             availableWidth,
-            120,
+            130,
             1,
             "#f1f0f4",
             10,
@@ -283,31 +268,16 @@ export const buildSummaryReportIntensityIndic = async ({
           );
         }
 
-        positionY += 140;
-        // Box Fournisseurs clés
-        canvas.push(
-          createRectObject(
-            defaultPosition.startX,
-            positionY,
-            availableWidth,
-            75,
-            1,
-            "#f1f0f4",
-            10,
-            null
-          )
-        );
-
         // Objectifs
 
-        positionY += 257;
+        positionY += 330;
 
         canvas.push(
           createRectObject(
             defaultPosition.startX,
             positionY,
             180,
-            155,
+            180,
             1,
             "#f1f0f4",
             10,
@@ -315,7 +285,7 @@ export const buildSummaryReportIntensityIndic = async ({
           )
         );
         canvas.push(
-          createRectObject(220, positionY, 345, 155, 1, "#f1f0f4", 10, null)
+          createRectObject(220, positionY, 345, 180, 1, "#f1f0f4", 10, null)
         );
       }
       return {
@@ -335,7 +305,8 @@ export const buildSummaryReportIntensityIndic = async ({
         indic,
         period,
         unit,
-        precision
+        precision,
+        unitGrossImpact
       ),
       //--------------------------------------------------
       ...buildProductionImpactSection(
@@ -344,21 +315,11 @@ export const buildSummaryReportIntensityIndic = async ({
         indic,
         chartImages
       ),
-      //--------------------------------------------------
-      // Key Suppliers
-      ...buildKeyProvidersSection(
-        topProviders,
-        nextTopProviders,
-        indic,
-        unit,
-        unitGrossImpact,
-        precision,
-        period
-      ),
+
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 25, 0, 20],
+        margin: [0, 40, 0, 25],
         columns: [
           {
             ...buildSIGTableSection(
@@ -521,7 +482,7 @@ const buildHeaderSection = (
     },
     //--------------------------------------------------
     {
-      margin: [10, 20, 10, 10],
+      margin: [10, 30, 10, 20],
       text: getIndicDescription(indic),
       alignment: "center",
     },
@@ -638,46 +599,6 @@ const buildProductionImpactSection = (
 
 // Sections  -----------------------------------------------------------
 
-const buildKeyProvidersSection = (
-  topProviders,
-  nextTopProviders,
-  indic,
-  unit,
-  unitGrossImpact,
-  precision,
-  period
-) => {
-  const getContent = (companies) => ({
-    margin: [5, 10, 0, 0],
-    columns: [
-      {
-        columnGap: 20,
-        columns: [
-          ...getIntensKeyProviders(
-            companies,
-            indic,
-            unit,
-            unitGrossImpact,
-            precision,
-            period
-          ),
-        ],
-      },
-    ],
-  });
-
-  return [
-    {
-      text: "\tFournisseurs clés\t",
-      style: "h2",
-      alignment: "center",
-      margin: [0, 15, 0, 0],
-      background: "#FFFFFF",
-    },
-    getContent(topProviders),
-    getContent(nextTopProviders),
-  ];
-};
 
 const buildSIGTableSection = (mainAggregates, period, indic) => {
   const {
@@ -861,19 +782,21 @@ const buildBranchPerformanceSection = (
     divisionName;
 
   return {
-    columnGap: 40,
+    columnGap: 25,
+
     columns: [
       // Left Box
       {
-        margin: [10, 0, 0, 0],
-        width: "33%",
+        margin: [10, 0, 10, 10],
+        width: "35%",
+
         stack: [
           {
             text: "\tObjectif de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
-            margin: [0, 0, 0, 10],
+            margin: [0, 0, 0, 20],
           },
           {
             text: branchProductionTarget ? branchProductionTarget + " %" : "-",
@@ -886,7 +809,7 @@ const buildBranchPerformanceSection = (
               ? "Objectif annuel"
               : "Aucun objectif défini",
             alignment: "center",
-            margin: [0, 2, 0, 10],
+            margin: [0, 2, 10, 10],
             bold: true,
           },
           {
@@ -925,13 +848,14 @@ const buildBranchPerformanceSection = (
         width: "*",
         stack: [
           {
-            text: "\tEvolution de la performance de la branche **\t",
+            text: "\tEvolution de la performance\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
+            margin: [0, 0, 0, 20],
           },
           {
-            width: 300,
+            width: 320,
             image: chartImages[`trend-chart-${indic}-print`],
           },
         ],
