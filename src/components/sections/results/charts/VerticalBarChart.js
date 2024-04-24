@@ -373,7 +373,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size:  10,
+            size:  printMode ? 15 : 10,
           },
         },
         grid: {
@@ -387,7 +387,7 @@ const buildChartOptions = (
           color: colors.textColor,
           align: "center", 
           font: {
-            size: 10,
+            size: printMode ? 15 : 10,
           },
         },
         grid: {
@@ -446,7 +446,7 @@ const buildChartOptions = (
         },
         color: colors.textColor,
         font: {
-          size: 10,
+          size: printMode ? 16 : 10,
           family: "Roboto",
         },
         padding: {
