@@ -89,9 +89,7 @@ export const buildSummaryReportIndexIndic = async ({
 
   const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
 
-  let providers = filterProvidersByPeriod(financialData, period);
 
-  const { topProviders, nextTopProviders } = getImpactData(indic, providers);
 
   const uncertaintyText = getUncertaintyDescription(
     "indice",
@@ -193,7 +191,7 @@ export const buildSummaryReportIndexIndic = async ({
       });
 
       // Empreintes SIG
-      positionY += 127;
+      positionY += 145;
 
       canvas.push(
         createRectObject(
@@ -207,27 +205,15 @@ export const buildSummaryReportIndexIndic = async ({
           null
         )
       );
-      positionY += 110;
-      canvas.push(
-        createRectObject(
-          defaultPosition.startX,
-          positionY,
-          availableWidth,
-          80,
-          1,
-          "#f1f0f4",
-          10,
-          null
-        )
-      );
-      positionY += 272;
+ 
+      positionY += 290;
 
       canvas.push(
         createRectObject(
           defaultPosition.startX,
           positionY,
           180,
-          150,
+          180,
           1,
           "#f1f0f4",
           10,
@@ -240,7 +226,7 @@ export const buildSummaryReportIndexIndic = async ({
           220,
           positionY,
           345,
-          150,
+          180,
           1,
           "#f1f0f4",
           10,
@@ -265,13 +251,11 @@ export const buildSummaryReportIndexIndic = async ({
         indic,
         period
       ),
-      //--------------------------------------------------
-      // Key Suppliers
-      ...buildKeyProvidersSection(topProviders, nextTopProviders, indic),
+
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 25, 0, 20],
+        margin: [0, 40, 0, 25],
         columns: [
           {
             ...buildSIGTableSection(
@@ -325,7 +309,7 @@ const buildHeaderSection = (revenue, indic, period) => {
     { text: libelle, style: "header" },
     //--------------------------------------------------
     {
-      margin: [0, 20, 0, 0],
+      margin: [0, 25, 0, 25],
       columns: [
         {
           stack: [
@@ -368,7 +352,7 @@ const buildHeaderSection = (revenue, indic, period) => {
     },
     //--------------------------------------------------
     {
-      margin: [0, 30, 0, 10],
+      margin: [50, 10, 50, 20],
       text: getIndicDescription(indic),
       alignment: "center",
     },
@@ -397,42 +381,7 @@ const buildSigFootprintSection = (mainAggregates, indic, period) => {
     },
     {
       columns: [
-        {
-          width: "25%",
-          stack: [
-            {
-              alignment: "center",
-              bold: true,
-              fontSize: 24,
-              color: "#fa595f",
-              text: [
-                {
-                  text: printValue(
-                    production.periodsData[period.periodKey].footprint
-                      .indicators[indic].value,
-                    nbDecimals
-                  ),
-                },
-                {
-                  text: unit,
-                },
-              ],
-            },
-            {
-              text: "Indice associé",
-              alignment: "center",
-              bold: true,
-              fontSize: 8,
-              margin: [0, 5, 0, 0],
-            },
-            {
-              text: "à la valeur produite",
-              alignment: "center",
-              bold: true,
-              fontSize: 8,
-            },
-          ],
-        },
+
         {
           stack: [
             {
@@ -541,66 +490,6 @@ const buildSigFootprintSection = (mainAggregates, indic, period) => {
   ];
 };
 
-const buildKeyProvidersSection = (topProviders, nextTopProviders, indic) => {
-  return [
-    {
-      text: "\tFournisseurs clés\t",
-      style: "h2",
-      alignment: "center",
-      margin: [0, 30, 0, 15],
-      background: "#FFFFFF",
-    },
-    generateKeyProviderColumns(topProviders, indic),
-    generateKeyProviderColumns(nextTopProviders, indic),
-  ];
-};
-
-const generateKeyProviderColumns = (providers, indic) => {
-  const { unit, nbDecimals } = metaIndics[indic];
-
-  providers = providers.filter(
-    (provider) =>
-      !provider.isDefaultAccount &&
-      provider.footprintStatus === 200 &&
-      provider.footprint.isValid()
-  );
-
-  const keyProviders = generateKeyProviders(providers, indic, unit, nbDecimals);
-
-  return {
-    margin: [10, 0, 10, 10],
-    columns: [
-      {
-        columnGap: 20,
-        columns: keyProviders,
-      },
-    ],
-  };
-};
-
-const generateKeyProviders = (providers, indic, unit, precision) =>
-  providers.map((provider) => ({
-    stack: [
-      {
-        text: cutString(provider.providerLib, 40),
-        fontSize: 8,
-        bold: true,
-      },
-      {
-        text:
-          indic === "idr"
-            ? `Rapport interdécile : ${provider.footprint.indicators[
-                indic
-              ].value.toFixed(precision)}`
-            : `${provider.footprint.indicators[indic].value.toFixed(
-                precision
-              )} ${unit}`,
-        fontSize: 7,
-      },
-    ],
-  }
-)
-);
 
 const buildSIGTableSection = (mainAggregates, period, indic) => {
   const {
@@ -767,19 +656,20 @@ const buildBranchPerformanceSection = (
     divisionName;
 
   return {
-    columnGap: 40,
+    columnGap: 25,
     columns: [
       // Left Box
       {
-        margin: [10, 0, 10, 0],
-        width: "33%",
+        margin: [10, 0, 10, 10],
+        width: "35%",
         stack: [
           {
             text: "\tObjectif de la branche **\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
-            margin: [0, 0, 0, 10],
+            margin: [0, 0, 0, 20],
+
           },
           {
             text: branchProductionTarget ? branchProductionTarget + " %" : "-",
@@ -792,7 +682,7 @@ const buildBranchPerformanceSection = (
               ? "Objectif annuel"
               : "Aucun objectif défini",
             alignment: "center",
-            margin: [0, 2, 0, 10],
+            margin: [0, 2, 10, 10],
             bold: true,
           },
           {
@@ -831,13 +721,14 @@ const buildBranchPerformanceSection = (
         width: "*",
         stack: [
           {
-            text: "\tEvolution de la performance de la branche **\t",
+            text: "\tEvolution de la performance\t",
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
+            margin: [0, 0, 0, 20],
           },
           {
-            width: 300,
+            width: 320,
             image: chartImages[`trend-chart-${indic}-print`],
           },
         ],

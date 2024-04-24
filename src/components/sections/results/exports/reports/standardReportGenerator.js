@@ -118,7 +118,7 @@ export const buildStandardReport = async ({
         },
       ],
     },
-    footer: generateFooter(),
+    footer: generateFooter,
     background: function () {
       return {
         canvas: [
