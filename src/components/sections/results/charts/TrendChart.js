@@ -407,7 +407,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         ticks: {
           color: colors.textColor,
           font: {
-            size: 11,
+            size: printMode ? 13 : 11,
             family: "Roboto",
           },
         },
@@ -420,7 +420,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         ticks: {
           color: colors.textColor,
           font: {
-            size: 11,
+            size: printMode ? 13 : 11,
           },
         },
         grid: {
@@ -446,7 +446,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
           color: colors.textColor,
           padding: 20,
           font: {
-            size: 12,
+            size: printMode ? 13 : 11,
             family: "Roboto",
           },
           generateLabels: function (chart) {
