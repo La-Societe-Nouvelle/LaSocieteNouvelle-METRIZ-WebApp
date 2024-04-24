@@ -50,7 +50,6 @@ const DirectImpacts = ({
     if(!isDataFetched) {
       setIsLoading(true);
       await session.comparativeData.fetchComparativeData(previewIndicators);
-      await session.updateFootprints(period);
       setIsLoading(false);
       setIsDataFetched(true);
     }
@@ -79,7 +78,7 @@ const DirectImpacts = ({
   useEffect(() => {
     
     let selectedStatements = Object.entries(statementsStatus)
-      .filter(([_,status]) => status.status!="unselect")
+      .filter(([_,status]) => status.status!="unselect" & status.status!="undefined")
       .map(([indic,_]) => indic);
     let invalidStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status=="error")
@@ -88,8 +87,10 @@ const DirectImpacts = ({
       .filter(([_,status]) => status.status=="incomplete")
       .map(([indic,_]) => indic);
 
-    // update session
-    session.validations[period.periodKey] = selectedStatements;
+    // update session (except if state on build)
+    if (Object.entries(statementsStatus).every(([_,status]) => status.status != "undefined")) {
+      session.validations[period.periodKey] = selectedStatements;
+    }
 
     // update state
     setSelectedStatements(selectedStatements);
