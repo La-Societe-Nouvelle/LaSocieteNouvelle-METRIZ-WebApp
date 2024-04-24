@@ -162,15 +162,22 @@ export const sendReportToAdmin = async (file, fileName) => {
   }
 };
 
-export const sendReportToSupport = async (errors) => {
+export const sendReportToSupport = async (errors,user_email,user_comments) => {
   const recipientMail = "support@lasocietenouvelle.org";
   const objetMail = "Rapport d'erreurs - Lecture du FEC";
 
-  const messageMail = "Liste des erreurs-----------------------\n";
+  const messageMail = "Liste des erreurs----------------------- \n\n";
 
   errors.forEach((error) => {
     messageMail += "-" + error + "\n";
   });
+
+  messageMail += "\n"
+    + "Adresse email de l'utilisateur  : \n"
+    + user_email + "\n"
+    + "\n"
+    + "Commentaires : \n"
+    + user_comments
 
   const contentMail = { recipientMail, objetMail, messageMail };
 
