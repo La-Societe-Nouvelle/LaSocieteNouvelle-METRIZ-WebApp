@@ -352,7 +352,7 @@ const buildHeaderSection = (revenue, indic, period) => {
     },
     //--------------------------------------------------
     {
-      margin: [50, 10, 50, 20],
+      margin: [0, 10, 0, 20],
       text: getIndicDescription(indic),
       alignment: "center",
     },
