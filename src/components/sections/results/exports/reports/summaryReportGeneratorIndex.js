@@ -29,7 +29,6 @@ import {
 } from "../../../../../utils/exportsUtils";
 
 // Utils
-import { sortByImpact } from "../../utils";
 import { printValue } from "/src/utils/formatters";
 
 // PDF Config
@@ -736,28 +735,3 @@ const buildBranchPerformanceSection = (
     ],
   };
 };
-
-
-// Functions -----------------------------------------------------------
-
-function getImpactData(indic, providers) {
-  providers = providers.filter(
-    (provider) =>
-      provider.footprintStatus == 200 && provider.footprint.isValid()
-  );
-
-  const topProviders = sortByImpact(providers, indic, "desc").slice(
-    0,
-    2
-  );
-  const nextTopProviders = sortByImpact(
-    providers,
-    indic,
-    "desc"
-  ).slice(2, 4);
-
-  return {
-    topProviders,
-    nextTopProviders,
-  };
-}

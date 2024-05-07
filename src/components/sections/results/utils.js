@@ -332,12 +332,11 @@ export function getMostImpactfulExpensesPart(expenses, total, indic) {
   return expensesPart;
 }
 
-
-export function sortByImpact(expensesAccounts, indicator, order) {
+export function sortAccountByImpact(expensesAccounts, periodKey, indicator, order) {
 
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
-    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
+    const valueA = a.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
+    const valueB = b.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
 
     if (order === "asc") {
       return valueA - valueB;

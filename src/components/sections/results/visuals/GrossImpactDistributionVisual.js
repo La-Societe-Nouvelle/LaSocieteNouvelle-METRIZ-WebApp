@@ -9,7 +9,7 @@ import { ValueDistributionChart } from "../charts/ValueDistributionChart";
 
 // Utils
 import { getPrevDate } from "../../../../utils/periodsUtils";
-import { sortByImpact } from "../utils";
+import { sortAccountByImpact } from "../utils";
 
 /* ---------- GROSS IMPACT DISTRIBUTION VISUAL ---------- */
 
@@ -44,8 +44,9 @@ export const GrossImpactDistributionVisual = ({ session, period, indic }) => {
       };
     });
 
-  const mostImpactfulExpensesAccounts = sortByImpact(
+  const mostImpactfulExpensesAccounts = sortAccountByImpact(
     expensesAccounts,
+    period.periodKey,
     indic,
     "desc"
   ).slice(0, 5);

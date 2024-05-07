@@ -31,7 +31,7 @@ import {
 import { printValue } from "/src/utils/formatters";
 import {
   getMostImpactfulExpensesPart,
-  sortByImpact,
+  sortAccountByImpact,
 } from "../../utils";
 
 // PDF Config
@@ -93,14 +93,18 @@ export const buildSummaryReportIntensityIndic = async ({
     Math.max(lastEstimatedData.length - 2, 1)
   );
 
-  let expensesAccounts = financialData.externalExpenses.filter(
-    (expense) =>
-      /^6(0[^3]|[1-2])/.test(expense.accountNum) &&
-      expense.date.slice(0, 4) == period.periodKey.slice(2)
-  );
+  let expensesAccounts = financialData.externalExpensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
+    .map((account) => {
+      return {
+        ...account.periodsData[period.periodKey],
+        accountLib: account.accountLib,
+      };
+    });
 
-  const mostImpactfulExpenses = sortByImpact(
+  const mostImpactfulExpenses = sortAccountByImpact(
     expensesAccounts,
+    period.periodKey,
     indic,
     "desc"
   ).slice(0, 3);
