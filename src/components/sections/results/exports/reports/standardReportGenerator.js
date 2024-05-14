@@ -8,12 +8,11 @@ import divisions from "/lib/divisions";
 
 // Utils
 import { generateSIGtable } from "./generateSIGtable";
-
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+import { generateFooter, loadFonts } from "./utils/layout";
 import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 import { getStatementNote } from "/src/utils/Writers";
 
-import { generateFooter, loadFonts } from "../../../../../utils/exportsUtils";
-import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 // --------------------------------------------------------------------------
 //  Indicator Report
@@ -118,7 +117,7 @@ export const buildStandardReport = async ({
         },
       ],
     },
-    footer: generateFooter,
+    footer: generateFooter(legalUnit.corporateName),
     background: function () {
       return {
         canvas: [
