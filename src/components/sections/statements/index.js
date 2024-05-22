@@ -59,17 +59,17 @@ const DirectImpacts = ({
 
     // init ART
     if (session.legalUnit.hasCraftedActivities 
-        && !session.impactsData[period.periodKey].isValueAddedCrafted) {
+        && session.impactsData[period.periodKey].isValueAddedCrafted === null) {
       session.impactsData[period.periodKey].isValueAddedCrafted = true;
     }
     // init SOC
     if ((session.legalUnit.isEconomieSocialeSolidaire || session.legalUnit.isSocieteMission)
-        && !session.impactsData[period.periodKey].isValueAddedCrafted) {
+        && session.impactsData[period.periodKey].hasSocialPurpose === null) {
       session.impactsData[period.periodKey].hasSocialPurpose = true;
     }
     // init IDR & GEQ
     if (!session.legalUnit.isEmployeur
-        && !session.impactsData[period.periodKey].hasEmployees) {
+        && session.impactsData[period.periodKey].hasEmployees === null) {
       session.impactsData[period.periodKey].hasEmployees = false;
     }
   }, []);
