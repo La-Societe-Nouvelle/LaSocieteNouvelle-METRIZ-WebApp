@@ -44,6 +44,9 @@ export class ComparativeData {
     // division
     this.comparativeDivision = props.comparativeDivision || "00";
 
+    this.isDataFetched = props.isDataFetched || false; 
+    this.lastFetchDateTime = props.lastFetchDateTime || null; 
+    this.fetchedIndicators = []; 
     // aggregates dataset
 
     for (let aggregate of Object.keys(metaAggregates)) {
@@ -59,6 +62,17 @@ export class ComparativeData {
       }
     }
   }
+
+  setFetchStatus = (isFetched) => {
+    this.isDataFetched = isFetched;
+    if (isFetched) {
+      this.lastFetchDateTime = new Date(); 
+    }
+  };
+
+  setFetchedIndicators = (indicators) => {
+    this.fetchedIndicators = indicators;
+  };
 
   fetchComparativeData = async (indics) => {
 
@@ -109,6 +123,9 @@ export class ComparativeData {
           }
         }
       }
+
+      this.setFetchedIndicators(indics);
+      this.setFetchStatus(true);
     } catch (error) {
       throw Error(error.message);
     }
