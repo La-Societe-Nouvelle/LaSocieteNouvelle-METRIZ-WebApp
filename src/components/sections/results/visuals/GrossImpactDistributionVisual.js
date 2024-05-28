@@ -35,17 +35,8 @@ export const GrossImpactDistributionVisual = ({ session, period, indic }) => {
 
   // --------------------------------------------------
 
-  let expensesAccounts = financialData.externalExpensesAccounts
-    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
-    .map((account) => {
-      return {
-        ...account.periodsData[period.periodKey],
-        accountLib: account.accountLib,
-      };
-    });
-
   const mostImpactfulExpensesAccounts = sortAccountByImpact(
-    expensesAccounts,
+    financialData.externalExpensesAccounts,
     period.periodKey,
     indic,
     "desc"

@@ -93,17 +93,8 @@ export const buildSummaryReportIntensityIndic = async ({
     Math.max(lastEstimatedData.length - 2, 1)
   );
 
-  let expensesAccounts = financialData.externalExpensesAccounts
-    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
-    .map((account) => {
-      return {
-        ...account.periodsData[period.periodKey],
-        accountLib: account.accountLib,
-      };
-    });
-
   const mostImpactfulExpenses = sortAccountByImpact(
-    expensesAccounts,
+    financialData.externalExpensesAccounts,
     period.periodKey,
     indic,
     "desc"
