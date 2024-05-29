@@ -41,7 +41,8 @@ const UnidentifiedProviders = ({
   );
   const [accounts, setAccounts] = useState([]);
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     let providerNums = providers.map((provider) => provider.providerNum);
 
     // expense accounts
@@ -519,6 +520,7 @@ const UnidentifiedProviders = ({
       {treatmentByExpenseAccount && (
         <ExpenseAccountsTable
           accounts={filteredProviders}
+          externalFlowsOnPeriod={externalFlowsOnPeriod}
           significativeAccounts={significativeAccounts}
           financialPeriod={financialPeriod}
           startIndex={startIndex}

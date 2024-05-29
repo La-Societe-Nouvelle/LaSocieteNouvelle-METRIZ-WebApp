@@ -22,12 +22,16 @@ import areas from "/lib/areas";
 
 const ExpenseAccountsTable = ({
   accounts,
+  externalFlowsOnPeriod,
   startIndex,
   endIndex,
   significativeAccounts,
   financialPeriod,
   setAccountDefaultFootprintParams
 }) => {
+
+  const [accountsWithDetails,setAccountsWithDetails] = useState([]);
+
   // Sorting for providers
   const [sorting, setSorting] = useState({
     sortColumn: "montant",
@@ -68,6 +72,16 @@ const ExpenseAccountsTable = ({
       account.defaultFootprintParams.code === "00"
   );
 
+  const handleShowDetails = (accountNum) => {
+    if (accountsWithDetails.includes(accountNum)) {
+      let nextAccountsWithDetails = accountsWithDetails.filter((account) => account!=accountNum);
+      setAccountsWithDetails(nextAccountsWithDetails);
+    } else {
+      let nextAccountsWithDetails = [...accountsWithDetails,accountNum];
+      setAccountsWithDetails([...nextAccountsWithDetails]);
+    }
+  }
+
   // Check if significant providers are unassigned
   const hasWarning = (account) => {
 
@@ -95,6 +109,7 @@ const ExpenseAccountsTable = ({
       <Table>
         <thead>
           <tr>
+            <th/>
             <th width={10}></th>
             <th onClick={() => handleSort("libelle")}>
               <i className="bi bi-arrow-down-up me-1"></i>
@@ -117,83 +132,91 @@ const ExpenseAccountsTable = ({
             </tr>
           ) : (
             sortedAccounts.slice(startIndex, endIndex).map((account, index) => (
-              <tr key={account.accountNum || account.providerNum}>
-                <td>
-                  <div className="d-flex">
-                    <i
-                      className={
-                        getUnidentifiedProviderStatusIcon(account).className
-                      }
-                      title={getUnidentifiedProviderStatusIcon(account).title}
-                    ></i>
-                    {hasWarning(account) && (
+              <>
+                <tr key={account.accountNum || account.providerNum}>
+                  <td onClick={() => handleShowDetails(account.accountNum)}>
+                    <i className={accountsWithDetails.includes(account.accountNum) ? "bi-eye-slash" : "bi-eye"}/>
+                  </td>
+                  <td>
+                    <div className="d-flex">
                       <i
-                        className="bi bi-exclamation-triangle text-warning"
-                        title="Grand risque d'imprécision"
+                        className={
+                          getUnidentifiedProviderStatusIcon(account).className
+                        }
+                        title={getUnidentifiedProviderStatusIcon(account).title}
                       ></i>
-                    )}
-                  </div>
-                </td>
-                <td>{account.accountLib || account.providerLib}</td>
-                <td>{account.accountNum || account.providerNum}</td>
-                <td>
-                  <Select
-                    styles={customSelectStyles("150px")}
-                    value={{
-                      label: areas[account.defaultFootprintParams.area],
-                      value: account.defaultFootprintParams.area,
-                    }}
-                    placeholder={"Choisissez un espace économique"}
-                    options={areasOptions}
-                    onChange={(e) =>
-                      setAccountDefaultFootprintParams(
-                        account.providerNum || account.accountNum,
-                        "area",
-                        e.value
-                      )
-                    }
-                  />
-                </td>
-                <td>
-                  <Select
-                    styles={customSelectStyles(
-                      "500px",
-                      account.footprintStatus,
-                      hasWarning(account)
-                    )}
-                    value={{
-                      label:
-                        account.defaultFootprintParams.code +
-                        " - " +
-                        divisions[account.defaultFootprintParams.code],
-                      value: account.defaultFootprintParams.code,
-                    }}
-                    placeholder={"Choisissez un secteur d'activité"}
-                    options={divisionsOptions}
-                    onChange={(e) =>
-                      setAccountDefaultFootprintParams(
-                        account.providerNum || account.accountNum,
-                        "code",
-                        e.value
-                      )
-                    }
-                  />
-                </td>
-                <td>
-                  <div key={index} className="text-center flex-grow-1">
-                    <span className={"badge rounded-pill bg-" + getTagClass(account.defaultFootprintParams.accuracyMapping)}>
-                      {(account.defaultFootprintParams.accuracyMapping || " -")+" %"}
-                    </span>
-                  </div>
-                </td>
-                <td className="text-end">
-                  {printValue(
-                    account.periodsData[financialPeriod.periodKey].amount,
-                    0
-                  )}{" "}
-                  &euro;
-                </td>
-              </tr>
+                      {hasWarning(account) && (
+                        <i
+                          className="bi bi-exclamation-triangle text-warning"
+                          title="Grand risque d'imprécision"
+                        ></i>
+                      )}
+                    </div>
+                  </td>
+                  <td>{account.accountLib || account.providerLib}</td>
+                  <td>{account.accountNum || account.providerNum}</td>
+                  <td>
+                    <Select
+                      styles={customSelectStyles("150px")}
+                      value={{
+                        label: areas[account.defaultFootprintParams.area],
+                        value: account.defaultFootprintParams.area,
+                      }}
+                      placeholder={"Choisissez un espace économique"}
+                      options={areasOptions}
+                      onChange={(e) =>
+                        setAccountDefaultFootprintParams(
+                          account.providerNum || account.accountNum,
+                          "area",
+                          e.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td>
+                    <Select
+                      styles={customSelectStyles(
+                        "500px",
+                        account.footprintStatus,
+                        hasWarning(account)
+                      )}
+                      value={{
+                        label:
+                          account.defaultFootprintParams.code +
+                          " - " +
+                          divisions[account.defaultFootprintParams.code],
+                        value: account.defaultFootprintParams.code,
+                      }}
+                      placeholder={"Choisissez un secteur d'activité"}
+                      options={divisionsOptions}
+                      onChange={(e) =>
+                        setAccountDefaultFootprintParams(
+                          account.providerNum || account.accountNum,
+                          "code",
+                          e.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td>
+                    <div key={index} className="text-center flex-grow-1">
+                      <span className={"badge rounded-pill bg-" + getTagClass(account.defaultFootprintParams.accuracyMapping)}>
+                        {(account.defaultFootprintParams.accuracyMapping || " -")+" %"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="text-end">
+                    {printValue(
+                      account.periodsData[financialPeriod.periodKey].amount,
+                      0
+                    )}{" "}
+                    &euro;
+                  </td>
+                </tr>
+                {accountsWithDetails.includes(account.accountNum) &&
+                  showDetails(account.accountNum,externalFlowsOnPeriod)
+                }
+              </>
             ))
           )}
         </tbody>
@@ -210,5 +233,28 @@ const ExpenseAccountsTable = ({
     </>
   );
 };
+
+const showDetails = (accountNum,externalFlowsOnPeriod) => 
+{
+  const uniqueProviders = externalFlowsOnPeriod.filter((flow) => flow.accountNum == accountNum)
+    .map((flow) => flow.providerNum)
+    .filter((value, index, self) => index === self.findIndex(item => item === value));
+  
+  return(
+    <>
+      {uniqueProviders.map((providerNum) => 
+        <tr>
+          <td/>
+          <td/>
+          <td>{providerNum}</td>
+          <td></td>
+          <td/>
+          <td/>
+          <td/>
+          <td/>
+        </tr>)}
+    </>
+  )
+}
 
 export default ExpenseAccountsTable;
