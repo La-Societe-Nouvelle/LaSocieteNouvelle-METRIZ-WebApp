@@ -30,7 +30,7 @@ import {
 // Utils
 import { printValue } from "/src/utils/formatters";
 import {
-  getMostImpactfulExpensesPart,
+  getMostImpactfulAccountsPart,
   sortAccountByImpact,
 } from "../../utils";
 
@@ -100,11 +100,12 @@ export const buildSummaryReportIntensityIndic = async ({
     "desc"
   ).slice(0, 3);
 
-  const mostImpactfulExpenseAccountsPart = getMostImpactfulExpensesPart(
+  const mostImpactfulExpenseAccountsPart = getMostImpactfulAccountsPart(
     mostImpactfulExpenses,
     production.periodsData[period.periodKey].footprint.indicators[
       indic
     ].getGrossImpact(production.periodsData[period.periodKey].amount),
+    period.periodKey,
     indic
   );
 

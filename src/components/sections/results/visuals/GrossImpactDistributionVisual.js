@@ -9,7 +9,7 @@ import { ValueDistributionChart } from "../charts/ValueDistributionChart";
 
 // Utils
 import { getPrevDate } from "../../../../utils/periodsUtils";
-import { sortAccountByImpact } from "../utils";
+import { getMostImpactfulAccountsPart, sortAccountByImpact } from "../utils";
 
 /* ---------- GROSS IMPACT DISTRIBUTION VISUAL ---------- */
 
@@ -35,6 +35,12 @@ export const GrossImpactDistributionVisual = ({ session, period, indic }) => {
 
   // --------------------------------------------------
 
+  const productionOnPeriod =
+    financialData.mainAggregates.production.periodsData[period.periodKey];
+  const productionOnPeriodGrossImpact = productionOnPeriod.footprint.indicators[
+    indic
+  ].getGrossImpact(productionOnPeriod.amount);
+
   const mostImpactfulExpensesAccounts = sortAccountByImpact(
     financialData.externalExpensesAccounts,
     period.periodKey,
@@ -42,20 +48,12 @@ export const GrossImpactDistributionVisual = ({ session, period, indic }) => {
     "desc"
   ).slice(0, 5);
 
-  const productionOnPeriod =
-    financialData.mainAggregates.production.periodsData[period.periodKey];
-  const productionOnPeriodGrossImpact = productionOnPeriod.footprint.indicators[
+  const mostImpactfulExpenseAccountsPart = getMostImpactfulAccountsPart(
+    mostImpactfulExpensesAccounts,
+    productionOnPeriodGrossImpact,
+    period.periodKey,
     indic
-  ].getGrossImpact(productionOnPeriod.amount);
-
-  mostImpactfulExpensesAccounts.forEach((account) => {
-    let accountImpact = account.footprint.indicators[indic].getGrossImpact(
-      account.amount
-    );
-    account.impactPercentage = Math.round(
-      (accountImpact / productionOnPeriodGrossImpact) * 100
-    );
-  });
+  );
 
   return (
     <div className="box">
@@ -82,7 +80,7 @@ export const GrossImpactDistributionVisual = ({ session, period, indic }) => {
                 <h5 className="mb-4">
                   Comptes de charges ayant le plus d'impact
                 </h5>
-                {mostImpactfulExpensesAccounts.map((account, index) => (
+                {mostImpactfulExpenseAccountsPart.map((account, index) => (
                   <div
                     key={index}
                     className="d-flex align-items-center impactful-expense "

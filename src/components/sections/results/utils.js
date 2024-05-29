@@ -319,17 +319,17 @@ export const hasComparativeData = (session, scale, serie, indic) => {
 
 // Livrables & Charts 
 
-export function getMostImpactfulExpensesPart(expenses, total, indic) {
-  const expensesPart = expenses.map((expense) => {
-    let expenseImpact = expense.footprint.indicators[indic].getGrossImpact(
-      expense.amount
+export function getMostImpactfulAccountsPart(accounts, total, periodKey, indic) {
+  const accountsPart = accounts.map((account) => {
+    let accountImpact = account.periodsData[periodKey].footprint.indicators[indic].getGrossImpact(
+      account.periodsData[periodKey].amount
     );
-    let impactPercentage = Math.round((expenseImpact / total) * 100);
-    let accountLib = expense.accountLib;
+    let impactPercentage = Math.round((accountImpact / total) * 100);
+    let accountLib = account.accountLib;
 
     return { accountLib, impactPercentage };
   });
-  return expensesPart;
+  return accountsPart;
 }
 
 export function sortAccountByImpact(expensesAccounts, periodKey, indicator, order) 
