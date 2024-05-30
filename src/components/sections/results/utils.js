@@ -332,18 +332,21 @@ export function getMostImpactfulAccountsPart(accounts, total, periodKey, indic) 
   return accountsPart;
 }
 
+// /!\ filter accounts defined on period specified
 export function sortAccountByImpact(expensesAccounts, periodKey, indicator, order) 
 {
-  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
-    const valueA = a.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
-    const valueB = b.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
+  const sortedExpensesAccounts = expensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(periodKey))
+    .sort((a, b) => {
+      const valueA = a.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
+      const valueB = b.periodsData[periodKey].footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
 
-    if (order === "asc") {
-      return valueA - valueB;
-    } else {
-      return valueB - valueA;
-    }
-  });
+      if (order === "asc") {
+        return valueA - valueB;
+      } else {
+        return valueB - valueA;
+      }
+    });
 
   return sortedExpensesAccounts;
 }
