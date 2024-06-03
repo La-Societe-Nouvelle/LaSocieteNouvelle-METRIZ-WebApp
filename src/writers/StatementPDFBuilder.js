@@ -1,16 +1,14 @@
 // La Société Nouvelle
 
 // Utils
-import { printValue } from "/src/utils/formatters";
 import { getShortCurrentDateString } from "../utils/periodsUtils";
-import { loadFonts } from "../utils/exportsUtils";
 
-// Libraries
-import metaIndics from "/lib/indics";
 
 // PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+
+import { loadFonts } from "../components/sections/results/exports/reports/utils/layout";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 

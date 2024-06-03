@@ -7,8 +7,12 @@ export const changeOpacity = (rgbaColor, newOpacity) => {
 };
 
 export const getCutOut = (width, factor) => {
+  if (width < 400) {
+    return width / (factor * 1.5);
+  }
   return width / factor;
 };
+
 
 
 // Get the maximum value on the Y-axis from multiple datasets

@@ -32,8 +32,8 @@ export const SyncErrorModal = ({ showModal, onClose, changeView }) => {
         </p>
 
         <p className="text-center mt-4">
-          <Button variant="primary" onClick={handleViewChangeAndClose}>
-            Afficher les comptes avec des erreurs
+          <Button variant="secondary" onClick={handleViewChangeAndClose}>
+            Afficher les comptes erronés
           </Button>
         </p>
       </Modal.Body>

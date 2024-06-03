@@ -10,18 +10,7 @@ import metaIndics from "/lib/indics";
 
 import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
 
-// Exports Utils
-import {
-  addUncertaintyText,
-  cutString,
-  filterProvidersByPeriod,
-  getIndicDescription,
-  getUncertaintyDescription,
-  sortAccountsByFootprint,
-  sortProvidersByContrib,
-} from "../exportsUtils";
-
-import { calculateAvailableWidth, createRectObject, generateFooter, generateHeader, getChartImageData, getDocumentInfo, loadFonts, definePDFStyles } from "../../../../../utils/exportsUtils";
+ 
 
 // Utils
 import { printValue } from "/src/utils/formatters";
@@ -29,6 +18,8 @@ import { getClosestYearData } from "../../utils";
 
 // PDF Config
 import { pdfMargins, pdfPageSize, defaultPosition } from "../../../../../constants/pdfConfig";
+import { calculateAvailableWidth, createRectObject, definePDFStyles, generateFooter, generateHeader, getDocumentInfo, loadFonts } from "./utils/layout";
+import { addUncertaintyText, cutString, getChartImageData, getIndicDescription, getUncertaintyDescription } from "./utils";
 
 
 // --------------------------------------------------------------------------
@@ -135,7 +126,7 @@ export const buildSummaryReportContributionIndic = async ({
       pdfMargins.bottom,
     ],
     header: generateHeader(corporateName,legalUnit.siren, currentPeriod),
-    footer: generateFooter,
+    footer: generateFooter(corporateName),
     background: function () {
       const canvas = [];
 
@@ -528,3 +519,90 @@ function getImpactData(externalExpensesAccounts, period, indic, providers){
     mostImpactfulProviders,
   };
 };
+
+// --------------------------------------------------
+// Sorting
+
+/**
+ * Sort accounts by footprint indicator value.
+ * @param {Array<object>} accounts - The accounts to sort.
+ * @param {object} period - The period object.
+ * @param {string} indicator - The indicator code.
+ * @param {string} order - The sort order ('asc' or 'desc').
+ * @returns {Array<object>} The sorted accounts.
+ */
+function sortAccountsByFootprint(accounts, period, indicator, order) {
+  const sortedAccounts = accounts.sort((a, b) => {
+    const valueA =
+      a.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    const valueB =
+      b.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    if (order === "asc") {
+      return valueA - valueB;
+    } else {
+      return valueB - valueA;
+    }
+  });
+
+  return sortedAccounts;
+}
+
+
+
+/**
+ * Sort providers by contribution to an indicator.
+ * @param {string} periodKey - The period key.
+ * @param {Array<object>} expensesAccounts - The expenses accounts to sort.
+ * @param {string} indicator - The indicator code.
+ * @param {string} order - The sort order ('asc' or 'desc').
+ * @returns {Array<object>} The sorted expenses accounts.
+ */
+function sortProvidersByContrib(
+  periodKey,
+  expensesAccounts,
+  indicator,
+  order
+) {
+  const sortedExpensesAccounts = expensesAccounts
+    .sort((a, b) => {
+      const valueA = a.footprint.indicators[indicator].getGrossImpact(
+        a.periodsData[periodKey].amount
+      );
+      const valueB = b.footprint.indicators[indicator].getGrossImpact(
+        b.periodsData[periodKey].amount
+      );
+
+      if (order === "asc") {
+        return valueA - valueB;
+      } else {
+        return valueB - valueA;
+      }
+    })
+    .slice(0, 4)
+    .sort((a, b) => {
+      let sortedAccountA = 100 - a.footprint.indicators[indicator].value;
+      let sortedAccountB = 100 - b.footprint.indicators[indicator].value;
+      return sortedAccountB - sortedAccountA;
+    });
+
+  return sortedExpensesAccounts;
+}
+
+
+
+// --------------------------------------------------
+// Filters
+
+/**
+ * Filter providers by period.
+ * @param {object} financialData - The financial data object.
+ * @param {object} period - The period object.
+ * @returns {Array<object>} The filtered providers.
+ */
+function filterProvidersByPeriod(financialData, period) {
+  return financialData.providers.filter((provider) => {
+    return Object.keys(provider.periodsData).some(
+      (key) => key === period.periodKey
+    );
+  });
+}

@@ -5,28 +5,6 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
-// Exports Utils
-import {
-  getMostImpactfulExpenseAccountRows,
-  getUncertaintyDescription,
-  targetAnnualReduction,
-  calculateAverageEvolutionRate,
-  addUncertaintyText,
-  getIndicDescription,
-} from "../exportsUtils";
-
-import {
-  calculateAvailableWidth,
-  createRectObject,
-  generateFooter,
-  generateHeader,
-  getChartImageData,
-  getDocumentInfo,
-  loadFonts,
-  definePDFStyles,
-  rgbaToHex,
-} from "../../../../../utils/exportsUtils";
-
 // Utils
 import { printValue } from "/src/utils/formatters";
 import {
@@ -43,6 +21,25 @@ import {
 
 // Colors
 import { aggregatesChartColors } from "../../../../../constants/chartColors";
+import {
+  calculateAvailableWidth,
+  createRectObject,
+  definePDFStyles,
+  generateFooter,
+  generateHeader,
+  getDocumentInfo,
+  loadFonts,
+} from "./utils/layout";
+import {
+  addUncertaintyText,
+  calculateAverageEvolutionRate,
+  cutString,
+  getChartImageData,
+  getIndicDescription,
+  getUncertaintyDescription,
+  rgbaToHex,
+  targetAnnualReduction,
+} from "./utils";
 
 // --------------------------------------------------------------------------
 //  Report for Intensity Indicator
@@ -79,10 +76,10 @@ export const buildSummaryReportIntensityIndic = async ({
   const target = comparativeData.production.division.target.data[indic];
 
   if (target.length) {
-    const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
-    branchProductionTarget = targetAnnualReduction(
-      linearTarget
+    const linearTarget = target.filter(
+      (data) => data.path == "LIN" && data.flag == "f"
     );
+    branchProductionTarget = targetAnnualReduction(linearTarget);
   }
 
   let lastEstimatedData = comparativeData.production.division.history.data[
@@ -109,7 +106,8 @@ export const buildSummaryReportIntensityIndic = async ({
     indic
   );
 
-  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
+  const branchProductionEvolution =
+    calculateAverageEvolutionRate(lastEstimatedData);
 
   // Part des consommations intermédiaires
   const intermediateConsumptionsPart = getIntermediateConsumptionsPart(
@@ -188,8 +186,8 @@ export const buildSummaryReportIntensityIndic = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: generateHeader(corporateName,legalUnit.siren, currentPeriod),
-    footer: generateFooter,
+    header: generateHeader(corporateName, legalUnit.siren, currentPeriod),
+    footer: generateFooter(corporateName),
     background: function (currentPage) {
       const canvas = [];
       // Background rectangles
@@ -458,7 +456,7 @@ const buildHeaderSection = (
               text: [
                 {
                   width: "auto",
-                  text: branchProductionTarget 
+                  text: branchProductionTarget
                     ? branchProductionTarget + " %"
                     : "-",
                   style: "numbers",
@@ -594,7 +592,6 @@ const buildProductionImpactSection = (
 };
 
 // Sections  -----------------------------------------------------------
-
 
 const buildSIGTableSection = (mainAggregates, period, indic) => {
   const {
@@ -770,7 +767,6 @@ const buildBranchPerformanceSection = (
   chartImages,
   indic
 ) => {
-  
   const branchReferenceText =
     "Branche de référence : " +
     comparativeData.comparativeDivision +
@@ -940,3 +936,34 @@ function getIntermediateConsumptionsPart(financialData, indic, period) {
 
   return intermediateConsumptionsPart;
 }
+
+const getMostImpactfulExpenseAccountRows = (
+  mostImpactfulExpenseAccountsPart,
+  bgColor
+) => {
+  let rows = [];
+
+  mostImpactfulExpenseAccountsPart.forEach((item) => {
+    let row = [];
+
+    row.push(
+      {
+        text: item.impactPercentage + " %",
+        fillColor: bgColor,
+        color: "#FFFFFF",
+        fontSize: 5,
+        borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+        alignment: "right",
+        bold: true,
+      },
+      {
+        text: cutString(item.accountLib, 40),
+        fontSize: 7,
+        borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+        bold: true,
+      }
+    );
+    rows.push(row);
+  });
+  return rows;
+};

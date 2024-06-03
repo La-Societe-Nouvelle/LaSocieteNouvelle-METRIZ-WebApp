@@ -30,7 +30,6 @@ const UnidentifiedProviders = ({
   legalUnitActivityCode,
   useChatGPT
 }) => {
-
   // State management
   const [providers, setProviders] = useState(
     financialData.providers.filter(
@@ -51,7 +50,7 @@ const UnidentifiedProviders = ({
       .filter((value, index, self) => index === self.findIndex(item => item === value));
     let accounts = financialData.externalExpensesAccounts
       .filter((account) => accountNums.includes(account.accountNum));
-    
+
     // immobilisation providers
     let immobilisationProviderNums = financialData.investments
       .filter((investment) => providerNums.includes(investment.providerNum) && financialPeriod.regex.test(investment.date))
@@ -96,7 +95,6 @@ const UnidentifiedProviders = ({
 
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
-
   }, []);
 
   // Filter providers or accounts based on the current view
@@ -113,7 +111,7 @@ const UnidentifiedProviders = ({
       filteredItems = filterProvidersByView(
         currentView,
         providers,
-        significativeProviders,
+        significativeProviders
       );
     }
     setFilteredProviders(filteredItems);
@@ -144,12 +142,12 @@ const UnidentifiedProviders = ({
   {
     const significativeProviders =
       await getSignificativeUnidentifiedProviders(
-        financialData.providers,
-        minFpt,
-        maxFpt,
-        financialPeriod
-      );
-    
+      financialData.providers,
+      minFpt,
+      maxFpt,
+      financialPeriod
+    );
+
     setSignificativeProviders(significativeProviders);
   };
 
@@ -168,14 +166,14 @@ const UnidentifiedProviders = ({
         .filter(expense => financialPeriod.regex.test(expense.date));
     const significativeAccounts =
       await getSignificativeAccountsFromFlows(
-        expensesOnPeriod,
-        accounts,
-        financialData.providers,
-        minFpt,
-        maxFpt,
-        financialPeriod
-      );
-    
+      expensesOnPeriod,
+      accounts,
+      financialData.providers,
+      minFpt,
+      maxFpt,
+      financialPeriod
+    );
+
     setSignificativeAccounts(significativeAccounts);
   };
 
@@ -184,8 +182,8 @@ const UnidentifiedProviders = ({
   {
     const isProvidersSync = [...providersToSync, ...accountsToSync]
       .every((account) => account.footprintStatus == 200 && account.footprint.isValid());
-    
-    return isProvidersSync;;
+
+    return isProvidersSync;
   };
 
   // --------------------------------------------------
@@ -224,7 +222,7 @@ const UnidentifiedProviders = ({
           provider.useDefaultFootprint &&
           (provider.footprintStatus !== 200 || !provider.footprint.isValid())
       );
-    } 
+    }
 
     // Expense Account
     if (treatmentByExpenseAccount) {
@@ -236,30 +234,36 @@ const UnidentifiedProviders = ({
         );
     }
 
-    await synchronizeProviders(elementsToSynchronize);
+    try {
+      await synchronizeProviders(elementsToSynchronize);
+      if (!treatmentByExpenseAccount) {
+        updateSignificativeProviders();
+      } else {
+        updateSignificativeAccounts();
+      }
 
-    if (!treatmentByExpenseAccount) {
-      updateSignificativeProviders();
-    } else {
-      updateSignificativeAccounts();
+      const isNextStepAvailable = checkSynchronisation();
+      setIsNextStepAvailable(isNextStepAvailable);
+
+      if (!isNextStepAvailable) {
+        setShowSyncErrorWarningModal(!isNextStepAvailable);
+        
+      
+      }
+
+      setShowSyncSuccessModal(isNextStepAvailable);
+      setState((prevState) => ({
+        ...prevState,
+        currentView: "all",
+        currentPage: 1,
+      }));
+    } catch (error) {
+
+      // log error 
     }
-
-    const isNextStepAvailable = checkSynchronisation();
-    setIsNextStepAvailable(isNextStepAvailable);
-
-    setShowSyncErrorWarningModal(!isNextStepAvailable);
-    setShowSyncSuccessModal(isNextStepAvailable);
-    setState((prevState) => ({
-      ...prevState,
-      currentView: "all",
-      currentPage: 1,
-    }));
-
-  
   };
 
-  const switchView = (event) => 
-  {
+  const switchView = (event) => {
     const treatmentByExpenseAccount = event.target.checked;
 
     let providerNums = providers.map((provider) => provider.providerNum);
@@ -270,7 +274,7 @@ const UnidentifiedProviders = ({
 
     if (treatmentByExpenseAccount) {
       updateSignificativeAccounts();
-      setFilteredProviders(accounts)
+      setFilteredProviders(accounts);
       setState((prevState) => ({
         ...prevState,
         currentView: "all",
@@ -285,8 +289,7 @@ const UnidentifiedProviders = ({
         currentPage: 1,
       }));
     }
-  }
-
+  };
 
   // Pré-selection economic division
   const setDefaultMapping = async () => 
@@ -312,8 +315,8 @@ const UnidentifiedProviders = ({
                 accuracyMapping: accuracy
               }
             });
-          } 
-          
+          }
+
           let provider = providers.find((provider) => provider.providerNum == accountId);
           if (provider) {
             provider.update({
@@ -396,27 +399,28 @@ const UnidentifiedProviders = ({
           Synchronisation des données grâce au secteur d'activité
         </h3>
       </div>
-
+ 
       <div className="alert-info ">
         <div className="info-icon">
           <Image src="/info-circle.svg" alt="icon info" />
         </div>
         <div>
           <p>
-            Le <b>traitement par compte de charges</b> permet de simplifier la démarche
-            d'identification des activités économiques correspondantes aux
-            dépenses non rattachées à un fournisseur identifié (via son numéro
-            SIREN).
-            Il permet de traiter les empreintes des dépenses par compte de charges plutôt que
-            par compte fournisseur.
+            Le <b>traitement par compte de charges</b> permet de simplifier la
+            démarche d'identification des activités économiques correspondantes
+            aux dépenses non rattachées à un fournisseur identifié (via son
+            numéro SIREN). Il permet de traiter les empreintes des dépenses par
+            compte de charges plutôt que par compte fournisseur.
           </p>
-          {useChatGPT && <p className="mt-1">
-            L'<b>association automatique est réalisée via ChatGPT</b> à partir du libellé
-            du compte et de la division à laquelle appartient l'entreprise.
-            Un indice de confiance (en pourcentage) est fourni pour exprimer le dégré
-            de confiance dans l'association proposée. Elle est de 100% lorsque l'association
-            est manuelle.
-          </p>}
+          {useChatGPT && (
+            <p className="mt-1">
+              L'<b>association automatique est réalisée via ChatGPT</b> à partir
+              du libellé du compte et de la division à laquelle appartient
+              l'entreprise. Un indice de confiance (en pourcentage) est fourni
+              pour exprimer le dégré de confiance dans l'association proposée.
+              Elle est de 100% lorsque l'association est manuelle.
+            </p>
+          )}
         </div>
       </div>
 
@@ -489,9 +493,11 @@ const UnidentifiedProviders = ({
         </Row>
 
         <div>
-          <Button className="btn btn-primary me-2" 
-                  onClick={setDefaultMapping}
-                  disabled={!useChatGPT}>
+          <Button
+            className="btn btn-primary me-2"
+            onClick={setDefaultMapping}
+            disabled={!useChatGPT}
+          >
             <i className="bi bi-shuffle"></i> Association automatique
           </Button>
 
@@ -551,7 +557,11 @@ const UnidentifiedProviders = ({
         showModal={showSyncErrorWarningModal}
         onClose={() => setShowSyncErrorWarningModal(false)}
         changeView={() =>
-          setState((prevState) => ({ ...prevState, currentView: "error", currentPage: 1 }))
+          setState((prevState) => ({
+            ...prevState,
+            currentView: "error",
+            currentPage: 1,
+          }))
         }
       />
 
@@ -630,29 +640,29 @@ function filterAccountsByView(currentView, accounts, significativeAccounts) {
 
   switch (currentView) {
     case "aux": // provider account
-    filteredAccounts = accounts.filter(
+      filteredAccounts = accounts.filter(
         (account) => !account.isDefaultProviderAccount
       );
       break;
     case "expenses": // default provider account
-    filteredAccounts = accounts.filter(
+      filteredAccounts = accounts.filter(
         (account) => account.isDefaultProviderAccount
       );
       break;
     case "significative": // significative provider
-    filteredAccounts = accounts.filter((account) =>
-      significativeAccounts.includes(account.accountNum)
+      filteredAccounts = accounts.filter((account) =>
+        significativeAccounts.includes(account.accountNum)
       );
       break;
     case "significativeWithoutActivity": // significative provider & no activity code set
-    filteredAccounts = accounts.filter(
+      filteredAccounts = accounts.filter(
         (account) =>
-        significativeAccounts.includes(account.accountNum) &&
-        account.defaultFootprintParams.code === "00"
+          significativeAccounts.includes(account.accountNum) &&
+          account.defaultFootprintParams.code === "00"
       );
       break;
     case "defaultActivity": // no activity code set
-    filteredAccounts = accounts.filter(
+      filteredAccounts = accounts.filter(
         (account) => account.defaultFootprintParams.code === "00"
       );
       break;
@@ -672,8 +682,9 @@ function filterAccountsByView(currentView, accounts, significativeAccounts) {
 function isSyncButtonEnabled(providers) {
   return providers.some(
     (provider) =>
-        (provider.footprintStatus !== 200 || !provider.footprint.isValid()) 
-      || provider.footprintStatus === 203
+      provider.footprintStatus !== 200 ||
+      !provider.footprint.isValid() ||
+      provider.footprintStatus === 203
   );
 }
 function hasSignificativeProvidersWithoutActivity(

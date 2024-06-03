@@ -1,8 +1,10 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
-import { loadFonts } from "../../../../../utils/exportsUtils";
-import { loadImageAsDataURL } from "../exportsUtils";
+// Utils
+import { loadFonts } from "./utils/layout";
+import { loadImageAsDataURL } from "./utils";
+
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();

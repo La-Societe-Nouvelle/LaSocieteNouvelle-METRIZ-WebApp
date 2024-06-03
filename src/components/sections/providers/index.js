@@ -67,6 +67,7 @@ const ProvidersSection = ({
         });
     } catch (error) {
       setApiError(true);
+      throw error;
     }
   };
 
@@ -77,9 +78,15 @@ const ProvidersSection = ({
     let i = 0;
     const n = accountsToSynchronise.length;
     for (const account of accountsToSynchronise) {
-      await synchronizeProviderData(account);
-      i++;
-      setProgression(Math.round((i / n) * 100));
+      try {
+        await synchronizeProviderData(account);
+        i++;
+        setProgression(Math.round((i / n) * 100));
+      } catch (error) {
+        setFetching(false);
+        throw error;
+      }
+   
     }
 
     setFetching(false);

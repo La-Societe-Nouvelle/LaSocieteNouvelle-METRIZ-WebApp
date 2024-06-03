@@ -493,7 +493,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+ligneCourante.CompteNum+".");
 
     // update data
-    immobilisation.initialState.amount = parseAmount(ligneCourante.Debit);
+    immobilisation.initialState.amount += parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   }
 
   // Comptes d'amortissements ------------------------------------------------------------------------- //
@@ -507,7 +507,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".");
 
     // update date
-    immobilisation.initialState.amortisationAmount = parseAmount(ligneCourante.Credit);
+    immobilisation.initialState.amortisationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
@@ -521,7 +521,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".");
 
     // update date
-    immobilisation.initialState.depreciationAmount = parseAmount(ligneCourante.Credit);
+    immobilisation.initialState.depreciationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   }
 
   /* --- STOCKS --- */
@@ -549,7 +549,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (stock == undefined) throw ("Erreur de lecture pour le compte de stock "+ligneCourante.CompteNum+"." );
 
     // update data
-    stock.initialState.amount = parseAmount(ligneCourante.Debit);
+    stock.initialState.amount += parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
@@ -563,7 +563,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (stock == undefined) throw ("Erreur de lecture pour le compte de stock "+accountData.assetAccountNum+".");
 
     // update date
-    stock.initialState.depreciationAmount = parseAmount(ligneCourante.Credit);
+    stock.initialState.depreciationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   }
 }
 

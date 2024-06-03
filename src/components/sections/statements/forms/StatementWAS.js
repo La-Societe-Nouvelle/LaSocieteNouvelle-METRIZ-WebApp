@@ -37,7 +37,7 @@ const StatementWAS = ({
   impactsData, 
   onUpdate 
 }) => {
-  // satte
+  // state
   const [wasteProduction, setWasteProduction] = useState(
     valueOrDefault(impactsData.wasteProduction, "")
   );

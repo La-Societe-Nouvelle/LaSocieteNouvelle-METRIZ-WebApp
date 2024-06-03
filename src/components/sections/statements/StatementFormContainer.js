@@ -52,6 +52,13 @@ function StatementFormContainer ({
     }
   };
 
+  // return unselect status if indic undefined/unselect when component did mount
+  useEffect(() => {
+    if (!selected) {
+      onUpdate(indic,{status:"unselect", errorMessage: null});
+    }
+  }, [])
+
   const onStatementUpdate = (statementStatus) => {
     setErrorMessage(statementStatus.errorMessage);
     onUpdate(indic,statementStatus);
