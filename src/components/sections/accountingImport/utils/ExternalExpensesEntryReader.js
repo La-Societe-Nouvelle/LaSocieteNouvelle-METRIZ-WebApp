@@ -77,11 +77,11 @@ export const readExternalExpensesFromEntry = async (entry,data) =>
   }
 
   // group by amount
-  subEntries = await getSubEntriesByAmount(entry);
-  if (subEntries.length>1) {
-    res = readExternalExpensesFromSubEntries(subEntries,data);
-    if (res.isExpensesTracked) return res;  
-  }
+  // subEntries = await getSubEntriesByAmount(entry);
+  // if (subEntries.length>1) {
+  //   res = readExternalExpensesFromSubEntries(subEntries,data);
+  //   if (res.isExpensesTracked) return res;  
+  // }
 
   // ---------- Error ---------- //
 
