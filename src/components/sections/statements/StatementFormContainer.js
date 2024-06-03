@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Form, Button } from "react-bootstrap";
 
 import {
