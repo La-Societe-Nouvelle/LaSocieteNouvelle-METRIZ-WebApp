@@ -26,9 +26,6 @@ import {
   loadFonts,
 } from "./utils/layout";
 
-// Utils
-import { printValue } from "/src/utils/formatters";
-
 // PDF Config
 import {
   addUncertaintyText,
