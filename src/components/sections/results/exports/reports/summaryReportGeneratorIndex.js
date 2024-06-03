@@ -5,29 +5,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
-
-// Exports Utils
-import {
-  addUncertaintyText,
-  calculateAverageEvolutionRate,
-  cutString,
-  filterProvidersByPeriod,
-  getIndicDescription,
-  getUncertaintyDescription,
-  targetAnnualReduction,
-} from "../exportsUtils";
-
-import {
-  createRectObject,
-  generateFooter,
-  generateHeader,
-  getDocumentInfo,
-  loadFonts,
-  definePDFStyles,
-  calculateAvailableWidth,
-  getChartImageData,
-} from "../../../../../utils/exportsUtils";
-
+ 
 // Utils
 import { printValue } from "/src/utils/formatters";
 
@@ -37,6 +15,29 @@ import {
   pdfMargins,
   pdfPageSize,
 } from "../../../../../constants/pdfConfig";
+
+import {
+  calculateAvailableWidth,
+  createRectObject,
+  definePDFStyles,
+  generateFooter,
+  generateHeader,
+  getDocumentInfo,
+  loadFonts,
+} from "./utils/layout";
+
+// Utils
+import { printValue } from "/src/utils/formatters";
+
+// PDF Config
+import {
+  addUncertaintyText,
+  calculateAverageEvolutionRate,
+  getChartImageData,
+  getIndicDescription,
+  getUncertaintyDescription,
+  targetAnnualReduction,
+} from "./utils";
 
 // --------------------------------------------------------------------------
 //  Report for Index Indicator
@@ -145,7 +146,7 @@ export const buildSummaryReportIndexIndic = async ({
       pdfMargins.bottom,
     ],
     header: generateHeader(corporateName,legalUnit.siren, currentPeriod),
-    footer: generateFooter,
+    footer: generateFooter(corporateName),
 
     background: function () {
       const canvas = [];
@@ -283,8 +284,7 @@ export const buildSummaryReportIndexIndic = async ({
       },
 
       //--------------------------------------------------
-      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins,defaultPosition), 
-      ,
+      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins,defaultPosition)
     ],
     //--------------------------------------------------
     // Style
