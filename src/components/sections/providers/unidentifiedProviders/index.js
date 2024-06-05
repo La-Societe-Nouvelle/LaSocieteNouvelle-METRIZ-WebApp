@@ -30,6 +30,7 @@ const UnidentifiedProviders = ({
   legalUnitActivityCode,
   useChatGPT
 }) => {
+
   // State management
   const [providers, setProviders] = useState(
     financialData.providers.filter(
@@ -40,7 +41,9 @@ const UnidentifiedProviders = ({
   );
   const [accounts, setAccounts] = useState([]);
 
-  useEffect(() => {
+  // init accounts array
+  useEffect(() => 
+  {
     let providerNums = providers.map((provider) => provider.providerNum);
 
     // expense accounts
@@ -61,23 +64,24 @@ const UnidentifiedProviders = ({
     setAccounts([...accounts,...immobilisationProviders]);
   }, [])
 
+  // significative providers/accounts
   const [significativeProviders, setSignificativeProviders] = useState([]);
   const [significativeAccounts, setSignificativeAccounts] = useState([]);
 
-  const [treatmentByExpenseAccount, setTreatmentByExpenseAccount] = useState(
-    financialData.externalExpenses
-      .filter((expense) => financialPeriod.regex.test(expense.date))
-      .some((flow) => flow.footprintOrigin == "account")
-  );
+  // mode
+  const [treatmentByExpenseAccount, setTreatmentByExpenseAccount] = useState(false);
+
+  // modals
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
   const [showSyncWarningModal, setShowWarningModal] = useState(false);
   const [showSyncErrorWarningModal , setShowSyncErrorWarningModal] = useState(false);
 
-  const [filteredProviders, setFilteredProviders] = useState(providers);
+  const [filteredProviders, setFilteredProviders] = useState(accounts);
   const [isNextStepAvailable, setIsNextStepAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
+  // view state
   const [state, setState] = useState({
     currentView: "all",
     currentPage: 1,
@@ -117,6 +121,26 @@ const UnidentifiedProviders = ({
     setFilteredProviders(filteredItems);
   }, [currentView]);
 
+  // init mode
+  useEffect(() => {
+    let treatmentByExpenseAccount = financialData.externalExpenses
+      .filter((expense) => financialPeriod.regex.test(expense.date))
+      .some((flow) => flow.footprintOrigin == "account");
+
+    let providerNums = providers.map((provider) => provider.providerNum);
+    externalFlowsOnPeriod
+      .filter((flow) => providerNums.includes(flow.providerNum))
+      .forEach((flow) => flow.footprintOrigin = treatmentByExpenseAccount ? "account" : "provider");
+    setTreatmentByExpenseAccount(treatmentByExpenseAccount);
+
+    if (treatmentByExpenseAccount) {
+      setFilteredProviders(accounts);
+    } else {
+      setFilteredProviders(providers);
+    }
+  }, [accounts]);
+
+  // switch mode
   useEffect(() => {
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
@@ -263,7 +287,8 @@ const UnidentifiedProviders = ({
     }
   };
 
-  const switchView = (event) => {
+  const switchView = (event) => 
+  {
     const treatmentByExpenseAccount = event.target.checked;
 
     let providerNums = providers.map((provider) => provider.providerNum);
