@@ -32,6 +32,27 @@ const columnsFEC = [
   "Idevise",
 ];
 
+const columnsFECWithDirection = [
+  "JournalCode",
+  "JournalLib",
+  "EcritureNum",
+  "EcritureDate",
+  "CompteNum",
+  "CompteLib",
+  "CompAuxNum",
+  "CompAuxLib",
+  "PieceRef",
+  "PieceDate",
+  "EcritureLib",
+  "Montant",
+  "Sens",
+  "EcritureLet",
+  "DateLet",
+  "ValidDate",
+  "Montantdevise",
+  "Idevise",
+];
+
 /* ---------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- FEC READER -------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------- */
@@ -111,8 +132,11 @@ export async function FECFileReader(content) {
     .replace("\r", "")
     .split(separator);
 
-  // Vérification des colonnes
-  const missingColumns = columnsFEC.filter(column => !header.includes(column));
+  // Vérification des colonnes (selon le format Montant/Sens ou Debit/Credit)
+  let format = header.includes("Montant") ? "withDirection" : "default";
+  let columnsFECExpected = format == "default" ? columnsFEC : columnsFECWithDirection ;
+  const missingColumns = columnsFECExpected.filter(column => !header.includes(column));
+
   if (missingColumns.length > 0) {
     throw `Fichier erroné (libellé(s) manquant(s) : ${missingColumns.join(', ')})`;
   }
@@ -136,7 +160,7 @@ export async function FECFileReader(content) {
       // -------------------------------------------------- //
 
       // Construction du JSON pour la ligne
-      let rowData = await readFECFileRow(indexColumns, row);
+      let rowData = await readFECFileRow(indexColumns, row, format);
 
       // Construction du journal (si absent) et mise à jour des métadonnées relatives aux journaux
       if (!(rowData.JournalCode in dataFEC.meta.books)) {
@@ -213,7 +237,7 @@ function getSeparator(line) {
 }
 
 // Read line (Array -> JSON)
-async function readFECFileRow(indexColumns, row) {
+async function readFECFileRow(indexColumns, row, format) {
   let rowData = {};
   Object.entries(indexColumns).forEach(([column, index]) => {
     rowData[column] = row[index]
@@ -221,6 +245,13 @@ async function readFECFileRow(indexColumns, row) {
       .replace(/\"$/, "") // remove quote at the end
       .replace(/^\s+|\s+$/, ""); // remove spaces before and after string
   });
+
+  // Pour format Montant/Sens, bascule vers Debit/Credit
+  if (format == "withDirection") {
+    rowData.Debit = rowData.Sens == "D" ? rowData.Montant : "0,00";
+    rowData.Credit = rowData.Sens == "C" ? rowData.Montant : "0,00" ;
+  }
+
   return rowData;
 }
 
