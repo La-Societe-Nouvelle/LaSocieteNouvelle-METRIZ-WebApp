@@ -10,6 +10,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
     { id: "summary-report", name: "Plaquette (.pdf)" },
 
     { id: "standard-report", name: "Rapport (.pdf)" },
+
   ];
 
   const [selectedFileIds, setSelectedFileIds] = useState([]);
@@ -102,6 +103,17 @@ const DownloadDropdown = ({ onDownload, view }) => {
               }
               checked={selectedFileIds.includes("checkbox-all")}
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
+            />
+          </div>
+          <div className="dropdown-item">
+            <Form.Check
+              type="checkbox"
+              id={`checkbox-ese-report`}
+              label={
+                <label htmlFor={`checkbox-ese-report`}>Rapport ESE (.pdf) </label>
+              }
+              checked={selectedFileIds.includes("checkbox-ese-report")}
+              onChange={(event) => handleCheckboxChange(event, "checkbox-ese-report")}
             />
           </div>
 

@@ -279,7 +279,7 @@ export const getTagsIndic = (
 };
 
 
-const isBetter = (indic,value,reference,margin) => {
+export const isBetter = (indic,value,reference,margin) => {
   const positiveImpact = ["eco","art","soc","knw"].includes(indic)
   if (positiveImpact) {
     return value>=reference*(1+margin/100)
@@ -288,7 +288,7 @@ const isBetter = (indic,value,reference,margin) => {
   }
 };
 
-const isWorst = (indic,value,reference,margin) => {
+export const isWorst = (indic,value,reference,margin) => {
   const positiveImpact = ["eco","art","soc","knw"].includes(indic)
   if (positiveImpact) {
     return value<=reference*(1-margin/100)

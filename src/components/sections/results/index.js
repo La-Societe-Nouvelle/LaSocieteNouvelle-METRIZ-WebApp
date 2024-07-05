@@ -28,12 +28,12 @@ import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryRepor
 import { buildSummaryReportIndexIndic } from "./exports/reports/summaryReportGeneratorIndex";
 import { buildStandardReport } from "./exports/reports/standardReportGenerator";
 import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
-import { buildCompleteFile } from "./exports/completeFileGenerator";
 import { buildCompleteReport, buildCompleteZipFile} from "./exports/completeFileGenerator";
 
 // Utils
 import { getYearPeriod } from "../../../utils/periodsUtils";
 import { triggerFileDownload } from "../../../utils/Utils";
+import { buildESEReport } from "./exports/reports/ESEReportgenerator";
 
 /* ---------- RESULTS SECTION ---------- */
 
@@ -356,6 +356,15 @@ const buildDownloadableFiles = async (
 
     saveAs(ZIPFile, zipFileName);
   }
+
+  if (selectedFiles.includes("checkbox-ese-report")) {
+    const PDFFile = await buildESEReport({
+      session,
+      period,
+    });
+    PDFFile.download(`Rapport_ESE_${legalUnitNameFile}_s.pdf`);
+  }
+  
 
   if (selectedFiles.includes("standard-report")) {
     const PDFFile = await buildStandardReport({
