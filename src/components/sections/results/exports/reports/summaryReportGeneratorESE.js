@@ -97,6 +97,8 @@ export const buildESEReport = async ({ session, period }) => {
 
   content.push({ text: '', pageBreak: 'after' });
 
+    // PAGE 2 -----------------------------------------
+
   content.push({
     text: "Résultats",
     style: "h4",
@@ -112,60 +114,10 @@ export const buildESEReport = async ({ session, period }) => {
       { text: 'Empreinte', style: 'tableHeader', alignment: 'right' },
       { text: 'Incertitude', style: 'tableHeader', alignment: 'right' },
       { text: 'Branche', style: 'tableHeader', alignment: 'right' },
-      { text: 'Objectif', style: 'tableHeader', alignment: 'right' }
+      { text: 'Objectif national', style: 'tableHeader', alignment: 'right' }
     ],
   ];
 
-
-  const isSectoralIssue = (key) => {
-
-
-    return keyIndics.includes(key) ? true : false;
-  };
-
-
-  const getFootprint = (key) => {
-    const footprintData = production.periodsData[period.periodKey].footprint.indicators[key];
-
-    if (!footprintData) {
-      return null;
-    }
-
-    const { value } = footprintData;
-
-    return value;
-  };
-
-  const getUncertainty = (key) => {
-    return production.periodsData[period.periodKey].footprint.indicators[key].uncertainty;
-  };
-
-  const getBranchAverage = (key) => {
-
-    const branchValue = comparativeData.production.division.history.data[key]?.slice(-1)[0].value;
-
-    if(!branchValue) {
-      return null;
-    }
-
-    return branchValue;
-  };
-
-  const getTarget = (key) => {
-    const targetData = comparativeData.production.division.target.data[key];
-
-    if (!targetData || targetData.length === 0) {
-      return null;
-    }
-
-    const geoData = targetData.filter(item => item.path === "GEO");
-
-    if (geoData.length === 0) {
-      return null;
-    }
-
-    return geoData.slice(-1)[0].value;
-  };
 
 
   const sortedIndicators = Object.keys(indicatorLabels).sort((a, b) => {
@@ -179,11 +131,11 @@ export const buildESEReport = async ({ session, period }) => {
   sortedIndicators.forEach(key => {
     tableBody.push([
       { text: indicatorLabels[key], style: 'tableData', alignment: 'left' },
-      { text: isSectoralIssue(key) ? "Oui" : "Non", style: 'tableData', alignment: 'center' },
-      { text: getFootprint(key) ? getFootprint(key) + " " + indicatorUnits[key] : " - ", style: 'tableData', alignment: 'right' },
-      { text: getUncertainty(key) ? getUncertainty(key) + "%" : " - ", style: 'tableData', alignment: 'right' },
-      { text: getBranchAverage(key) ? getBranchAverage(key) + indicatorUnits[key] : " - ", style: 'tableData', alignment: 'right' },
-      { text: getTarget(key) ? getTarget(key) + indicatorUnits[key] : " - ", style: 'tableData', alignment: 'right' },
+      { text: isSectoralIssue(keyIndics,key) ? "Oui" : "Non", style: 'tableData', alignment: 'center' },
+      { text:getFootprintValue(production,period,key) ?getFootprintValue(production,period,key) + " " + indicatorUnits[key] : " - ", style: 'tableData', alignment: 'right' },
+      { text: getUncertainty(production,period,key) ? getUncertainty(production,period,key) + "%" : " ", style: 'tableData', alignment: 'right' },
+      { text: getBranchValue(comparativeData,key) ? getBranchValue(comparativeData,key) + " " + indicatorUnits[key] : " - ", style: 'tableData', alignment: 'right' },
+      { text: getTargetValue(comparativeData,key) ? "Oui" : "Non", style: 'tableData', alignment: 'right' },
     ]);
   });
 
@@ -194,19 +146,7 @@ export const buildESEReport = async ({ session, period }) => {
       widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto'],
       body: tableBody,
     },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 1) ? 0.5 : 0.2;
-      },
-      hLineColor: function (i, node) {
-        return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
-      },
-      vLineWidth: function (i, node) {
-        return 0;
-      },
-      paddingTop: function (i, node) { return 4; },
-      paddingBottom: function (i, node) { return 4; },
-    },
+    layout: tableLayout(),
     style: 'table',
   });
 
@@ -215,11 +155,11 @@ export const buildESEReport = async ({ session, period }) => {
   
   const getValuablesIndicators = () => {
     const valuableIndicators = Object.keys(indicatorLabels).filter(key => {
-      const indicatorValue = getFootprint(key);
+      const indicatorValue =getFootprintValue(production,period,key);
       if (!indicatorValue) {
         return false;
       }
-      const branchValue = getBranchAverage(key);
+      const branchValue = getBranchValue(comparativeData,key);
       if (!branchValue) {
         return false;
       }
@@ -242,29 +182,27 @@ export const buildESEReport = async ({ session, period }) => {
   };
 
 const valuableIndicators = getValuablesIndicators();
-  console.log('valuable', valuableIndicators);
 
   const valuableIndicatorsTableBody = [
     [
       { text: 'Indicateur', style: 'tableHeader' },
       { text: 'Enjeu', style: 'tableHeader', alignment: 'right' },
       { text: 'Écart par rapport à la branche', style: 'tableHeader', alignment: 'right' },
-      { text: 'Objectif atteint', style: 'tableHeader', alignment: 'right' },
+      { text: 'Objectif', style: 'tableHeader', alignment: 'right' },
     ],
   ];
 
   valuableIndicators.forEach(key => {
     const indicatorValue = production.periodsData[period.periodKey].footprint.indicators[key].value;
-    const targetValue = getTarget(key);
-    const branchValue = getBranchAverage(key);
+    const targetValue = getTargetValue(comparativeData,key);
+    const branchValue = getBranchValue(comparativeData,key);
     const marginValue = (indicatorValue - branchValue).toFixed(1);
-    const isGoalAchieved =  targetValue !== null ? isBetter(key, indicatorValue, targetValue, 10) ? "Oui" : "Non" : "-";
 
     valuableIndicatorsTableBody.push([
       { text: indicatorLabels[key], style: 'tableData', alignment: 'left'},
-      { text:  isSectoralIssue(key) ? "Oui" : "Non", style: 'tableData', alignment: 'right'},
+      { text:  isSectoralIssue(keyIndics,key) ? "Oui" : "Non", style: 'tableData', alignment: 'right'},
       { text: `${marginValue} ${indicatorUnits[key]}`, style: 'tableData', alignment: 'right'},
-      { text: isGoalAchieved , style: 'tableData', alignment: 'right'},
+      { text: targetValue ? "Oui" : "Non" , style: 'tableData', alignment: 'right'},
     ]);
   });
 
@@ -280,19 +218,8 @@ const valuableIndicators = getValuablesIndicators();
       widths: ['*', 'auto', 'auto', 'auto'],
       body: valuableIndicatorsTableBody,
     },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 1) ? 0.5 : 0.2;
-      },
-      hLineColor: function (i, node) {
-        return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
-      },
-      vLineWidth: function (i, node) {
-        return 0; 
-      },
-      paddingTop: function (i, node) { return 4; },
-      paddingBottom: function (i, node) { return 4; },
-    },
+    layout: tableLayout(),
+
     style: 'table',
   });
 
@@ -300,11 +227,11 @@ const valuableIndicators = getValuablesIndicators();
 
   const getIndicatorsToImprove = () => {
     const indicatorsToImprove = Object.keys(indicatorLabels).filter(key => {
-      const indicatorValue = getFootprint(key);
+      const indicatorValue =getFootprintValue(production,period,key);
       if (!indicatorValue) {
         return false;
       }
-      const branchValue = getBranchAverage(key);
+      const branchValue = getBranchValue(comparativeData,key);
       if (!branchValue) {
         return false;
       }
@@ -328,7 +255,6 @@ const valuableIndicators = getValuablesIndicators();
 
   
 const indicatorsToImprove  = getIndicatorsToImprove();
-  console.log(indicatorsToImprove)
 
   const indicatorsToImproveTableBody = [
     [
@@ -341,13 +267,13 @@ const indicatorsToImprove  = getIndicatorsToImprove();
 
   indicatorsToImprove .forEach(key => {
     const indicatorValue = production.periodsData[period.periodKey].footprint.indicators[key].value;
-    const targetValue = getTarget(key);
-    const branchValue = getBranchAverage(key);
+    const targetValue = getTargetValue(comparativeData,key);
+    const branchValue = getBranchValue(comparativeData,key);
     const marginValue = (indicatorValue - branchValue).toFixed(1);
 
     indicatorsToImproveTableBody.push([
       { text: indicatorLabels[key], style: 'tableData', alignment: 'left'},
-      { text:  isSectoralIssue(key) ? "Oui" : "Non", style: 'tableData', alignment: 'right'},
+      { text:  isSectoralIssue(keyIndics,key) ? "Oui" : "Non", style: 'tableData', alignment: 'right'},
       { text: `${marginValue} ${indicatorUnits[key]}`, style: 'tableData', alignment: 'right'},
       { text: targetValue ? "Oui" : "Non ", style: 'tableData', alignment: 'right' },
 
@@ -366,26 +292,14 @@ const indicatorsToImprove  = getIndicatorsToImprove();
       widths: ['*', 'auto', 'auto', 'auto'],
       body: indicatorsToImproveTableBody,
     },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 1) ? 0.5 : 0.2;
-      },
-      hLineColor: function (i, node) {
-        return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
-      },
-      vLineWidth: function (i, node) {
-        return 0; 
-      },
-      paddingTop: function (i, node) { return 4; },
-      paddingBottom: function (i, node) { return 4; },
-    },
+   layout: tableLayout(),
+
     style: 'table',
   });
 
 
 
   const prevPeriod = getPrevPeriod(availablePeriods, period);
-  console.log(prevPeriod);
 
   if (prevPeriod) {
 
@@ -409,7 +323,7 @@ const indicatorsToImprove  = getIndicatorsToImprove();
 
     sortedIndicators.forEach(key => {
 
-      const currentFootprint = getFootprint(key);
+      const currentFootprint =getFootprintValue(production,period,key);
       const prevFootprint = production.periodsData[prevPeriod.periodKey].footprint.indicators[key].value;
 
 
@@ -423,53 +337,39 @@ const indicatorsToImprove  = getIndicatorsToImprove();
         if (isBetterCurrent) {
           prevTableBody.push([
             { text: indicatorLabels[key], style: 'tableData', alignment: 'left' },
-            { text: isSectoralIssue(key) ? "Oui" : "Non", style: 'tableData', alignment: 'center' },
+            { text: isSectoralIssue(keyIndics,key) ? "Oui" : "Non", style: 'tableData', alignment: 'center' },
             { text: `${marginValue} ${indicatorUnits[key]}`, style: 'tableData', alignment: 'right' },
           ]);
         }
       }
     });
 
-    // TO DO : don't push if no rows 
     content.push({
       table: {
         headerRows: 1,
         widths: ['*', 'auto', 'auto'],
         body: prevTableBody,
       },
-      layout: {
-        hLineWidth: function (i, node) {
-          return (i === 1) ? 0.5 : 0.2;
-        },
-        hLineColor: function (i, node) {
-          return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
-        },
-        vLineWidth: function (i, node) {
-          return 0; 
-        },
-        paddingTop: function (i, node) { return 4; },
-        paddingBottom: function (i, node) { return 4; },
-      },
+      layout: tableLayout(),
+
       style: 'table',
     });
-
-
 
   }
 
 
-  const getIndicatorsWithFootprint = () => {
-    const indicatorsWithFootprint = Object.keys(indicatorLabels).filter(key => {
-      const footprintData = getFootprint(key);
-      const targetData = getTarget(key);
+  const getTargetIndicators = () => {
+    const indicatorsWithTarget = Object.keys(indicatorLabels).filter(key => {
+      const footprintData = getFootprintValue(production,period,key);
+      const targetData = getTargetValue(comparativeData,key);
   
       return (footprintData  && targetData );
     });
   
-    return indicatorsWithFootprint;
+    return indicatorsWithTarget;
   };
   
-  const indicatorsWithFootprint = getIndicatorsWithFootprint()
+  const indicatorsWithTarget = getTargetIndicators()
 
 
   const footprintTableBody = [
@@ -477,14 +377,14 @@ const indicatorsToImprove  = getIndicatorsToImprove();
       { text: 'Indicateur', style: 'tableHeader' },
       { text: 'Objectif 2030', style: 'tableHeader', alignment: 'right' },
       { text: 'Ecart', style: 'tableHeader', alignment: 'right' },
-      { text: 'Objectif atteint', style: 'tableHeader', alignment: 'right' },
+      { text: 'Atteint', style: 'tableHeader', alignment: 'right' },
 
     ],
   ]
 
-  indicatorsWithFootprint.forEach(key => {
-    const footprintValue = getFootprint(key);
-    const targetValue = getTarget(key);
+  indicatorsWithTarget.forEach(key => {
+    const footprintValue =getFootprintValue(production,period,key);
+    const targetValue = getTargetValue(comparativeData,key);
   
     const marginValue = (footprintValue - targetValue).toFixed(2);
   
@@ -508,19 +408,8 @@ const indicatorsToImprove  = getIndicatorsToImprove();
       widths: ['*', 'auto', 'auto', 'auto'],
       body: footprintTableBody,
     },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 1) ? 0.5 : 0.2;
-      },
-      hLineColor: function (i, node) {
-        return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
-      },
-      vLineWidth: function (i, node) {
-        return 0; 
-      },
-      paddingTop: function (i, node) { return 4; },
-      paddingBottom: function (i, node) { return 4; },
-    },
+    layout: tableLayout(),
+
     style: 'table',
   });
 
@@ -544,6 +433,9 @@ const indicatorsToImprove  = getIndicatorsToImprove();
       font: "Raleway",
     },
     styles: {
+        h4 : {
+            bold : true,
+        },
       table: {
         margin: [0, 0, 0, 10],
         fontSize: 9,
@@ -594,14 +486,83 @@ const getIndidcatorCharts = async () => {
 
   Object.keys(metaIndics).forEach(key => {
     const id = `socialfootprintvisual_${key}`;
-    console.log( getChartImageData(id) )
 
     const imageData = getChartImageData(id) || defaultImage;
     if (imageData) {
       indicatorImages[key] = imageData;
     }
   });
-  console.log(indicatorImages);
   return indicatorImages;
 };
 
+const tableLayout = () => {
+  return {
+    hLineWidth: function (i, node) {
+      return (i === 1) ? 0.5 : 0.2;
+    },
+    hLineColor: function (i, node) {
+      return (i === 0 || i === 1) ? '#191558' : '#f0f0f8';
+    },
+    vLineWidth: function (i, node) {
+      return 0;
+    },
+    paddingTop: function (i, node) { return 4; },
+    paddingBottom: function (i, node) { return 4; },
+  };
+}
+
+
+
+const isSectoralIssue = (keyIndics, key) => {
+    return keyIndics.includes(key) ? true : false;
+};
+
+
+
+const getFootprintValue = (production, period,key) => {
+    const footprintData = production.periodsData[period.periodKey].footprint.indicators[key];
+
+    if (!footprintData) {
+        return null;
+    }
+
+    const { value } = footprintData;
+
+    return value;
+};
+
+
+
+const getUncertainty = (production,period,key) => {
+    return production.periodsData[period.periodKey].footprint.indicators[key].uncertainty;
+  };
+
+  
+
+
+  const getBranchValue = (comparativeData,key) => {
+
+    const branchValue = comparativeData.production.division.history.data[key]?.slice(-1)[0].value;
+
+    if(!branchValue) {
+      return null;
+    }
+
+    return branchValue;
+  };
+
+  const getTargetValue = (comparativeData,key) => {
+    const targetData = comparativeData.production.division.target.data[key];
+
+    if (!targetData || targetData.length === 0) {
+      return null;
+    }
+
+    const geoData = targetData.filter(item => item.path === "GEO");
+
+    if (geoData.length === 0) {
+      return null;
+    }
+
+    return geoData.slice(-1)[0].value;
+  };

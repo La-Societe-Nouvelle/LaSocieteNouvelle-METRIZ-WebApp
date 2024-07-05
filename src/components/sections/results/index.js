@@ -33,7 +33,7 @@ import { buildCompleteReport, buildCompleteZipFile} from "./exports/completeFile
 // Utils
 import { getYearPeriod } from "../../../utils/periodsUtils";
 import { triggerFileDownload } from "../../../utils/Utils";
-import { buildESEReport } from "./exports/reports/ESEReportgenerator";
+import { buildESEReport } from "./exports/reports/summaryReportGeneratorESE";
 
 /* ---------- RESULTS SECTION ---------- */
 
