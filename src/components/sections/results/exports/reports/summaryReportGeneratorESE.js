@@ -80,9 +80,11 @@ export const buildESEReport = async ({ session, period }) => {
       title: {
         bold: true,
         margin: [0, 10, 0, 10],
+        color : "#921430",
       },
       h4: {
         bold: true,
+        color : "#921430",
       },
       table: {
         margin: [0, 0, 0, 10],
@@ -90,10 +92,10 @@ export const buildESEReport = async ({ session, period }) => {
         font: "Roboto",
       },
       tableHeader: {
-        fillColor: "#f0f0f8",
+        fillColor: "#f4f4f4",
         bold: true,
         margin: [0, 5, 0, 5],
-        color: "#191558",
+        color: "#4B6873",
         alignment: "center"
       },
       tableData: {
@@ -188,7 +190,7 @@ const createResultsTable = (production, currentPeriod, period, indicatorLabels, 
         return (i === 0 || i === 1 || i === 2 || i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
-        return '#191558';
+        return '#4B6873';
       },
       vLineWidth: function (i, node) {
         if ((i == 3 || i == 5)) {
@@ -198,7 +200,7 @@ const createResultsTable = (production, currentPeriod, period, indicatorLabels, 
         }
       },
       vLineColor: function (i, node) {
-        return '#191558';
+        return '#4B6873';
       },
       paddingTop: function (i, node) { return 3; },
       paddingBottom: function (i, node) { return 3; },
@@ -249,13 +251,13 @@ const createImpactsTable = (netValueAdded, period, indicatorLabels, absoluteUnit
         return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
-        return '#191558';
+        return '#4B6873';
       },
       vLineWidth: function (i, node) {
         return 0;
       },
       vLineColor: function (i, node) {
-        return '#191558';
+        return '#4B6873';
       },
       paddingTop: function (i, node) { return 3; },
       paddingBottom: function (i, node) { return 3; },
@@ -456,7 +458,7 @@ const createNationalTargetsTable = (production, period, indicatorLabels, indicat
         targetAchieved === true ? {
           columns: [
             { svg: checkIcon, width: 10, height: 10 },
-            { width: '*', text: "atteint", alignment: "left" }
+            { width: '*', text: "atteint", alignment: "left", style: 'tableData' }
           ]
         }
           :
@@ -483,13 +485,13 @@ const tableLayout = () => {
       return (i === 0 || i === 1 | i === node.table.body.length) ? 0.5 : 0;
     },
     hLineColor: function (i, node) {
-      return '#191558';
+      return '#4B6873';
     },
     vLineWidth: function (i, node) {
       return 0;
     },
     vLineColor: function (i, node) {
-      return '#191558';
+      return '#4B6873';
     },
     paddingTop: function (i, node) { return 4; },
     paddingBottom: function (i, node) { return 4; },
