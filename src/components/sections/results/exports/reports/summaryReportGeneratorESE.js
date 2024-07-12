@@ -180,35 +180,34 @@ const getIndicatorAbsoluteUnit = () => {
 };
 
 const getIndicatorCharts = async () => {
-
   const indicatorImages = {
     "Création de la valeur": [],
     "Empreinte sociale": [],
     "Empreinte environnementale": []
   };
 
+  const defaultImages = {
+    "Création de la valeur": "/pie-no-data.png",
+    "Empreinte sociale": "/bar-no-data.png",
+    "Empreinte environnementale": "/bar-no-data.png"
+  };
 
-  const defaultPieImage = "/pie-no-data.png";
-  const defaultImage = await loadImageAsDataURL(defaultPieImage);
+  const loadImage = async (key, id) => {
+    const imageData = getChartImageData(id);
+    return imageData || await loadImageAsDataURL(defaultImages[key]);
+  };
 
-
-  Object.keys(metaIndics).forEach(key => {
+  await Promise.all(Object.keys(metaIndics).map(async (key) => {
     const id = `socialfootprintvisual_${key}-print`;
+    const category = metaIndics[key].category;
 
-    const imageData = getChartImageData(id) || defaultImage;
-    if (imageData) {
-      const category = metaIndics[key].category;
-      if (category === "Création de la valeur") {
-        indicatorImages["Création de la valeur"].push({ key, image: imageData });
-      } else if (category === "Empreinte sociale") {
-        indicatorImages["Empreinte sociale"].push({ key, image: imageData });
-      } else if (category === "Empreinte environnementale") {
-        indicatorImages["Empreinte environnementale"].push({ key, image: imageData });
-      }
-    }
-  });
+    const image = await loadImage(category, id);
+    indicatorImages[category].push({ key, image });
+  }));
+
   return indicatorImages;
-}
+};
+
 const getValuableIndicators = (production, period, indicatorLabels, keyIndics, comparativeData) => {
   return Object.keys(indicatorLabels).filter(key => {
     const footprintValue = getFootprintValue(production, period, key);
