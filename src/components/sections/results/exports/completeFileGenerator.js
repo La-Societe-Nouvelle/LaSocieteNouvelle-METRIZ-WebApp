@@ -19,6 +19,7 @@ import { buildSummaryReportIndexIndic } from "./reports/summaryReportGeneratorIn
 import { generateFootprintPDF } from "../../../../writers/Export";
 import { buildDataFile } from "./dataFiles/dataFileGenerator";
 import { getYearPeriod } from "../../../../utils/periodsUtils";
+import { buildESEReport } from "./reports/summaryReportGeneratorESE";
 
 /* ---------- DOWNLOADABLES FILES ---------- */
 
@@ -52,6 +53,7 @@ export async function buildCompleteZipFile({ session, period, showAnalyses }) {
     indicators,
     showStandardReports: true,
     showAnalyses,
+    showESEReport : true
   });
 
   // Add the full report to the ZIP file
@@ -99,7 +101,8 @@ export async function buildCompleteReport({
   year,
   indicators,
   showStandardReports,
-  showAnalyses
+  showAnalyses,
+  showESEReport
 }) {
   try {
 
@@ -113,16 +116,24 @@ export async function buildCompleteReport({
       const appendixesCoverPage = generateReportDividerPage(indicators.length > 1 ? "Annexes" : "Annexe");
       standardPDFs = [
         appendixesCoverPage,
-        ...await generateStandardReports(session, period,indicators,showAnalyses)
+        ...await generateStandardReports(session, period, indicators, showAnalyses)
       ];
     }
-    
+
     // Generate summary reports and their blobs
     const summaryPDFs = await generateSummaryReports(session, period, indicators);
 
-    // Merge all PDFs
-    const completeReport = await generateMergedPDF([coverPage,...summaryPDFs, ...standardPDFs]);
+    let ESEReport = null;
+    if (showESEReport) {
+      ESEReport = await generateESEReport(
+        session,
+        period,
+      );
+    }
 
+    // Merge all PDFs
+    const completeReport = await generateMergedPDF([coverPage, ESEReport,...summaryPDFs, ...standardPDFs].filter(Boolean));
+    
     return completeReport;
   } catch (error) {
     console.error(
@@ -130,12 +141,25 @@ export async function buildCompleteReport({
       error
     );
     throw error;
- 
+
   }
 }
 
+async function generateESEReport(session, period) {
+  const report = await buildESEReport({
+    session,
+    period,
+  });
 
-async function generateStandardReports(session, period,indicators,showAnalyses) {
+  return new Promise((resolve) => {
+    report.getBlob((blob) => {
+      resolve(blob);
+    });
+  });
+}
+
+
+async function generateStandardReports(session, period, indicators, showAnalyses) {
   const standardPDFs = await Promise.all(
     indicators.map(async (indic) => {
       const standardReport = await buildStandardReport({
@@ -187,9 +211,10 @@ async function generateSummaryReports(session, period, indicators) {
   return reportPDFpromises.filter(Boolean); // Filter out undefined values
 }
 
+
 async function generateMergedPDF(mergedPromises) {
   try {
-    const pdfBuffers  = await Promise.all(mergedPromises);
+    const pdfBuffers = await Promise.all(mergedPromises);
 
     const mergedPdfDoc = await PDFDocument.create();
 
@@ -240,11 +265,10 @@ async function generateMergedPDF(mergedPromises) {
     return await mergedPdfDoc.save();
   } catch (error) {
     console.error("Une erreur s'est produite lors de la fusion des PDFs :", error);
-    throw error; 
+    throw error;
   }
 }
-async function buildSIGFootprintReport({ session, period }) 
-{
+async function buildSIGFootprintReport({ session, period }) {
   const {
     legalUnit,
     financialData
@@ -285,17 +309,6 @@ async function buildSIGFootprintReport({ session, period })
   return docEES;
 }
 
-//  Get canvas id and add it to folder zip
-async function addChartToZip(folder, chartId, fileName) {
-  const chartCanvas = document.getElementById(chartId);
-
-  if (!chartCanvas) {
-    return;
-  }
-
-  const chartData = chartCanvas.toDataURL("image/png");
-  folder.file(fileName, chartData.split("base64,")[1], { base64: true });
-}
 
 
 

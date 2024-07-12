@@ -105,17 +105,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
             />
           </div>
-          <div className="dropdown-item">
-            <Form.Check
-              type="checkbox"
-              id={`checkbox-ese-report`}
-              label={
-                <label htmlFor={`checkbox-ese-report`}>Rapport ESE (.pdf) </label>
-              }
-              checked={selectedFileIds.includes("checkbox-ese-report")}
-              onChange={(event) => handleCheckboxChange(event, "checkbox-ese-report")}
-            />
-          </div>
+    
 
           <Dropdown.Divider></Dropdown.Divider>
           <div className="dropdown-item">

@@ -3,7 +3,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import metaIndics from "/lib/indics.json";
 
 // Utils
-import { loadFonts } from "./utils/layout";
+import { generateFooter, generateHeader, loadFonts } from "./utils/layout";
 import { getChartImageData, loadImageAsDataURL } from "./utils";
 import { getKeyIndics, isBetter, isWorst } from "../../utils";
 
@@ -11,11 +11,14 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
 export const buildESEReport = async ({ session, period }) => {
+
   const {
+    legalUnit,
     financialData,
     comparativeData,
   } = session;
 
+  const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
   const { production, netValueAdded } = financialData.mainAggregates;
 
@@ -26,13 +29,12 @@ export const buildESEReport = async ({ session, period }) => {
 
   const indicatorImages = await getIndicatorCharts();
 
-  const margins = {
-    top: 30,
-    bottom: 30,
-    left: 25,
-    right: 25,
-  };
-
+  const colors = {
+    primary : "#191558",
+    secondary : "#fa595f",
+    text : "#191558",
+    light : "#ededff",
+  }
   const pageSize = {
     width: 595.28,
     height: 841.89,
@@ -41,29 +43,28 @@ export const buildESEReport = async ({ session, period }) => {
   const content = [
     {
       text: "Rapport - Empreinte Sociétale de l'Entreprise",
-      alignment: "center",
-      fontSize: 16,
-      bold: true,
+      style: "h1",
     },
     ...createIndicatorCharts(indicatorLabels, indicatorImages),
     { text: '', pageBreak: 'after' },
-    { text: "Résultats", style: "h4", margin: [0, 0, 0, 20] },
+    { text: "Résultats", style: "h2", },
     createResultsTable(production, currentPeriod, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
-    { text: "Impacts directs", style: "h4", margin: [0, 20, 0, 20] },
+    { text: "Impacts directs", style: "h2" },
     createImpactsTable(netValueAdded, period, indicatorLabels, absoluteUnits, keyIndics),
     { text: '', pageBreak: 'after' },
-
-    { text: "Indicateurs valorisables", style: "h4", margin: [0, 0, 0, 20] },
+    { text: "Indicateurs valorisables", style: "h2" },
     createValuableIndicatorsTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
-    { text: "Points d'améliorations", style: "h4", margin: [0, 10, 0, 20] },
+    { text: "Points d'améliorations", style: "h2" },
     createImprovementTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
-    { text: "Objectifs sectoriels", style: "h4", margin: [0, 10, 0, 20] },
+    { text: "Objectifs sectoriels", style: "h2" },
     createNationalTargetsTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData)
   ];
 
   const docDefinition = {
     pageSize,
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pageMargins: [40, 50, 40, 50],
+    header: generateHeader(corporateName, legalUnit.siren, currentPeriod),
+    footer: generateFooter(corporateName),
     info: {
       title: "",
       author: "",
@@ -73,434 +74,69 @@ export const buildESEReport = async ({ session, period }) => {
     },
     content,
     defaultStyle: {
-      color: "#2c3b4a",
-      font: "Raleway",
+      color: colors.text,
+      font: "Roboto",
     },
     styles: {
-      title: {
+
+      h1: {
+        bold: true,
+        color: colors.primary,
+        font: "Raleway",
+        margin: [0, 0, 0, 10],
+        alignment: "center",
+      },
+      h2: {
         bold: true,
         margin: [0, 10, 0, 10],
-        color : "#921430",
+        color: colors.secondary,
+        font: "Raleway",
       },
-      h4: {
+      h3: {
         bold: true,
-        color : "#921430",
-      },
-      table: {
         margin: [0, 0, 0, 10],
         fontSize: 8,
-        font: "Roboto",
+        color: colors.primary,
+        font: "Raleway",
+      },
+      table: {
+        margin: [0, 10, 0, 10],
+        fontSize: 8,
+      },
+      unit: {
+        fontSize: 6,
+        alignment: "right"
       },
       tableHeader: {
-        fillColor: "#f4f4f4",
-        bold: true,
+        fillColor: colors.light,
         margin: [0, 5, 0, 5],
-        color: "#4B6873",
-        alignment: "center"
       },
-      tableData: {
-        fontSize: 7,
-        alignment: 'right'
+      lightBackground : {
+        fillColor: colors.primary,
+        color : "#FFF",
+        bold : true,
       },
+      data: {
+        alignment: "right"
+      }
+
     },
   };
+  console.log(docDefinition)
 
   const ESEReport = pdfMake.createPdf(docDefinition);
 
   return ESEReport;
 };
-
-
-const createIndicatorCharts = (indicatorLabels, indicatorImages) => {
-  const columns = [];
-
-  Object.keys(indicatorImages).forEach(category => {
-    columns.push({
-      text: category,
-      style: "title"
-    });
-
-    let currentRow = [];
-    indicatorImages[category].forEach((indicator, index) => {
-      currentRow.push({
-        margin: [0, 10],
-        stack: [
-          { text: indicatorLabels[indicator.key], bold: true, margin: [0, 5], fontSize: 8 },
-          { image: indicator.image, width: 100 }
-        ],
-      });
-
-      if ((index + 1) % 3 === 0 || index === indicatorImages[category].length - 1) {
-        columns.push({ columns: currentRow });
-        currentRow = [];
-      }
-    });
-  });
-
-  return columns;
-};
-
-const createResultsTable = (production, currentPeriod, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
-
-  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
-
-  const tableBody = [
-    [
-      { text: '', border: [false, false, false, false] },
-      { text: '', border: [false, false, false, false] },
-      { text: '', border: [false, false, false, false] },
-      { text: 'Exercice ' + currentPeriod, colSpan: 2, alignment: "center", border: [true, true, true, true], bold: true },
-      { text: '', border: [false, false, false, false] },
-      { text: '', border: [false, false, false, false] },
-      { text: '', border: [false, false, false, false] },
-    ],
-    [
-      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
-      { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader', alignment: "center" },
-      { text: 'Empreinte', style: 'tableHeader' },
-      { text: 'Incertitude', style: 'tableHeader' },
-      { text: 'Moyenne\nBranche', style: 'tableHeader' },
-      { text: 'Objectif\nsectoriel', style: 'tableHeader' }
-    ],
-  ];
-
-  Object.keys(indicatorLabels).sort((a, b) => {
-    return indicatorLabels[a].localeCompare(indicatorLabels[b]);
-  }).forEach(key => {
-    tableBody.push([
-      { text: indicatorLabels[key], style: 'tableData', alignment: "left" },
-      { text: indicatorUnits[key], style: 'tableData', fontSize: 6 },
-      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, style: 'tableData', alignment: "center" } : { text: '-', style: 'tableData', alignment: "center" },
-      { text: getFootprintValue(production, period, key) ? `${getFootprintValue(production, period, key)}` : "-", style: 'tableData' },
-      { text: getUncertainty(production, period, key) ? `${getUncertainty(production, period, key)} %` : "-", style: 'tableData' },
-      { text: getBranchValue(comparativeData, key) ? `${getBranchValue(comparativeData, key)}` : " - ", style: 'tableData' },
-      { text: getTargetValue(comparativeData, key) ? getTargetValue(comparativeData, key) : "-", style: 'tableData' },
-    ]);
-  });
-
-  return {
-    table: {
-      headerRows: 2,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === 2 || i === node.table.body.length) ? 0.5 : 0;
-      },
-      hLineColor: function (i, node) {
-        return '#4B6873';
-      },
-      vLineWidth: function (i, node) {
-        if ((i == 3 || i == 5)) {
-          return 0.5;
-        } else {
-          return 0;
-        }
-      },
-      vLineColor: function (i, node) {
-        return '#4B6873';
-      },
-      paddingTop: function (i, node) { return 3; },
-      paddingBottom: function (i, node) { return 3; },
-    },
-    style: 'table',
-  };
-};
-
-const createImpactsTable = (netValueAdded, period, indicatorLabels, absoluteUnits, keyIndics) => {
-
-  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
-
-  const tableBody = [
-
-    [
-      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
-      { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader', alignment: "center" },
-      { text: 'Impact', style: 'tableHeader' },
-    ],
-  ];
-
-  Object.keys(indicatorLabels).sort((a, b) => {
-    return indicatorLabels[a].localeCompare(indicatorLabels[b]);
-  }).forEach(key => {
-
-    const grossImpactValue = getGrossImpactValue(netValueAdded, period, key);
-    if (!grossImpactValue) {
-      return;
-    }
-
-    tableBody.push([
-      { text: indicatorLabels[key], style: 'tableData', alignment: "left" },
-      { text: absoluteUnits[key], style: 'tableData', fontSize: 6 },
-      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, style: 'tableData', alignment: "center" } : { text: '-', style: 'tableData', alignment: "center" },
-      { text: grossImpactValue, style: 'tableData' },
-    ]);
-  });
-
-  return {
-    table: {
-      headerRows: 2,
-      widths: ["*", 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
-      },
-      hLineColor: function (i, node) {
-        return '#4B6873';
-      },
-      vLineWidth: function (i, node) {
-        return 0;
-      },
-      vLineColor: function (i, node) {
-        return '#4B6873';
-      },
-      paddingTop: function (i, node) { return 3; },
-      paddingBottom: function (i, node) { return 3; },
-    },
-    style: 'table',
-  };
-};
+// ----------------------------------------------------------------------------------
+// Data
 
 const isSectoralIssue = (keyIndics, key) => keyIndics.includes(key);
 
-const createValuableIndicatorsTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
-  const valuableIndicators = getValuableIndicators(production, period, indicatorLabels, keyIndics, comparativeData);
-  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
-
-  const tableBody = [
-    [
-      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
-      { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader', alignment: "center" },
-      { text: 'Ecart\nbranche', style: 'tableHeader' },
-      { text: 'Objectif\ndéfini', style: 'tableHeader', alignment: "center" },
-    ],
-  ];
-
-  valuableIndicators.sort((a, b) => {
-    const isSectoralA = keyIndics.includes(a);
-    const isSectoralB = keyIndics.includes(b);
-
-    if (isSectoralA && !isSectoralB) {
-      return -1;
-    } else if (!isSectoralA && isSectoralB) {
-      return 1;
-    } else {
-      const hasTargetA = getTargetValue(comparativeData, a) !== null;
-      const hasTargetB = getTargetValue(comparativeData, b) !== null;
-
-      if (hasTargetA && !hasTargetB) {
-        return -1;
-      } else if (!hasTargetA && hasTargetB) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }).forEach(key => {
-    const indicatorValue = getFootprintValue(production, period, key);
-    const targetValue = getTargetValue(comparativeData, key);
-    const branchValue = getBranchValue(comparativeData, key);
-
-    const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
-
-
-    tableBody.push([
-      { text: indicatorLabels[key], style: 'tableData', alignment: 'left' },
-      { text: indicatorUnits[key], style: 'tableData', fontSize: 6 },
-      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, style: 'tableData', alignment: "center" } : { text: '-', style: 'tableData', alignment: "center" },
-      { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'tableData' },
-      { text: targetValue ? "Oui" : "Non", style: 'tableData', alignment: "center" },
-    ]);
-  });
-
-  return {
-    table: {
-      headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: tableLayout(),
-    style: 'table',
-  };
-};
-
-const createImprovementTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
-  const improvementIndicators = getImprovementIndicators(production, period, indicatorLabels, keyIndics, comparativeData);
-  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
-
-  const tableBody = [
-    [
-      { text: 'Indicateur', style: 'tableHeader', alignment: 'left' },
-      { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader', alignment: "center" },
-      { text: 'Ecart\nbranche', style: 'tableHeader' },
-      { text: 'Objectif\ndéfini', style: 'tableHeader', alignment: "center" },
-    ],
-  ];
-
-  improvementIndicators
-    .sort((a, b) => {
-      const isSectoralA = keyIndics.includes(a);
-      const isSectoralB = keyIndics.includes(b);
-
-      if (isSectoralA && !isSectoralB) {
-        return -1;
-      } else if (!isSectoralA && isSectoralB) {
-        return 1;
-      } else {
-        const hasTargetA = getTargetValue(comparativeData, a) !== null;
-        const hasTargetB = getTargetValue(comparativeData, b) !== null;
-
-        if (hasTargetA && !hasTargetB) {
-          return -1;
-        } else if (!hasTargetA && hasTargetB) {
-          return 1;
-        } else {
-          return 0;
-        }
-      }
-    })
-    .forEach(key => {
-      const indicatorValue = getFootprintValue(production, period, key);
-      const targetValue = getTargetValue(comparativeData, key);
-      const branchValue = getBranchValue(comparativeData, key);
-      const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
-
-      tableBody.push([
-        { text: indicatorLabels[key], style: 'tableData', alignment: 'left' },
-        { text: indicatorUnits[key], style: 'tableData', fontSize: 6 },
-        isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, style: 'tableData', alignment: "center" } : { text: '-', style: 'tableData', alignment: "center" },
-        { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'tableData' },
-        { text: targetValue ? "Oui" : "Non", style: 'tableData', alignment: "center" },
-      ]);
-    });
-
-  return {
-    table: {
-      headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: tableLayout(),
-    style: 'table',
-  };
-};
-
-const createNationalTargetsTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
-  const nationalTargets = getNationalTargets(indicatorLabels, comparativeData);
-  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
-
-  const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#36c575" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"></path></svg>';
-
-
-  const tableBody = [
-    [
-      { text: 'Indicateur', style: 'tableHeader', alignment: 'left' },
-      { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader', alignment: "center" },
-      { text: 'Empreinte', style: 'tableHeader' },
-      { text: 'Objectif\nà atteindre', style: 'tableHeader' },
-      { text: 'Effort\nà fournir', style: 'tableHeader' },
-
-    ],
-  ];
-
-  nationalTargets
-    .sort((a, b) => {
-      const isSectoralA = keyIndics.includes(a);
-      const isSectoralB = keyIndics.includes(b);
-
-      if (isSectoralA && !isSectoralB) {
-        return -1;
-      } else if (!isSectoralA && isSectoralB) {
-        return 1;
-      } else {
-        const hasTargetA = getTargetValue(comparativeData, a) !== null;
-        const hasTargetB = getTargetValue(comparativeData, b) !== null;
-
-        if (hasTargetA && !hasTargetB) {
-          return -1;
-        } else if (!hasTargetA && hasTargetB) {
-          return 1;
-        } else {
-          const footprintValueA = getFootprintValue(production, period, a) !== null;
-          const footprintValueB = getFootprintValue(production, period, b) !== null;
-
-          if (footprintValueA && !footprintValueB) {
-            return -1;
-          } else if (!footprintValueA && footprintValueB) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }
-      }
-    })
-    .forEach(key => {
-      const targetValue = getTargetValue(comparativeData, key);
-      const footprintValue = getFootprintValue(production, period, key);
-      const targetAchieved = footprintValue ? isBetter(key, footprintValue, targetValue, 10) : null;
-      const marginPercentage = getEffortPercentage(footprintValue, targetValue);
-
-      tableBody.push([
-        { text: indicatorLabels[key], style: 'tableData', alignment: 'left' },
-        { text: indicatorUnits[key], style: 'tableData', fontSize: 6 },
-        isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, style: 'tableData', alignment: "center" } : { text: '-', style: 'tableData', alignment: "center" },
-        { text: footprintValue ? `${footprintValue}` : "-", style: 'tableData' },
-        { text: `${targetValue}`, style: 'tableData' },
-
-        targetAchieved === true ? {
-          columns: [
-            { svg: checkIcon, width: 10, height: 10 },
-            { width: '*', text: "atteint", alignment: "left", style: 'tableData' }
-          ]
-        }
-          :
-          { text: targetAchieved === null ? "-" : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'tableData' }
-
-      ]);
-
-    });
-
-  return {
-    table: {
-      headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: tableLayout(),
-    style: 'table',
-  };
-};
-
-const tableLayout = () => {
-  return {
-    hLineWidth: function (i, node) {
-      return (i === 0 || i === 1 | i === node.table.body.length) ? 0.5 : 0;
-    },
-    hLineColor: function (i, node) {
-      return '#4B6873';
-    },
-    vLineWidth: function (i, node) {
-      return 0;
-    },
-    vLineColor: function (i, node) {
-      return '#4B6873';
-    },
-    paddingTop: function (i, node) { return 4; },
-    paddingBottom: function (i, node) { return 4; },
-  };
-}
+// ----------------------------------------------------------------------------------
 
 const getFootprintValue = (production, period, key) => production.periodsData[period.periodKey]?.footprint.indicators[key].value;
 const getGrossImpactValue = (production, period, key) => production.periodsData[period.periodKey]?.footprint.indicators[key].getGrossImpact(production.periodsData[period.periodKey].amount);
-
 const getUncertainty = (production, period, key) => production.periodsData[period.periodKey]?.footprint.indicators[key].uncertainty;
 const getBranchValue = (comparativeData, key) => comparativeData.production.division.history.data[key]?.slice(-1)[0].value;
 const getTargetValue = (comparativeData, key) => {
@@ -519,6 +155,8 @@ const getTargetValue = (comparativeData, key) => {
   return geoData.slice(-1)[0].value;
 };
 
+// ----------------------------------------------------------------------------------
+
 const getIndicatorLabels = () => {
   const indicatorLabels = {};
   Object.keys(metaIndics).forEach(key => {
@@ -526,7 +164,6 @@ const getIndicatorLabels = () => {
   });
   return indicatorLabels;
 };
-
 const getIndicatorUnits = () => {
   const indicatorUnits = {};
   Object.keys(metaIndics).forEach(key => {
@@ -534,7 +171,6 @@ const getIndicatorUnits = () => {
   });
   return indicatorUnits;
 };
-
 const getIndicatorAbsoluteUnit = () => {
   const absoluteUnits = {};
   Object.keys(metaIndics).forEach(key => {
@@ -557,7 +193,7 @@ const getIndicatorCharts = async () => {
 
 
   Object.keys(metaIndics).forEach(key => {
-    const id = `socialfootprintvisual_${key}`;
+    const id = `socialfootprintvisual_${key}-print`;
 
     const imageData = getChartImageData(id) || defaultImage;
     if (imageData) {
@@ -592,12 +228,12 @@ const getImprovementIndicators = (production, period, indicatorLabels, keyIndics
   });
 };
 
-
 const getNationalTargets = (indicatorLabels, comparativeData) => {
   return Object.keys(indicatorLabels).filter(key => {
     return getTargetValue(comparativeData, key) !== null;
   });
 };
+// ----------------------------------------------------------------------------------
 
 const getEffortPercentage = (currentValue, targetValue) => {
   if (currentValue !== null && targetValue !== null && currentValue !== 0) {
@@ -615,6 +251,388 @@ const getMarginPercentage = (indicatorValue, referenceValue) => {
   return '-';
 };
 
+// ----------------------------- Tables ----------------------------------------------
+
+const createIndicatorCharts = (indicatorLabels, indicatorImages) => {
+  const columns = [];
+
+  Object.keys(indicatorImages).forEach(category => {
+    columns.push({
+      text: category,
+      style: "h2"
+    });
+
+    let currentRow = [];
+    indicatorImages[category].forEach((indicator, index) => {
+      currentRow.push({
+        margin: [0, 10],
+        stack: [
+          { text: splitTitle(indicatorLabels[indicator.key]), style: "h3", alignment: "center" },
+          { image: indicator.image, width: 100, alignment: "center" }
+        ],
+      });
+
+      if ((index + 1) % 3 === 0 || index === indicatorImages[category].length - 1) {
+        columns.push({ columns: currentRow, columnGap: 10 });
+        currentRow = [];
+      }
+    });
+  });
+
+  return columns;
+};
+
+const createResultsTable = (production, currentPeriod, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
+
+  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
+
+  const tableBody = [
+    [
+      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, false] },
+      { text: 'Exercice ' + currentPeriod, colSpan: 2, border: [true, true, true, true], style : "lightBackground" },
+      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, false] },
+    ],
+    [
+      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
+      { text: 'Unité', style: 'tableHeader' },
+      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Empreinte', style: 'tableHeader' },
+      { text: 'Incertitude', style: 'tableHeader' },
+      { text: 'Moyenne\nBranche', style: 'tableHeader' },
+      { text: 'Objectif\nsectoriel', style: 'tableHeader' }
+    ],
+  ];
+
+  Object.keys(indicatorLabels).sort((a, b) => {
+    return indicatorLabels[a].localeCompare(indicatorLabels[b]);
+  }).forEach(key => {
+    tableBody.push([
+      { text: indicatorLabels[key], alignment: "left" },
+      { text: indicatorUnits[key], style: 'unit' },
+      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
+      { text: getFootprintValue(production, period, key) ? `${getFootprintValue(production, period, key)}` : "-", style: 'data' },
+      { text: getUncertainty(production, period, key) ? `${getUncertainty(production, period, key)} %` : "-", style: 'data' },
+      { text: getBranchValue(comparativeData, key) ? `${getBranchValue(comparativeData, key)}` : " - ", style: 'data' },
+      { text: getTargetValue(comparativeData, key) ? getTargetValue(comparativeData, key) : "-", style: 'data' },
+    ]);
+  });
+
+  return {
+    table: {
+      headerRows: 2,
+      widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === 1 || i === 2 || i === node.table.body.length) ? 0.5 : 0;
+      },
+      hLineColor: function (i, node) {
+        return '#191558';
+      },
+      vLineWidth: function (i, node) {
+        if ((i == 3 || i == 5)) {
+          return 0.5;
+        } else {
+          return 0;
+        }
+      },
+      vLineColor: function (i, node) {
+        return '#191558';
+      },
+      paddingTop: function (i, node) { return (i === 0 || i === 1) ? 2 : 5; },
+      paddingBottom: function (i, node) { return (i === 0 || i === 1) ? 2 : 5; },
+    },
+    style: 'table',
+  };
+};
+
+const createImpactsTable = (netValueAdded, period, indicatorLabels, absoluteUnits, keyIndics,colors) => {
+
+  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
+
+  const tableBody = [
+
+    [
+      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
+      { text: 'Unité', style: 'tableHeader' },
+      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Impact', style: 'tableHeader' },
+    ],
+  ];
+
+  Object.keys(indicatorLabels).sort((a, b) => {
+    return indicatorLabels[a].localeCompare(indicatorLabels[b]);
+  }).forEach(key => {
+
+    const grossImpactValue = getGrossImpactValue(netValueAdded, period, key);
+    if (!grossImpactValue) {
+      return;
+    }
+
+    tableBody.push([
+      { text: indicatorLabels[key], alignment: "left" },
+      { text: absoluteUnits[key], style: 'unit' },
+      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
+      { text: grossImpactValue, style: 'data' },
+    ]);
+  });
+
+  return {
+    table: {
+      headerRows: 2,
+      widths: ["*", 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+      },
+      hLineColor: function (i, node) {
+        return '#191558';
+      },
+      vLineWidth: function (i, node) {
+        return 0;
+      },
+      vLineColor: function (i, node) {
+        return '#191558';
+      },
+      paddingTop: function (i, node) { return 3; },
+      paddingBottom: function (i, node) { return 3; },
+    },
+    style: 'table',
+  };
+};
+
+const createValuableIndicatorsTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData,colors) => {
+  const valuableIndicators = getValuableIndicators(production, period, indicatorLabels, keyIndics, comparativeData);
+  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
+
+  const tableBody = [
+    [
+      { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
+      { text: 'Unité', style: 'tableHeader' },
+      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Ecart\nbranche', style: 'tableHeader' },
+      { text: 'Objectif\ndéfini', style: 'tableHeader' },
+    ],
+  ];
+
+  valuableIndicators.sort((a, b) => {
+    const isSectoralA = keyIndics.includes(a);
+    const isSectoralB = keyIndics.includes(b);
+
+    if (isSectoralA && !isSectoralB) {
+      return -1;
+    } else if (!isSectoralA && isSectoralB) {
+      return 1;
+    } else {
+      const indicatorValueA = getFootprintValue(production, period, a);
+      const indicatorValueB = getFootprintValue(production, period, b);
+      const branchValueA = getBranchValue(comparativeData, a);
+      const branchValueB = getBranchValue(comparativeData, b);
+
+      const marginPercentageA = getMarginPercentage(indicatorValueA, branchValueA);
+      const marginPercentageB = getMarginPercentage(indicatorValueB, branchValueB);
+
+      return Math.abs(marginPercentageB) - Math.abs(marginPercentageA);
+    }
+  }).forEach(key => {
+    const indicatorValue = getFootprintValue(production, period, key);
+    const targetValue = getTargetValue(comparativeData, key);
+    const branchValue = getBranchValue(comparativeData, key);
+
+    const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
+
+    tableBody.push([
+      { text: indicatorLabels[key] },
+      { text: indicatorUnits[key], style: 'unit' },
+      isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
+      { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'data' },
+      { text: targetValue ? "Oui" : "Non", alignment: "center" },
+    ]);
+  });
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: tableLayout(),
+    style: 'table',
+  };
+};
+
+const createImprovementTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData,colors) => {
+  const improvementIndicators = getImprovementIndicators(production, period, indicatorLabels, keyIndics, comparativeData);
+  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
+
+  const tableBody = [
+    [
+      { text: 'Indicateur', style: 'tableHeader' },
+      { text: 'Unité', style: 'tableHeader' },
+      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Ecart\nbranche', style: 'tableHeader' },
+      { text: 'Objectif\ndéfini', style: 'tableHeader' },
+    ],
+  ];
+
+  improvementIndicators
+    .sort((a, b) => {
+      const isSectoralA = keyIndics.includes(a);
+      const isSectoralB = keyIndics.includes(b);
+
+      if (isSectoralA && !isSectoralB) {
+        return -1;
+      } else if (!isSectoralA && isSectoralB) {
+        return 1;
+      } else {
+        const indicatorValueA = getFootprintValue(production, period, a);
+        const indicatorValueB = getFootprintValue(production, period, b);
+        const branchValueA = getBranchValue(comparativeData, a);
+        const branchValueB = getBranchValue(comparativeData, b);
+
+        const marginPercentageA = getMarginPercentage(indicatorValueA, branchValueA);
+        const marginPercentageB = getMarginPercentage(indicatorValueB, branchValueB);
+
+        return Math.abs(marginPercentageB) - Math.abs(marginPercentageA);
+      }
+    })
+    .forEach(key => {
+      const indicatorValue = getFootprintValue(production, period, key);
+      const targetValue = getTargetValue(comparativeData, key);
+      const branchValue = getBranchValue(comparativeData, key);
+      const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
+
+      tableBody.push([
+        { text: indicatorLabels[key] },
+        { text: indicatorUnits[key], style: 'unit' },
+        isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
+        { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'data' },
+        { text: targetValue ? "Oui" : "Non", alignment: "center" },
+      ]);
+    });
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: tableLayout(),
+    style: 'table',
+  };
+};
+
+const createNationalTargetsTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData,colors) => {
+  const nationalTargets = getNationalTargets(indicatorLabels, comparativeData);
+  const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
+
+  const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#36c575" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"></path></svg>';
+
+
+  const tableBody = [
+    [
+      { text: 'Indicateur', style: 'tableHeader' },
+      { text: 'Unité', style: 'tableHeader' },
+      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Empreinte', style: 'tableHeader' },
+      { text: 'Objectif\nà atteindre', style: 'tableHeader' },
+      { text: 'Effort\nà fournir', style: 'tableHeader' },
+
+    ],
+  ];
+
+  nationalTargets
+    .sort((a, b) => {
+      const targetValueA = getTargetValue(comparativeData, a);
+      const targetValueB = getTargetValue(comparativeData, b);
+
+      const footprintValueA = getFootprintValue(production, period, a);
+      const footprintValueB = getFootprintValue(production, period, b);
+
+      const targetAchievedA = footprintValueA ? isBetter(a, footprintValueA, targetValueA, 10) : null;
+      const targetAchievedB = footprintValueB ? isBetter(b, footprintValueB, targetValueB, 10) : null;
+
+      if (targetAchievedA === true && targetAchievedB !== true) {
+        return -1;
+      } else if (targetAchievedB === true && targetAchievedA !== true) {
+        return 1;
+      } else {
+        const marginPercentageA = getEffortPercentage(footprintValueA, targetValueA);
+        const marginPercentageB = getEffortPercentage(footprintValueB, targetValueB);
+
+        return Math.abs(marginPercentageB) - Math.abs(marginPercentageA);
+      }
+    })
+    .forEach(key => {
+      const targetValue = getTargetValue(comparativeData, key);
+      const footprintValue = getFootprintValue(production, period, key);
+      const targetAchieved = footprintValue ? isBetter(key, footprintValue, targetValue, 10) : null;
+      const marginPercentage = getEffortPercentage(footprintValue, targetValue);
+
+      tableBody.push([
+        { text: indicatorLabels[key] },
+        { text: indicatorUnits[key], style: 'unit' },
+        isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
+        { text: footprintValue ? `${footprintValue}` : "-", style: 'data' },
+        { text: `${targetValue}`, style: 'data' },
+
+        targetAchieved === true ? {
+          columns: [
+            { svg: checkIcon, width: 10, height: 10 },
+            { width: '*', text: "atteint", alignment: "left" }
+          ]
+        }
+          :
+          { text: targetAchieved === null ? "-" : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'data' }
+
+      ]);
+
+    });
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: tableLayout(),
+    style: 'table',
+  };
+};
+
+const tableLayout = () => {
+  return {
+    hLineWidth: function (i, node) {
+      return (i === 0 || i === 1 | i === node.table.body.length) ? 0.5 : 0;
+    },
+    hLineColor: function (i, node) {
+      return '#191558';
+    },
+    vLineWidth: function (i, node) {
+      return 0;
+    },
+    vLineColor: function (i, node) {
+      return '#191558';
+    },
+    paddingTop: function (i, node) { return (i === 0) ? 1 : 5; },
+    paddingBottom: function (i, node) { return (i === 0) ? 1 : 5; },
+  };
+}
+
+// ----------------------------- Utils ----------------------------------------------
+
+const splitTitle = (title) => {
+  const words = title.split(' ');
+  const middle = Math.ceil(words.length / 2);
+  return words.slice(0, middle).join(' ') + '\n' + words.slice(middle).join(' ');
+};
 
 
 

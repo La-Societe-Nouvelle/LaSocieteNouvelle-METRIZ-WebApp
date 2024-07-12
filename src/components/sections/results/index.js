@@ -349,22 +349,12 @@ const buildDownloadableFiles = async (
     let ZIPFile = await buildCompleteZipFile({
       session,
       period,
-      showAnalyses,
-    });
+      showAnalyses    });
 
     const zipFileName = `Empreinte-Societale_${legalUnitNameFile}_${year}`;
 
     saveAs(ZIPFile, zipFileName);
-  }
-
-  if (selectedFiles.includes("checkbox-ese-report")) {
-    const PDFFile = await buildESEReport({
-      session,
-      period,
-    });
-    PDFFile.download(`Rapport_ESE_${legalUnitNameFile}_s.pdf`);
-  }
-  
+  }  
 
   if (selectedFiles.includes("standard-report")) {
     const PDFFile = await buildStandardReport({
@@ -411,6 +401,8 @@ const buildCustomizedReport = async (
   const PDFTitle = `Rapport-Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`;
 
   const showStandardReports = selectedFiles.includes("standardReports");
+  const showESEReport = selectedFiles.includes("eseReport");
+
   const showAnalyses = selectedFiles.includes("with-analyses");
 
   const PDFFile = await buildCompleteReport({
@@ -420,6 +412,7 @@ const buildCustomizedReport = async (
     indicators: selectedIndicators,
     showStandardReports,
     showAnalyses,
+    showESEReport
   });
 
   const PDFBlob = new Blob([PDFFile], { type: "application/pdf" });
