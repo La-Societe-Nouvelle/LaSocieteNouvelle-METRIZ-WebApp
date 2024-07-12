@@ -23,7 +23,7 @@ export const StockPurchasesMapping = ({
 }) => {
 
   const stocksAccounts = Object.keys(meta.accounts).filter((accountNum) => /^3(1|2|7)/.test(accountNum));
-  const purchasesAccounts = Object.keys(meta.accounts).filter((accountNum) => /^60(1|2|5|7)/.test(accountNum));
+  const purchasesAccounts = Object.keys(meta.accounts).filter((accountNum) => /^60(1|2|5|6|7)/.test(accountNum));
 
   const [accounts, setAccounts] = useState(meta.accounts);
 
