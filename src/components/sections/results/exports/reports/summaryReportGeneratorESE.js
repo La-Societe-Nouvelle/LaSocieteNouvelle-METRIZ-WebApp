@@ -56,7 +56,7 @@ export const buildESEReport = async ({ session, period }) => {
     createValuableIndicatorsTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
     { text: "Points d'améliorations", style: "h2" },
     createImprovementTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
-    { text: "Objectifs sectoriels", style: "h2" },
+    { text: "Objectifs sectoriels 2030", style: "h2" },
     createNationalTargetsTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData)
   ];
 
@@ -78,7 +78,6 @@ export const buildESEReport = async ({ session, period }) => {
       font: "Roboto",
     },
     styles: {
-
       h1: {
         bold: true,
         color: colors.primary,
@@ -101,17 +100,18 @@ export const buildESEReport = async ({ session, period }) => {
       },
       table: {
         margin: [0, 10, 0, 10],
-        fontSize: 8,
+        fontSize: 6,
       },
       unit: {
-        fontSize: 6,
+        fontSize: 5,
         alignment: "right"
       },
       tableHeader: {
         fillColor: colors.light,
         margin: [0, 5, 0, 5],
+        bold : true
       },
-      lightBackground : {
+      darkBackground : {
         fillColor: colors.primary,
         color : "#FFF",
         bold : true,
@@ -290,7 +290,7 @@ const createResultsTable = (production, currentPeriod, period, indicatorLabels, 
       { text: '', border: [false, false, false, false] },
       { text: '', border: [false, false, false, false] },
       { text: '', border: [false, false, false, false] },
-      { text: 'Exercice ' + currentPeriod, colSpan: 2, border: [true, true, true, true], style : "lightBackground" },
+      { text: 'Exercice ' + currentPeriod, colSpan: 2, border: [true, true, true, true], style : "darkBackground", alignment : "center" },
       { text: '', border: [false, false, false, false] },
       { text: '', border: [false, false, false, false] },
       { text: '', border: [false, false, false, false] },
@@ -298,7 +298,7 @@ const createResultsTable = (production, currentPeriod, period, indicatorLabels, 
     [
       { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
       { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Enjeu\nsectoriel', style: 'tableHeader' },
       { text: 'Empreinte', style: 'tableHeader' },
       { text: 'Incertitude', style: 'tableHeader' },
       { text: 'Moyenne\nBranche', style: 'tableHeader' },
@@ -314,7 +314,7 @@ const createResultsTable = (production, currentPeriod, period, indicatorLabels, 
       { text: indicatorUnits[key], style: 'unit' },
       isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
       { text: getFootprintValue(production, period, key) ? `${getFootprintValue(production, period, key)}` : "-", style: 'data' },
-      { text: getUncertainty(production, period, key) ? `${getUncertainty(production, period, key)} %` : "-", style: 'data' },
+      { text: getUncertainty(production, period, key) ? `${getUncertainty(production, period, key)} %` : "-", style: 'data', fontSize : 5 },
       { text: getBranchValue(comparativeData, key) ? `${getBranchValue(comparativeData, key)}` : " - ", style: 'data' },
       { text: getTargetValue(comparativeData, key) ? getTargetValue(comparativeData, key) : "-", style: 'data' },
     ]);
@@ -359,7 +359,7 @@ const createImpactsTable = (netValueAdded, period, indicatorLabels, absoluteUnit
     [
       { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
       { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Enjeu\nsectoriel', style: 'tableHeader' },
       { text: 'Impact', style: 'tableHeader' },
     ],
   ];
@@ -415,9 +415,8 @@ const createValuableIndicatorsTable = (production, period, indicatorLabels, indi
     [
       { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
       { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Enjeu\nsectoriel', style: 'tableHeader' },
       { text: 'Ecart\nbranche', style: 'tableHeader' },
-      { text: 'Objectif\ndéfini', style: 'tableHeader' },
     ],
   ];
 
@@ -442,7 +441,6 @@ const createValuableIndicatorsTable = (production, period, indicatorLabels, indi
     }
   }).forEach(key => {
     const indicatorValue = getFootprintValue(production, period, key);
-    const targetValue = getTargetValue(comparativeData, key);
     const branchValue = getBranchValue(comparativeData, key);
 
     const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
@@ -452,14 +450,13 @@ const createValuableIndicatorsTable = (production, period, indicatorLabels, indi
       { text: indicatorUnits[key], style: 'unit' },
       isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
       { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'data' },
-      { text: targetValue ? "Oui" : "Non", alignment: "center" },
     ]);
   });
 
   return {
     table: {
       headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
+      widths: ["*", 'auto', 'auto', 'auto'],
       body: tableBody,
     },
     layout: tableLayout(),
@@ -475,9 +472,8 @@ const createImprovementTable = (production, period, indicatorLabels, indicatorUn
     [
       { text: 'Indicateur', style: 'tableHeader' },
       { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Enjeu\nsectoriel', style: 'tableHeader' },
       { text: 'Ecart\nbranche', style: 'tableHeader' },
-      { text: 'Objectif\ndéfini', style: 'tableHeader' },
     ],
   ];
 
@@ -504,7 +500,6 @@ const createImprovementTable = (production, period, indicatorLabels, indicatorUn
     })
     .forEach(key => {
       const indicatorValue = getFootprintValue(production, period, key);
-      const targetValue = getTargetValue(comparativeData, key);
       const branchValue = getBranchValue(comparativeData, key);
       const marginPercentage = getMarginPercentage(indicatorValue, branchValue);
 
@@ -513,14 +508,13 @@ const createImprovementTable = (production, period, indicatorLabels, indicatorUn
         { text: indicatorUnits[key], style: 'unit' },
         isSectoralIssue(keyIndics, key) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
         { text: marginPercentage === '-' ? marginPercentage : `${marginPercentage > 0 ? '+' : ''}${marginPercentage}%`, style: 'data' },
-        { text: targetValue ? "Oui" : "Non", alignment: "center" },
       ]);
     });
 
   return {
     table: {
       headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto'],
+      widths: ["*", 'auto', 'auto', 'auto'],
       body: tableBody,
     },
     layout: tableLayout(),
@@ -539,7 +533,7 @@ const createNationalTargetsTable = (production, period, indicatorLabels, indicat
     [
       { text: 'Indicateur', style: 'tableHeader' },
       { text: 'Unité', style: 'tableHeader' },
-      { text: 'Enjeu', style: 'tableHeader' },
+      { text: 'Enjeu\nsectoriel', style: 'tableHeader' },
       { text: 'Empreinte', style: 'tableHeader' },
       { text: 'Objectif\nà atteindre', style: 'tableHeader' },
       { text: 'Effort\nà fournir', style: 'tableHeader' },
