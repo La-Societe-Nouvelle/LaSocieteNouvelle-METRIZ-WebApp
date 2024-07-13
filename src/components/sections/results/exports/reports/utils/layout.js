@@ -61,6 +61,44 @@ export const createRectObject = (
   return rectObj;
 };
 
+/**
+ * Create a rectangle object.
+ * @param {number} x1 - The x-coordinate of the first end.
+ * @param {number} y1 - The y-coordinate of the first end.
+ * @param {number} x2 - The x-coordinate of the second end.
+ * @param {number} y2 - The y-coordinate of the second end.
+ * @param {number} lineWidth - The line width.
+ * @param {string} lineColor - The color of the line.
+ * @param {string} color - The color of the line.
+ * @returns {object} The line object.
+ */
+export const createLineObject = (
+  x1,
+  y1,
+  x2,
+  y2,
+  lineWidth,
+  lineColor,
+  color
+) => {
+  const lineObj = {
+    type: "line",
+    x1,
+    y1,
+    x2,
+    y2,
+    lineWidth,
+    lineColor,
+  };
+
+  // add color
+  if (color) {
+    lineObj.color = color;
+  }
+
+  return lineObj;
+};
+
 // --------------------------------------------------
 // Header / Footer
 

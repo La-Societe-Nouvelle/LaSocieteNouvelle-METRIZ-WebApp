@@ -17,7 +17,21 @@ const DownloadDropdown = ({ onDownload, view }) => {
 
   const handleCheckboxChange = (event, fileId) => {
     const isCheckboxAll = fileId === "checkbox-all";
+    const isCheckboxReport = fileId === "checkbox-report";
     const isWithAnalyses = fileId === "with-analyses";
+
+    const handleCheckboxReport = () => {
+      setSelectedFileIds((prevSelected) =>
+        event.target.checked
+          ? [
+              "checkbox-report",
+              ...(prevSelected.includes("with-analyses")
+                ? ["with-analyses"]
+                : []),
+            ]
+          : prevSelected.filter((id) => id !== fileId)
+      );
+    };
 
     const handleCheckboxAll = () => {
       setSelectedFileIds((prevSelected) =>
@@ -45,7 +59,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
         const newSelected = event.target.checked
           ? [
               ...prevSelected.filter(
-                (id) => id !== "checkbox-all" 
+                (id) => id !== "checkbox-all" && id !== "checkbox-report"
               ),
               fileId,
             ]
@@ -56,6 +70,8 @@ const DownloadDropdown = ({ onDownload, view }) => {
 
     if (isCheckboxAll) {
       handleCheckboxAll();
+    } else if (isCheckboxReport) {
+      handleCheckboxReport();
     } else if (isWithAnalyses) {
       handleWithAnalyses();
     } else {
@@ -97,6 +113,15 @@ const DownloadDropdown = ({ onDownload, view }) => {
           <div className="dropdown-item">
             <Form.Check
               type="checkbox"
+              id={`checkbox-report`}
+              label={
+                <label htmlFor={`checkbox-report`}>Rapport global (.pdf) </label>
+              }
+              checked={selectedFileIds.includes("checkbox-report")}
+              onChange={(event) => handleCheckboxChange(event, "checkbox-report")}
+            />
+            <Form.Check
+              type="checkbox"
               id={`checkbox-all`}
               label={
                 <label htmlFor={`checkbox-all`}>Dossier complet (.zip) </label>
@@ -105,7 +130,6 @@ const DownloadDropdown = ({ onDownload, view }) => {
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
             />
           </div>
-    
 
           <Dropdown.Divider></Dropdown.Divider>
           <div className="dropdown-item">

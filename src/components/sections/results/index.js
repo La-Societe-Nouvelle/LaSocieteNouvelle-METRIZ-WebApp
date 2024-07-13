@@ -354,6 +354,15 @@ const buildDownloadableFiles = async (
     const zipFileName = `Empreinte-Societale_${legalUnitNameFile}_${year}`;
 
     saveAs(ZIPFile, zipFileName);
+  }
+
+  if (selectedFiles.includes("checkbox-report")) {
+    let PDFFile = await buildESEReport({
+      session,
+      period
+    });
+    PDFTitle = `Rapport_${legalUnitNameFile}_${year}.pdf`
+    PDFFile.download(PDFTitle);
   }  
 
   if (selectedFiles.includes("standard-report")) {
