@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import {  Row } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 
 // Lib
 import indicators from "/lib/indics";
@@ -15,6 +15,7 @@ import { HorizontalBarChart } from "../charts/HorizontalBarChart";
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { VerticalBarChart } from "../charts/VerticalBarChart";
 import { getMaxFootprintValue } from "../charts/chartsUtils";
+import { RingChart } from "../charts/RingChart";
 
 /* ---------- CHARTS CONTAINER ---------- */
 
@@ -29,13 +30,44 @@ import { getMaxFootprintValue } from "../charts/chartsUtils";
 
 export const PrintChartsContainer = ({ session, period }) => {
   return (
-    <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
-      {session.validations[period.periodKey].map((indic) => (
-        <Row key={indic}>
-          <IndicatorCharts session={session} period={period} indic={indic} />
-        </Row>
-      ))}
-    </div>
+    <>
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+        {session.validations[period.periodKey].map((indic) => (
+          <Row key={indic}>
+            <IndicatorCharts session={session} period={period} indic={indic} />
+          </Row>
+        ))}
+      </div>
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+        {session.validations[period.periodKey].map((indic) => (
+           <Row key={indic}>
+              <div>
+                {buildIndicatorChart({
+                  id: "socialfootprintvisual_" + indic + "-print",
+                  session,
+                  datasetOptions: {
+                    period,
+                    aggregate: "production",
+                    indic
+                  },
+                  printOptions: {
+                    printMode: true,
+                    showDivisionData: true,
+                    showAreaData: false,
+                    showTargetData: false,
+                    useIndicColors: true,
+                    showLegend: true,
+                    showXlabels: false,
+                    aspectRatio: 1,
+                    label: "Empreinte de la production"
+                  }
+                })}
+              </div>
+
+            </Row>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -88,20 +120,20 @@ const IndicatorCharts = ({ session, period, indic }) => {
 
       {(indicators[indic].type == "intensité" ||
         indicators[indic].type == "indice") && (
-        <div className="deviation-chart-container ">
-          <HorizontalBarChart
-            id={`deviation-chart-${indic}-print`}
-            session={session}
-            datasetOptions={{
-              period,
-              indic,
-            }}
-            printOptions={{
-              printMode: true,
-            }}
-          />
-        </div>
-      )}
+          <div className="deviation-chart-container ">
+            <HorizontalBarChart
+              id={`deviation-chart-${indic}-print`}
+              session={session}
+              datasetOptions={{
+                period,
+                indic,
+              }}
+              printOptions={{
+                printMode: true,
+              }}
+            />
+          </div>
+        )}
 
       {/* ----------Gross Impact Chart ----------  */}
       {indicators[indic].type == "intensité" && (
@@ -186,3 +218,23 @@ const renderSigCharts = (session, aggregate, indic, period, id) => {
     </>
   );
 };
+
+/* --------- Production Footprint charts ----------  */
+
+const buildIndicatorChart = (props) => {
+  switch (props.datasetOptions.indic) {
+    case "art": return (<RingChart {...props} />);
+    case "eco": return (<RingChart {...props} />);
+    case "geq": return (<VerticalBarChart {...props} />);
+    case "ghg": return (<VerticalBarChart {...props} />);
+    case "haz": return (<VerticalBarChart {...props} />);
+    case "idr": return (<VerticalBarChart {...props} />);
+    case "knw": return (<RingChart {...props} />);
+    case "mat": return (<VerticalBarChart {...props} />);
+    case "nrg": return (<VerticalBarChart {...props} />);
+    case "soc": return (<RingChart {...props} />);
+    case "was": return (<VerticalBarChart {...props} />);
+    case "wat": return (<VerticalBarChart {...props} />);
+    default: return (<></>)
+  }
+}

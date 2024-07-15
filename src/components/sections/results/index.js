@@ -28,12 +28,12 @@ import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryRepor
 import { buildSummaryReportIndexIndic } from "./exports/reports/summaryReportGeneratorIndex";
 import { buildStandardReport } from "./exports/reports/standardReportGenerator";
 import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
-import { buildCompleteFile } from "./exports/completeFileGenerator";
 import { buildCompleteReport, buildCompleteZipFile} from "./exports/completeFileGenerator";
 
 // Utils
 import { getYearPeriod } from "../../../utils/periodsUtils";
 import { triggerFileDownload } from "../../../utils/Utils";
+import { buildESEReport } from "./exports/reports/summaryReportGeneratorESE";
 
 /* ---------- RESULTS SECTION ---------- */
 
@@ -349,13 +349,21 @@ const buildDownloadableFiles = async (
     let ZIPFile = await buildCompleteZipFile({
       session,
       period,
-      showAnalyses,
-    });
+      showAnalyses    });
 
     const zipFileName = `Empreinte-Societale_${legalUnitNameFile}_${year}`;
 
     saveAs(ZIPFile, zipFileName);
   }
+
+  if (selectedFiles.includes("checkbox-report")) {
+    let PDFFile = await buildESEReport({
+      session,
+      period
+    });
+    PDFTitle = `Rapport_${legalUnitNameFile}_${year}.pdf`
+    PDFFile.download(PDFTitle);
+  }  
 
   if (selectedFiles.includes("standard-report")) {
     const PDFFile = await buildStandardReport({
@@ -402,6 +410,8 @@ const buildCustomizedReport = async (
   const PDFTitle = `Rapport-Empreinte-Societale_${legalUnitNameFile}_${year}.pdf`;
 
   const showStandardReports = selectedFiles.includes("standardReports");
+  const showESEReport = selectedFiles.includes("eseReport");
+
   const showAnalyses = selectedFiles.includes("with-analyses");
 
   const PDFFile = await buildCompleteReport({
@@ -411,6 +421,7 @@ const buildCustomizedReport = async (
     indicators: selectedIndicators,
     showStandardReports,
     showAnalyses,
+    showESEReport
   });
 
   const PDFBlob = new Blob([PDFFile], { type: "application/pdf" });

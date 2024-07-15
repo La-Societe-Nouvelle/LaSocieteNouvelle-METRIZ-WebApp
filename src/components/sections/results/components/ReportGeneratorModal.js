@@ -11,7 +11,7 @@ const ReportGeneratorModal = ({
 }) => {
   const [selectedIndicators, setSelectedIndicators] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  
+
 
   useEffect(() => {
     // Reset checkboxes when the modal view changes
@@ -20,9 +20,9 @@ const ReportGeneratorModal = ({
   }, [showModal]);
 
   useEffect(() => {
-    
-  
-   
+
+
+
   }, []);
 
   // Handle
@@ -30,7 +30,7 @@ const ReportGeneratorModal = ({
   const handleCheckboxAll = (event) => {
     setSelectedIndicators(() => (event.target.checked ? [...indicators] : []));
 
-    if(!event.target.checked) {
+    if (!event.target.checked) {
       setSelectedFiles([]);
     }
   };
@@ -40,15 +40,15 @@ const ReportGeneratorModal = ({
       const newSelected = event.target.checked
         ? [...prevSelected, indicator]
         : prevSelected.filter((id) => id !== indicator);
-  
+
       if (newSelected.length === 0) {
         setSelectedFiles([]);
       }
-  
+
       return newSelected;
     });
   };
-    
+
   const handleOtherCheckboxes = (event, file) => {
     const isChecked = event.target.checked;
 
@@ -67,7 +67,7 @@ const ReportGeneratorModal = ({
   };
 
   const handleDownload = () => {
-    onDownload({selectedIndicators, selectedFiles});
+    onDownload({ selectedIndicators, selectedFiles });
   };
 
   return (
@@ -93,67 +93,78 @@ const ReportGeneratorModal = ({
         <h6>Plaquettes à inclure</h6>
         <Form>
 
-        {indicators.map((indicator) => (
-          <Form.Check
-            key={indicator}
-            type="checkbox"
-            className="pb-1"
-            id={`checkbox-${indicator}`}
-            label={
-              <label htmlFor={`checkbox-${indicator}`}>
-                {metaIndics[indicator].libelle}
-              </label>
-            }
-            checked={selectedIndicators.includes(indicator)}
-            onChange={(event) => handleIndicatorsCheckboxes(event, indicator)}
-          />
-        ))}
-      <hr className="p-0 m-2 border-1"></hr>
+          {indicators.map((indicator) => (
+            <Form.Check
+              key={indicator}
+              type="checkbox"
+              className="pb-1"
+              id={`checkbox-${indicator}`}
+              label={
+                <label htmlFor={`checkbox-${indicator}`}>
+                  {metaIndics[indicator].libelle}
+                </label>
+              }
+              checked={selectedIndicators.includes(indicator)}
+              onChange={(event) => handleIndicatorsCheckboxes(event, indicator)}
+            />
+          ))}
+          <hr className="p-0 m-2 border-1"></hr>
           <Form.Check
             type="checkbox"
             className="pb-1"
             id={`checkbox-all`}
             label={
               <label htmlFor={`checkbox-all`}>
-                 Tout sélectionner
+                Tout sélectionner
               </label>
             }
             checked={selectedIndicators.length == indicators.length}
             onChange={(event) => handleCheckboxAll(event, "checkbox-all")}
           />
+          <div className="mt-4">
+            <h6>Autres</h6>
+            <Form.Check
+              type="checkbox"
+              id={`eseReport`}
+              label={<label htmlFor={`eseReport`}> Rapport sur l'empreinte sociétale  </label>}
+              checked={selectedFiles.includes("eseReport")}
+              onChange={(event) => handleOtherCheckboxes(event, "eseReport")}
+            />
 
-        <div className="mt-4">
-          <h6>Annexes</h6>
-          <Form.Check
-            type="checkbox"
-            id={`standardReports`}
-            disabled={selectedIndicators.length == 0}
-            label={<label htmlFor={`standardReports`}> Inclure les annexes </label>}
-            checked={selectedFiles.includes("standardReports")}
-            onChange={(event) => handleOtherCheckboxes(event, "standardReports")}
-          />
-          <Form.Check
-            type="checkbox"
-            id={`with-analyses`}
-            className="ms-4"
-            disabled={!selectedFiles.includes("standardReports")}
-            label={
-              <label htmlFor={`with-analyses`}>
-                Inclure les notes d'analyse dans les annexes
-              </label>
-            }
-            checked={selectedFiles.includes("with-analyses")}
-            onChange={(event) => handleOtherCheckboxes(event, "with-analyses")}
-          />
-        </div>
+          </div>
+
+          <div className="mt-4">
+            <h6>Annexes</h6>
+            <Form.Check
+              type="checkbox"
+              id={`standardReports`}
+              disabled={selectedIndicators.length == 0}
+              label={<label htmlFor={`standardReports`}> Inclure les annexes </label>}
+              checked={selectedFiles.includes("standardReports")}
+              onChange={(event) => handleOtherCheckboxes(event, "standardReports")}
+            />
+            <Form.Check
+              type="checkbox"
+              id={`with-analyses`}
+              className="ms-4"
+              disabled={!selectedFiles.includes("standardReports")}
+              label={
+                <label htmlFor={`with-analyses`}>
+                  Inclure les notes d'analyse dans les annexes
+                </label>
+              }
+              checked={selectedFiles.includes("with-analyses")}
+              onChange={(event) => handleOtherCheckboxes(event, "with-analyses")}
+            />
+          </div>
         </Form>
 
         <p className="text-end">
-        <Button  onClick={onClose} className="me-2">
-           Fermer
+          <Button onClick={onClose} className="me-2">
+            Fermer
           </Button>
-          <Button variant="secondary" onClick={handleDownload} disabled={ selectedIndicators.length === 0 }>
-           Télécharger
+          <Button variant="secondary" onClick={handleDownload} disabled={selectedFiles.length === 0 && selectedIndicators.length === 0}>
+            Télécharger
           </Button>
         </p>
       </Modal.Body>

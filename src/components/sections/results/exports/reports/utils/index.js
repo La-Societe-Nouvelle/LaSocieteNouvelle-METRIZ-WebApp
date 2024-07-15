@@ -10,7 +10,7 @@
  */
 export const getChartImageData = (id) => {
   const chartCanvas = document.getElementById(id);
-  return chartCanvas ? chartCanvas.toDataURL("image/png") : null;
+  return chartCanvas ? chartCanvas.toDataURL({format: 'png',quality: 1}) : null;
 };
 
 // --------------------------------------------------
