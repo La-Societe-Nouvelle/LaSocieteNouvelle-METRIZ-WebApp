@@ -373,7 +373,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size:  printMode ? 15 : 10,
+            size:  printMode ? 12 : 10,
           },
         },
         grid: {
@@ -407,6 +407,7 @@ const buildChartOptions = (
           font: {
             size: 10,
             family: "Roboto",
+            weight : printMode ? "bold" : "normal",
           },
           generateLabels: (chart) => {
             const labels = [];
@@ -447,6 +448,7 @@ const buildChartOptions = (
         color: colors.textColor,
         font: {
           size: printMode ? 14 : 10,
+          weight : printMode ? "bold" : "normal",
           family: "Roboto",
         },
         padding: {
@@ -457,6 +459,7 @@ const buildChartOptions = (
         display: false,
       },
       tooltip: {
+        enabled : printMode ? false : true,
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,

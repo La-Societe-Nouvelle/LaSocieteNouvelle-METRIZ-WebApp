@@ -44,7 +44,6 @@ export const RingChart = ({ id, session, datasetOptions, printOptions }) =>
 
   // --------------------------------------------------
   // Options
-
   const chartOptions = buildChartOptions(printOptions);
 
   // --------------------------------------------------
@@ -104,7 +103,7 @@ const buildChartData = (session, datasetOptions) => {
 // ################################################## OPTIONS ##################################################
 
 const buildChartOptions = (printOptions) => {
-  const { cutOut } = printOptions;
+  const { cutOut, printMode } = printOptions;
 
   const [width, setWidth] = useState(100);
 
@@ -115,26 +114,26 @@ const buildChartOptions = (printOptions) => {
   const chartOptions = {
     maintainAspectRatio: true,
     responsive: true,
-    devicePixelRatio: 2,
+    devicePixelRatio: 2, 
     onResize: handleResize,
     layout: {
       padding: {
-        top: 20,
-        left: 20,
-        right: 20,
+        top: printMode ? 0 : 20,
+        left: printMode ? 0 : 20,
+        right: printMode ? 0 : 20,
       },
     },
     plugins: {
       datalabels: {
         formatter: (value, context) => {
-          if (context.dataIndex === 0) {
+          if (context.dataIndex === 0 ) {
             return `${value}%`;
           } else {
             return "";
           }
         },
         backgroundColor: (context) => {
-          if (context.dataIndex === 0) {
+          if (context.dataIndex === 0 ) {
             return colors.lightBackground;
           } else {
             return colors.transparent;
@@ -152,11 +151,13 @@ const buildChartOptions = (printOptions) => {
         offset : 10,
         anchor :  "start",
         font: {
-          size: 10,
+          size: printMode ? 15 : 10,
+          weight : printMode ? "bold" : "normal",
           family: "Roboto",
         },
       },
       tooltip: {
+        enabled : printMode ? false : true,
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,
@@ -180,7 +181,8 @@ const buildChartOptions = (printOptions) => {
           boxWidth: 10,
           color : colors.textColor,
           font: {
-            size: 10,
+            size:  10,
+            weight : printMode ? "bold" : "normal",
           },
           generateLabels: (chart) => {
             const labels = [];
