@@ -125,7 +125,7 @@ export const buildSummaryReportContributionIndic = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: generateHeader(corporateName,legalUnit.siren, currentPeriod),
+    header: generateHeader(corporateName,legalUnit.siren, period),
     footer: generateFooter(corporateName),
     background: function () {
       const canvas = [];

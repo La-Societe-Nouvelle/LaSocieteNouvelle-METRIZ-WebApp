@@ -76,7 +76,7 @@ const buildValueIDR = (indicator, impactsData) =>
 
 const buildValueECO = (indicator, impactsData) => 
 {
-  const { nbDecimals } = metaIndics.art;
+  const { nbDecimals } = metaIndics.eco;
   const { 
     domesticProduction, 
     netValueAdded
