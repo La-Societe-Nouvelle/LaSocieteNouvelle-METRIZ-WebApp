@@ -249,22 +249,22 @@ const getIndicatorCharts = async () => {
   };
 
   const defaultImages = {
-    "Création de la valeur": "/pie-no-data.png",
-    "Empreinte sociale": "/bar-no-data.png",
-    "Empreinte environnementale": "/bar-no-data.png"
+    "proportion": "/no-data-doughnutchart.png", 
+    "indice": "/no-data-barchart.png",
+    "intensité": "/no-data-barchart.png"
   };
 
-  const loadImage = async (key, id) => {
+  const loadImage = async (indic, id) => {
     const imageData = getChartImageData(id);
-    return imageData || await loadImageAsDataURL(defaultImages[key]);
+    return imageData || await loadImageAsDataURL(defaultImages[metaIndics[indic].type]);
   };
 
-  await Promise.all(Object.keys(metaIndics).map(async (key) => {
-    const id = `socialfootprintvisual_${key}-print`;
-    const category = metaIndics[key].category;
+  await Promise.all(Object.keys(metaIndics).map(async (indic) => {
+    const id = `socialfootprintvisual_${indic}-print`;
+    const category = metaIndics[indic].category;
 
-    const image = await loadImage(category, id);
-    indicatorImages[category].push({ key, image });
+    const image = await loadImage(indic, id);
+    indicatorImages[category].push({ indic, image });
   }));
 
   return indicatorImages;
@@ -323,12 +323,12 @@ const createIndicatorCharts = (indicatorLabels, indicatorImages) => {
     columns.push(title);
 
     let currentRow = [];
-    indicatorImages[category].forEach((indicator, index) => {
+    indicatorImages[category].forEach(({indic,image}, index) => {
       currentRow.push({
         margin: [0, 10],
         stack: [
-          { text: splitTitle(indicatorLabels[indicator.key]), style: "h3", alignment: "center" },
-          { image: indicator.image, width: 100, alignment: "center" }
+          { text: splitTitle(indicatorLabels[indic]), style: "h3", alignment: "center" },
+          { image: image, width: 100, alignment: "center" }
         ],
       });
 

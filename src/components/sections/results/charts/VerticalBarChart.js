@@ -401,11 +401,12 @@ const buildChartOptions = (
         display: showLegend,
         position: "bottom",
         align: "center",
+        fullSize: true,
         labels: {
           boxWidth: 10,
           color: colors.textColor,
           font: {
-            size: 10,
+            size: printMode ? 15 : 10,
             family: "Roboto",
             weight : printMode ? "bold" : "normal",
           },
@@ -417,20 +418,24 @@ const buildChartOptions = (
                 if (backgroundColor) {
                   labels.push({
                     text: datasetIndex === 0 ? label : dataset.label,
+                    textAlign: 'left',
                     fillStyle: backgroundColor,
                     strokeStyle: backgroundColor,
                     lineWidth: 0,
                     hidden: false,
-                    boxWidth: 10,
+                    boxWidth: printMode ? 15 : 10,
+                    boxHeight: printMode ? 15 : 10,
                   });
                 }
               });
             });
-
             return labels;
           },
+          sort: (a,b) => {
+            return -a.text.localeCompare(b.text);
+          }
         },
-      },  
+      },
       datalabels: {
         display: true,
         overlap: "auto",
