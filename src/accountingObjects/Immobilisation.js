@@ -214,7 +214,7 @@ export class Immobilisation
         date,
         prevStateDate,
         amount: immobilisationAmount,
-        amortisationAmount: amortisationAmount,
+        amortisationAmount: Math.max(amortisationAmount, 0), // avoid negative amortisation amount
         amortisationExpenseAmount: adjustedAmortisationExpenseAmount
       });
 
