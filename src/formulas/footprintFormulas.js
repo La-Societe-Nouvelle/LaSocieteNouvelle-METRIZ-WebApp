@@ -117,8 +117,8 @@ export async function buildDifferenceIndicator(indic,itemA,itemB)
   let indicatorA = itemA.footprint.indicators[indic];
   let indicatorB = itemA.footprint.indicators[indic];
 
-  if (isValidNumber(itemA.amount) && itemA.footprint.indicators[indic].isValid()
-   && isValidNumber(itemB.amount) && itemB.footprint.indicators[indic].isValid())
+  if (isValidNumber(itemA.amount) && indicatorA.isValid()
+   && isValidNumber(itemB.amount) && indicatorB.isValid())
   {
     let amountVariation = amountA - amountB;
     let impactVariation = indicatorA.getValue()*amountA - indicatorB.getValue()*amountB;
@@ -134,6 +134,12 @@ export async function buildDifferenceIndicator(indic,itemA,itemB)
       indicator.setValue(null);
       indicator.setUncertainty(null);
     }
+  } else if (isValidNumber(itemA.amount) && indicatorA.isValid() && itemB.amount == 0) {
+    indicator.setValue(indicatorA.getValue());
+    indicator.setUncertainty(indicatorA.getUncertainty());
+  } else if (isValidNumber(itemB.amount) && indicatorB.isValid() && itemA.amount == 0) {
+    indicator.setValue(indicatorB.getValue());
+    indicator.setUncertainty(indicatorB.getUncertainty());
   } else {
     indicator.setValue(null);
     indicator.setUncertainty(null);
