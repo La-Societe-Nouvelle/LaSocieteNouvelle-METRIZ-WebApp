@@ -711,13 +711,14 @@ const createPublishedProviderFootprintsTable = (providers, validatedIndics, peri
     .forEach((provider) => 
     {
       const nbPublishedIndics = Object.values(provider.footprint.indicators)
-        .filter((indicator) => validatedIndics.includes(indicator.indic) && indicator.flag == "p").length;
+        .filter((indicator) => indicator.flag == "p").length;
+        // .filter((indicator) => validatedIndics.includes(indicator.indic) && indicator.flag == "p").length;
 
       tableBody.push([
         { text: provider.providerNum },
         { text: provider.legalUnitData.siren || "error" },
         { text: provider.legalUnitData.denomination || "error" },
-        { text: nbPublishedIndics+"/"+validatedIndics.length, alignment: "center" }
+        { text: nbPublishedIndics+"/"+"12", alignment: "center" }
       ]);
     });
 
@@ -846,27 +847,27 @@ const getStatementData = (impactsData, period, validations, indic) =>
         uncertainty: ""
       }
       case "ghg": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.greenhouseGasEmissions)*statementUnits[impactsDataOnPeriod.greenhouseGasEmissionsUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.greenhouseGasEmissions)*statementUnits[impactsDataOnPeriod.greenhouseGasEmissionsUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.greenhouseGasEmissionsUncertainty, 0)+" %"
       }
       case "nrg": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.energyConsumption)*statementUnits[impactsDataOnPeriod.energyConsumptionUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.energyConsumption)*statementUnits[impactsDataOnPeriod.energyConsumptionUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.energyConsumptionUncertainty, 0)+" %"
       }
       case "wat": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.waterConsumption)*statementUnits[impactsDataOnPeriod.waterConsumptionUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.waterConsumption)*statementUnits[impactsDataOnPeriod.waterConsumptionUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.waterConsumptionUncertainty, 0)+" %"
       }
       case "mat": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.materialsExtraction)*statementUnits[impactsDataOnPeriod.materialsExtractionUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.materialsExtraction)*statementUnits[impactsDataOnPeriod.materialsExtractionUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.materialsExtractionUncertainty, 0)+" %"
       }
       case "was": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.wasteProduction)*statementUnits[impactsDataOnPeriod.wasteProductionUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.wasteProduction)*statementUnits[impactsDataOnPeriod.wasteProductionUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.wasteProductionUncertainty, 0)+" %"
       }
       case "haz": return {
-        statement: printValue(parseFloat(impactsDataOnPeriod.hazardousSubstancesUse)*statementUnits[impactsDataOnPeriod.hazardousSubstancesUseUnit].coef, nbDecimals),
+        statement: printValue(parseFloat(impactsDataOnPeriod.hazardousSubstancesUse)*statementUnits[impactsDataOnPeriod.hazardousSubstancesUseUnit].coef, 0),
         uncertainty: printValue(impactsDataOnPeriod.hazardousSubstancesUseUncertainty, 0)+" %"
       }
       default: return {
