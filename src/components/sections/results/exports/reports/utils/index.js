@@ -1,4 +1,5 @@
 // Utils
+import metaIndics from "/lib/indics.json";
 
 // --------------------------------------------------
 // Images
@@ -263,3 +264,5 @@ export function calculateAverageEvolutionRate(data) {
 
   return averageEvolutionRate.toFixed(0);
 }
+
+

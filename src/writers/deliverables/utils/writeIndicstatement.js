@@ -14,9 +14,9 @@ export const writeStatementECO = (impactsData) => {
   if (impactsData.isAllActivitiesInFrance) {
     textStatement.push({
       text: "*Les activités de l'entreprise sont déclarées entièrement localisées en France",
-      fontSize: 8,
+      fontSize: 5,
       italics: true,
-      margin:[0,10,0,10]
+      margin:[0,10,0,0]
     });
   }
   return textStatement;
@@ -36,9 +36,9 @@ export const writeStatementART = (impactsData) => {
   if (impactsData.isValueAddedCrafted) {
     textStatement.push({
       text: "*Les activités de l'entreprise sont déclarées artisanales / faisant appel à un savoir-faire reconnu",
-      fontSize: 8,
+      fontSize: 5,
       italics: true,
-      margin:[0,10,0,10]
+      margin:[0,10,0,0]
     });
   }
 
@@ -59,9 +59,9 @@ export const writeStatementGEQ = (impactsData) => {
   if (!impactsData.hasEmployees) {
     textStatement.push({
       text: "*L'entreprise est déclarée non-employeur",
-      fontSize: 8,
+      fontSize: 5,
       italics: true,
-      margin:[0,10,0,10]
+      margin:[0,10,0,0]
     });
   }
   return textStatement;
@@ -111,9 +111,9 @@ export const writeStatementIDR = (impactsData) => {
   if (!impactsData.hasEmployees) {
     textStatement.push({
       text: "*L'entreprise est déclarée non-employeur",
-      fontSize: 8,
+      fontSize: 5,
       italics: true,
-      margin:[0,10,0,10]
+      margin:[0,10,0,0]
     });
   }
 

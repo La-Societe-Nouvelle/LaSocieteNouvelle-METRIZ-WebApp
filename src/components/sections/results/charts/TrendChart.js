@@ -394,7 +394,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
 
   const chartOptions = {
     devicePixelRatio: 2,
-    maintainAspectRatio: printMode ? false : true,
+    maintainAspectRatio: true,
     pointRadius: 0,
     scales: {
       y: {

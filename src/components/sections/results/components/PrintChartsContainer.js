@@ -178,12 +178,12 @@ const renderComparativeCharts = ({
         printOptions={{
           printMode: true,
           showDivisionData: true,
-          showAreaData: true,
+          showAreaData: false,
           showTargetData: true,
-          useIndicColors: false,
+          useIndicColors: true,
           showLegend: false,
           showXlabels: true,
-          aspectRatio: 1.5,
+          aspectRatio: 1,
           maxYAxis: maxFootprintValue,
           label: "Production",
         }}

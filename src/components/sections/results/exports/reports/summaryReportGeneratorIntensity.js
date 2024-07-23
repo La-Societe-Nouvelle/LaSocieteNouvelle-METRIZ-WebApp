@@ -316,7 +316,7 @@ export const buildSummaryReportIntensityIndic = async ({
         margin: [0, 40, 0, 25],
         columns: [
           {
-            ...buildSIGTableSection(
+            ...createSIGtableSectionSection(
               financialData.mainAggregates,
               period,
               indic
@@ -593,7 +593,7 @@ const buildProductionImpactSection = (
 
 // Sections  -----------------------------------------------------------
 
-const buildSIGTableSection = (mainAggregates, period, indic) => {
+const createSIGtableSectionSection = (mainAggregates, period, indic) => {
   const {
     production,
     netValueAdded,
