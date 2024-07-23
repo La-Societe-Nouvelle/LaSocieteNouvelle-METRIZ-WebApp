@@ -524,7 +524,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+ligneCourante.CompteNum+".");
 
     // update data
-    immobilisation.initialState.amount += parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    immobilisation.initialState.amount = roundValue(immobilisation.initialState.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit), 2);
   }
 
   // Comptes d'amortissements ------------------------------------------------------------------------- //
@@ -538,7 +538,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".");
 
     // update date
-    immobilisation.initialState.amortisationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    immobilisation.initialState.amortisationAmount = roundValue(immobilisation.initialState.amortisationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit), 2);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
@@ -552,7 +552,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (immobilisation == undefined) throw ("Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".");
 
     // update date
-    immobilisation.initialState.depreciationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    immobilisation.initialState.depreciationAmount = roundValue(immobilisation.initialState.depreciationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit), 2);
   }
 
   /* --- STOCKS --- */
@@ -580,7 +580,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (stock == undefined) throw ("Erreur de lecture pour le compte de stock "+ligneCourante.CompteNum+"." );
 
     // update data
-    stock.initialState.amount += parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    stock.initialState.amount = roundValue(stock.initialState.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit), 2);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
@@ -594,7 +594,7 @@ async function readANouveauxEntry(data, journal, ligneCourante) {
     if (stock == undefined) throw ("Erreur de lecture pour le compte de stock "+accountData.assetAccountNum+".");
 
     // update date
-    stock.initialState.depreciationAmount += parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    stock.initialState.depreciationAmount = roundValue(stock.initialState.depreciationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit), 2);
   }
 }
 

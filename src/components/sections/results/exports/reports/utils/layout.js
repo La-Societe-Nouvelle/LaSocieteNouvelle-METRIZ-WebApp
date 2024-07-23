@@ -1,5 +1,6 @@
 
 // Utils ---------------------------------------------------------------------
+import { getLabelPeriod } from "../../../../../../utils/periodsUtils";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 
 // Layout --------------------------------------------------------------------
@@ -106,10 +107,10 @@ export const createLineObject = (
  * Generate the header for the document.
  * @param {string} corporateName - The name of the company.
  * @param {string} siren - The SIREN number.
- * @param {string} currentPeriod - The current period.
+ * @param {string} period - The current period.
  * @returns {object} The header configuration.
  */
-export const generateHeader = (corporateName, siren, currentPeriod) => {
+export const generateHeader = (corporateName, siren, period) => {
   return {
     columns: [
       {
@@ -120,7 +121,7 @@ export const generateHeader = (corporateName, siren, currentPeriod) => {
         text: corporateName,
       },
       {
-        text: "Exercice  " + currentPeriod,
+        text: getLabelPeriod(period),
         alignment: "right",
       },
     ],

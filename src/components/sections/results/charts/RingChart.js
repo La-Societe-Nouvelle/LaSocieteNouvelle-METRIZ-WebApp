@@ -177,30 +177,35 @@ const buildChartOptions = (printOptions) => {
         display: true,
         position: "bottom",
         align: "center",
+        fullSize: true,
         labels: {
           boxWidth: 10,
           color : colors.textColor,
           font: {
-            size:  10,
+            size:  printMode ? 15 : 10,
             weight : printMode ? "bold" : "normal",
           },
           generateLabels: (chart) => {
             const labels = [];
             chart.data.datasets.forEach((dataset,index) => {
               const label = chart.data.labels[index];
-                const backgroundColor = dataset.backgroundColor[0];
-                labels.push({
-                  text: label,
-                  fillStyle: backgroundColor,
-                  strokeStyle: backgroundColor,
-                  lineWidth: 0,
-                  hidden: false,
-                  boxWidth: 10,
-                });
-             
+              const backgroundColor = dataset.backgroundColor[0];
+              labels.push({
+                text: label,
+                textAlign: 'left',
+                fillStyle: backgroundColor,
+                strokeStyle: backgroundColor,
+                lineWidth: 0,
+                hidden: false,
+                boxWidth: printMode ? 15 : 10,
+                boxHeight: printMode ? 15 : 10,
+              });
             });
             return labels;
           },
+          sort: (a,b) => {
+            return -a.text.localeCompare(b.text);
+          }
         },
       },
     },

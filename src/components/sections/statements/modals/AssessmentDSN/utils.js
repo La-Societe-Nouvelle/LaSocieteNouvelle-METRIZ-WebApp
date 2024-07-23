@@ -71,7 +71,7 @@ export const checkIndividualData = (individualData) =>
   if (isValidNumber(individualData.workingHours,0)
    && ["1","2"].includes(individualData.sex)
    && isValidNumber(individualData.wage,0)
-   && isValidNumber(individualData.hourlyRate,0)
+   && (isValidNumber(individualData.hourlyRate,0) || individualData.workingHours==0)
    && isValidInput(individualData.apprenticeshipHours,0,individualData.workingHours)) {
     return true;
   } else {
@@ -80,6 +80,8 @@ export const checkIndividualData = (individualData) =>
 }
 
 export const getIndividualsData = async (declarations) => {
+  // period
+  let regexPeriod = buildRegexPeriod(declarations);
   // array of data
   let individualsData = [];
   for (let declaration of declarations) {
@@ -88,9 +90,9 @@ export const getIndividualsData = async (declarations) => {
       let id = individu.identifiant || individu.identifiantTechnique;
       let sex = getIndividualSex(individu);
       let name = individu.prenoms + " " + individu.nomFamille;
-      let workingHours = await getIndividualWorkingHours(individu);
-      let wage = await getIndividualWage(individu);
-      let apprenticeshipHours = await getIndividualApprenticeshipHours(individu);
+      let workingHours = await getIndividualWorkingHours(individu, regexPeriod);
+      let wage = await getIndividualWage(individu, regexPeriod);
+      let apprenticeshipHours = await getIndividualApprenticeshipHours(individu, regexPeriod);
       let apprenticeshipContract = await getIndividualApprenticeshipContract(individu);
       let isExecutive = isIndividualExecutive(individu);
 
@@ -316,7 +318,7 @@ export const getIndividualSex = (individu) =>
 {
   // with property "sexe"
   if (/^0(1|2)$/.test(individu.sexe)) {
-    return individu.sexe == "01" ? 1 : 2;
+    return individu.sexe == "01" ? "1" : "2";
   } 
   // with property "identifiant"
   else if (/^(1|2)[0-9]{12}$/.test(individu.identifiant)) {
@@ -339,41 +341,44 @@ export const getIndividualSex = (individu) =>
  *    - 018
  */
 
-export const getIndividualWage = (individu) => {
+export const getIndividualWage = (individu, regexPeriod) => {
   let montantDeclaration = 0;
 
   let versements = individu.versements;
-  versements.forEach((versement) => {
-    // Rémunérations
-    let remunerations = versement.remunerations;
-    remunerations
-      .filter((remuneration) => remuneration.type == "001")
-      .forEach((remuneration) => {
-        montantDeclaration += parseFloat(remuneration.montant);
-      });
-    remunerations
-      .filter((remuneration) =>
-        ["012", "013", "017", "018"].includes(remuneration.type)
-      )
-      .forEach((remuneration) => {
-        montantDeclaration += parseFloat(remuneration.montant);
-      });
-    // Primes
-    let primes = versement.primes;
-    primes
-      .filter((prime) => primesIncludedInPay.includes(prime.type))
-      .forEach((prime) => {
-        montantDeclaration += parseFloat(prime.montant);
-      });
-    // Autres revenus
-    let revenuAutres = versement.revenuAutres;
-    revenuAutres
-      .filter((revenuAutre) =>
-        revenuAutresIncludedInPay.includes(revenuAutre.type)
-      )
-      .forEach((revenuAutre) => {
-        montantDeclaration += parseFloat(revenuAutre.montant);
-      });
+  versements
+    .filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
+    .forEach((versement) => 
+    {
+      // Rémunérations
+      let remunerations = versement.remunerations;
+      remunerations
+        .filter((remuneration) => remuneration.type == "001")
+        .forEach((remuneration) => {
+          montantDeclaration += parseFloat(remuneration.montant);
+        });
+      remunerations
+        .filter((remuneration) =>
+          ["012", "013", "017", "018"].includes(remuneration.type)
+        )
+        .forEach((remuneration) => {
+          montantDeclaration += parseFloat(remuneration.montant);
+        });
+      // Primes
+      let primes = versement.primes;
+      primes
+        .filter((prime) => primesIncludedInPay.includes(prime.type))
+        .forEach((prime) => {
+          montantDeclaration += parseFloat(prime.montant);
+        });
+      // Autres revenus
+      let revenuAutres = versement.revenuAutres;
+      revenuAutres
+        .filter((revenuAutre) =>
+          revenuAutresIncludedInPay.includes(revenuAutre.type)
+        )
+        .forEach((revenuAutre) => {
+          montantDeclaration += parseFloat(revenuAutre.montant);
+        });
   });
 
   return roundValue(montantDeclaration, 2);
@@ -388,39 +393,42 @@ export const getIndividualWage = (individu) => {
  *    - 018
  */
 
-export const getIndividualWorkingHours = (individu) => {
+export const getIndividualWorkingHours = (individu, regexPeriod) => {
   let heuresDeclaration = 0;
 
   let versements = individu.versements;
-  versements.forEach((versement) => {
-    // Rémunérations
-    let remunerations = versement.remunerations;
-    remunerations
-      .filter((remuneration) => remuneration.type == "002")
-      .forEach((remuneration) => {
-        let contrat = individu.contrats.filter(
-          (contrat) => contrat.numero == remuneration.numeroContrat
-        )[0];
-        let uniteContrat = contrat.uniteMesure;
-        let activites = remuneration.activites;
-        activites
-          .filter((activite) => activite.type == "01")
-          .forEach((activite) => {
-            heuresDeclaration += getQuotiteTravail(
-              parseInt(activite.mesure),
-              activite.uniteMesure,
-              uniteContrat
-            );
-          });
-      });
-    remunerations
-      .filter(
-        (remuneration) =>
-          ["012", "013", "017", "018"].includes(remuneration.type) // add to doc
-      )
-      .forEach((remuneration) => {
-        heuresDeclaration += parseInt(remuneration.nombreHeures);
-      });
+  versements
+    .filter((versement) => regexPeriod.test(versement.date))
+    .forEach((versement) => 
+    {
+      // Rémunérations
+      let remunerations = versement.remunerations;
+      remunerations
+        .filter((remuneration) => remuneration.type == "002")
+        .forEach((remuneration) => {
+          let contrat = individu.contrats.filter(
+            (contrat) => contrat.numero == remuneration.numeroContrat
+          )[0];
+          let uniteContrat = contrat.uniteMesure;
+          let activites = remuneration.activites;
+          activites
+            .filter((activite) => activite.type == "01")
+            .forEach((activite) => {
+              heuresDeclaration += getQuotiteTravail(
+                parseInt(activite.mesure),
+                activite.uniteMesure,
+                uniteContrat
+              );
+            });
+        });
+      remunerations
+        .filter(
+          (remuneration) =>
+            ["012", "013", "017", "018"].includes(remuneration.type) // add to doc
+        )
+        .forEach((remuneration) => {
+          heuresDeclaration += parseInt(remuneration.nombreHeures);
+        });
   });
 
   let isExecutive = isIndividualExecutive(individu);
@@ -462,38 +470,41 @@ export const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
  *    - dispositif politique "92" : Stage de la formation professionnelle
  */
 
-export const getIndividualApprenticeshipHours = (individu) => {
+export const getIndividualApprenticeshipHours = (individu, regexPeriod) => {
   let trainingHours = 0;
 
   let versements = individu.versements;
-  versements.forEach((versement) => {
-    // Rémunérations
-    let remunerations = versement.remunerations;
-    remunerations
-      .filter((remuneration) => remuneration.type == "002")
-      .forEach((remuneration) => {
-        let contrat = individu.contrats.filter(
-          (contrat) => contrat.numero == remuneration.numeroContrat
-        )[0];
-        if (
-          contrat.nature == "29" ||
-          ["61", "64", "65", "66", "81", "92"].includes(
-            contrat.dispositifPolitique
-          )
-        ) {
-          let uniteContrat = contrat.uniteMesure;
-          let activites = remuneration.activites;
-          activites
-            .filter((activite) => activite.type == "01")
-            .forEach((activite) => {
-              trainingHours += getQuotiteTravail(
-                parseInt(activite.mesure),
-                activite.uniteMesure,
-                uniteContrat
-              );
-            });
-        }
-      });
+  versements
+    .filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
+    .forEach((versement) => 
+    {
+      // Rémunérations
+      let remunerations = versement.remunerations;
+      remunerations
+        .filter((remuneration) => remuneration.type == "002")
+        .forEach((remuneration) => {
+          let contrat = individu.contrats.filter(
+            (contrat) => contrat.numero == remuneration.numeroContrat
+          )[0];
+          if (
+            contrat.nature == "29" ||
+            ["61", "64", "65", "66", "81", "92"].includes(
+              contrat.dispositifPolitique
+            )
+          ) {
+            let uniteContrat = contrat.uniteMesure;
+            let activites = remuneration.activites;
+            activites
+              .filter((activite) => activite.type == "01")
+              .forEach((activite) => {
+                trainingHours += getQuotiteTravail(
+                  parseInt(activite.mesure),
+                  activite.uniteMesure,
+                  uniteContrat
+                );
+              });
+          }
+        });
   });
 
   return roundValue(trainingHours, 2);
@@ -629,3 +640,18 @@ export const compare = (statementA, statementB) => {
     return 0;
   }
 };
+
+/* -------------------- GENERAL UTILS -------------------- */
+
+const buildRegexPeriod = (declarations) => 
+{
+  try {
+    // get mounths
+    let months = declarations.map((declaration) => declaration.mois.substring(2, 8));
+    let regexString = "^[0-9]{2}(" + months.join("|") + ")";
+    return new RegExp(regexString);
+  } catch(error) {
+    console.log(error);
+    return new RegExp("^[0-9]{8}")
+  }
+}
