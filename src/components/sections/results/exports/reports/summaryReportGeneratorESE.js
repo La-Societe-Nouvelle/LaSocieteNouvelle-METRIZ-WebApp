@@ -28,7 +28,7 @@ export const buildESEReport = async ({ session, period }) => {
 
   const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
-  const { production, netValueAdded } = financialData.mainAggregates;
+  const { production } = financialData.mainAggregates;
 
   const keyIndics = getKeyIndics(comparativeData.comparativeDivision);
   const indicatorLabels = getIndicatorLabels();
@@ -164,7 +164,6 @@ export const buildESEReport = async ({ session, period }) => {
 
     },
   };
-  console.log(docDefinition)
 
   const ESEReport = pdfMake.createPdf(docDefinition);
 

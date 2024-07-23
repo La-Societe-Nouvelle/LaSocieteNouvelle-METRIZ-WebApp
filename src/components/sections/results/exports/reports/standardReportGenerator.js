@@ -7,11 +7,14 @@ import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
 // Utils
-import { generateSIGtable } from "./generateSIGtable";
-import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
-import { generateFooter, loadFonts } from "./utils/layout";
-import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
+import { createSIGtableSection } from "./utils/createSIGtableSection";
+import { colors, pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+import { generateFooter, generateHeader, loadFonts } from "./utils/layout";
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 import { getStatementNote } from "/src/utils/Writers";
+import { getChartImageData } from "./utils";
+import { printValue } from "/src/utils/formatters";
+import { hasComparativeData } from "../../utils";
 
 
 // --------------------------------------------------------------------------
@@ -31,55 +34,40 @@ export const buildStandardReport = async ({
 }) => {
   // Session data --------------------------------------------------
 
-  const { legalUnit, financialData, impactsData, comparativeData, analysis } =
-    session;
+  const { legalUnit, financialData, impactsData, comparativeData, analysis } = session;
 
-  // Metadata ------------------------------------------------------
+  const { mainAggregates, productionAggregates } = financialData;
+  const { production } = mainAggregates;
 
-  const { libelle, unit } = metaIndics[indic];
-
-  // ---------------------------------------------------------------
-  // Text Generation
-
+  const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
 
-  const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
+  // get Intermediate Aggregates
+  const intermediateConsumptionsAggregates = await buildIntermediateConsumptionsAggregates(financialData, [period]);
+  const fixedCapitalConsumptionsAggregates = await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
 
+  const isTargetDataAvailable  = hasComparativeData(session,'division','target',indic);
+  console.log(isTargetDataAvailable)
+  // Metadata ------------------------------------------------------
+
+  const { libelle, unit, precision, libelleGrandeur } = metaIndics[indic];
+
+  // ---------------------------------------------------------------
+  // Charts
+
+  const productionChart = getChartImageData(`comparative-chart-production-${indic}-print`);
+  const valueAddedChart = getChartImageData(`comparative-chart-netValueAdded-${indic}-print`);
+  const intermediateConsumptionsChart = getChartImageData(`comparative-chart-intermediateConsumptions-${indic}-print`);
+  const fixedCapitalConsumptionsChart = getChartImageData(`comparative-chart-fixedCapitalConsumptions-${indic}-print`);
+  const trendChart = getChartImageData(`trend-chart-${indic}-print`)
+
+  //
+
+  const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
   const analysisNotes =
     analysis[period.periodKey][indic]?.isAvailable && showAnalyses
       ? analysis[period.periodKey][indic].analysis
       : null;
-
-  // get Intermediate Aggregates
-  const intermediateConsumptionsAggregates =
-    await buildIntermediateConsumptionsAggregates(financialData, [period]);
-
-  const fixedCapitalConsumptionsAggregates =
-    await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
-
-  // ---------------------------------------------------------------
-  // Get chart canvas and encode it to import in document
-
-  const prodChartCanvas = document.getElementById(
-    `comparative-chart-production-${indic}-print`
-  );
-  const prodChartImage = prodChartCanvas.toDataURL("image/png");
-
-  const interConsChartCanvas = document.getElementById(
-    `comparative-chart-intermediateConsumptions-${indic}-print`
-  );
-  const interConsChartImage = interConsChartCanvas.toDataURL("image/png");
-
-  const valueAddedCanvas = document.getElementById(
-    `comparative-chart-netValueAdded-${indic}-print`
-  );
-
-  const valueAddedImage = valueAddedCanvas.toDataURL("image/png");
-
-  const fixedCapConsChartCanvas = document.getElementById(
-    `comparative-chart-fixedCapitalConsumptions-${indic}-print`
-  );
-  const fixedCapConsChartImage = fixedCapConsChartCanvas.toDataURL("image/png");
 
   // ---------------------------------------------------------------
   // Document Property
@@ -92,6 +80,44 @@ export const buildStandardReport = async ({
     "-" +
     indic.toUpperCase();
 
+
+  // ---------------------------------------------------------------
+  // Content
+
+  const content = [
+    {
+      text: `${libelle}`,
+      style: "h1",
+    },
+    createKeyFigures(comparativeData.production.division, production, period, indic, unit, libelleGrandeur, colors),
+    createFinancialChartsSection(
+      valueAddedChart,
+      intermediateConsumptionsChart,
+      fixedCapitalConsumptionsChart
+    ),
+    createSIGtableSection(mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, precision, colors),
+    createProductionSection(productionChart, statementNotes, analysisNotes),
+    { text: '', pageBreak: 'after' },
+    {
+      text: "Suivi des objectifs sectoriels 2030",
+      style: "h2",
+    },
+    isTargetDataAvailable ? createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors) : 
+    {text : "Aucun objectif défini pour cet indicateur", margin : [0,0,0,20]},
+    {
+      text: "Evolution de la performance",
+      style: "h2",
+    },
+    {
+      image: trendChart,
+      width: 350,
+      alignment: "center",
+      margin: [0, 0, 0, 20]
+    },
+    { text: '', pageBreak: 'after' },
+
+  ];
+
   // ---------------------------------------------------------------
   // PDF Content and Layout
   const docDefinition = {
@@ -102,46 +128,8 @@ export const buildStandardReport = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: {
-      columns: [
-        {
-          text: legalUnit.corporateName,
-          margin: [15, 15, 0, 0],
-          fontSize: 7,
-        },
-        {
-          text: "Exercice  " + currentPeriod,
-          alignment: "right",
-          margin: [0, 15, 15, 0],
-          fontSize: 7,
-        },
-      ],
-    },
-    footer: generateFooter(legalUnit.corporateName),
-    background: function () {
-      return {
-        canvas: [
-          // Background
-          {
-            type: "rect",
-            x: 0,
-            y: 0,
-            w: 595.28,
-            h: 841.89,
-            color: "#f1f0f4",
-          },
-          {
-            type: "rect",
-            x: pdfMargins.left - 20,
-            y: pdfMargins.top - 15,
-            w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
-            h: pdfPageSize.height - pdfMargins.top - 15,
-            color: "#FFFFFF",
-            r: 10,
-          },
-        ],
-      };
-    },
+    header: generateHeader(corporateName, legalUnit.siren, currentPeriod),
+    footer: generateFooter(""),
     info: {
       libelle: documentTitle,
       author: legalUnit.corporateName,
@@ -149,344 +137,80 @@ export const buildStandardReport = async ({
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",
     },
-    content: [
-      { text: "Résultat - " + libelle, style: "header" },
-      //--------------------------------------------------
-      {
-        text: "Empreintes de vos Soldes Intermédiaires de Gestion",
-        style: "h2",
-        margin: [0, 10, 0, 20],
-      },
-      {
-        style: "table",
-        table: {
-          widths: ["*", "auto", "auto", "auto"],
-          body: generateSIGtable(
-            financialData.mainAggregates,
-            financialData.productionAggregates,
-            indic,
-            unit,
-            intermediateConsumptionsAggregates,
-            fixedCapitalConsumptionsAggregates,
-            period
-          ),
-        },
-        layout: {
-          hLineWidth: function (i, node) {
-            return i === 0 ||
-              i === 4 ||
-              i === 10 ||
-              i === 13 ||
-              i === node.table.body.length
-              ? 1
-              : 0;
-          },
-
-          vLineWidth: function (i, node) {
-            return i === 0 || i === node.table.widths.length ? 1 : 0;
-          },
-          vLineColor: function (i, node) {
-            return i === 0 || i === node.table.widths.length ? "#f0f0f8" : "";
-          },
-          hLineColor: function (i, node) {
-            return i === 0 ? "" : "#f0f0f8";
-          },
-        },
-      },
-      //--------------------------------------------------
-      { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
-      statementNotes.map((note) => note),
-      {
-        text: impactsData[period.periodKey].comments[indic],
-        margin: [0, 10, 0, 10],
-      },
-
-      // ---------------------------------------------------------------------------
-      //  PAGE 2
-      {
-        text: "Analyse - " + libelle,
-        style: "header",
-        pageBreak: "before",
-      },
-      // ---------------------------------------------------------------------------
-      // Charts
-      {
-        text: "Comparaisons",
-        style: "h2",
-        margin: [0, 10, 0, 10],
-      },
-      comparativeData.comparativeDivision !== "00"
-        ? {
-            text:
-              "Branche d'activité : " +
-              divisions[comparativeData.comparativeDivision],
-            margin: [0, 0, 0, 10],
-            font: "Raleway",
-          }
-        : "",
-      {
-        margin: [0, 20, 0, 0],
-        columns: [
-          {
-            stack: [
-              {
-                text: "Production ",
-                style: "h4",
-                alignment: "center",
-                margin: [0, 0, 0, 20],
-              },
-              {
-                image: prodChartImage,
-                width: 200,
-                alignment: "center",
-              },
-            ],
-          },
-          {
-            stack: [
-              {
-                text: "Valeur ajoutée",
-                style: "h4",
-                alignment: "center",
-                margin: [0, 0, 0, 20],
-              },
-              {
-                image: valueAddedImage,
-                width: 200,
-                alignment: "center",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        margin: [0, 20, 0, 0],
-        columns: [
-          {
-            stack: [
-              {
-                text: "Consommations intermédiaires ",
-                style: "h4",
-                alignment: "center",
-                margin: [0, 0, 0, 20],
-              },
-              {
-                image: interConsChartImage,
-                width: 200,
-                alignment: "center",
-              },
-              ///
-              {
-                margin: [0, 30, 0, 0],
-                table: {
-                  widths: [1, "*"],
-                  heights: [4, 4, 4, 4],
-                  body: [
-                    [
-                      {
-                        text: "",
-                        fillColor: "#b0b9f7",
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                      {
-                        text: "Valeur pour la France",
-                        fontSize: 5,
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                    ],
-                    [
-                      {
-                        text: "",
-                        fillColor: "#d7dcfb",
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                      {
-                        text: "Objectifs 2030 pour la France",
-                        fontSize: 5,
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                    ],
-                    [
-                      {
-                        text: "",
-                        fillColor: "#ffb642",
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                      {
-                        text: "Valeur pour la branche",
-                        fontSize: 5,
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                    ],
-                    [
-                      {
-                        text: "",
-                        fillColor: "#ffdc8d",
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                      {
-                        text: "Objectifs 2030 pour la branche",
-                        fontSize: 5,
-                        borderColor: [
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                          "#ffffff",
-                        ],
-                      },
-                    ],
-                  ],
-                  layout: {
-                    defaultBorder: false,
-                    hLineWidth: function (i, node) {
-                      return i === 0 || i === node.table.body.length ? 2 : 1;
-                    },
-                    vLineWidth: function (i, node) {
-                      return i === 0 || i === node.table.widths.length ? 2 : 1;
-                    },
-                    hLineColor: function (i, node) {
-                      return i === 0 || i === node.table.body.length
-                        ? "white"
-                        : "white";
-                    },
-                    vLineColor: function (i, node) {
-                      return i === 0 || i === node.table.widths.length
-                        ? "white"
-                        : "white";
-                    },
-                  },
-                },
-              },
-            ],
-          },
-          {
-            stack: [
-              {
-                text: "Consommations de capital fixe ",
-                style: "h4",
-                alignment: "center",
-                margin: [0, 0, 0, 20],
-              },
-              {
-                image: fixedCapConsChartImage,
-                width: 200,
-                alignment: "center",
-              },
-            ],
-          },
-        ],
-      },
-      // ---------------------------------------------------------------------------
-      //  PAGE 3
-      analysisNotes && [
-        {
-          text: "Analyse - " + libelle,
-          style: "header",
-          pageBreak: "before",
-        },
-        // Analysis note
-        { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-        {
-          text: analysisNotes,
-          style: "text",
-          fontSize: 9,
-        },
-      ],
-    ],
+    content,
     // ---------------------------------------------------------------------------
     // Style
     defaultStyle: {
-      fontSize: 10,
-      color: "#191558",
+      color: colors.text,
+      font: "Roboto",
+      fontSize: 7,
+      alignment: "justify"
     },
     styles: {
-      header: {
-        fontSize: 16,
-        font: "Raleway",
-        color: "#191558",
+      h1: {
         bold: true,
-        margin: [0, 5, 0, 10],
+        color: colors.secondary,
+        font: "Raleway",
+        margin: [0, 0, 0, 20],
+        alignment: "center",
+        fontSize: 15
       },
       h2: {
-        fontSize: 14,
-        font: "Raleway",
-        color: "#fa595f",
-        bold: true,
-      },
-      h3: {
-        fontSize: 12,
-        font: "Raleway",
-        color: "#191558",
         bold: true,
         margin: [0, 0, 0, 10],
-      },
-      h4: {
-        fontSize: 10,
+        fontSize: 8,
+        color: colors.primary,
         font: "Raleway",
-        bold: true,
       },
-      text: {
-        alignment: "justify",
-        lineHeight: 1.5,
+      keyNumber: {
+        fontSize: 20,
+        bold: true,
+        alignment: "center",
+        font: "Raleway",
+      },
+      keyNumberUnit: {
+        fontSize: 10,
+        bold: true,
+        alignment: "center",
+        margin: [0, 0, 5, 0],
+        font: "Raleway",
+      },
+      libelle: {
+        margin: [0, 0, 0, 10],
+        alignment: 'center'
       },
       table: {
-        alignment: "right",
-        fontSize: 9,
-        margin: [0, 0, 0, 10],
+        margin: [0, 10, 0, 10],
+        fontSize: 6,
       },
       tableHeader: {
-        fillColor: "#f0f0f8",
-        bold: true,
         margin: [0, 5, 0, 5],
-        color: "#191558",
-        alignment: "center",
+        bold: true,
+        fontSize: 7,
+      },
+      tableHeaderDark: {
+        fillColor: colors.primary,
+        color: "#FFF",
+        margin: [0, 5, 0, 5],
+        bold: true,
+      },
+      darkBackground: {
+        fillColor: colors.primary,
+        color: "#FFF",
+        bold: true,
       },
       tableBold: {
         bold: true,
-        alignment: "left",
+        fillColor: colors.light,
+        margin: [0, 3, 0, 3],
       },
-      tableLeft: {
-        alignment: "left",
+      data: {
+        alignment: "right"
       },
-      legendText: {
-        fontSize: 7,
-        margin: [0, 10, 0, 0],
-      },
+      unit: {
+        fontSize: 5,
+        alignment: "right"
+      }
     },
   };
 
@@ -494,3 +218,288 @@ export const buildStandardReport = async ({
 
   return standardReport;
 };
+
+
+const createKeyFigures = (branchProduction, production, period, indic, unit, libelle, colors) => {
+  const footprint = production.periodsData[period.periodKey].footprint.indicators[indic].value;
+  const branchFootprint = branchProduction.history.data[indic].pop();
+  const branchTarget = branchProduction.target.data[indic].filter(value => value.path === "GEO").pop();
+
+  const createTableColumn = (value, label) => ({
+    width: '*',
+    table: {
+      widths: ['*'],
+      body: [
+        [{
+          text: [
+            { text: value, style: 'keyNumber' },
+            { text: ` ${unit}`, style: 'keyNumberUnit' }
+          ], fillColor: colors.light, margin: [0, 10, 0, 0]
+        }],
+        [{ text: label, style: 'libelle', fillColor: colors.light }],
+      ],
+    },
+    layout: {
+      defaultBorder: false,
+    }
+  });
+
+  return {
+    alignment: 'center',
+    margin: [0, 5, 0, 5],
+    columnGap: 50,
+    columns: [
+      createTableColumn(footprint, libelle),
+      createTableColumn(branchFootprint.value, "Valeur de la branche"),
+      createTableColumn(branchTarget ? branchTarget.value : " - ", "Objectif national 2030"),
+    ],
+  };
+};
+
+const createFinancialChartsSection = (
+  valueAddedChart,
+  intermediateConsumptionsChart,
+  fixedCapitalConsumptionsChart
+) => {
+  return {
+    margin: [0, 20, 0, 20],
+    columnGap: 20,
+    columns: [
+      {
+        width: '*',
+        stack: [
+          {
+            text: "Valeur ajoutée",
+            style: "h2",
+            alignment: "center",
+          },
+          {
+            image: valueAddedChart,
+            width: 150,
+            alignment: "center",
+          },
+        ],
+      },
+      {
+        width: '*',
+        stack: [
+          {
+            text: "Consommations intermédiaires ",
+            style: "h2",
+            alignment: "center",
+          },
+          {
+            image: intermediateConsumptionsChart,
+            width: 150,
+            alignment: "center",
+          },
+        ],
+      },
+      {
+
+        stack: [
+          {
+            text: "Consommations de capital fixe ",
+            style: "h2",
+            alignment: "center",
+          },
+          {
+            image: fixedCapitalConsumptionsChart,
+            width: 150,
+            alignment: "center",
+          },
+        ],
+      },
+    ],
+  };
+};
+
+const createProductionSection = (productionChartImage, statementNotes, analysisNotes) => {
+  return {
+    columns: [
+      {
+        width: '40%',
+        columnGap: 20,
+        stack: [
+          {
+            text: "Production",
+            style: "h2",
+          },
+          {
+            image: productionChartImage,
+            width: 180,
+          },
+        ],
+      },
+      {
+        width: '*',
+        stack: [
+          {
+            text: "Impact direct",
+            style: "h2",
+          },
+          statementNotes.map((note) => note),
+          {
+            margin: [0, 10, 0, 10],
+            text: "Note d'analyse",
+            style: "h2",
+          },
+          {
+            text: analysisNotes,
+            fontSize: 6,
+          },
+        ],
+      },
+    ],
+  };
+};
+const createTargetTableSection = (
+  comparativeData,
+  mainAggregates,
+  indic,
+  unit,
+  period,
+  precision,
+  colors
+) => {
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded,
+  } = mainAggregates;
+
+  const branchProductionTarget = comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").pop();
+  const branchNetValueAddedTarget = comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO").pop();
+  const branchIntermediateConsumptionsTarget = comparativeData.intermediateConsumptions.division.target.data[indic].filter(value => value.path === "GEO").pop();
+  const branchFixedCapitalConsumptionsTarget = comparativeData.fixedCapitalConsumptions.division.target.data[indic].filter(value => value.path === "GEO").pop();
+
+  const tableBody = [
+    [
+      {
+        text: "Agrégat",
+        style: "tableHeaderDark",
+      },
+      {
+        text: "Unité",
+        style: "tableHeaderDark",
+        alignment: "right"
+      },
+      {
+        text: "Empreinte",
+        style: "tableHeaderDark",
+        alignment: "right"
+      },
+      {
+        text: "Objectif à atteindre",
+        style: "tableHeaderDark",
+        alignment: "right"
+      },
+      {
+        text: "Effort à fournir d'ici 2030",
+        style: "tableHeaderDark",
+        alignment: "right"
+      },
+    ],
+    [
+      { text: "Production" },
+      { text: unit },
+      {
+        text:
+          printValue(
+            production.periodsData[period.periodKey].footprint.indicators[indic].value,
+            precision
+          ),
+        style: "data"
+      },
+      {
+        text: branchProductionTarget.value,
+        style: "data"
+      },
+      { text: "" },
+
+    ],
+
+    [
+      {
+        text: "Consommations intermédiaires",
+      },
+      { text: unit },
+      {
+        text:
+          printValue(
+            intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+            precision
+          ),
+        style: "data",
+      },
+      {
+        text: branchIntermediateConsumptionsTarget.value,
+        style: "data"
+      },
+      { text: "" },
+    ],
+
+    [
+      {
+        text: "Consommations de capital fixe",
+      },
+      { text: unit },
+      {
+        text: printValue(
+          fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+          precision
+        ),
+        style: "data",
+      },
+      {
+        text: branchFixedCapitalConsumptionsTarget.value,
+        style: "data"
+      },
+      { text: "" },
+    ],
+
+    [
+      {
+        text: "Valeur ajoutée nette",
+      },
+      { text: unit },
+      {
+        text: printValue(
+          netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
+          precision
+        ),
+        style: "data",
+      },
+      {
+        text: branchNetValueAddedTarget.value,
+        style: "data"
+      },
+      { text: "" },
+    ],
+  ];
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+      },
+      hLineColor: function (i, node) {
+        return (i === 5 || i === 8) ? colors.light : colors.primary;
+      },
+      vLineWidth: function (i, node) {
+        return 0
+      },
+      paddingTop: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
+      paddingBottom: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
+    },
+    style: 'table',
+    margin: [0, 0, 0, 20]
+  };
+}
