@@ -5,6 +5,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
+import flagData from "/lib/flags";
 
 // Utils
 import { createSIGtableSection } from "./utils/createSIGtableSection";
@@ -47,7 +48,6 @@ export const buildStandardReport = async ({
   const fixedCapitalConsumptionsAggregates = await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
 
   const isTargetDataAvailable  = hasComparativeData(session,'division','target',indic);
-  console.log(isTargetDataAvailable)
   // Metadata ------------------------------------------------------
 
   const { libelle, unit, precision, libelleGrandeur } = metaIndics[indic];
@@ -115,7 +115,7 @@ export const buildStandardReport = async ({
       margin: [0, 0, 0, 20]
     },
     { text: '', pageBreak: 'after' },
-
+    createProvidersTable(financialData.providers, period,indic)
   ];
 
   // ---------------------------------------------------------------
@@ -503,3 +503,84 @@ const createTargetTableSection = (
     margin: [0, 0, 0, 20]
   };
 }
+
+const createProvidersTable = (providers, period, indic) => {
+
+  const filteredProviders = providers
+  .filter((provider) => !provider.isDefaultProviderAccount)
+  .filter((provider) => !provider.useDefaultFootprint)
+  .filter((provider) => provider.footprintStatus === 200 && provider.footprint.isValid())
+  .filter((provider) => provider.periodsData.hasOwnProperty(period.periodKey))
+  .filter((provider) => provider.periodsData[period.periodKey].amountExpenses !== 0);
+
+
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  const positiveImpact = ["eco", "art", "soc", "knw"].includes(indic);
+
+  const sortAccountsByFootprint = (accounts, positiveImpact) => {
+    accounts.sort((a, b) => {
+      const impactA = a.footprint.indicators[indic].getValue();
+      const impactB = b.footprint.indicators[indic].getValue();
+
+      if (positiveImpact) {
+        return impactB - impactA; 
+      } else {
+        return impactA - impactB; 
+      }
+    });
+  };
+
+  sortAccountsByFootprint(filteredProviders, positiveImpact);
+
+  const topProviders = filteredProviders.slice(0, 10);
+
+  const tableBody = [
+    [
+      { text: 'Compte', style: 'tableHeaderDark' },
+      { text: 'Libellé', style: 'tableHeaderDark' },
+      { text: 'Unité', style: 'tableHeaderDark' },
+      { text: 'Empreinte', style: 'tableHeaderDark' },
+      { text: 'Incertitude (%)', style: 'tableHeaderDark' },
+      { text: 'Empreinte publiée', style: 'tableHeaderDark' },
+    ]
+  ];
+
+  topProviders
+    .forEach(({ providerNum, providerLib, footprint }) => {
+
+      const row = [
+        {text : providerNum},
+        {text : providerLib},
+        {text : unit, style : 'unit'},
+        {text : printValue(footprint.indicators[indic].getValue(), nbDecimals), style : 'data' },
+        {text :  printValue(footprint.indicators[indic].getUncertainty(), 0), style : 'data'},
+        {text:  flagData[footprint.indicators[indic].flag].label, style : 'data'},
+      ];
+
+      tableBody.push(row);
+    });
+
+  return {
+    style: 'table',
+    table: {
+      headerRows: 1,
+      widths: ['auto', '*', 'auto','auto', 'auto','auto'],
+      body: tableBody
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+      },
+      hLineColor: function (i, node) {
+        return (i === 5 || i === 8) ? colors.light : colors.primary;
+      },
+      vLineWidth: function (i, node) {
+        return 0
+      },
+      paddingTop: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
+      paddingBottom: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
+    },
+  };
+};
+
