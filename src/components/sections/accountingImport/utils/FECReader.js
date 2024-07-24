@@ -656,7 +656,7 @@ const readImmobilisationEntry = async (data, journal, ligneCourante) => {
         accountLib: ligneCourante.CompteLib,
         providerNum: providerData.providerNum,
         providerLib: providerData.providerLib,
-        isDefaultProvider: providerData.isDefaultProviderAccount,
+        isDefaultProviderAccount: providerData.isDefaultProviderAccount,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
