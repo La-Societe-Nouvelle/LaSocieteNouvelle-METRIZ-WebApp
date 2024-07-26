@@ -100,7 +100,7 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     if (showTargetData && areaTargetValue !== undefined) {
       labels.push('Objectif ');
       data.push(areaTargetValue);
-      backgroundColors.push(pattern.draw('zigzag', comparativeChartColors.area));
+      backgroundColors.push(pattern.draw('dash', comparativeChartColors.area));
     }
     // Ajout d'un espace pour séparer visuellement les groupes
     if (areaValue !== undefined || areaTargetValue !== undefined) {
@@ -143,7 +143,7 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     if (showTargetData && divisionTargetValue !== undefined) {
       labels.push("Objectif");
       data.push(divisionTargetValue);
-      backgroundColors.push(useIndicColors ? pattern.draw('zigzag', lighten('0.3', metaIndics[indic].color)) : pattern.draw('zigzag', comparativeChartColors.branch));
+      backgroundColors.push(useIndicColors ? pattern.draw('dash', lighten('0.3', metaIndics[indic].color)) : pattern.draw('dash', comparativeChartColors.branch));
     }
    
   }

@@ -52,7 +52,7 @@ export const buildStandardReport = async ({
 
   // Metadata ------------------------------------------------------
 
-  const { libelle, unit, precision, unitDeclaration, libelleDeclaration } = metaIndics[indic];
+  const { libelle, unit, precision, unitDeclaration, libelleDeclaration, libelleIndirect } = metaIndics[indic];
   // ---------------------------------------------------------------
   // Charts
 
@@ -93,7 +93,7 @@ export const buildStandardReport = async ({
       text: `${libelle}`,
       style: "h1",
     },
-    createKeyFigures(indirectImpact, statementValue, unitDeclaration, libelleDeclaration, production, period, prevPeriod, indic, unit, colors),
+    createKeyFigures(indirectImpact, statementValue, unitDeclaration, libelleDeclaration, libelleIndirect, production, period, prevPeriod, indic, unit, colors),
 
     //
     {
@@ -110,8 +110,12 @@ export const buildStandardReport = async ({
     statementNotes.map((note) => note),
     {
       margin: [0, 10, 0, 10],
-      text: "Impacts indirects",
+      text: "Impact indirect",
       style: "h2",
+    },
+
+    {
+      text : `${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`,
     },
     createSectionTitle("Analyse de la performance"),
 
@@ -267,7 +271,7 @@ export const buildStandardReport = async ({
 };
 
 
-const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libelleDeclaration, production, period, prevPeriod, indic, unit, colors) => {
+const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libelleDeclaration, libelleIndirect, production, period, prevPeriod, indic, unit, colors) => {
   const footprint = production.periodsData[period.periodKey].footprint.indicators[indic].value;
 
   const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : " - ";
@@ -284,7 +288,7 @@ const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libel
             { text: ` ${unit}`, style: 'keyNumberUnit' }
           ], margin: [0, 10, 0, 0]
         }],
-        [{ text: label, style: 'libelle' }],
+        [{ text: label, style: 'libelle'}],
       ],
     },
     layout: {
@@ -312,8 +316,8 @@ const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libel
     columns: [
       createTableColumn(footprint, "Empreinte\nde la production", unit),
       createTableColumn(statementValue, libelleDeclaration, unitDeclaration),
-      createTableColumn(indirectImpact.value, "Impact\nindirect", indirectImpact.unit),
-      createTableColumn(prevFootprint, "Exercice\nprécédent", prevPeriod ? unitDeclaration : ""),
+      createTableColumn(indirectImpact.value, libelleIndirect, indirectImpact.unit),
+      createTableColumn(prevFootprint, "Empreinte\nde l'exercice précédent", prevPeriod ? unitDeclaration : ""),
     ],
   };
 };
@@ -557,7 +561,7 @@ const createTargetTableSection = (
         style: "data"
       },
       { style : "data",
-        text: branchProductionTarget.value ? getEffortPercentage( production.periodsData[period.periodKey].footprint.indicators[indic].value,  branchProductionTarget?.value) + " %" : " - "},
+        text: branchProductionTarget ? getEffortPercentage( production.periodsData[period.periodKey].footprint.indicators[indic].value,  branchProductionTarget?.value) + " %" : " - "},
 
     ],
 
@@ -579,7 +583,7 @@ const createTargetTableSection = (
         style: "data"
       },
       { style : "data",
-        text: branchIntermediateConsumptionsTarget.value ? getEffortPercentage( intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,  branchIntermediateConsumptionsTarget?.value) + " %" : " - "},
+        text: branchIntermediateConsumptionsTarget ? getEffortPercentage( intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,  branchIntermediateConsumptionsTarget?.value) + " %" : " - "},
 
     ],
 
@@ -600,7 +604,7 @@ const createTargetTableSection = (
         style: "data"
       },
       { style : "data",
-        text: branchFixedCapitalConsumptionsTarget.value ? getEffortPercentage( fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,  branchFixedCapitalConsumptionsTarget?.value) + " %" : " - "},
+        text: branchFixedCapitalConsumptionsTarget ? getEffortPercentage( fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,  branchFixedCapitalConsumptionsTarget?.value) + " %" : " - "},
 
     ],
 
@@ -621,7 +625,7 @@ const createTargetTableSection = (
         style: "data"
       },
       { style : "data",
-        text: branchNetValueAddedTarget.value ? getEffortPercentage( netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,  branchNetValueAddedTarget?.value) + " %" : " - "},
+        text: branchNetValueAddedTarget ? getEffortPercentage( netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,  branchNetValueAddedTarget?.value) + " %" : " - "},
 
     ],
   ];
