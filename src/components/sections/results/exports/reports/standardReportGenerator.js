@@ -102,7 +102,7 @@ export const buildStandardReport = async ({
       margin: [0, 10, 0, 10]
     },
 
-    createSIGtableSection(mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, precision, colors),
+    createSIGtableSection(comparativeData,mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, precision, colors),
     {
       text: "Déclaration",
       style: "h2",
@@ -510,6 +510,7 @@ const createTargetTableSection = (
     fixedCapitalConsumptions,
     netValueAdded,
   } = mainAggregates;
+
 
   const branchProductionTarget = comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").pop() ?? null;
   const branchNetValueAddedTarget = comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO").pop() ?? null;
