@@ -1,3 +1,4 @@
+import { getLabelPeriod } from "../../../../../../utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 
 export const createSIGtableSection = (
@@ -25,27 +26,53 @@ export const createSIGtableSection = (
     netValueAdded,
   } = mainAggregates;
 
+  const showPrevPeriod = false;
+
   const tableBody = [
+    [
+      { text: '', border: [false, false, false, false] },
+      { text: getLabelPeriod(period), colSpan: 3, border: [true, true, true, true], style : "darkBackground", alignment : "center" },
+      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, false] },
+
+    ],
     [
       {
         text: "Agrégat",
-        style: "tableHeaderDark",
+        style: "tableHeader",
       },
       {
         text: "Montant",
-        style: "tableHeaderDark",
+        style: "tableHeader",
         alignment: "right"
       },
       {
-        text: "Empreinte",
-        style: "tableHeaderDark",
+        text: [
+          {
+            text : "Empreinte\n"
+          },
+          {
+            text : unit,
+            style : "unit"
+          }
+        ],
+        style: "tableHeader",
         alignment: "right"
       },
       {
-        text: "Incertitude",
-        style: "tableHeaderDark",
+        text: [
+          {
+            text : "Incertitude\n"
+          },
+          {
+            text : "%",
+            style : "unit"
+          }
+        ],
+        style: "tableHeader",
         alignment: "right"
       },
+
     ],
     [
       { text: "Production", style: "tableBold" },
@@ -63,18 +90,17 @@ export const createSIGtableSection = (
                 precision
               ) + " "
           },
-          { text: unit },
         ],
         style: "tableBold",
         alignment: "right"
       },
       {
         text:
-          printValue(production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
-          " %",
+          printValue(production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0),
         style: "tableBold",
         alignment: "right"
       },
+ 
     ],
     [
       {
@@ -96,14 +122,15 @@ export const createSIGtableSection = (
                 precision
               ) + " ",
           },
-          { text: unit },
+          
         ],
       },
       {
         style: "data",
         text:
-          printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0),
       },
+   
     ],
     [
       {
@@ -124,7 +151,7 @@ export const createSIGtableSection = (
                 precision
               ) + " ",
           },
-          { text: unit },
+          
         ],
       },
       {
@@ -132,9 +159,10 @@ export const createSIGtableSection = (
           printValue(
             storedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
-          ) + " %",
+          ),
         style: "data",
       },
+    
     ],
     ...getImmobilisedProductionRow(
       immobilisedProduction,
@@ -161,7 +189,7 @@ export const createSIGtableSection = (
                 precision
               ) + " ",
           },
-          { text: unit },
+          
         ],
         style: "tableBold",
         alignment: "right"
@@ -171,7 +199,7 @@ export const createSIGtableSection = (
           printValue(
             intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
-          ) + " %",
+          ),
             style: "tableBold",
         alignment : "right"
       },
@@ -202,7 +230,7 @@ export const createSIGtableSection = (
                 precision
               ) + " "
           },
-          { text: unit },
+          
         ],
         style: "tableBold",
         alignment: "right"
@@ -212,7 +240,7 @@ export const createSIGtableSection = (
           printValue(
             fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
-          ) + " %",
+          ),
         style: "tableBold",
         alignment: "right"
       },
@@ -244,7 +272,7 @@ export const createSIGtableSection = (
                 precision
               ) + " "
           },
-          { text: unit },
+          
         ],
         style: "tableBold",
         alignment: "right"
@@ -256,6 +284,11 @@ export const createSIGtableSection = (
         style: "tableBold",
         alignment: "right"
       },
+      ...showPrevPeriod ? [
+        { text: "", style: 'data' },
+        { text: "", style: 'data' },
+        { text: "", style: 'data', fontSize : 5 }
+      ] : [],
     ],
   ];
 
@@ -267,13 +300,20 @@ export const createSIGtableSection = (
     },
     layout: {
       hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+        return (i === 0 || i === 1 || i === 2 || i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
         return (i === 5 || i === 8) ? colors.light : colors.primary;
       },
       vLineWidth: function (i, node) {
-        return 0
+        if ((i == 1 || i == 4 || (showPrevPeriod && i == 7))) {
+          return 0.5;
+        } else {
+          return 0;
+        }
+      },
+      vLineColor: function (i, node) {
+        return '#191558';
       },
       paddingTop: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
       paddingBottom: function (i, node) { return (i === 0 || i === 1) ? 2 : 3; },
@@ -313,7 +353,7 @@ const getImmobilisedProductionRow = (
                 precision
               ) + " ",
           },
-          { text: unit },
+          
         ],
       },
       {
@@ -321,10 +361,11 @@ const getImmobilisedProductionRow = (
           printValue(
             immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
-          ) + " %",
+          ),
         style: "data",
 
       }
+      
     );
   }
 
@@ -355,7 +396,7 @@ const getAggregateRow = (aggregates, indic, unit, precision, period) => {
                   precision
                 ) + " ",
             },
-            { text: unit },
+            
           ],
         },
         {

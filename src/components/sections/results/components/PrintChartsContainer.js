@@ -58,7 +58,7 @@ export const PrintChartsContainer = ({ session, period }) => {
                     useIndicColors: true,
                     showLegend: true,
                     showXlabels: false,
-                    aspectRatio: 1,
+                    aspectRatio: 2,
                     label: "Empreinte de la production"
                   }
                 })}

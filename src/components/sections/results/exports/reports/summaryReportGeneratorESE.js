@@ -11,6 +11,7 @@ import { getKeyIndics, isBetter, isWorst } from "../../utils";
 import { roundValue } from "../../../../../utils/Utils";
 import { getLabelPeriod } from "../../../../../utils/periodsUtils";
 import { printValue } from "../../../../../utils/formatters";
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
@@ -60,11 +61,6 @@ export const buildESEReport = async ({ session, period }) =>
     light : "#ededff",
   }
 
-  // Page size
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
 
   // ---------------------------------------------------------------
   // Content
@@ -127,10 +123,15 @@ export const buildESEReport = async ({ session, period }) =>
   // Document definition
 
   const docDefinition = {
-    pageSize,
-    pageMargins: [40, 40, 40, 50],
-    header: generateHeader(corporateName, legalUnit.siren, period),
-    footer: generateFooter(""),
+    pageSize: pdfPageSize,
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
+    header: generateHeader(corporateName, legalUnit.siren, period,colors),
+    footer: generateFooter(colors),
     info: {
       title: "",
       author: "",
@@ -819,6 +820,7 @@ const getStatementData = (impactsData, period, validations, indic) =>
 {
   const { nbDecimals, statementUnits } = metaIndics[indic];
   const impactsDataOnPeriod = impactsData[period.periodKey];
+  
   if (validations[period.periodKey].includes(indic))
   {
     switch(indic) {
@@ -983,7 +985,7 @@ const getTransparentProviders = (providers,period) => {
 
 // ----------------------------------------------------------------------------------
 
-const getEffortPercentage = (currentValue, targetValue) => {
+export const getEffortPercentage = (currentValue, targetValue) => {
   if (currentValue !== null && targetValue !== null && currentValue !== 0) {
     const effortPercentage = ((targetValue - currentValue) / currentValue * 100).toFixed(1);
     return effortPercentage;
@@ -1031,6 +1033,7 @@ const createTableTitle = (label) => {
       },
       vLineWidth: function (i, node) { return 0 },
       vLineColor: function (i, node) { return '#fa595f' },
+      paddingLeft: function (i, node) { return 0 },
       paddingTop: function (i, node) { return 2 },
       paddingBottom: function (i, node) { return 2 },
     },

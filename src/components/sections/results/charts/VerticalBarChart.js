@@ -4,6 +4,7 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
+import pattern from 'patternomaly';
 
 // Colors
 import { lighten } from "polished";
@@ -75,96 +76,183 @@ export const VerticalBarChart = ({
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (session,datasetOptions,printOptions) => 
-{
-  const { 
-    financialData, 
-    comparativeData 
-  } = session;
+const buildChartData = (session, datasetOptions, printOptions) => {
+  const { financialData, comparativeData } = session;
   const mainAggregates = financialData.mainAggregates;
-  const {
-    indic,
-    aggregate,
-    period
-  } = datasetOptions;
-  const {
-    showAreaData,
-    showDivisionData,
-    showTargetData,
-    useIndicColors,
-  } = printOptions;
+  const { indic, aggregate, period } = datasetOptions;
+  const { showAreaData, showDivisionData, showTargetData, useIndicColors } = printOptions;
 
-  const datasets = [];
-  const labels = buildLabels(
-    showAreaData,
-    showDivisionData,
-    period
-  );
-  const hasTargetData = comparativeData[aggregate].division.target.data[indic].length > 0 ? true : false;
-  // ------------ --------------------------------------
-  // footprint dataset
+  const labels = [];
+  const data = [];
+  const backgroundColors = [];
 
-  const footprintDataset = {
-    label: "Empreinte",
-    data: buildFootprintData(
-      comparativeData,
-      aggregate,
-      indic,
-      showAreaData,
-      showDivisionData,
-      mainAggregates,
-      period,
-    ),
-    backgroundColor: buildFootprintBackgroundColors(
-      indic,
-      useIndicColors,
-      showAreaData,
-      showDivisionData,
-    ),
-    borderWidth: 0,
-    type: "bar",
-    barPercentage: 0.6,
-    categoryPercentage: 0.9,
-    minBarLength: 2,
-  };
+  // Area data
+  if (showAreaData) {
+    const areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0]?.value;
+    const areaTargetValue = comparativeData[aggregate].area.target.data[indic].slice(-1)[0]?.value;
 
-  datasets.push(footprintDataset);
-
-  // --------------------------------------------------
-  // target dataset
-  if (showTargetData && hasTargetData )
-  {
-    const targetDataset = {
-      label: "Objectif",
-      data: buildTargetData(
-        comparativeData,
-        aggregate,
-        indic,
-        showAreaData,
-        showDivisionData
-      ),
-      skipNull: true,
-      backgroundColor: buildTargetBackgroundColors(
-        showAreaData,
-        showDivisionData
-      ),
-      borderWidth: 0,
-      barPercentage: 0.5,
-      categoryPercentage: 0.9,
-      minBarLength: 2,
+    if (areaValue !== undefined) {
+      labels.push('France');
+      data.push(areaValue);
+      backgroundColors.push(comparativeChartColors.area);
     }
 
-    datasets.push(targetDataset);
+    if (showTargetData && areaTargetValue !== undefined) {
+      labels.push('Objectif ');
+      data.push(areaTargetValue);
+      backgroundColors.push(pattern.draw('zigzag', comparativeChartColors.area));
+    }
+    // Ajout d'un espace pour séparer visuellement les groupes
+    if (areaValue !== undefined || areaTargetValue !== undefined) {
+      labels.push(''); 
+      data.push(null);
+      backgroundColors.push('transparent'); 
+    }
   }
 
-  // --------------------------------------------------
+  // Legal unit data
+  const legalUnitValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic]?.value;
+  if (legalUnitValue !== undefined) {
+    
+    const labelPeriod = getLabelPeriod(period);
 
-  const chartData = {
-    datasets,
-    labels,
-  };
-  return chartData;
-}
+    const [label, ...rest] = labelPeriod.split(' ');
+
+    labels.push([label,rest.join(' ')]);
+
+    data.push(legalUnitValue);
+    backgroundColors.push(useIndicColors ? metaIndics[indic].color : comparativeChartColors.legalunit);
+
+      labels.push(''); 
+      data.push(null);
+  
+  }
+  backgroundColors.push('transparent'); 
+
+  // Division data
+  if (showDivisionData) {
+    const divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0]?.value;
+    const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value;
+
+    if (divisionValue !== undefined) {
+      labels.push('Branche');
+      data.push(divisionValue);
+      backgroundColors.push(useIndicColors ? lighten('0.3', metaIndics[indic].color) : comparativeChartColors.branch);
+    }
+
+    if (showTargetData && divisionTargetValue !== undefined) {
+      labels.push("Objectif");
+      data.push(divisionTargetValue);
+      backgroundColors.push(useIndicColors ? pattern.draw('zigzag', lighten('0.3', metaIndics[indic].color)) : pattern.draw('zigzag', comparativeChartColors.branch));
+    }
+   
+  }
+
+  // Build the chart data
+  const datasets = [{
+    label: 'Empreinte',
+    data,
+    backgroundColor: backgroundColors,
+    borderWidth: 0,
+    barPercentage: 0.5,
+    categoryPercentage: 1.3,
+    minBarLength: 2,
+  }];
+
+  return { labels, datasets };
+};
+
+
+// const buildChartData = (session,datasetOptions,printOptions) => 
+// {
+//   const { 
+//     financialData, 
+//     comparativeData 
+//   } = session;
+//   const mainAggregates = financialData.mainAggregates;
+//   const {
+//     indic,
+//     aggregate,
+//     period
+//   } = datasetOptions;
+//   const {
+//     showAreaData,
+//     showDivisionData,
+//     showTargetData,
+//     useIndicColors,
+//   } = printOptions;
+
+//   const datasets = [];
+//   const labels = buildLabels(
+//     showAreaData,
+//     showDivisionData,
+//     period
+//   );
+//   const hasTargetData = comparativeData[aggregate].division.target.data[indic].length > 0 ? true : false;
+//   // ------------ --------------------------------------
+//   // footprint dataset
+
+//   const footprintDataset = {
+//     label: "Empreinte",
+//     data: buildFootprintData(
+//       comparativeData,
+//       aggregate,
+//       indic,
+//       showAreaData,
+//       showDivisionData,
+//       mainAggregates,
+//       period,
+//     ),
+//     backgroundColor: buildFootprintBackgroundColors(
+//       indic,
+//       useIndicColors,
+//       showAreaData,
+//       showDivisionData,
+//     ),
+//     borderWidth: 0,
+//     type: "bar",
+//     barPercentage: 0.6,
+//     categoryPercentage: 0.9,
+//     minBarLength: 2,
+//   };
+
+//   datasets.push(footprintDataset);
+
+//   // --------------------------------------------------
+//   // target dataset
+//   if (showTargetData && hasTargetData )
+//   {
+//     const targetDataset = {
+//       label: "Objectif",
+//       data: buildTargetData(
+//         comparativeData,
+//         aggregate,
+//         indic,
+//         showAreaData,
+//         showDivisionData
+//       ),
+//       skipNull: true,
+//       backgroundColor: buildTargetBackgroundPatterns(
+//         showAreaData,
+//         showDivisionData
+//       ),
+//       borderWidth: 0,
+//       barPercentage: 0.5,
+//       categoryPercentage: 0.9,
+//       minBarLength: 2,
+//     }
+
+//     datasets.push(targetDataset);
+//   }
+
+//   // --------------------------------------------------
+
+//   const chartData = {
+//     datasets,
+//     labels,
+//   };
+//   return chartData;
+// }
 
 const buildFootprintData = (
   comparativeData,
@@ -254,27 +342,27 @@ const buildTargetData = (
   return data;
 }
 
-const buildTargetBackgroundColors = (
+
+const buildTargetBackgroundPatterns = (
   showAreaData,
   showDivisionData
 ) => {
-
-  const backgroundColors = [];
+  const backgroundPatterns = [];
 
   // Target area
   if (showAreaData) {
-    backgroundColors.push(comparativeChartColors.targetarea);
-  } 
+    backgroundPatterns.push(pattern.draw('dash', comparativeChartColors.targetarea));
+  }
 
   // Target legal unit
-  backgroundColors.push(colors.transparent);
+  backgroundPatterns.push(colors.transparent);
 
   // Target division
   if (showDivisionData) {
-    backgroundColors.push(comparativeChartColors.targetbranch);
+    backgroundPatterns.push(pattern.draw('dash', comparativeChartColors.targetbranch));
   }
 
-  return backgroundColors;
+  return backgroundPatterns;
 }
 
 const buildLabels = (
@@ -360,9 +448,7 @@ const buildChartOptions = (
     devicePixelRatio: 2,
     layout: {
       padding: {
-        top:  40,
-        left : printMode ? 0 : 10,
-        right : printMode ? 0 : 10, 
+        top:  40
       },
     },
     scales: {
@@ -431,9 +517,9 @@ const buildChartOptions = (
             });
             return labels;
           },
-          sort: (a,b) => {
-            return -a.text.localeCompare(b.text);
-          }
+          // sort: (a,b) => {
+          //   return -a.text.localeCompare(b.text);
+          // }
         },
       },
       datalabels: {

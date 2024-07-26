@@ -47,7 +47,8 @@ export const TrendChart = ({
 
   const chartData = buildChartData(
     session,
-    datasetOptions
+    datasetOptions,
+    printOptions,
   );
 
   // --------------------------------------------------
@@ -72,7 +73,8 @@ export const TrendChart = ({
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (session,datasetOptions) => 
+const buildChartData = (session,datasetOptions,printOptions) => 
+
 {
   const {
     financialData,
@@ -84,6 +86,10 @@ const buildChartData = (session,datasetOptions) =>
     indic
   } = datasetOptions;
 
+  const {
+    printMode,
+
+  } = printOptions;
   const datasets = [];
   const labels = [];
 
@@ -189,7 +195,7 @@ const buildChartData = (session,datasetOptions) =>
     borderColor: trendChartColors.trend,
     backgroundColor: trendChartColors.trend,
     order: 3,
-    borderWidth: 4,
+    borderWidth: printMode ? 2 : 4,
     tension: 0.3,
   };
   datasets.push(branchHistoricalDataset);
@@ -214,7 +220,7 @@ const buildChartData = (session,datasetOptions) =>
       serieType: "trend",
       borderColor: trendChartColors.trend,
       backgroundColor: trendChartColors.trend,
-      borderWidth: 4,
+      borderWidth: printMode ? 2 : 4,
       borderDash: [12, 6],
       order: 4,
       tension: 0.3,
@@ -243,7 +249,7 @@ const buildChartData = (session,datasetOptions) =>
       skipNull: true,
       borderColor: trendChartColors.target,
       backgroundColor: trendChartColors.target,
-      borderWidth: 4,
+      borderWidth: printMode ? 2 : 4,
       order: 5,
       tension: 0.3,
     };
@@ -407,25 +413,25 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 10 : 11,
             family: "Roboto",
           },
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: printMode ? 0 : 1,
+          lineWidth: 1,
         },
       },
       x: {
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 9 : 11,
           },
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: 2,
+          lineWidth: 1,
         },
         type: "time",
         time: {
@@ -446,7 +452,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
           color: colors.textColor,
           padding: 20,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 8 : 11,
             family: "Roboto",
           },
           generateLabels: function (chart) {
@@ -501,7 +507,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         text: unit,
         color: colors.textColor,
         font: {
-          size: 12,
+          size: printMode ? 9 : 12,
         },
       },
       tooltip: {

@@ -1,7 +1,7 @@
 // Constants for Document Properties
 const pdfMargins = {
   top: 40,
-  bottom: 40,
+  bottom: 30,
   left: 40,
   right: 40,
 };
