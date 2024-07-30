@@ -100,14 +100,9 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     if (showTargetData && areaTargetValue !== undefined) {
       labels.push('Objectif ');
       data.push(areaTargetValue);
-      backgroundColors.push(pattern.draw('dash', comparativeChartColors.area));
+      backgroundColors.push(pattern.draw('diagonal', "#ffffff", comparativeChartColors.area,10));
     }
-    // Ajout d'un espace pour séparer visuellement les groupes
-    if (areaValue !== undefined || areaTargetValue !== undefined) {
-      labels.push(''); 
-      data.push(null);
-      backgroundColors.push('transparent'); 
-    }
+    
   }
 
   // Legal unit data
@@ -123,16 +118,12 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     data.push(legalUnitValue);
     backgroundColors.push(useIndicColors ? metaIndics[indic].color : comparativeChartColors.legalunit);
 
-      labels.push(''); 
-      data.push(null);
   
   }
-  backgroundColors.push('transparent'); 
 
   // Division data
   if (showDivisionData) {
     const divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0]?.value;
-    const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value;
 
     if (divisionValue !== undefined) {
       labels.push('Branche');
@@ -140,23 +131,28 @@ const buildChartData = (session, datasetOptions, printOptions) => {
       backgroundColors.push(useIndicColors ? lighten('0.3', metaIndics[indic].color) : comparativeChartColors.branch);
     }
 
-    if (showTargetData && divisionTargetValue !== undefined) {
-      labels.push("Objectif");
-      data.push(divisionTargetValue);
-      backgroundColors.push(useIndicColors ? pattern.draw('dash', lighten('0.3', metaIndics[indic].color)) : pattern.draw('dash', comparativeChartColors.branch));
-    }
    
   }
+  
+  const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value;
+  
+  if (showTargetData && divisionTargetValue !== undefined) { 
+    
 
+    labels.push("Objectif");
+    data.push(divisionTargetValue);
+    backgroundColors.push(useIndicColors ? pattern.draw('diagonal', "#ffffff", lighten('0.3', metaIndics[indic].color), 10) : pattern.draw('diagonal', "#ffffff", comparativeChartColors.branch,10));
+  }
   // Build the chart data
   const datasets = [{
     label: 'Empreinte',
     data,
     backgroundColor: backgroundColors,
     borderWidth: 0,
-    barPercentage: 0.5,
-    categoryPercentage: 1.3,
+    barPercentage: 0.8,
+    categoryPercentage: 0.8,
     minBarLength: 2,
+    skipNull : true,
   }];
 
   return { labels, datasets };
@@ -351,7 +347,7 @@ const buildTargetBackgroundPatterns = (
 
   // Target area
   if (showAreaData) {
-    backgroundPatterns.push(pattern.draw('dash', comparativeChartColors.targetarea));
+    backgroundPatterns.push(pattern.draw('diagonal', comparativeChartColors.targetarea), "#ffffff", 10);
   }
 
   // Target legal unit
@@ -359,7 +355,7 @@ const buildTargetBackgroundPatterns = (
 
   // Target division
   if (showDivisionData) {
-    backgroundPatterns.push(pattern.draw('dash', comparativeChartColors.targetbranch));
+    backgroundPatterns.push(pattern.draw('diagonal', comparativeChartColors.targetbranch), "#ffffff", 10);
   }
 
   return backgroundPatterns;

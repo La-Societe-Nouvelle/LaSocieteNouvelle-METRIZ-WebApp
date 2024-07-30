@@ -142,8 +142,8 @@ export const buildSummaryReportIndexIndic = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: generateHeader(corporateName,legalUnit.siren, period),
-    footer: generateFooter(corporateName),
+    header: generateHeader(corporateName,legalUnit.siren, period,colors),
+    footer:generateFooter(colors),
 
     background: function () {
       const canvas = [];

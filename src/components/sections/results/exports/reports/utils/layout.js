@@ -121,29 +121,29 @@ export const generateHeader = (corporateName, siren, period,colors) => {
             y: 0,
             w: 595.28,
             h: 30, 
-            color: colors.primary,
+            color: colors.light,
           },
         ],
         margin: [0, 0, 0, -30] 
       },
       {
-        columns: [
+        columns: [  
           {
             text: siren ? "SIREN : " + siren : "",
             margin: [20, 10, 0, 0], 
-            color : "#fff"
+            color : colors.primary
           },
           {
             alignment: "center",
             text: corporateName,
             margin: [0, 10, 0, 0], 
-            color : "#fff"
+            color : colors.primary
           },
           {
             text: getLabelPeriod(period),
             alignment: "right",
             margin: [0, 10, 20, 0],
-            color : "#fff"
+            color : colors.primary
           },
         ],
         fontSize: 7,
@@ -170,7 +170,7 @@ export const generateFooter = (colors) => {
             y: 0,
             w: 595.28, 
             h: 30, 
-            color: colors.primary
+            color: colors.light
           },
         ],
         margin: [0, 0, 0, -30] 
@@ -180,7 +180,7 @@ export const generateFooter = (colors) => {
           {
             text: "Edité le " + getShortCurrentDateString(),
             margin: [30, 10, 0, 0],
-            color : "#fff"
+            color : colors.primary
           },
  
         ],

@@ -186,8 +186,8 @@ export const buildSummaryReportIntensityIndic = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: generateHeader(corporateName, legalUnit.siren, period),
-    footer: generateFooter(corporateName),
+    header: generateHeader(corporateName, legalUnit.siren, period,colors),
+    footer:generateFooter(colors),
     background: function (currentPage) {
       const canvas = [];
       // Background rectangles
