@@ -247,7 +247,7 @@ export const buildSummaryReportIntensityIndic = async ({
 
         // Objectifs
 
-        positionY += 350;
+        positionY += 340;
 
         canvas.push(
           createRectObject(
