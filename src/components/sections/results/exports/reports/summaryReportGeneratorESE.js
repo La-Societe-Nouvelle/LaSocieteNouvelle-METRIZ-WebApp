@@ -3,6 +3,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Metadata
 import metaIndics from "/lib/indics.json";
+import styles from "/lib/styles"
 
 // Utils
 import { generateFooter, generateHeader, loadFonts } from "./utils/layout";
@@ -53,14 +54,10 @@ export const buildESEReport = async ({ session, period }) =>
   // ---------------------------------------------------------------
   // Page Property
 
+  // ---------------------------------------------------------------
   // Colors
-  const colors = {
-    primary : "#191558",
-    secondary : "#fa595f",
-    text : "#191558",
-    light : "#ededff",
-  }
 
+  const { colors } = styles["default"];
 
   // ---------------------------------------------------------------
   // Content
@@ -73,7 +70,7 @@ export const buildESEReport = async ({ session, period }) =>
       text: "Empreinte Sociétale de l'Entreprise",
       style: "h1",
     },
-    ...createSocialFootprintCharts(indicatorLabels, indicatorCharts),
+    ...createSocialFootprintCharts(indicatorLabels, indicatorCharts,colors),
 
     // Page 2 - Tableau des données + impacts directs déclarées ------------------------------------------- //
 
@@ -149,16 +146,17 @@ export const buildESEReport = async ({ session, period }) =>
         bold: true,
         color: colors.primary,
         font: "Raleway",
-        margin: [0, 0, 0, 20],
+        margin: [0, 10, 0, 10],
         alignment: "center",
-        fontSize: 20
+        fontSize: 15
       },
       h2: {
         bold: true,
         margin: [0, 10, 0, 10],
         color: colors.primary,
         font: "Raleway",
-        border: "2px"
+        border: "2px",
+        fontSize: 7,
       },
       h3: {
         bold: true,
@@ -167,6 +165,8 @@ export const buildESEReport = async ({ session, period }) =>
         color: colors.primary,
         font: "Raleway",
       },
+
+
       table: {
         margin: [0, 10, 0, 10],
         fontSize: 6,
@@ -217,13 +217,13 @@ export const buildESEReport = async ({ session, period }) =>
 // ----------------------------------------------------------------------------------------------------
 // Footprint charts
 
-const createSocialFootprintCharts = (indicatorLabels, indicatorImages) => {
+const createSocialFootprintCharts = (indicatorLabels, indicatorImages,colors) => {
   const content = [];
 
   Object.keys(indicatorImages).forEach(category => {
     
     // title category
-    const title = createTableTitle(category);
+    const title = createTableTitle(category,colors);
     content.push(title);
 
     let currentRow = [];
@@ -231,9 +231,9 @@ const createSocialFootprintCharts = (indicatorLabels, indicatorImages) => {
 
       // indic footprint chart
       currentRow.push({
-        margin: [0, 5],
+        margin: [0, 0,0, 5],
         stack: [
-          { text: splitTitle(indicatorLabels[indic]), style: "h3", alignment: "center" },
+          { text: splitTitle(indicatorLabels[indic]), style: "h2", alignment: "center" },
           { image: image, width: 100, alignment: "center" }
         ],
       });
@@ -942,6 +942,7 @@ const getIndicatorCharts = async (validatedIndics) => {
   await Promise.all(Object.keys(metaIndics).map(async (indic) => {
     const { category, type } = metaIndics[indic];
     if (validatedIndics.includes(indic)) {
+      
       const id = `socialfootprintvisual_${indic}-print`;
       const image = getChartImageData(id);
       indicatorCharts[category].push({ indic, image });  
@@ -1001,7 +1002,7 @@ export const getMarginPercentage = (indicatorValue, referenceValue) => {
   return '-';
 };
 
-const createTableTitle = (label) => {
+const createTableTitle = (label,colors) => {
 
   const tableBody = [
     [{ 
@@ -1009,8 +1010,7 @@ const createTableTitle = (label) => {
       style: {
         fontSize: 11,
         bold: true,
-        margin: [0, 10, 0, 0],
-        color: "#fa595f",
+        color: colors.secondary,
         font: "Raleway",
         border: "2px"
       }, 
@@ -1029,15 +1029,15 @@ const createTableTitle = (label) => {
         return (i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
-        return '#fa595f';
+        return colors.secondary;
       },
-      vLineWidth: function (i, node) { return 0 },
-      vLineColor: function (i, node) { return '#fa595f' },
+      vLineWidth: function (i, node) {
+        return 0;
+      },
       paddingLeft: function (i, node) { return 0 },
-      paddingTop: function (i, node) { return 2 },
-      paddingBottom: function (i, node) { return 2 },
+      paddingBottom: function (i, node) { return 4 },
     },
-    margin: [0, 10, 0, 5],
+    margin: [0, 10, 0, 10],
   };
 };
 

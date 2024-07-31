@@ -50,18 +50,18 @@ export const VerticalBarChart = ({
   // --------------------------------------------------
   // Data
 
-  const chartData = buildChartData(session,datasetOptions,printOptions);
+  const chartData = buildChartData(session, datasetOptions, printOptions);
 
   // --------------------------------------------------
   // Options
 
-    const yearsLabelsTooltips = getYearsLabelsTooltips(session,datasetOptions);
+  const yearsLabelsTooltips = getYearsLabelsTooltips(session, datasetOptions);
 
-    const chartOptions = buildChartOptions(
-      datasetOptions,
-      printOptions,
-      yearsLabelsTooltips
-    );
+  const chartOptions = buildChartOptions(
+    datasetOptions,
+    printOptions,
+    yearsLabelsTooltips
+  );
 
   // --------------------------------------------------
 
@@ -100,25 +100,25 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     if (showTargetData && areaTargetValue !== undefined) {
       labels.push('Objectif ');
       data.push(areaTargetValue);
-      backgroundColors.push(pattern.draw('diagonal', "#ffffff", comparativeChartColors.area,10));
+      backgroundColors.push(pattern.draw('diagonal', "#ffffff", comparativeChartColors.area, 10));
     }
-    
+
   }
 
   // Legal unit data
   const legalUnitValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic]?.value;
   if (legalUnitValue !== undefined) {
-    
+
     const labelPeriod = getLabelPeriod(period);
 
     const [label, ...rest] = labelPeriod.split(' ');
 
-    labels.push([label,rest.join(' ')]);
+    labels.push([label, rest.join(' ')]);
 
     data.push(legalUnitValue);
     backgroundColors.push(useIndicColors ? metaIndics[indic].color : comparativeChartColors.legalunit);
 
-  
+
   }
 
   // Division data
@@ -131,17 +131,17 @@ const buildChartData = (session, datasetOptions, printOptions) => {
       backgroundColors.push(useIndicColors ? lighten('0.3', metaIndics[indic].color) : comparativeChartColors.branch);
     }
 
-   
+
   }
-  
+
   const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].filter(value => value.path === "GEO").slice(-1)[0]?.value ?? null;
-  
-  if (showTargetData && divisionTargetValue !== undefined) { 
-    
+
+  if (showTargetData && divisionTargetValue !== undefined) {
+
 
     labels.push("Objectif");
     data.push(divisionTargetValue);
-    backgroundColors.push(useIndicColors ? pattern.draw('diagonal', "#ffffff", lighten('0.3', metaIndics[indic].color), 10) : pattern.draw('diagonal', "#ffffff", comparativeChartColors.branch,10));
+    backgroundColors.push(useIndicColors ? pattern.draw('diagonal', "#ffffff", lighten('0.3', metaIndics[indic].color), 10) : pattern.draw('diagonal', "#ffffff", comparativeChartColors.branch, 10));
   }
   // Build the chart data
   const datasets = [{
@@ -152,7 +152,7 @@ const buildChartData = (session, datasetOptions, printOptions) => {
     barPercentage: 0.8,
     categoryPercentage: 0.8,
     minBarLength: 2,
-    skipNull : true,
+    skipNull: true,
   }];
 
   return { labels, datasets };
@@ -303,7 +303,7 @@ const buildFootprintBackgroundColors = (
 
   // Footprint division
   if (showDivisionData) {
-    let divisionBackgroundColor = useIndicColors ?  lighten('0.3', indicColor) : comparativeChartColors.branch;
+    let divisionBackgroundColor = useIndicColors ? lighten('0.3', indicColor) : comparativeChartColors.branch;
     backgroundColors.push(divisionBackgroundColor);
   }
 
@@ -324,10 +324,10 @@ const buildTargetData = (
   if (showAreaData) {
     let areaTargetValue = comparativeData[aggregate].area.target.data[indic].slice(-1)[0]?.value;
     data.push(areaTargetValue);
-  } 
+  }
 
   // Target legal unit
-  data.push(null); 
+  data.push(null);
 
   // Target division
   if (showDivisionData) {
@@ -382,7 +382,7 @@ const buildLabels = (
 }
 
 const getYearsLabelsTooltips = (session, datasetOptions) => {
-const {period,aggregate,indic} = datasetOptions;
+  const { period, aggregate, indic } = datasetOptions;
 
   const branchData = session.comparativeData[aggregate].division.history.data[indic] ?? [];
   const targetData = session.comparativeData[aggregate].division.target.data[indic] ?? [];
@@ -409,7 +409,7 @@ const {period,aggregate,indic} = datasetOptions;
 const buildChartOptions = (
   datasetOptions,
   printOptions,
- yearsLabelsTooltips
+  yearsLabelsTooltips
 ) => {
 
   const {
@@ -444,11 +444,10 @@ const buildChartOptions = (
     devicePixelRatio: 2,
     layout: {
       padding: {
-        top:  40
+        top: printMode ? 0 : 40
       },
     },
     scales: {
-
       y: {
         display: true,
         min: 0,
@@ -456,7 +455,7 @@ const buildChartOptions = (
         ticks: {
           color: colors.textColor,
           font: {
-            size:  printMode ? 14 : 10,
+            size: printMode ? 14 : 10,
           },
         },
         grid: {
@@ -468,7 +467,7 @@ const buildChartOptions = (
         display: showXlabels,
         ticks: {
           color: colors.textColor,
-          align: "center", 
+          align: "center",
           font: {
             size: printMode ? 18 : 10,
           },
@@ -486,13 +485,12 @@ const buildChartOptions = (
         align: "center",
         fullSize: true,
         labels: {
-          
           boxWidth: 10,
           color: colors.textColor,
           font: {
             size: printMode ? 15 : 10,
             family: "Roboto",
-            weight : printMode ? "bold" : "normal",
+            weight: printMode ? "bold" : "normal",
           },
           generateLabels: (chart) => {
             const labels = [];
@@ -501,7 +499,7 @@ const buildChartOptions = (
                 const backgroundColor = dataset.backgroundColor[labelIndex];
                 if (backgroundColor) {
                   labels.push({
-                    text: datasetIndex === 0 ? label : dataset.label,
+                    text: Array.isArray(label) ? label.join(' ') : label,
                     textAlign: 'left',
                     fillStyle: backgroundColor,
                     strokeStyle: backgroundColor,
@@ -537,7 +535,7 @@ const buildChartOptions = (
         color: colors.textColor,
         font: {
           size: printMode ? 14 : 10,
-          weight : printMode ? "bold" : "normal",
+          weight: printMode ? "bold" : "normal",
           family: "Roboto",
         },
         padding: {
@@ -548,7 +546,7 @@ const buildChartOptions = (
         display: false,
       },
       tooltip: {
-        enabled : printMode ? false : true,
+        enabled: printMode ? false : true,
         backgroundColor: tooltips.backgroundColor,
         padding: tooltips.padding,
         cornerRadius: tooltips.cornerRadius,
@@ -563,9 +561,8 @@ const buildChartOptions = (
             const unitLabel = `${unit}`;
             // Area dataset
             if (context.dataIndex === 0) {
-              return `${datasetLabel} (${
-                context.datasetIndex === 0 ? areaValueYear : areaTargetValueYear
-              }) : ${rawValue}${unitLabel}`;
+              return `${datasetLabel} (${context.datasetIndex === 0 ? areaValueYear : areaTargetValueYear
+                }) : ${rawValue}${unitLabel}`;
             }
 
             // Legal Unit dataset
@@ -575,9 +572,8 @@ const buildChartOptions = (
 
             // Target dataset
             if (context.dataIndex === 2) {
-              return `${datasetLabel} (${
-                context.datasetIndex === 0 ? branchValueYear : targetValueYear
-              }) : ${rawValue}${unitLabel}`;
+              return `${datasetLabel} (${context.datasetIndex === 0 ? branchValueYear : targetValueYear
+                }) : ${rawValue}${unitLabel}`;
             }
           },
 
