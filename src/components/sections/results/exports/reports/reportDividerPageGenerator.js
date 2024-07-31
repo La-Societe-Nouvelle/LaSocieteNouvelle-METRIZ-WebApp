@@ -5,22 +5,20 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { loadFonts } from "./utils/layout";
 
+import styles from "/lib/styles"
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
-export const generateReportDividerPage = (title) => 
-{
-  const margins = {
-    top: 50,
-    bottom: 50,
-    left: 40,
-    right: 40,
-  };
+export const generateReportDividerPage = (title) => {
 
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
+
+  // ---------------------------------------------------------------
+  // Colors
+
+  const { colors } = styles["default"];
 
   const footer = {
     columns: [
@@ -38,16 +36,16 @@ export const generateReportDividerPage = (title) =>
         type: "rect",
         x: 0,
         y: 0,
-        w: pageSize.width,
-        h: pageSize.height,
-        color: "#f1f0f4",
+        w: pdfPageSize.width,
+        h: pdfPageSize.height,
+        color: colors.light,
       },
       {
         type: "rect",
-        x: margins.left - 20,
-        y: margins.top - 15,
-        w: pageSize.width - margins.left - margins.right + 40,
-        h: pageSize.height - margins.top - 15,
+        x: pdfMargins.left - 20,
+        y: pdfMargins.top - 15,
+        w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
+        h: pdfPageSize.height - pdfMargins.top - 15,
         color: "#FFFFFF",
         r: 10,
       },
@@ -68,8 +66,13 @@ export const generateReportDividerPage = (title) =>
   ];
 
   const docDefinition = {
-    pageSize: pageSize,
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pdfPageSize: pdfPageSize,
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
     footer: footer,
     background: background,
     info: {
@@ -81,7 +84,7 @@ export const generateReportDividerPage = (title) =>
     },
     content: content,
     defaultStyle: {
-      color: "#191558",
+      color: colors.primary,
       font: "Raleway",
     },
     styles: {},

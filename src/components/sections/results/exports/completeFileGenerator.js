@@ -53,7 +53,7 @@ export async function buildCompleteZipFile({ session, period, showAnalyses }) {
     indicators,
     showStandardReports: true,
     showAnalyses,
-    showESEReport : true
+    showESEReport: true
   });
 
   // Add the full report to the ZIP file
@@ -105,23 +105,29 @@ export async function buildCompleteReport({
   showESEReport
 }) {
   try {
-
-
     // Report Cover
     const coverPage = generateReportCover(year, session.legalUnit);
 
     // Generate standard reports and their blobs
-    let standardPDFs = [];
+
+    let indicatorDividerPage;
+    showESEReport ?
+      indicatorDividerPage = generateReportDividerPage("Détails par indicateur") : [];
+    const standardPDFs = [
+      indicatorDividerPage,
+      ...await generateStandardReports(session, period, indicators, showAnalyses)
+    ]
+    // Generate summary reports and their blobs
+
+    let summaryPDFs = [];
     if (showStandardReports) {
       const appendixesCoverPage = generateReportDividerPage(indicators.length > 1 ? "Annexes" : "Annexe");
-      standardPDFs = [
+      summaryPDFs = [
         appendixesCoverPage,
-        ...await generateStandardReports(session, period, indicators, showAnalyses)
+        ...await generateSummaryReports(session, period, indicators)
       ];
     }
 
-    // Generate summary reports and their blobs
-    const summaryPDFs = await generateSummaryReports(session, period, indicators);
 
     let ESEReport = null;
     if (showESEReport) {
@@ -132,8 +138,8 @@ export async function buildCompleteReport({
     }
 
     // Merge all PDFs
-    const completeReport = await generateMergedPDF([coverPage, ESEReport,...summaryPDFs, ...standardPDFs].filter(Boolean));
-    
+    const completeReport = await generateMergedPDF([coverPage, ESEReport, ...standardPDFs, ...summaryPDFs,].filter(Boolean));
+
     return completeReport;
   } catch (error) {
     console.error(

@@ -5,6 +5,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { loadFonts } from "./utils/layout";
 import { loadImageAsDataURL } from "./utils";
 
+import styles from "/lib/styles"
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
@@ -14,17 +16,11 @@ export const generateReportCover = async (year, legalUnit) => {
   const illuPath = "/resources/metriz_illus.png";
   const illustration = await loadImageAsDataURL(illuPath);
 
-  const margins = {
-    top: 50,
-    bottom: 50,
-    left: 40,
-    right: 40,
-  };
+  // ---------------------------------------------------------------
+  // Colors
 
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
+  const { colors } = styles["default"];
+
 
   const background = {
     canvas: [
@@ -32,16 +28,16 @@ export const generateReportCover = async (year, legalUnit) => {
         type: "rect",
         x: 0,
         y: 0,
-        w: pageSize.width,
-        h: pageSize.height,
-        color: "#f1f0f4",
+        w: pdfPageSize.width,
+        h: pdfPageSize.height,
+        color: colors.light,
       },
       {
         type: "rect",
-        x: margins.left - 20,
-        y: margins.top - 15,
-        w: pageSize.width - margins.left - margins.right + 40,
-        h: pageSize.height - margins.top - 15,
+        x: pdfMargins.left - 20,
+        y: pdfMargins.top - 15,
+        w: pdfPageSize.width - pdfMargins.left - pdfMargins.right + 40,
+        h: pdfPageSize.height - pdfMargins.top - 15,
         color: "#FFFFFF",
         r: 10,
       },
@@ -71,11 +67,11 @@ export const generateReportCover = async (year, legalUnit) => {
       columns: [
         {
           text: `SIREN : ${legalUnit.siren}`,
-          alignment : "right",
+          alignment: "right",
         },
         {
           text: `Exercice ${year}`,
-          alignment : "left",
+          alignment: "left",
         },
       ],
     },
@@ -88,8 +84,13 @@ export const generateReportCover = async (year, legalUnit) => {
   ];
 
   const docDefinition = {
-    pageSize: pageSize,
-    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    pdfPageSize: pdfPageSize,
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
     background: background,
     info: {
       title: "",
