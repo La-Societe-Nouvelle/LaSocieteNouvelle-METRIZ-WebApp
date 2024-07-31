@@ -5,7 +5,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
- 
+import styles from "/lib/styles"
+
 // Utils
 import { printValue } from "/src/utils/formatters";
 
@@ -96,7 +97,7 @@ export const buildSummaryReportIndexIndic = async ({
 
   // ---------------------------------------------------------------
   // Get charts canvas and encode it to import in document
- 
+
   const chartIds = [
     `deviation-chart-${indic}-print`,
     `trend-chart-${indic}-print`,
@@ -107,6 +108,11 @@ export const buildSummaryReportIndexIndic = async ({
     chartImages[id] = getChartImageData(id);
   });
 
+
+  // ---------------------------------------------------------------
+  // Colors
+
+  const { colors } = styles["default"];
 
   // ---------------------------------------------------------------
   // Document Property
@@ -142,34 +148,12 @@ export const buildSummaryReportIndexIndic = async ({
       pdfMargins.right,
       pdfMargins.bottom,
     ],
-    header: generateHeader(corporateName,legalUnit.siren, period,colors),
-    footer:generateFooter(colors),
+    header: generateHeader(corporateName, legalUnit.siren, period, colors),
+    footer: generateFooter(colors),
 
     background: function () {
       const canvas = [];
-      // Background rectangles
-      canvas.push(
-        createRectObject(
-          0,
-          0,
-          pdfPageSize.width,
-          pdfPageSize.height,
-          0,
-          null,
-          null,
-          "#f1f0f4"
-        ),
-        createRectObject(
-          20,
-          35,
-          pdfPageSize.width - 40,
-          pdfPageSize.height - 65,
-          0,
-          null,
-          10,
-          "#FFFFFF"
-        )
-      );
+
       // Key Figures
 
       keyFigureBoxes.forEach((box) => {
@@ -180,7 +164,7 @@ export const buildSummaryReportIndexIndic = async ({
             box.width,
             box.height,
             1,
-            "#f1f0f4",
+           colors.light,
             10,
             null
           )
@@ -197,12 +181,12 @@ export const buildSummaryReportIndexIndic = async ({
           availableWidth,
           90,
           1,
-          "#f1f0f4",
+         colors.light,
           10,
           null
         )
       );
- 
+
       positionY += 290;
 
       canvas.push(
@@ -212,7 +196,7 @@ export const buildSummaryReportIndexIndic = async ({
           180,
           180,
           1,
-          "#f1f0f4",
+         colors.light,
           10,
           null
         )
@@ -225,7 +209,7 @@ export const buildSummaryReportIndexIndic = async ({
           345,
           180,
           1,
-          "#f1f0f4",
+         colors.light,
           10,
           null
         )
@@ -271,7 +255,7 @@ export const buildSummaryReportIndexIndic = async ({
       //--------------------------------------------------
       // Branch Performance
       {
-        ...buildBranchPerformanceSection( branchProductionTarget,
+        ...buildBranchPerformanceSection(branchProductionTarget,
           branchProductionEvolution,
           lastEstimatedData,
           comparativeData,
@@ -281,7 +265,7 @@ export const buildSummaryReportIndexIndic = async ({
       },
 
       //--------------------------------------------------
-      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins,defaultPosition)
+      addUncertaintyText(uncertaintyText, pdfPageSize, pdfMargins, defaultPosition)
     ],
     //--------------------------------------------------
     // Style
@@ -338,7 +322,7 @@ const buildHeaderSection = (revenue, indic, period) => {
               style: "numbers",
             },
             {
-              margin: indic == "idr" ? [0, 5, 0, 12] :  [0, 5, 0, 0],
+              margin: indic == "idr" ? [0, 5, 0, 12] : [0, 5, 0, 0],
               text: indic == "idr" ? "Rapport interdécile D9/D1" : "d'" + libelleGrandeur,
               alignment: "center",
             },
@@ -524,7 +508,7 @@ const createSIGtableSectionSection = (mainAggregates, period, indic) => {
           {},
           {},
           {
-            text: unit ,
+            text: unit,
             fontSize: "5",
             alignment: "right",
           },
@@ -630,7 +614,7 @@ const buildDeviationChartSection = (chartImage) => {
       },
       {
         width: 240,
-        image : chartImage
+        image: chartImage
       },
     ],
   };
@@ -721,7 +705,6 @@ const buildBranchPerformanceSection = (
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
-            margin: [0, 0, 0, 20],
           },
           {
             width: 320,

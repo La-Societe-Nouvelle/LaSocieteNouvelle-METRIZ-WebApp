@@ -4,6 +4,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
+import styles from "/lib/styles"
 
 // Utils
 import { printValue } from "/src/utils/formatters";
@@ -140,13 +141,19 @@ export const buildSummaryReportIntensityIndic = async ({
 
   const totalRevenue = revenue.periodsData[period.periodKey].amount;
 
+  
+  // ---------------------------------------------------------------
+  // Colors
+
+  const { colors } = styles["default"];
+
   // ---------------------------------------------------------------
   // PDF Content and Layout
 
   // ---------------------------------------------------------------
   // Document Property
 
-  let positionY = 90;
+  let positionY = 80;
   const availableWidth = await calculateAvailableWidth(pdfPageSize, pdfMargins);
   const figureKeyBoxWidth = 125;
   const figureKeyBoxHeight = 60;
@@ -190,30 +197,6 @@ export const buildSummaryReportIntensityIndic = async ({
     footer:generateFooter(colors),
     background: function (currentPage) {
       const canvas = [];
-      // Background rectangles
-      canvas.push(
-        createRectObject(
-          0,
-          0,
-          pdfPageSize.width,
-          pdfPageSize.height,
-          0,
-          null,
-          null,
-          "#f1f0f4"
-        ),
-        createRectObject(
-          20,
-          35,
-          pdfPageSize.width - 40,
-          pdfPageSize.height - 65,
-          0,
-          null,
-          10,
-          "#FFFFFF"
-        )
-      );
-
       if (currentPage == 1) {
         // Key Figures
         keyFigureBoxes.forEach((box) => {
@@ -224,7 +207,7 @@ export const buildSummaryReportIntensityIndic = async ({
               box.width,
               box.height,
               1,
-              "#f1f0f4",
+             colors.light,
               10,
               null
             )
@@ -241,7 +224,7 @@ export const buildSummaryReportIntensityIndic = async ({
             availableWidth,
             130,
             1,
-            "#f1f0f4",
+           colors.light,
             10,
             null
           )
@@ -255,7 +238,7 @@ export const buildSummaryReportIntensityIndic = async ({
               195,
               75,
               1,
-              "#f1f0f4",
+             colors.light,
               10,
               "#FFFFFF"
             )
@@ -264,7 +247,7 @@ export const buildSummaryReportIntensityIndic = async ({
 
         // Objectifs
 
-        positionY += 330;
+        positionY += 350;
 
         canvas.push(
           createRectObject(
@@ -273,13 +256,13 @@ export const buildSummaryReportIntensityIndic = async ({
             180,
             180,
             1,
-            "#f1f0f4",
+           colors.light,
             10,
             null
           )
         );
         canvas.push(
-          createRectObject(220, positionY, 345, 180, 1, "#f1f0f4", 10, null)
+          createRectObject(220, positionY, 345, 180, 1,colors.light, 10, null)
         );
       }
       return {
@@ -313,7 +296,7 @@ export const buildSummaryReportIntensityIndic = async ({
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 40, 0, 25],
+        margin: [0, 40, 0, 20],
         columns: [
           {
             ...createSIGtableSectionSection(
@@ -379,9 +362,10 @@ const buildHeaderSection = (
     { text: libelle, style: "header" },
     //--------------------------------------------------
     {
+      margin: [0, 10, 0, 0],
+      columnGap : 20,
       columns: [
         {
-          margin: [0, 10, 0, 0],
           alignment: "center",
           stack: [
             {
@@ -395,7 +379,6 @@ const buildHeaderSection = (
           ],
         },
         {
-          margin: [0, 10, 0, 0],
           alignment: "center",
           stack: [
             {
@@ -414,14 +397,13 @@ const buildHeaderSection = (
               ],
             },
             {
-              margin: [10, 5, 15, 0],
+              margin: [0, 5, 0, 0],
               text: "d'" + libelle,
               fontSize: 8,
             },
           ],
         },
         {
-          margin: [0, 10, 0, 0],
           alignment: "center",
           stack: [
             {
@@ -448,7 +430,6 @@ const buildHeaderSection = (
           ],
         },
         {
-          margin: [0, 10, 0, 0],
           alignment: "center",
           stack: [
             {
@@ -476,7 +457,7 @@ const buildHeaderSection = (
     },
     //--------------------------------------------------
     {
-      margin: [10, 30, 10, 20],
+      margin: [5, 30, 5, 20],
       text: getIndicDescription(indic),
       alignment: "center",
     },
@@ -844,7 +825,7 @@ const buildBranchPerformanceSection = (
             style: "h2",
             alignment: "center",
             background: "#FFFFFF",
-            margin: [0, 0, 0, 20],
+            margin: [0, 0, 0, 10],
           },
           {
             width: 320,

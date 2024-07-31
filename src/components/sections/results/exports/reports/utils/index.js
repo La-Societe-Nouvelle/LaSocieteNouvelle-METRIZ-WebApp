@@ -105,7 +105,7 @@ export const addUncertaintyText = (
     ],
     absolutePosition: {
       x: defaultPosition.startX,
-      y: pdfPageSize.height - pdfMargins.bottom - 32,
+      y: pdfPageSize.height - pdfMargins.bottom - 40,
     },
     style: "legend",
   };

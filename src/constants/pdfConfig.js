@@ -14,7 +14,7 @@ const pdfPageSize = {
 
 const defaultPosition = {
   startX: 30,
-  startY : 100,
+  startY : 90,
 };
 
 

@@ -134,8 +134,6 @@ export const buildSummaryReportContributionIndic = async ({
     background: function () {
       const canvas = [];
 
-
-
       // Key Figures
 
       keyFigureBoxes.forEach((box) => {
@@ -163,10 +161,10 @@ export const buildSummaryReportContributionIndic = async ({
       positionY += 215;
 
       // Comparaison avec la branche d'activité
-      canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 170, 1, colors.light, 10, null));
+      canvas.push(createRectObject(defaultPosition.startX, positionY, 210, 230, 1, colors.light, 10, null));
 
       // Comptes de charges les plus impactants
-      canvas.push(createRectObject(260, positionY, 305, 170, 1, colors.light, 10, null));
+      canvas.push(createRectObject(260, positionY, 305, 230, 1, colors.light, 10, null));
 
       return {
         canvas: canvas,
@@ -376,7 +374,6 @@ const buildLeftColumnContent = (indic, chartImages, externalExpensesContribution
       image:
         chartImages[`comparative-chart-production-${indic}-print`],
       width: 190,
-      margin: [10, 0, 0, 5],
     },
 
   ]
