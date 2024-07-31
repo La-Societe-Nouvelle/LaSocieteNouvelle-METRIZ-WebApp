@@ -993,7 +993,7 @@ export const getEffortPercentage = (currentValue, targetValue) => {
   return '-';
 };
 
-const getMarginPercentage = (indicatorValue, referenceValue) => {
+export const getMarginPercentage = (indicatorValue, referenceValue) => {
   if (indicatorValue !== null && referenceValue !== null && referenceValue !== 0) {
     const percentageValue = ((indicatorValue - referenceValue) / referenceValue * 100).toFixed(1);
     return percentageValue;

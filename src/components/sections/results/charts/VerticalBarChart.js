@@ -134,7 +134,7 @@ const buildChartData = (session, datasetOptions, printOptions) => {
    
   }
   
-  const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].slice(-1)[0]?.value;
+  const divisionTargetValue = comparativeData[aggregate].division.target.data[indic].filter(value => value.path === "GEO").slice(-1)[0]?.value ?? null;
   
   if (showTargetData && divisionTargetValue !== undefined) { 
     
@@ -448,6 +448,7 @@ const buildChartOptions = (
       },
     },
     scales: {
+
       y: {
         display: true,
         min: 0,
@@ -485,6 +486,7 @@ const buildChartOptions = (
         align: "center",
         fullSize: true,
         labels: {
+          
           boxWidth: 10,
           color: colors.textColor,
           font: {
@@ -519,7 +521,7 @@ const buildChartOptions = (
         },
       },
       datalabels: {
-        display: true,
+        display: printMode ? false : true,
         overlap: "auto",
         anchor: "end",
         align: "top",

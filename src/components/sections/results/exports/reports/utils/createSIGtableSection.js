@@ -1,4 +1,4 @@
-import { padding } from "polished";
+import { borderColor } from "polished";
 import { getLabelPeriod } from "../../../../../../utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 
@@ -46,11 +46,11 @@ export const createSIGtableSection = (
         }, {
           text: unit,
           bold: true
-        }], border: [false, false, false, false]
+        }], border: [false, false, false, true]
       },
-      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, true] },
       { text: getLabelPeriod(period), colSpan: 2, border: [true, true, true, true], style: "darkBackground", alignment: "center" },
-      { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, false, false, true] },
       // { text: '', border: [false, false, false, false] },
     ],
     [
@@ -61,7 +61,8 @@ export const createSIGtableSection = (
       {
         text: "Montant",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "right",
+        border : [false,false,true,false] 
       },
       {
         text: "Empreinte",
@@ -71,7 +72,8 @@ export const createSIGtableSection = (
       {
         text: "Incertitude",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "right",
+        border : [false,false,true,true] 
       },
       // {
       //   text: "Empreinte\nbranche",
@@ -80,11 +82,12 @@ export const createSIGtableSection = (
       // },
     ],
     [
-      { text: "Production", style: "tableBold" },
+      { text: "Production", style: "tableBold", border : [false,true,false,true] },
       {
         text: printValue(production.periodsData[period.periodKey].amount, 0) + " €",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,true,true] 
       },
       {
         text: [
@@ -97,13 +100,16 @@ export const createSIGtableSection = (
           },
         ],
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,false,true] 
       },
       {
         text:
           printValue(production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,true,true] 
+
       },
       // {
       //   text: branchProductionFootprint,
@@ -119,6 +125,7 @@ export const createSIGtableSection = (
       {
         text: printValue(revenue.periodsData[period.periodKey].amount, 0) + " €",
         style: "data",
+        border : [false,false,true,false] 
       },
       {
 
@@ -138,6 +145,8 @@ export const createSIGtableSection = (
         style: "data",
         text:
           printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          border : [false,false,true,false] 
+
       },
       // {
       //   text: " - ",
@@ -153,6 +162,8 @@ export const createSIGtableSection = (
       {
         text: printValue(storedProduction.periodsData[period.periodKey].amount, 0) + " €",
         style: "data",
+        border : [false,false,true,false] 
+
       },
       {
         style: "data",
@@ -174,6 +185,8 @@ export const createSIGtableSection = (
             0
           ) + " %",
         style: "data",
+        border : [false,false,true,true] 
+
       },
       // {
       //   text: " - ",
@@ -190,12 +203,13 @@ export const createSIGtableSection = (
       {
         text: "Consommations intermédiaires",
         style: "tableBold",
-        border: [true, true, true, true]
+        border: [false, true, false, true]
       },
       {
         text: printValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0) + " €",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,true,true] 
       },
       {
         text: [
@@ -209,7 +223,8 @@ export const createSIGtableSection = (
 
         ],
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, true]
       },
       {
         text:
@@ -218,7 +233,8 @@ export const createSIGtableSection = (
             0
           ) + " %",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, true, true]
       },
       // {
       //   text: branchIntermediateConsumptionsFootprint.value,
@@ -237,11 +253,14 @@ export const createSIGtableSection = (
       {
         text: "Consommations de capital fixe",
         style: "tableBold",
+        border: [false, true, false, true]
+
       },
       {
         text: printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,true,true] 
       },
       {
         text: [
@@ -255,7 +274,8 @@ export const createSIGtableSection = (
 
         ],
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, true]
       },
       {
         text:
@@ -264,7 +284,9 @@ export const createSIGtableSection = (
             0
           ) + " %",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, true, true]
+
       },
       // {
       //   text: branchFixedCapitalConsumptionsFootprint.value,
@@ -283,11 +305,14 @@ export const createSIGtableSection = (
       {
         text: "Valeur ajoutée nette",
         style: "tableBold",
+        border: [false, true, false, true]
+
       },
       {
         text: printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border : [false,true,true,true] 
       },
       {
         style: "data",
@@ -302,14 +327,16 @@ export const createSIGtableSection = (
 
         ],
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, true],
       },
       {
         text:
           printValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
           " %",
         style: "tableBold",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, true, true],
       },
       // {
       //   text: branchNetValueAddedFootprint.value,
@@ -332,21 +359,18 @@ export const createSIGtableSection = (
       body: tableBody,
     },
     layout: {
+      defaultBorder : false,
       hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === 2 || i === node.table.body.length) ? 0.5 : 0;
+        { return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 1 }
       },
       hLineColor: function (i, node) {
-        return (i === 5 || i === 8) ? colors.light : colors.primary;
+        { return (i === 0 || i === 1 || i === node.table.body.length) ? colors.primary : colors.light }
       },
       vLineWidth: function (i, node) {
-        if ((i == 2|| i == 4 || (showPrevPeriod && i == 7))) {
-          return 0.5;
-        } else {
-          return 0;
-        }
+        return  0.5;
       },
       vLineColor: function (i, node) {
-        return '#191558';
+        return  colors.primary;
       },
       paddingRight: function (i, node) { return i === 1 ? 7 : 2; },
       paddingTop: function (i, node) { return 2 },
@@ -376,6 +400,7 @@ const getImmobilisedProductionRow = (
       {
         text: printValue(immobilisedProduction.periodsData[period.periodKey].amount, 0) + " €",
         style: "data",
+        border : [false,false,true,false] 
       },
       {
         style: "data",
@@ -423,6 +448,7 @@ const getAggregateRow = (aggregates, indic, unit, precision, period) => {
         {
           text: printValue(periodsData[period.periodKey].amount, 0) + " €",
           style: "data",
+          border: [false, false, true, false]
         },
         {
           style: "data",
@@ -442,6 +468,8 @@ const getAggregateRow = (aggregates, indic, unit, precision, period) => {
             printValue(periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
             " %",
           style: "data",
+          border: [false, false, true, false]
+
         },
         // {
         //   text: " - ",

@@ -114,6 +114,7 @@ const IndicatorCharts = ({ session, period, indic }) => {
             indic,
           }}
           printOptions={{
+            useIndicColors: true,
             printMode: true,
           }}
         />
@@ -192,7 +193,7 @@ const renderComparativeCharts = ({
       />
       
     </div>
-    <div key={chartId} className={"comparative-chart-container "}>
+    <div key={`target-${chartId}`} className={"comparative-chart-container "}>
       <VerticalBarChart
         id={`target-${chartId}`}
         session={session}

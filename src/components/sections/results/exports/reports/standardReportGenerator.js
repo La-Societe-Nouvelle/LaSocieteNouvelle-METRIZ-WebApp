@@ -17,7 +17,9 @@ import { getStatementNote } from "/src/utils/Writers";
 import { getChartImageData, getTransparentProviders } from "./utils";
 import { printValue } from "/src/utils/formatters";
 import { getPrevPeriod } from "../../../../../utils/periodsUtils";
-import { getEffortPercentage } from "./summaryReportGeneratorESE";
+import { getEffortPercentage, getMarginPercentage } from "./summaryReportGeneratorESE";
+import { hasComparativeData } from "../../utils";
+import { roundValue } from "../../../../../utils/Utils";
 
 
 // --------------------------------------------------------------------------
@@ -53,6 +55,19 @@ export const buildStandardReport = async ({
 
   const prevPeriod = getPrevPeriod(availablePeriods, period);
 
+  // Data
+
+  const statementValue = getStatementValue(impactsData, period, indic);
+  const indirectImpact = getIndirectImpact(intermediateConsumptions, fixedCapitalConsumptions, period, indic);
+  const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
+
+  const analysisNotes =
+    analysis[period.periodKey][indic]?.isAvailable && showAnalyses
+      ? analysis[period.periodKey][indic].analysis
+      : " - ";
+
+  const isTargetDataAvailable = hasComparativeData(session, 'division', 'target', indic);
+
   // Metadata ------------------------------------------------------
 
   const { libelle, unit, precision, unitDeclaration, libelleDeclaration, libelleIndirect } = metaIndics[indic];
@@ -68,19 +83,9 @@ export const buildStandardReport = async ({
   const targetIntermediateConsumptionsChart = getChartImageData(`target-comparative-chart-intermediateConsumptions-${indic}-print`);
   const targetFixedCapitalConsumptionsChart = getChartImageData(`target-comparative-chart-fixedCapitalConsumptions-${indic}-print`);
 
-
   const trendChart = getChartImageData(`trend-chart-${indic}-print`)
 
-  //
 
-  const statementValue = getStatementValue(impactsData, period, indic);
-  const indirectImpact = getIndirectImpact(intermediateConsumptions, fixedCapitalConsumptions, period, indic);
-  const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
-
-  const analysisNotes =
-    analysis[period.periodKey][indic]?.isAvailable && showAnalyses
-      ? analysis[period.periodKey][indic].analysis
-      : " - ";
 
   // ---------------------------------------------------------------
   // Colors
@@ -109,25 +114,51 @@ export const buildStandardReport = async ({
     },
     createKeyFigures(indirectImpact, statementValue, unitDeclaration, libelleDeclaration, libelleIndirect, production, period, prevPeriod, indic, unit, colors),
 
-    //
+    // ---------------------------------------------------------------
+    // SIG
     createSectionTitle("Tableau des résultats", colors),
-
-    //
     createSIGtableSection(comparativeData, mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, precision, colors),
+
+    // ---------------------------------------------------------------
+    // Statement 
     {
       text: "Déclaration",
       style: "h2",
     },
     statementNotes.map((note) => note),
     {
-      text: `${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`,
+      text: `- ${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`, margin: [0, 5, 0, 10]
     },
+
+    // ---------------------------------------------------------------
+    // Production Footprint & Analysis
+
     createSectionTitle("Analyse de la performance", colors),
+    createProductionSection(period, indic, unit, precision, colors, production, comparativeData, productionChart, analysisNotes),
 
-    createProductionSection(period, indic,unit,precision, colors,production, comparativeData,productionChart, analysisNotes),
 
+    // ---------------------------------------------------------------
+    // Target 
     { text: '', pageBreak: 'after' },
-    createSectionTitle("Détails de la performance", colors),
+
+    createSectionTitle("Suivi de l'objectif sectoriel", colors),
+
+    isTargetDataAvailable ?
+      [
+        createFinancialChartsSection(
+          targetValueAddedChart,
+          targetIntermediateConsumptionsChart,
+          targetFixedCapitalConsumptionsChart
+        ),
+        createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors)
+      ] :
+      [
+        { text: "Aucun objectif sectoriel défini pour cet indicateur." }
+      ],
+
+    // ---------------------------------------------------------------
+    // Branch 
+    createSectionTitle("Détails de la performance (Comparaison avec la branche)", colors),
 
     createFinancialChartsSection(
       valueAddedChart,
@@ -135,21 +166,19 @@ export const buildStandardReport = async ({
       fixedCapitalConsumptionsChart
     ),
     createAggregatesTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors),
-    createSectionTitle("Suivi de l'objectif sectoriel", colors),
-    createFinancialChartsSection(
-      targetValueAddedChart,
-      targetIntermediateConsumptionsChart,
-      targetFixedCapitalConsumptionsChart
-    ),
 
-    createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors),
-    { text: '', pageBreak: 'after' },
+    isTargetDataAvailable ? [
+      { text: '', pageBreak: 'after' },
+    ] : [],
+
+    // ---------------------------------------------------------------
+    // Trend & Target
     createSectionTitle("Evolution de la performance", colors),
     {
       image: trendChart,
       width: 515,
       alignment: "center",
-      margin: [0, 0, 0, 20]
+      margin: [0, 0, 0, 10]
     },
 
     {
@@ -165,25 +194,29 @@ export const buildStandardReport = async ({
     {
       text: `Source : ${metaTrends[indic].source}`, margin: [0, 5, 0, 10], style: "legendText"
     },
-
-    {
-      text: "Objectif de la branche :",
-      style: "h2",
-    },
-    {
-      text: metaTargets[indic] ? metaTargets[indic].info : "Aucun objectif défini."
-    },
-    {
-      text: metaTargets[indic] ? `Source : ${metaTargets[indic].source}` : "", style: "legendText", margin: [0, 5, 0, 10]
-    },
-
-
+    metaTargets[indic] ?
+      [
+        {
+          text: "Objectif de la branche :",
+          style: "h2",
+        },
+        {
+          text: metaTargets[indic].info
+        },
+        {
+          text: `Source : ${metaTargets[indic].source}`, style: "legendText", margin: [0, 5, 0, 10]
+        },
+      ] :
+      [],
+    // ---------------------------------------------------------------
+    // Providers 
     { text: '', pageBreak: 'after' },
+
     createSectionTitle("Empreinte des principaux fournisseurs", colors),
-    createMainProvidersTable(providers, period, indic),
+    createMainProvidersTable(providers, period, indic, colors),
     ...transparentProviders.length > 0 ? [
       { text: "Fournisseurs ayant publié leur empreinte", style: "h2" },
-      createPublishedProvidersTable(providers, period),
+      createPublishedProvidersTable(providers, period, colors),
     ] : [],
 
   ];
@@ -221,7 +254,7 @@ export const buildStandardReport = async ({
         bold: true,
         color: colors.primary,
         font: "Raleway",
-        margin: [0, 10, 0, 20],
+        margin: [0, 10, 0, 10],
         alignment: "center",
         fontSize: 15
       },
@@ -263,7 +296,7 @@ export const buildStandardReport = async ({
         alignment: 'center'
       },
       table: {
-        margin: [0, 10, 0, 10],
+        margin: [0, 0, 0, 10],
         fontSize: 6,
       },
       tableHeader: {
@@ -288,7 +321,7 @@ export const buildStandardReport = async ({
         bold: true,
       },
       data: {
-        alignment: "right"
+        alignment: "right",
       },
       unit: {
         fontSize: 5,
@@ -331,13 +364,13 @@ const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libel
         return (i === 0 || i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
-        return  highlighted ? colors.primary : colors.light;
+        return highlighted ? colors.primary : colors.light;
       },
       vLineWidth: function (i, node) {
         return 0.5;
       },
       vLineColor: function (i, node) {
-        return  highlighted ? colors.primary : colors.light;
+        return highlighted ? colors.primary : colors.light;
       },
 
     },
@@ -357,92 +390,13 @@ const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libel
   };
 };
 
-const getStatementValue = (impactsData, period, indic) => {
-
-  const { statementUnits } = metaIndics[indic];
-  const impactsDataOnPeriod = impactsData[period.periodKey];
-
-  switch (indic) {
-    case "eco":
-      return printValue(impactsDataOnPeriod.domesticProduction, 0);
-    case "soc":
-      return impactsDataOnPeriod.hasSocialPurpose ? "Oui" : "Non";
-    case "art":
-      return impactsDataOnPeriod.craftedProduction > 0 ? "Oui" : "Non";
-    case "idr":
-      return printValue(impactsDataOnPeriod.interdecileRange, 1);
-    case "geq":
-      return impactsDataOnPeriod.wageGap;
-    case "knw":
-      return printValue(impactsDataOnPeriod.researchAndTrainingContribution, 0);
-    case "ghg":
-      return printValue(parseFloat(impactsDataOnPeriod.greenhouseGasEmissions) * statementUnits[impactsDataOnPeriod.greenhouseGasEmissionsUnit].coef, 0);
-    case "nrg":
-      return printValue(parseFloat(impactsDataOnPeriod.energyConsumption) * statementUnits[impactsDataOnPeriod.energyConsumptionUnit].coef, 0);
-    case "wat":
-      return printValue(parseFloat(impactsDataOnPeriod.waterConsumption) * statementUnits[impactsDataOnPeriod.waterConsumptionUnit].coef, 0);
-    case "mat":
-      return printValue(parseFloat(impactsDataOnPeriod.materialsExtraction) * statementUnits[impactsDataOnPeriod.materialsExtractionUnit].coef, 0);
-    case "was":
-      return printValue(parseFloat(impactsDataOnPeriod.wasteProduction) * statementUnits[impactsDataOnPeriod.wasteProductionUnit].coef, 0);
-    case "haz":
-      return printValue(parseFloat(impactsDataOnPeriod.hazardousSubstancesUse) * statementUnits[impactsDataOnPeriod.hazardousSubstancesUseUnit].coef, 0);
-    default:
-      return "-";
-  }
-};
-
-const getIndirectImpact = (intermediateConsumptions, fixedCapitalConsumptions, period, indic) => {
-  const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
-
-  const indicsWithGrossImpact = new Set([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat"
-  ]);
-
-  const showGrossImpact = indicsWithGrossImpact.has(indic);
-
-  const intermediateData = intermediateConsumptions.periodsData[period.periodKey];
-  const fixedCapitalData = fixedCapitalConsumptions.periodsData[period.periodKey];
-
-  const intermediateAmount = intermediateData?.amount || 0;
-  const fixedCapitalAmount = fixedCapitalData?.amount || 0;
-
-  const intermediateIndicator = intermediateData?.footprint.indicators[indic];
-  const fixedCapitalIndicator = fixedCapitalData?.footprint.indicators[indic];
-
-  if (showGrossImpact) {
-    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getGrossImpact(intermediateAmount) : 0;
-    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getGrossImpact(fixedCapitalAmount) : 0;
-
-    const totalIndirectImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
-    return { value: printValue(totalIndirectImpact, nbDecimals), unit: unitAbsolute };
-  } else {
-
-    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getValue() * intermediateAmount : 0;
-    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getValue() * fixedCapitalAmount : 0;
-
-    const totalAmount = intermediateAmount + fixedCapitalAmount;
-    const totalGrossImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
-    const indirectImpact = totalAmount > 0 ? totalGrossImpact / totalAmount : 0;
-
-    const value = printValue(parseFloat(indirectImpact), nbDecimals)
-
-    return { value, unit };
-  }
-};
-
 const createFinancialChartsSection = (
   valueAddedChart,
   intermediateConsumptionsChart,
   fixedCapitalConsumptionsChart
 ) => {
   return {
-    margin: [0, 20, 0, 20],
+    margin: [0, 0, 0, 10],
     columnGap: 20,
     columns: [
       {
@@ -493,84 +447,115 @@ const createFinancialChartsSection = (
     ],
   };
 };
+// ----------------------------------------------------------------------------------------------------
+// Production
 
-const createProductionSection = (period,indic,unit,precision ,colors,production,comparativeData,productionChartImage, analysisNotes) => {
+const createProductionSection = (period, indic, unit, precision, colors, production, comparativeData, productionChartImage, analysisNotes) => {
 
   const branchProductionFootprint = comparativeData.production.division.history.data[indic]?.[comparativeData.netValueAdded.division.history.data[indic].length - 1] ?? null;
-
+  const branchProductionTarget = comparativeData.production.division.target.data[indic]?.filter(value => value.path === "GEO")?.[comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
   const tableBody = [
     [
       {
         text: "",
-        style : "tableHeader",
-        alignment : "right",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Unité",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
       },
       {
         text: "Empreinte",
         style: "tableHeader",
+        border: [false, true, false, false]
+
       },
       {
         text: "Empreinte\nde la branche",
         style: "tableHeader",
-        alignment : "right",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Objectif\nsectoriel",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
       },
     ],
     [
       {
         text: "Production",
+        border: [false, false, false, true]
+
+      },
+      {
+        text: unit,
+        style: "unit",
+        border: [false, false, false, true]
       },
       {
         text:
           printValue(
             production.periodsData[period.periodKey].footprint.indicators[indic].value,
             precision
-          ) + " " + unit,
+          ),
         style: "data",
+        border: [false, false, false, true]
+
       },
       {
-        text: branchProductionFootprint?.value  + " " + unit ?? " - ",
-        style: "data"
+        text: branchProductionFootprint?.value ?? " - ",
+        style: "data",
+        border: [false, false, false, true]
+      },
+      {
+        text: branchProductionTarget?.value ?? " - ",
+        style: "data",
+        border: [false, false, false, true]
       },
     ],
-   
+
   ];
 
 
   return {
+    columnGap: 20,
     columns: [
       {
-        width: '40%',
-        columnGap: 20,
+        width: '45%',
         stack: [
           {
             text: "Empreinte de la production",
             style: "h3",
-            margin: [0, 10, 0, 10],
+            margin: [0, 0, 0, 10],
           },
           {
             image: productionChartImage,
-            width: 180,
+            width: 200,
           },
           {
             table: {
               headerRows: 1,
-              widths: ['*', 'auto', 'auto'],
+              widths: ['*', 'auto', 'auto', 'auto', 'auto'],
               body: tableBody,
             },
+            defaultBorder: false,
             layout: {
               hLineWidth: function (i, node) {
-                return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+                return (i === 0 || i === node.table.body.length) ? 0.5 : 0;
               },
               hLineColor: function (i, node) {
-                return (i === 5 || i === 7) ? colors.light : colors.primary;
+                return colors.primary;
               },
-              vLineWidth: function (i, node) {
-                return 0
-              },
-       
+
             },
             style: 'table',
-            margin: [0, 10, 0, 0]
+            margin: [0, 5, 0, 0]
           }
         ],
       },
@@ -579,7 +564,7 @@ const createProductionSection = (period,indic,unit,precision ,colors,production,
         stack: [
 
           {
-            margin: [0, 10, 0, 10],
+            margin: [0, 0, 0, 10],
             text: "Note d'analyse",
             style: "h3",
           },
@@ -591,6 +576,201 @@ const createProductionSection = (period,indic,unit,precision ,colors,production,
     ],
   };
 };
+
+// ----------------------------------------------------------------------------------------------------
+// Objectifs
+
+const createTargetTableSection = (
+  comparativeData,
+  mainAggregates,
+  indic,
+  unit,
+  period,
+  precision,
+  colors
+) => {
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded,
+  } = mainAggregates;
+
+
+  const branchProductionTarget = comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
+  const branchNetValueAddedTarget = comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
+  const branchIntermediateConsumptionsTarget = comparativeData.intermediateConsumptions.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.intermediateConsumptions.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
+  const branchFixedCapitalConsumptionsTarget = comparativeData.fixedCapitalConsumptions.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.fixedCapitalConsumptions.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
+
+  const tableBody = [
+    [
+      {
+        text: "Agrégat",
+        style: "tableHeader",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Unité",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Empreinte",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Objectif\nsectoriel",
+        style: "tableHeader",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+      {
+        text: "Effort à fournir\nd'ici 2030",
+        style: "tableHeaderDark",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+    ],
+    [
+      {
+        text: "Production",
+        border: [false, false, false, true]
+      },
+      {
+        text: unit, style: "unit", border: [false, false, false, true]
+      },
+      {
+        text:
+          printValue(
+            production.periodsData[period.periodKey].footprint.indicators[indic].value,
+            precision
+          ),
+        style: "data",
+        border: [false, false, false, true]
+      },
+      {
+        text: branchProductionTarget?.value ?? " - ",
+        style: "data",
+        border: [false, false, false, true]
+      },
+      {
+        style: "data",
+        text: branchProductionTarget ? getEffortPercentage(production.periodsData[period.periodKey].footprint.indicators[indic].value, branchProductionTarget?.value) + " %" : " - ",
+        border: [false, false, false, true]
+
+      },
+    ],
+    [
+      {
+        text: "Details",
+        bold: true, italics: true, colSpan: "5"
+      },
+
+    ],
+    [
+      {
+        text: "Consommations intermédiaires",
+        margin: [5, 0, 0, 0]
+      },
+      { text: unit, style: "unit" },
+      {
+        text:
+          printValue(
+            intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+            precision
+          ),
+        style: "data",
+      },
+      {
+        text: branchIntermediateConsumptionsTarget?.value ?? " - ",
+        style: "data"
+      },
+      {
+        style: "data",
+        text: branchIntermediateConsumptionsTarget ? getEffortPercentage(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value, branchIntermediateConsumptionsTarget?.value) + " %" : " - "
+      },
+
+    ],
+
+    [
+      {
+        text: "Consommations de capital fixe",
+        margin: [5, 0, 0, 0]
+      },
+      { text: unit, style: "unit" },
+      {
+        text: printValue(
+          fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+          precision
+        ),
+        style: "data",
+      },
+      {
+        text: branchFixedCapitalConsumptionsTarget?.value ?? " - ",
+        style: "data"
+      },
+      {
+        style: "data",
+        text: branchFixedCapitalConsumptionsTarget ? getEffortPercentage(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value, branchFixedCapitalConsumptionsTarget?.value) + " %" : " - "
+      },
+
+    ],
+
+    [
+      {
+        text: "Valeur ajoutée nette",
+        margin: [5, 0, 0, 0],
+        border: [false, false, false, true]
+      },
+      { text: unit, style: "unit", border: [false, false, false, true] },
+      {
+        text: printValue(
+          netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
+          precision
+        ),
+        style: "data",
+        border: [false, false, false, true]
+      },
+      {
+        text: branchNetValueAddedTarget?.value ?? " - ",
+        style: "data",
+        border: [false, false, false, true]
+      },
+      {
+        style: "data",
+        text: branchNetValueAddedTarget ? getEffortPercentage(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value, branchNetValueAddedTarget?.value) + " %" : " - ",
+        border: [false, false, false, true]
+
+      },
+
+    ],
+  ];
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: {
+      defaultBorder: false,
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === node.table.body.length) ? 0.5 : 1;
+      },
+      hLineColor: function (i, node) {
+        return (i === 0 || i === node.table.body.length) ? colors.primary : colors.light;
+      },
+    },
+    style: 'table',
+  };
+}
+// ----------------------------------------------------------------------------------------------------
+// Ecart branche
+
 const createAggregatesTableSection = (
   comparativeData,
   mainAggregates,
@@ -619,28 +799,42 @@ const createAggregatesTableSection = (
       {
         text: "Agrégat",
         style: "tableHeader",
+        border: [false, true, false, false]
       },
       {
         text: "Unité",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, false]
       },
       {
         text: "Empreinte",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, false]
       },
       {
         text: "Empreinte\nbranche",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "right",
+        border: [false, true, false, false]
       },
+      {
+        text: "Ecart par rapport\nà la branche",
+        style: "tableHeaderDark",
+        alignment: "right",
+        border: [false, true, false, false]
+      },
+
     ],
     [
       {
         text: "Production",
+        border: [false, false, false, true]
       },
-      { text: unit, style: "unit" },
+      {
+        text: unit, style: "unit", border: [false, false, false, true]
+      },
       {
         text:
           printValue(
@@ -648,22 +842,31 @@ const createAggregatesTableSection = (
             precision
           ),
         style: "data",
+        border: [false, false, false, true]
       },
       {
         text: branchProductionFootprint?.value ?? " - ",
-        style: "data"
+        style: "data",
+        border: [false, false, false, true]
       },
+      createMarginTextCell(
+        production.periodsData[period.periodKey].footprint.indicators[indic].value,
+        branchProductionFootprint?.value,
+        true
+      ),
+
     ],
     [
       {
         text: "Details",
-        bold: true, italics: true, colSpan: "4"
+        bold: true, italics: true, colSpan: "5"
       },
 
     ],
     [
       {
         text: "Consommations intermédiaires",
+        margin: [5, 0, 0, 0]
       },
       { text: unit, style: "unit" },
       {
@@ -678,10 +881,16 @@ const createAggregatesTableSection = (
         text: branchIntermediateConsumptionsFootprint?.value ?? " - ",
         style: "data"
       },
+      createMarginTextCell(
+        intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+        branchIntermediateConsumptionsFootprint?.value,
+        false
+      ),
     ],
     [
       {
         text: "Consommations de capital fixe",
+        margin: [5, 0, 0, 0]
       },
       { text: unit, style: "unit" },
       {
@@ -695,197 +904,41 @@ const createAggregatesTableSection = (
         text: branchFixedCapitalConsumptionsFootprint?.value ?? " - ",
         style: "data"
       },
+      createMarginTextCell(
+        fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+        branchFixedCapitalConsumptionsFootprint?.value,
+        false
+      ),
+
     ],
 
     [
       {
         text: "Valeur ajoutée nette",
+        margin: [5, 0, 0, 0],
+        border: [false, false, false, true]
       },
-      { text: unit, style: "unit" },
+      {
+        text: unit, style: "unit", border: [false, false, false, true]
+      },
       {
         text: printValue(
           netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
           precision
         ),
         style: "data",
+        border: [false, false, false, true]
       },
       {
         text: branchNetValueAddedFootprint?.value ?? " - ",
-        style: "data"
-      },
-    ],
-  ];
-
-  return {
-    table: {
-      headerRows: 1,
-      widths: ['*', 'auto', 'auto', 'auto'],
-      body: tableBody,
-    },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
-      },
-      hLineColor: function (i, node) {
-        return (i === 5 || i === 7) ? colors.light : colors.primary;
-      },
-      vLineWidth: function (i, node) {
-        return 0
-      },
-      paddingTop: function (i, node) { return i === 0 ? 2 : 3; },
-      paddingBottom: function (i, node) { return i === 0 ? 2 : 3; },
-    },
-    style: 'table',
-    margin: [0, 0, 0, 20]
-  };
-}
-const createTargetTableSection = (
-  comparativeData,
-  mainAggregates,
-  indic,
-  unit,
-  period,
-  precision,
-  colors
-) => {
-
-  const {
-    production,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    netValueAdded,
-  } = mainAggregates;
-
-
-  const branchProductionTarget = comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
-const branchNetValueAddedTarget = comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.netValueAdded.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
-const branchIntermediateConsumptionsTarget = comparativeData.intermediateConsumptions.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.intermediateConsumptions.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
-const branchFixedCapitalConsumptionsTarget = comparativeData.fixedCapitalConsumptions.division.target.data[indic].filter(value => value.path === "GEO")?.[comparativeData.fixedCapitalConsumptions.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
-
-  const tableBody = [
-    [
-      {
-        text: "Agrégat",
-        style: "tableHeader",
-      },
-      {
-        text: "Unité",
-        style: "tableHeader",
-        alignment: "right"
-      },
-      {
-        text: "Empreinte",
-        style: "tableHeader",
-        alignment: "right"
-      },
-      {
-        text: "Objectif\nsectoriel",
-        style: "tableHeader",
-        alignment: "right"
-      },
-      {
-        text: "Effort à fournir\nd'ici 2030",
-        style: "tableHeaderDark",
-        alignment: "right"
-      },
-    ],
-    [
-      {
-        text: "Production",
-      },
-      { text: unit, style: "unit" },
-      {
-        text:
-          printValue(
-            production.periodsData[period.periodKey].footprint.indicators[indic].value,
-            precision
-          ),
         style: "data",
+        border: [false, false, false, true]
       },
-      {
-        text: branchProductionTarget?.value ?? " - ",
-        style: "data"
-      },
-      {
-        style: "data",
-        text: branchProductionTarget ? getEffortPercentage(production.periodsData[period.periodKey].footprint.indicators[indic].value, branchProductionTarget?.value) + " %" : " - "
-      },
-    ],
-    [
-      {
-        text: "Details",
-        bold: true, italics: true, colSpan: "5"
-      },
-
-    ],
-    [
-      {
-        text: "Consommations intermédiaires",
-      },
-      { text: unit, style: "unit" },
-      {
-        text:
-          printValue(
-            intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
-            precision
-          ),
-        style: "data",
-      },
-      {
-        text: branchIntermediateConsumptionsTarget?.value ?? " - ",
-        style: "data"
-      },
-      {
-        style: "data",
-        text: branchIntermediateConsumptionsTarget ? getEffortPercentage(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value, branchIntermediateConsumptionsTarget?.value) + " %" : " - "
-      },
-
-    ],
-
-    [
-      {
-        text: "Consommations de capital fixe",
-      },
-      { text: unit, style: "unit" },
-      {
-        text: printValue(
-          fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
-          precision
-        ),
-        style: "data",
-      },
-      {
-        text: branchFixedCapitalConsumptionsTarget?.value ?? " - ",
-        style: "data"
-      },
-      {
-        style: "data",
-        text: branchFixedCapitalConsumptionsTarget ? getEffortPercentage(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value, branchFixedCapitalConsumptionsTarget?.value) + " %" : " - "
-      },
-
-    ],
-
-    [
-      {
-        text: "Valeur ajoutée nette",
-      },
-      { text: unit, style: "unit" },
-      {
-        text: printValue(
-          netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
-          precision
-        ),
-        style: "data",
-      },
-      {
-        text: branchNetValueAddedTarget?.value ?? " - ",
-        style: "data"
-      },
-      {
-        style: "data",
-        text: branchNetValueAddedTarget ? getEffortPercentage(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value, branchNetValueAddedTarget?.value) + " %" : " - "
-      },
-
+      createMarginTextCell(
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
+        branchNetValueAddedFootprint?.value,
+        true
+      ),
     ],
   ];
 
@@ -896,27 +949,30 @@ const branchFixedCapitalConsumptionsTarget = comparativeData.fixedCapitalConsump
       body: tableBody,
     },
     layout: {
+      defaultBorder: false,
       hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 0;
+        return (i === 0 || i === node.table.body.length) ? 0.5 : 1;
       },
       hLineColor: function (i, node) {
-        return colors.primary;
+        return (i === 0 || i === node.table.body.length) ? colors.primary : colors.light;
       },
-      vLineWidth: function (i, node) {
-        return 0
-      },
-      paddingTop: function (i, node) { return 2; },
-      paddingBottom: function (i, node) { return 2; },
     },
     style: 'table',
-    margin: [0, 0, 0, 20]
+  };
+}
+const createMarginTextCell = (value, branchValue, borderRight) => {
+
+  const marginPercentage = getMarginPercentage(value, branchValue);
+  return {
+    text: marginPercentage == 0.0 ? '=' : `${marginPercentage > 0 ? '+ ' : '- '}${roundValue(Math.abs(marginPercentage), 0)} %`, style: "data",
+    border: [false, false, false, borderRight ? true : false]
   };
 }
 
 // ----------------------------------------------------------------------------------------------------
 // Providers table
 
-const createMainProvidersTable = (providers, period, indic) => {
+const createMainProvidersTable = (providers, period, indic, colors) => {
   const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#36c575" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"></path></svg>';
 
   // Filtrage des fournisseurs
@@ -1048,28 +1104,13 @@ const createMainProvidersTable = (providers, period, indic) => {
       widths: ['auto', 50, '*', 'auto', 'auto', 'auto'],
       body: tableBody,
     },
-    layout: {
-      hLineWidth: function (i, node) {
-        return (i === 0 || i === 1 | i === node.table.body.length - 1) ? 0.5 : 0;
-      },
-      hLineColor: function (i, node) {
-        return '#191558';
-      },
-      vLineWidth: function (i, node) {
-        return 0;
-      },
-      vLineColor: function (i, node) {
-        return '#191558';
-      },
-      paddingTop: function (i, node) { return (i === 0) ? 1 : 3; },
-      paddingBottom: function (i, node) { return (i === 0) ? 1 : 3; },
-    },
+    layout: tableLayout(colors),
     style: 'table',
     margin: [0, 0, 0, 25],
   };
 };
 
-const createPublishedProvidersTable = (providers, period) => {
+const createPublishedProvidersTable = (providers, period, colors) => {
 
 
   // Tri des fournisseurs par montant d'achats
@@ -1129,13 +1170,93 @@ const createPublishedProvidersTable = (providers, period) => {
       widths: ['auto', 50, '*'],
       body: tableBody,
     },
-    layout: tableLayout(),
+    layout: tableLayout(colors),
     style: 'table',
     margin: [0, 0, 0, 5],
   };
 };
 
+// ----------------------------------------------------------------------------------------------------
+// Utils
 
+const getStatementValue = (impactsData, period, indic) => {
+
+  const { statementUnits } = metaIndics[indic];
+  const impactsDataOnPeriod = impactsData[period.periodKey];
+
+  switch (indic) {
+    case "eco":
+      return printValue(impactsDataOnPeriod.domesticProduction, 0);
+    case "soc":
+      return impactsDataOnPeriod.hasSocialPurpose ? "Oui" : "Non";
+    case "art":
+      return impactsDataOnPeriod.craftedProduction > 0 ? "Oui" : "Non";
+    case "idr":
+      return printValue(impactsDataOnPeriod.interdecileRange, 1);
+    case "geq":
+      return impactsDataOnPeriod.wageGap;
+    case "knw":
+      return printValue(impactsDataOnPeriod.researchAndTrainingContribution, 0);
+    case "ghg":
+      return printValue(parseFloat(impactsDataOnPeriod.greenhouseGasEmissions) * statementUnits[impactsDataOnPeriod.greenhouseGasEmissionsUnit].coef, 0);
+    case "nrg":
+      return printValue(parseFloat(impactsDataOnPeriod.energyConsumption) * statementUnits[impactsDataOnPeriod.energyConsumptionUnit].coef, 0);
+    case "wat":
+      return printValue(parseFloat(impactsDataOnPeriod.waterConsumption) * statementUnits[impactsDataOnPeriod.waterConsumptionUnit].coef, 0);
+    case "mat":
+      return printValue(parseFloat(impactsDataOnPeriod.materialsExtraction) * statementUnits[impactsDataOnPeriod.materialsExtractionUnit].coef, 0);
+    case "was":
+      return printValue(parseFloat(impactsDataOnPeriod.wasteProduction) * statementUnits[impactsDataOnPeriod.wasteProductionUnit].coef, 0);
+    case "haz":
+      return printValue(parseFloat(impactsDataOnPeriod.hazardousSubstancesUse) * statementUnits[impactsDataOnPeriod.hazardousSubstancesUseUnit].coef, 0);
+    default:
+      return "-";
+  }
+};
+
+const getIndirectImpact = (intermediateConsumptions, fixedCapitalConsumptions, period, indic) => {
+  const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
+
+  const indicsWithGrossImpact = new Set([
+    "ghg",
+    "haz",
+    "mat",
+    "nrg",
+    "was",
+    "wat"
+  ]);
+
+  const showGrossImpact = indicsWithGrossImpact.has(indic);
+
+  const intermediateData = intermediateConsumptions.periodsData[period.periodKey];
+  const fixedCapitalData = fixedCapitalConsumptions.periodsData[period.periodKey];
+
+  const intermediateAmount = intermediateData?.amount || 0;
+  const fixedCapitalAmount = fixedCapitalData?.amount || 0;
+
+  const intermediateIndicator = intermediateData?.footprint.indicators[indic];
+  const fixedCapitalIndicator = fixedCapitalData?.footprint.indicators[indic];
+
+  if (showGrossImpact) {
+    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getGrossImpact(intermediateAmount) : 0;
+    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getGrossImpact(fixedCapitalAmount) : 0;
+
+    const totalIndirectImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
+    return { value: printValue(totalIndirectImpact, nbDecimals), unit: unitAbsolute };
+  } else {
+
+    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getValue() * intermediateAmount : 0;
+    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getValue() * fixedCapitalAmount : 0;
+
+    const totalAmount = intermediateAmount + fixedCapitalAmount;
+    const totalGrossImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
+    const indirectImpact = totalAmount > 0 ? totalGrossImpact / totalAmount : 0;
+
+    const value = printValue(parseFloat(indirectImpact), nbDecimals)
+
+    return { value, unit };
+  }
+};
 
 const createSectionTitle = (label, colors) => {
 
@@ -1166,23 +1287,23 @@ const createSectionTitle = (label, colors) => {
       paddingLeft: function (i, node) { return 0 },
       paddingBottom: function (i, node) { return 4 },
     },
-    margin: [0, 10, 0, 10],
+    margin: [0, 10, 0, 20],
   };
 };
 
-const tableLayout = () => {
+const tableLayout = (colors) => {
   return {
     hLineWidth: function (i, node) {
       return (i === 0 || i === 1 | i === node.table.body.length) ? 0.5 : 0;
     },
     hLineColor: function (i, node) {
-      return '#191558';
+      return colors.primary;
     },
     vLineWidth: function (i, node) {
       return 0;
     },
     vLineColor: function (i, node) {
-      return '#191558';
+      return colors.primary;
     },
     paddingTop: function (i, node) { return (i === 0) ? 1 : 3; },
     paddingBottom: function (i, node) { return (i === 0) ? 1 : 3; },
