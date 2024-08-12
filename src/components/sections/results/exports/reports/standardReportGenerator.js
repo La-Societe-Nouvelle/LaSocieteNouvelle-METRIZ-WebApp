@@ -20,6 +20,7 @@ import { getPrevPeriod } from "../../../../../utils/periodsUtils";
 import { getEffortPercentage, getMarginPercentage } from "./summaryReportGeneratorESE";
 import { hasComparativeData } from "../../utils";
 import { roundValue } from "../../../../../utils/Utils";
+import { createGHGDetailsTable, createNRGDetailsTable } from "./utils/statementDetails";
 
 
 // --------------------------------------------------------------------------
@@ -39,10 +40,10 @@ export const buildStandardReport = async ({
 }) => {
   // Session data --------------------------------------------------
 
-  const { legalUnit, financialData, impactsData, comparativeData, analysis, availablePeriods } = session;
+  const { legalUnit, financialData, impactsData, comparativeData, analysis, availablePeriods, } = session;
 
-  const { mainAggregates, productionAggregates, providers } = financialData;
-  const { production, intermediateConsumptions, fixedCapitalConsumptions } = mainAggregates;
+  const { mainAggregates, productionAggregates, providers, externalExpensesAccounts, immobilisations } = financialData;
+  const { production, intermediateConsumptions, fixedCapitalConsumptions, netValueAdded } = mainAggregates;
 
   const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
@@ -57,7 +58,6 @@ export const buildStandardReport = async ({
 
   // Data
 
-  const statementValue = getStatementValue(impactsData, period, indic);
   const indirectImpact = getIndirectImpact(intermediateConsumptions, fixedCapitalConsumptions, period, indic);
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
 
@@ -112,7 +112,7 @@ export const buildStandardReport = async ({
       text: `${libelle}`,
       style: "h1",
     },
-    createKeyFigures(indirectImpact, statementValue, unitDeclaration, libelleDeclaration, libelleIndirect, production, period, prevPeriod, indic, unit, colors),
+    createKeyFigures(indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, precision, period, prevPeriod, indic, unit, colors),
 
     // ---------------------------------------------------------------
     // SIG
@@ -121,21 +121,62 @@ export const buildStandardReport = async ({
 
     // ---------------------------------------------------------------
     // Statement 
-    {
-      text: "Déclaration",
-      style: "h2",
-    },
+
+    createSectionTitle("Déclaration", colors),
+
     statementNotes.map((note) => note),
+    getStatementDetails(impactsData[period.periodKey], indic, colors),
     {
-      text: `- ${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`, margin: [0, 5, 0, 10]
+      text: `${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`, margin: [0, 5, 0, 10]
     },
 
     // ---------------------------------------------------------------
     // Production Footprint & Analysis
+    { text: '', pageBreak: 'after' },
 
-    createSectionTitle("Analyse de la performance", colors),
+    createSectionTitle("Performance globale", colors),
     createProductionSection(period, indic, unit, precision, colors, production, comparativeData, productionChart, analysisNotes),
 
+
+    // ---------------------------------------------------------------
+    // Trend & Target
+    createSectionTitle("Evolution de la performance", colors),
+    {
+      image: trendChart,
+      width: 515,
+      alignment: "center",
+      margin: [0, 0, 0, 5]
+    },
+
+    {
+      text: "Tendance de la branche :",
+      style: "h2",
+    },
+
+    {
+      text: "La courbe de tendance correspond à une projection des empreintes observées sur les dix dernières années.Les valeurs actuelles " +
+        "s'appuient sur l'hypothèse d’une structure macroéconomique inchangée.Des travaux sont en cours pour proposer des valeurs tenant compte de l’évolution tendancielle de la structure de " +
+        "l'économie nationale, ses interactions avec l’extérieur et de la dynamique des prix par branche."
+    },
+    {
+      text: `Source : ${metaTrends[indic].source}`, margin: [0, 5, 0, 0], style: "legendText"
+    },
+    metaTargets[indic] ?
+      [
+
+        {
+          text: "Objectif de la branche :",
+          style: "h2",
+          margin: [0, 5, 0, 10]
+        },
+        {
+          text: metaTargets[indic].info
+        },
+        {
+          text: `Source : ${metaTargets[indic].source}`, style: "legendText", margin: [0, 5, 0, 0]
+        },
+      ] :
+      [],
 
     // ---------------------------------------------------------------
     // Target 
@@ -153,7 +194,7 @@ export const buildStandardReport = async ({
         createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors)
       ] :
       [
-        { text: "Aucun objectif sectoriel défini pour cet indicateur." }
+        { text: "Aucun objectif sectoriel défini pour cet indicateur.", margin: [0, 0, 0, 30] }
       ],
 
     // ---------------------------------------------------------------
@@ -167,47 +208,6 @@ export const buildStandardReport = async ({
     ),
     createAggregatesTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors),
 
-    isTargetDataAvailable ? [
-      { text: '', pageBreak: 'after' },
-    ] : [],
-
-    // ---------------------------------------------------------------
-    // Trend & Target
-    createSectionTitle("Evolution de la performance", colors),
-    {
-      image: trendChart,
-      width: 515,
-      alignment: "center",
-      margin: [0, 0, 0, 10]
-    },
-
-    {
-      text: "Tendance de la branche :",
-      style: "h2",
-    },
-
-    {
-      text: "La courbe de tendance correspond à une projection des empreintes observées sur les dix dernières années.Les valeurs actuelles " +
-        "s'appuient sur l'hypothèse d’une structure macroéconomique inchangée.Des travaux sont en cours pour proposer des valeurs tenant compte de l’évolution tendancielle de la structure de " +
-        "l'économie nationale, ses interactions avec l’extérieur et de la dynamique des prix par branche."
-    },
-    {
-      text: `Source : ${metaTrends[indic].source}`, margin: [0, 5, 0, 10], style: "legendText"
-    },
-    metaTargets[indic] ?
-      [
-        {
-          text: "Objectif de la branche :",
-          style: "h2",
-        },
-        {
-          text: metaTargets[indic].info
-        },
-        {
-          text: `Source : ${metaTargets[indic].source}`, style: "legendText", margin: [0, 5, 0, 10]
-        },
-      ] :
-      [],
     // ---------------------------------------------------------------
     // Providers 
     { text: '', pageBreak: 'after' },
@@ -218,6 +218,15 @@ export const buildStandardReport = async ({
       { text: "Fournisseurs ayant publié leur empreinte", style: "h2" },
       createPublishedProvidersTable(providers, period, colors),
     ] : [],
+    // ---------------------------------------------------------------
+    // Détails comptes de charge
+    { text: '', pageBreak: 'after' },
+    createSectionTitle("Empreinte des comptes de charges", colors),
+    createExternalExpensesAccountsTable(externalExpensesAccounts, period, indic, colors),
+    // ---------------------------------------------------------------
+    // Détails Immo
+    createSectionTitle("Empreinte des immobilisations", colors),
+    // createImmobilisationsTable(immobilisations, period, indic, colors),
 
   ];
 
@@ -339,11 +348,12 @@ export const buildStandardReport = async ({
 };
 
 
-const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libelleDeclaration, libelleIndirect, production, period, prevPeriod, indic, unit, colors) => {
+const createKeyFigures = (indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, precision, period, prevPeriod, indic, unit, colors) => {
 
-  const footprint = production.periodsData[period.periodKey].footprint.indicators[indic].value;
+  const productionFootprint = production.periodsData[period.periodKey].footprint.indicators[indic].value.toFixed(precision);
+  const netValueAddedFootprint = netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value.toFixed(precision);
 
-  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : " - ";
+  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value.toFixed(precision) : " - ";
 
   const createTableColumn = (value, label, unit, highlighted) => ({
     width: '*',
@@ -379,11 +389,11 @@ const createKeyFigures = (indirectImpact, statementValue, unitDeclaration, libel
 
   return {
     alignment: 'center',
-    margin: [0, 5, 0, 5],
+    margin: [0, 5, 0, 20],
     columnGap: 20,
     columns: [
-      createTableColumn(footprint, "Empreinte\nde la production", unit, true),
-      createTableColumn(statementValue, libelleDeclaration, unitDeclaration, false),
+      createTableColumn(productionFootprint, "Empreinte\nde la production", unit, true),
+      createTableColumn(netValueAddedFootprint, libelleDeclaration, unit, false),
       createTableColumn(indirectImpact.value, libelleIndirect, indirectImpact.unit, false),
       createTableColumn(prevFootprint, "Evolution par rapport à l'exercice précédent", prevPeriod ? unitDeclaration : "", false),
     ],
@@ -474,29 +484,19 @@ const createProductionSection = (period, indic, unit, precision, colors, product
         border: [false, true, false, false]
 
       },
-      {
-        text: "Empreinte\nde la branche",
-        style: "tableHeader",
-        alignment: "right",
-        border: [false, true, false, false]
-      },
-      {
-        text: "Objectif\nsectoriel",
-        style: "tableHeader",
-        alignment: "right",
-        border: [false, true, false, false]
-      },
+
     ],
     [
       {
         text: "Production",
-        border: [false, false, false, true]
+        border: [false, false, false, false]
 
       },
       {
         text: unit,
         style: "unit",
-        border: [false, false, false, true]
+        border: [false, false, false, false]
+
       },
       {
         text:
@@ -505,12 +505,37 @@ const createProductionSection = (period, indic, unit, precision, colors, product
             precision
           ),
         style: "data",
-        border: [false, false, false, true]
+        border: [false, false, false, false]
 
+      },
+
+    ],
+    [
+      {
+        text: "Moyenne de la branche",
+        border: [false, false, false, false]
+      },
+      {
+        text: unit,
+        style: "unit",
+        border: [false, false, false, false]
       },
       {
         text: branchProductionFootprint?.value ?? " - ",
         style: "data",
+        border: [false, false, false, false]
+      },
+
+    ],
+    [
+      {
+        text: "Objectif sectoriel",
+        border: [false, false, false, true]
+
+      },
+      {
+        text: unit,
+        style: "unit",
         border: [false, false, false, true]
       },
       {
@@ -541,7 +566,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
           {
             table: {
               headerRows: 1,
-              widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['*', 'auto', 'auto'],
               body: tableBody,
             },
             defaultBorder: false,
@@ -555,7 +580,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
 
             },
             style: 'table',
-            margin: [0, 5, 0, 0]
+            margin: [0, 5, 0, 20]
           }
         ],
       },
@@ -564,7 +589,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
         stack: [
 
           {
-            margin: [0, 0, 0, 10],
+            margin: [0, 0, 0, 20],
             text: "Note d'analyse",
             style: "h3",
           },
@@ -766,6 +791,7 @@ const createTargetTableSection = (
       },
     },
     style: 'table',
+    margin: [0, 0, 0, 30]
   };
 }
 // ----------------------------------------------------------------------------------------------------
@@ -1177,6 +1203,149 @@ const createPublishedProvidersTable = (providers, period, colors) => {
 };
 
 // ----------------------------------------------------------------------------------------------------
+// External Accounts table
+const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, indic,colors) => {
+
+  const { unit, nbDecimals } = metaIndics[indic];
+
+
+  const mainExternalExpenses = externalExpensesAccounts
+   .filter((account) => account.periodsData[period.periodKey].amount > 0)
+   .sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount)
+   .slice(0, 10);
+
+
+  // Préparation des données pour la table
+  const tableBody = [
+    [
+      { text: 'Compte', style: 'tableHeader' },
+      { text: 'Libellé', style: 'tableHeader' },
+      {
+        text: [
+          {
+            text: "Empreinte\n"
+          },
+          {
+            text: unit,
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+      {
+        text: [
+          {
+            text: "Incertitude\n"
+          },
+          {
+            text: "%",
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+
+    ],
+  ];
+
+ 
+  mainExternalExpenses.forEach((account) => {
+
+    const footprintIndicator = account.periodsData[period.periodKey].footprint.indicators[indic];
+
+    tableBody.push([
+      { text: account.accountNum },
+      { text: account.accountLib},
+      { text: printValue(footprintIndicator.getValue(), nbDecimals), style: 'data' },
+      { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data' },
+
+
+    ]);
+  });
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ['auto', '*', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: tableLayout(colors),
+    style: 'table',
+    margin: [0, 0, 0, 30],
+  };
+};
+
+
+// ----------------------------------------------------------------------------------------------------
+// immo table
+const createImmobilisationsTable = (immobilisations, period, indic,colors) => {
+
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  const tableBody = [
+    [
+      { text: 'Compte', style: 'tableHeader' },
+      { text: 'Libellé', style: 'tableHeader' },
+      {
+        text: [
+          {
+            text: "Empreinte\n"
+          },
+          {
+            text: unit,
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+      {
+        text: [
+          {
+            text: "Incertitude\n"
+          },
+          {
+            text: "%",
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+
+    ],
+  ];
+
+ 
+  // mainExternalExpenses.forEach((account) => {
+
+  //   const footprintIndicator = account.periodsData[period.periodKey].footprint.indicators[indic];
+
+  //   tableBody.push([
+  //     { text: account.accountNum },
+  //     { text: account.accountLib},
+  //     { text: printValue(footprintIndicator.getValue(), nbDecimals), style: 'data' },
+  //     { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data' },
+
+
+  //   ]);
+  // });
+
+  return {
+    table: {
+      headerRows: 1,
+      widths: ['auto', '*', 'auto', 'auto'],
+      body: tableBody,
+    },
+    layout: tableLayout(colors),
+    style: 'table',
+    margin: [0, 0, 0, 5],
+  };
+};
+
+// ----------------------------------------------------------------------------------------------------
 // Utils
 
 const getStatementValue = (impactsData, period, indic) => {
@@ -1213,6 +1382,39 @@ const getStatementValue = (impactsData, period, indic) => {
       return "-";
   }
 };
+export const getStatementDetails = (impactsData, indic, colors) => {
+
+  const { unitDeclaration, precision } = metaIndics[indic];
+  switch (indic) {
+    // case "art":
+    //   return createARTDetailsTable(impactsData);
+    // case "idr":
+    //   return createIDRDetailsTable(impactsData);
+    // case "eco":
+    //   return createECODetailsTable(impactsData);
+    // case "geq":
+    //   return createGEQDetailsTable(impactsData);
+    case "ghg":
+      return createGHGDetailsTable(impactsData, unitDeclaration, precision, colors);
+    // case "haz":
+    //   return createHAZDetailsTable(impactsData);
+    // case "knw":
+    //   return createKNWDetailsTable(impactsData);
+    // case "mat":
+    //   return createMATDetailsTable(impactsData);
+    case "nrg":
+      return createNRGDetailsTable(impactsData, unitDeclaration, precision, colors);
+    // case "soc":
+    //   return createSOCDetailsTable(impactsData);
+    // case "was":
+    //   return createWASDetailsTable(impactsData);
+    // case "wat":
+    //   return createWATDetailsTable(impactsData);
+    default:
+      return [];
+  }
+}
+
 
 const getIndirectImpact = (intermediateConsumptions, fixedCapitalConsumptions, period, indic) => {
   const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
@@ -1287,7 +1489,7 @@ const createSectionTitle = (label, colors) => {
       paddingLeft: function (i, node) { return 0 },
       paddingBottom: function (i, node) { return 4 },
     },
-    margin: [0, 10, 0, 20],
+    margin: [0, 0, 0, 20],
   };
 };
 

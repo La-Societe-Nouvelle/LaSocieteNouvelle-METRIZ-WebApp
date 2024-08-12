@@ -4,7 +4,7 @@ export const writeStatementECO = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Valeur ajoutée nette produite en France : " +
+        "Valeur ajoutée nette produite en France : " +
         printValue(impactsData.domesticProduction, 0) +
         " €" +
         (impactsData.isAllActivitiesInFrance ? "*" : ""),
@@ -26,7 +26,7 @@ export const writeStatementART = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Valeur ajoutée artisanale : " +
+        "Valeur ajoutée artisanale : " +
         printValueInput(impactsData.craftedProduction, 0) +
         " €" +
         (impactsData.isValueAddedCrafted ? "*" : ""),
@@ -49,7 +49,7 @@ export const writeStatementGEQ = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Ecart interne de rémunérations Femmes/Hommes : " +
+        "Ecart interne de rémunérations Femmes/Hommes : " +
         printValue(impactsData.wageGap, 0) +
         " %" +
         (!impactsData.hasEmployees ? "*" : ""),
@@ -68,10 +68,12 @@ export const writeStatementGEQ = (impactsData) => {
 };
 
 export const writeStatementGHG = (impactsData) => {
+  console.log("impact",impactsData);
+
   const textStatement = [
     {
       text:
-        "- Emissions directes de gaz à effet de serre : " +
+        "Emissions directes de gaz à effet de serre : " +
         printValue(impactsData.greenhouseGasEmissions, 0) +
         " kgCO2e +/- " +
         printValue(impactsData.greenhouseGasEmissionsUncertainty, 0) +
@@ -86,7 +88,7 @@ export const writeStatementHAZ = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Quantité utilisée de produits dangereux : " +
+        "Quantité utilisée de produits dangereux : " +
         printValue(impactsData.hazardousSubstancesUse, 0) +
         " kg +/- " +
         printValue(impactsData.hazardousSubstancesUseUncertainty, 0) +
@@ -101,7 +103,7 @@ export const writeStatementIDR = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Rapport interdécile D9/D1 interne : " +
+        "Rapport interdécile D9/D1 interne : " +
         printValue(impactsData.interdecileRange, 2) +
         " " +
         (!impactsData.hasEmployees ? "*" : ""),
@@ -124,7 +126,7 @@ export const writeStatementKNW = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Contribution directe à l'évolution des compétences et des connaissances : " +
+        "Contribution directe à l'évolution des compétences et des connaissances : " +
         printValue(impactsData.researchAndTrainingContribution, 0) +
         " €",
     },
@@ -137,7 +139,7 @@ export const writeStatementMAT = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Quantité extraite de matières premières : " +
+        "Quantité extraite de matières premières : " +
         printValue(impactsData.materialsExtraction, 0) +
         " kg +/- " +
         printValue(impactsData.materialsExtractionUncertainty, 0) +
@@ -152,7 +154,7 @@ export const writeStatementNRG = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Consommation d'eau déclarée : " +
+        "Consommation d'énergie déclarée : " +
         printValue(impactsData.energyConsumption, 0) +
         " MJ +/- " +
         printValue(impactsData.energyConsumptionUncertainty, 0) +
@@ -167,7 +169,7 @@ export const writeStatementSOC = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Acteur doté d'une raison sociale : " +
+        "Acteur doté d'une raison sociale : " +
         (impactsData.hasSocialPurpose ? "oui" : "non"),
     },
   ];
@@ -179,7 +181,7 @@ export const writeStatementWAS = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Production directe de déchets : " +
+        "Production directe de déchets : " +
         printValue(impactsData.wasteProduction, 0) +
         " kg +/- " +
         printValue(impactsData.wasteProductionUncertainty, 0) +
@@ -194,7 +196,7 @@ export const writeStatementWAT = (impactsData) => {
   const textStatement = [
     {
       text:
-        "- Consommation d'eau déclarée : " +
+        "Consommation d'eau déclarée : " +
         printValue(impactsData.waterConsumption, 0) +
         " m3 +/- " +
         printValue(impactsData.waterConsumptionUncertainty, 0) +

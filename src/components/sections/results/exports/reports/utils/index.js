@@ -273,3 +273,6 @@ export const getTransparentProviders = (providers,period,indic) => {
     .sort((a,b) => a.legalUnitData.denomination.localeCompare(b.legalUnitData.denomination));
   return transparentProviders
 }
+
+
+

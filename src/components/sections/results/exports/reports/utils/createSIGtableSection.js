@@ -1,4 +1,4 @@
-import { borderColor } from "polished";
+import { borderColor, margin } from "polished";
 import { getLabelPeriod } from "../../../../../../utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 
@@ -29,7 +29,7 @@ export const createSIGtableSection = (
   } = mainAggregates;
 
   const showPrevPeriod = false;
-
+  const currentYear = period.periodKey.slice(2)
   
   // const branchProductionFootprint = comparativeData.production.division.history.data[indic]?.[comparativeData.production.division.history.data[indic].length - 1] ?? null;
   // const branchNetValueAddedFootprint = comparativeData.netValueAdded.division.history.data[indic]?.[comparativeData.netValueAdded.division.history.data[indic].length - 1] ?? null;
@@ -59,7 +59,7 @@ export const createSIGtableSection = (
         style: "tableHeader",
       },
       {
-        text: "Montant",
+        text: `Montant\n${currentYear}`,
         style: "tableHeader",
         alignment: "right",
         border : [false,false,true,false] 
@@ -361,10 +361,10 @@ export const createSIGtableSection = (
     layout: {
       defaultBorder : false,
       hLineWidth: function (i, node) {
-        { return (i === 0 || i === 1 || i === node.table.body.length) ? 0.5 : 1 }
+        return  0.5;
       },
       hLineColor: function (i, node) {
-        { return (i === 0 || i === 1 || i === node.table.body.length) ? colors.primary : colors.light }
+        return  colors.primary;
       },
       vLineWidth: function (i, node) {
         return  0.5;
@@ -373,11 +373,11 @@ export const createSIGtableSection = (
         return  colors.primary;
       },
       paddingRight: function (i, node) { return i === 1 ? 7 : 2; },
-      paddingTop: function (i, node) { return 2 },
-      paddingBottom: function (i, node) { return 2 },
+      paddingTop: function (i, node) { return 3 },
+      paddingBottom: function (i, node) { return 3 },
     },
     style: 'table',
-    margin: [0, 0, 0, 20]
+    margin : [0,0,0,20]
   };
 }
 
