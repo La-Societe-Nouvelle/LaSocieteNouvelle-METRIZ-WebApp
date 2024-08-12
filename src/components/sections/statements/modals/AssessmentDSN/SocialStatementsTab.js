@@ -128,7 +128,7 @@ export const SocialStatementsTab = ({
         files.map(async (file) => 
         {
           const extension = file.name.split(".").pop();
-          if (extension === "edi" || extension === "txt") 
+          if (extension === "edi" || extension === "txt" || extension === "dsn") 
           {
             // read file
             const dataDSN = await new Promise((resolve, reject) => {
@@ -202,7 +202,7 @@ export const SocialStatementsTab = ({
     <div className="assessment">
       <div>
         <p>Importez les déclarations mensuelles</p>
-        <Dropzone onDrop={onDrop} accept={[".edi", ".txt"]}>
+        <Dropzone onDrop={onDrop} accept={[".edi", ".txt", ".dsn"]}>
           {({ getRootProps, getInputProps }) => (
             <div className="dropzone-section">
               <div {...getRootProps()} className="dropzone">
