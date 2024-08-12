@@ -416,7 +416,7 @@ export const getIndividualWorkingHours = (individu, regexPeriod) => {
             .forEach((activite) => {
               heuresDeclaration += getQuotiteTravail(
                 parseInt(activite.mesure),
-                activite.uniteMesure,
+                activite.unite,
                 uniteContrat
               );
             });
@@ -499,7 +499,7 @@ export const getIndividualApprenticeshipHours = (individu, regexPeriod) => {
               .forEach((activite) => {
                 trainingHours += getQuotiteTravail(
                   parseInt(activite.mesure),
-                  activite.uniteMesure,
+                  activite.unite,
                   uniteContrat
                 );
               });
