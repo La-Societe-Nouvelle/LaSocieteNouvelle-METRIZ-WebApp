@@ -70,7 +70,8 @@ export const buildStandardReport = async ({
 
   // Metadata ------------------------------------------------------
 
-  const { libelle, unit, precision, unitDeclaration, libelleDeclaration, libelleIndirect } = metaIndics[indic];
+  const { libelle, unit, nbDecimals, unitDeclaration, libelleDeclaration, libelleIndirect } = metaIndics[indic];
+
   // ---------------------------------------------------------------
   // Charts
 
@@ -112,34 +113,32 @@ export const buildStandardReport = async ({
       text: `${libelle}`,
       style: "h1",
     },
-    createKeyFigures(indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, precision, period, prevPeriod, indic, unit, colors),
+    createKeyFigures(indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, nbDecimals, period, prevPeriod, indic, unit, colors),
 
     // ---------------------------------------------------------------
     // SIG
+
     createSectionTitle("Tableau des résultats", colors),
-    createSIGtableSection(comparativeData, mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, precision, colors),
+    createSIGtableSection(comparativeData, mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, nbDecimals, colors),
 
     // ---------------------------------------------------------------
     // Statement 
 
-    createSectionTitle("Déclaration", colors),
-
-    statementNotes.map((note) => note),
+    createSectionTitle("Impacts directs", colors),
     getStatementDetails(impactsData[period.periodKey], indic, colors),
-    {
-      text: `${libelleIndirect} : ${indirectImpact.value} ${indirectImpact.unit}`, margin: [0, 5, 0, 10]
-    },
+
+    createSectionTitle("Impacts indirects", colors),
 
     // ---------------------------------------------------------------
     // Production Footprint & Analysis
+
     { text: '', pageBreak: 'after' },
-
     createSectionTitle("Performance globale", colors),
-    createProductionSection(period, indic, unit, precision, colors, production, comparativeData, productionChart, analysisNotes),
-
+    createProductionSection(period, indic, unit, nbDecimals, colors, production, comparativeData, productionChart, analysisNotes),
 
     // ---------------------------------------------------------------
     // Trend & Target
+
     createSectionTitle("Evolution de la performance", colors),
     {
       image: trendChart,
@@ -147,12 +146,10 @@ export const buildStandardReport = async ({
       alignment: "center",
       margin: [0, 0, 0, 5]
     },
-
     {
       text: "Tendance de la branche :",
       style: "h2",
     },
-
     {
       text: "La courbe de tendance correspond à une projection des empreintes observées sur les dix dernières années.Les valeurs actuelles " +
         "s'appuient sur l'hypothèse d’une structure macroéconomique inchangée.Des travaux sont en cours pour proposer des valeurs tenant compte de l’évolution tendancielle de la structure de " +
@@ -163,7 +160,6 @@ export const buildStandardReport = async ({
     },
     metaTargets[indic] ?
       [
-
         {
           text: "Objectif de la branche :",
           style: "h2",
@@ -175,13 +171,12 @@ export const buildStandardReport = async ({
         {
           text: `Source : ${metaTargets[indic].source}`, style: "legendText", margin: [0, 5, 0, 0]
         },
-      ] :
-      [],
+      ] : [],
 
     // ---------------------------------------------------------------
     // Target 
-    { text: '', pageBreak: 'after' },
 
+    { text: '', pageBreak: 'after' },
     createSectionTitle("Suivi de l'objectif sectoriel", colors),
 
     isTargetDataAvailable ?
@@ -191,7 +186,7 @@ export const buildStandardReport = async ({
           targetIntermediateConsumptionsChart,
           targetFixedCapitalConsumptionsChart
         ),
-        createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors)
+        createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, nbDecimals, colors)
       ] :
       [
         { text: "Aucun objectif sectoriel défini pour cet indicateur.", margin: [0, 0, 0, 30] }
@@ -199,35 +194,38 @@ export const buildStandardReport = async ({
 
     // ---------------------------------------------------------------
     // Branch 
-    createSectionTitle("Détails de la performance (Comparaison avec la branche)", colors),
 
+    createSectionTitle("Détails de la performance (Comparaison avec la branche)", colors),
     createFinancialChartsSection(
       valueAddedChart,
       intermediateConsumptionsChart,
       fixedCapitalConsumptionsChart
     ),
-    createAggregatesTableSection(comparativeData, mainAggregates, indic, unit, period, precision, colors),
+    createAggregatesTableSection(comparativeData, mainAggregates, indic, unit, period, nbDecimals, colors),
 
     // ---------------------------------------------------------------
     // Providers 
-    { text: '', pageBreak: 'after' },
 
+    { text: '', pageBreak: 'after' },
     createSectionTitle("Empreinte des principaux fournisseurs", colors),
     createMainProvidersTable(providers, period, indic, colors),
     ...transparentProviders.length > 0 ? [
       { text: "Fournisseurs ayant publié leur empreinte", style: "h2" },
       createPublishedProvidersTable(providers, period, colors),
     ] : [],
+
     // ---------------------------------------------------------------
     // Détails comptes de charge
+
     { text: '', pageBreak: 'after' },
     createSectionTitle("Empreinte des comptes de charges", colors),
     createExternalExpensesAccountsTable(externalExpensesAccounts, period, indic, colors),
+
     // ---------------------------------------------------------------
     // Détails Immo
+    
     createSectionTitle("Empreinte des immobilisations", colors),
     createImmobilisationsTable(immobilisations, period, indic, colors),
-
   ];
 
   // ---------------------------------------------------------------
@@ -457,6 +455,7 @@ const createFinancialChartsSection = (
     ],
   };
 };
+
 // ----------------------------------------------------------------------------------------------------
 // Production
 
