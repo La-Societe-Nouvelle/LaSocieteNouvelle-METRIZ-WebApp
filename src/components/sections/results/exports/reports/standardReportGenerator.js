@@ -226,7 +226,7 @@ export const buildStandardReport = async ({
     // ---------------------------------------------------------------
     // Détails Immo
     createSectionTitle("Empreinte des immobilisations", colors),
-    // createImmobilisationsTable(immobilisations, period, indic, colors),
+    createImmobilisationsTable(immobilisations, period, indic, colors),
 
   ];
 
@@ -1204,18 +1204,16 @@ const createPublishedProvidersTable = (providers, period, colors) => {
 
 // ----------------------------------------------------------------------------------------------------
 // External Accounts table
-const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, indic,colors) => {
+const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, indic, colors) => {
 
   const { unit, nbDecimals } = metaIndics[indic];
 
 
   const mainExternalExpenses = externalExpensesAccounts
-   .filter((account) => account.periodsData[period.periodKey].amount > 0)
-   .sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount)
-   .slice(0, 10);
+    .filter((account) => account.periodsData[period.periodKey].amount > 0)
+    .sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount)
+    .slice(0, 10);
 
-
-  // Préparation des données pour la table
   const tableBody = [
     [
       { text: 'Compte', style: 'tableHeader' },
@@ -1250,14 +1248,14 @@ const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, i
     ],
   ];
 
- 
+
   mainExternalExpenses.forEach((account) => {
 
     const footprintIndicator = account.periodsData[period.periodKey].footprint.indicators[indic];
 
     tableBody.push([
       { text: account.accountNum },
-      { text: account.accountLib},
+      { text: account.accountLib },
       { text: printValue(footprintIndicator.getValue(), nbDecimals), style: 'data' },
       { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data' },
 
@@ -1280,7 +1278,9 @@ const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, i
 
 // ----------------------------------------------------------------------------------------------------
 // immo table
-const createImmobilisationsTable = (immobilisations, period, indic,colors) => {
+const createImmobilisationsTable = (immobilisations, period, indic, colors) => {
+
+  const immobilisationsAccounts = immobilisations.slice(0, 10);
 
   const { unit, nbDecimals } = metaIndics[indic];
 
@@ -1291,7 +1291,7 @@ const createImmobilisationsTable = (immobilisations, period, indic,colors) => {
       {
         text: [
           {
-            text: "Empreinte\n"
+            text: "En début d'exercice\n"
           },
           {
             text: unit,
@@ -1314,29 +1314,55 @@ const createImmobilisationsTable = (immobilisations, period, indic,colors) => {
         style: "tableHeader",
         alignment: "right"
       },
-
-    ],
+      {
+        text: [
+          {
+            text: "En fin d'exercice\n"
+          },
+          {
+            text: unit,
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+      {
+        text: [
+          {
+            text: "Incertitude\n"
+          },
+          {
+            text: "%",
+            style: "unit"
+          }
+        ],
+        style: "tableHeader",
+        alignment: "right"
+      },
+    ]
   ];
 
- 
-  // mainExternalExpenses.forEach((account) => {
+  immobilisationsAccounts.forEach((account) => {
 
-  //   const footprintIndicator = account.periodsData[period.periodKey].footprint.indicators[indic];
+   const initialFootprint = account.initialState.footprint.indicators[indic];
+    const endFootprint = account.states[period.dateEnd].footprint.indicators[indic];
 
-  //   tableBody.push([
-  //     { text: account.accountNum },
-  //     { text: account.accountLib},
-  //     { text: printValue(footprintIndicator.getValue(), nbDecimals), style: 'data' },
-  //     { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data' },
+    tableBody.push([
+      { text: account.accountNum },
+      { text: account.accountLib },
+      { text: printValue(initialFootprint.getValue(), nbDecimals), style: 'data' },
+      { text: printValue(initialFootprint.getUncertainty(), 0), style: 'data' },
+      { text: printValue(endFootprint.getValue(), nbDecimals), style: 'data' },
+      { text: printValue(endFootprint.getUncertainty(), 0), style: 'data' },
 
-
-  //   ]);
-  // });
+    ]);
+  });
 
   return {
     table: {
       headerRows: 1,
-      widths: ['auto', '*', 'auto', 'auto'],
+      widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
       body: tableBody,
     },
     layout: tableLayout(colors),
