@@ -20,7 +20,7 @@ import { getPrevPeriod } from "../../../../../utils/periodsUtils";
 import { getEffortPercentage, getMarginPercentage } from "./summaryReportGeneratorESE";
 import { hasComparativeData } from "../../utils";
 import { roundValue } from "../../../../../utils/Utils";
-import { createGHGDetailsTable, createNRGDetailsTable } from "./utils/statementDetails";
+import { getStatementDetails } from "./utils/statementDetails";
 
 
 // --------------------------------------------------------------------------
@@ -1407,39 +1407,6 @@ const getStatementValue = (impactsData, period, indic) => {
       return "-";
   }
 };
-export const getStatementDetails = (impactsData, indic, colors) => {
-
-  const { unitDeclaration, precision } = metaIndics[indic];
-  switch (indic) {
-    // case "art":
-    //   return createARTDetailsTable(impactsData);
-    // case "idr":
-    //   return createIDRDetailsTable(impactsData);
-    // case "eco":
-    //   return createECODetailsTable(impactsData);
-    // case "geq":
-    //   return createGEQDetailsTable(impactsData);
-    case "ghg":
-      return createGHGDetailsTable(impactsData, unitDeclaration, precision, colors);
-    // case "haz":
-    //   return createHAZDetailsTable(impactsData);
-    // case "knw":
-    //   return createKNWDetailsTable(impactsData);
-    // case "mat":
-    //   return createMATDetailsTable(impactsData);
-    case "nrg":
-      return createNRGDetailsTable(impactsData, unitDeclaration, precision, colors);
-    // case "soc":
-    //   return createSOCDetailsTable(impactsData);
-    // case "was":
-    //   return createWASDetailsTable(impactsData);
-    // case "wat":
-    //   return createWATDetailsTable(impactsData);
-    default:
-      return [];
-  }
-}
-
 
 const getIndirectImpact = (intermediateConsumptions, fixedCapitalConsumptions, period, indic) => {
   const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
