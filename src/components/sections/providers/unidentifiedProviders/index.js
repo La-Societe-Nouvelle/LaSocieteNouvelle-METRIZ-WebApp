@@ -5,12 +5,11 @@ import React, { useState, useEffect } from "react";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 
 // Components
-import ProvidersTable from "./ProvidersTable";
 import ExpenseAccountsTable from "./ExpenseAccountsTable";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
-import { getMappingFromChatGPT, getSignificativeAccounts, getSignificativeAccountsFromFlows, getSignificativeUnidentifiedProviders } from "./utils";
+import { getMappingFromChatGPT, getSignificativeAccounts, getSignificativeAccountsFromFlows } from "./utils";
 import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 
 // Modals
@@ -25,56 +24,57 @@ const UnidentifiedProviders = ({
   maxFpt,
   prevStep,
   submit,
-  synchronizeProviders,
+  synchronizeAccounts,
   sessionDidUpdate,
   legalUnitActivityCode,
   useChatGPT
 }) => {
 
+  const { providers, externalExpenses, externalExpensesAccounts, investments, immobilisations } = financialData;
+
   // State management
-  const [providers, setProviders] = useState(
-    financialData.providers.filter(
-      (provider) =>
-        provider.useDefaultFootprint &&
-        provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
-    )
-  );
   const [accounts, setAccounts] = useState([]);
 
   // init accounts array
   useEffect(() => 
   {
     // providers nums without defined fpt
-    let providerNums = providers.map((provider) => provider.providerNum);
+    let providerNums = providers
+      .filter((provider) => provider.useDefaultFootprint)
+      .map((provider) => provider.providerNum);
 
     // expense accounts
-    let externalAccountNums = financialData.externalExpenses
+    let externalAccountNums = externalExpenses
       .filter((expense) => providerNums.includes(expense.providerNum) && financialPeriod.regex.test(expense.date))
       .map((expense) => expense.accountNum)
       .filter((value, index, self) => index === self.findIndex(item => item === value));
-    let externalAccounts = financialData.externalExpensesAccounts
+    let externalAccounts = externalExpensesAccounts
       .filter((account) => externalAccountNums.includes(account.accountNum));
 
-    // immobilisation accounts
-    let immobilisationAccountNums = financialData.investments
-      .filter((investment) => providerNums.includes(investment.providerNum) && financialPeriod.regex.test(investment.date))
-      .map((investment) => investment.accountNum)
-      .filter((value, index, self) => index === self.findIndex(item => item === value));
-    let immobilisationAccounts = financialData.immobilisations
-      .filter((account) => immobilisationAccountNums.includes(account.accountNum));
-    
-    // immobilisation providers
-    // let immobilisationProviderNums = financialData.investments
-    //   .filter((investment) => providerNums.includes(investment.providerNum) && financialPeriod.regex.test(investment.date))
-    //   .map((investment) => investment.providerNum);
-    // let immobilisationProviders = providers
-    //   .filter((provider) => immobilisationProviderNums.includes(provider.providerNum));
+    // update footprint origin
+    externalExpenses
+      .concat(investments)
+      .filter((flow) => providerNums.includes(flow.providerNum))
+      .forEach((flow) => flow.footprintOrigin = "account");
 
-    setAccounts([...externalAccounts,...immobilisationAccounts]);
+    // handle investment fpt (with initial state fpt of immobilisation account)
+    investments
+      .filter(investment => investment.footprintOrigin == "account")
+      .forEach(investment => {
+        let immobilisation = immobilisations.find(immobilisation => immobilisation.accountNum == investment.accountNum);
+        if (immobilisation) {
+          investment.footprint = immobilisation.initialState.footprint;
+        } else {
+          console.log("[ERROR] investment not linked to immobilisation account")
+          console.log(investment);
+          console.log(immobilisations);
+        }
+      });
+
+    setAccounts([...externalAccounts]);
   }, [])
 
   // significative providers/accounts
-  const [significativeProviders, setSignificativeProviders] = useState([]);
   const [significativeAccounts, setSignificativeAccounts] = useState([]);
 
   // modals
@@ -82,88 +82,47 @@ const UnidentifiedProviders = ({
   const [showSyncWarningModal, setShowWarningModal] = useState(false);
   const [showSyncErrorWarningModal , setShowSyncErrorWarningModal] = useState(false);
 
-  const [filteredProviders, setFilteredProviders] = useState(accounts);
+  const [filteredAccounts, setFilteredAccounts] = useState(accounts);
   const [isNextStepAvailable, setIsNextStepAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   // view state
-  const [state, setState] = useState({
-    currentView: "all",
+  const [viewState, setViewState] = useState({
+    currentView: "",
     currentPage: 1,
-    itemsPerPage: 20,
+    itemsPerPage: "20",
   });
 
-  const { currentView, currentPage, itemsPerPage } = state;
+  const { currentView, currentPage, itemsPerPage } = viewState;
 
   // --------------------------------------------------
 
-  // initi significative providers
+  // initi significative accounts
   useEffect(() => {
-    updateSignificativeProviders();
     updateSignificativeAccounts();
 
     const isNextStepAvailable = checkSynchronisation();
     setIsNextStepAvailable(isNextStepAvailable);
   }, []);
 
-  // init mode
-  useEffect(() => 
-  {
-    let providerNums = providers.map((provider) => provider.providerNum);
-    externalFlowsOnPeriod
-      .filter((flow) => providerNums.includes(flow.providerNum))
-      .forEach((flow) => flow.footprintOrigin = "account");
-
-  }, [accounts]);
+  useEffect(() => {
+    let filteredAccounts = filterAccountsByView(currentView, accounts, significativeAccounts);
+    setFilteredAccounts(filteredAccounts);
+  }, [currentView, accounts, significativeAccounts])
 
   // --------------------------------------------------
-  // derivated arrays
-
-  const externalFlowsOnPeriod = [
-    ...financialData.externalExpenses,
-    ...financialData.investments,
-  ].filter((flow) => financialPeriod.regex.test(flow.date));
-
-  const providersToSync = providers
-    .filter((provider) => externalFlowsOnPeriod.some((flow) => (flow.footprintOrigin=="provider" || /^2/.test(flow.accountNum)) && flow.providerNum==provider.providerNum));
-  const accountsToSync = accounts
-    .filter((account) => externalFlowsOnPeriod.some((flow) => (flow.footprintOrigin=="account" && flow.accountNum==account.accountNum) || account.providerNum));
-
-  // --------------------------------------------------
-
-  // update significative providers
-  const updateSignificativeProviders = async () => 
-  {
-    const significativeProviders =
-      await getSignificativeUnidentifiedProviders(
-      financialData.providers,
-      minFpt,
-      maxFpt,
-      financialPeriod
-    );
-
-    setSignificativeProviders(significativeProviders);
-  };
 
   // update significative accounts
   const updateSignificativeAccounts = async () => 
   {
-    // const significativeAccounts =
-    //   await getSignificativeAccounts(
-    //     accounts,
-    //     minFpt,
-    //     maxFpt,
-    //     financialPeriod
-    //   );
-
     const expensesOnPeriod = financialData.externalExpenses
         .filter(expense => financialPeriod.regex.test(expense.date));
     const significativeAccounts =
       await getSignificativeAccountsFromFlows(
       expensesOnPeriod,
       accounts,
-      financialData.providers,
+      providers,
       minFpt,
       maxFpt,
       financialPeriod
@@ -175,24 +134,21 @@ const UnidentifiedProviders = ({
   // check if providers are synchronized
   const checkSynchronisation = () => 
   {
-    const isProvidersSync = [...providersToSync, ...accountsToSync]
-      .every((account) => account.footprintStatus == 200 && account.footprint.isValid());
-
-    return isProvidersSync;
+    const isAccountsToSync = accounts.every((account) => account.footprintStatus == 200 && account.footprint.isValid());
+    return isAccountsToSync;
   };
 
   // --------------------------------------------------
   // Event handlers
 
   const handleViewChange = (e) => {
-    setState((prevState) => ({ ...prevState, currentView: e.target.value , currentPage : 1}));
+    setViewState((prevState) => ({ ...prevState, currentView: e.target.value , currentPage : 1}));
   };
 
   const handleItemsPerPageChange = (e) => {
-    setState((prevState) => ({
+    setViewState((prevState) => ({
       ...prevState,
-      itemsPerPage:
-        e.target.value === "all" ? providers.length : parseInt(e.target.value),
+      itemsPerPage: e.target.value,
     }));
   };
 
@@ -205,19 +161,16 @@ const UnidentifiedProviders = ({
   const handleSynchronize = async () => {
     setShowWarningModal(false);
 
-    let elementsToSynchronize = [];
+    let accountsToSynchronize = [];
 
     // Expense Account
-    elementsToSynchronize = accountsToSync
-      .concat(providersToSync)
-      .filter(
-        (account) =>
-          account.footprintStatus !== 200 || !account.footprint.isValid()
-      );
+    accountsToSynchronize = accounts
+      .filter((account) =>  account.footprintStatus !== 200 || !account.footprint.isValid());
 
     try 
     {
-      await synchronizeProviders(elementsToSynchronize);
+      console.log(accountsToSynchronize);
+      await synchronizeAccounts(accountsToSynchronize);
       updateSignificativeAccounts();
 
       const isNextStepAvailable = checkSynchronisation();
@@ -230,13 +183,13 @@ const UnidentifiedProviders = ({
       }
 
       setShowSyncSuccessModal(isNextStepAvailable);
-      setState((prevState) => ({
+      setViewState((prevState) => ({
         ...prevState,
         currentView: "all",
         currentPage: 1,
       }));
     } catch (error) {
-
+      console.log(error);
       // log error 
     }
   };
@@ -264,45 +217,12 @@ const UnidentifiedProviders = ({
               }
             });
           }
-
-          let provider = providers.find((provider) => provider.providerNum == accountId);
-          if (provider) {
-            provider.update({
-              defaultFootprintParams: {
-                code: defaultCode,
-                accuracyMapping: accuracy
-              }
-            });
-          }
         });
       } else {
         setError(true);
       }
       setLoading(false);
     }
-  };
-
-  // Update Providers
-  const setProviderDefaultFootprintParams = (providerNum, paramName, paramValue) => {
-
-    // Disable next step to force user to re-synchronize
-    setIsNextStepAvailable(false);
-
-    const updatedProviders = providers.map((provider) => {
-      if (provider.providerNum === providerNum) {
-        const updatedParams = {
-          ...provider.defaultFootprintParams,
-          [paramName]: paramValue,
-          accuracyMapping: 100,
-        };
-        provider.update({ defaultFootprintParams: updatedParams });
-        return provider;
-      }
-      return provider;
-    });
-    setProviders(updatedProviders);
-
-    sessionDidUpdate();
   };
 
   // Update Providers
@@ -329,15 +249,15 @@ const UnidentifiedProviders = ({
   };
 
   // Pagination
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const totalPages = Math.ceil(accountsToSync.length / itemsPerPage);
+  const startIndex =  itemsPerPage == "all" ? 0 : (currentPage - 1) * parseInt(itemsPerPage);
+  const endIndex =    itemsPerPage == "all" ? accounts.length : startIndex + parseInt(itemsPerPage);
+  const totalPages =  itemsPerPage == "all" ? 1 : Math.ceil(accounts.length / parseInt(itemsPerPage));
 
   // Sync button status
   const isSyncButtonEnable = isSyncButtonEnabled(accounts);
 
   // Options
-  const renderSignificativeOption = hasSignificativeProvidersWithoutActivity(providers, significativeProviders);
+  // const renderSignificativeOption = hasSignificativeProvidersWithoutActivity(providers, significativeProviders);
 
   return (
     <section className="step">
@@ -383,24 +303,18 @@ const UnidentifiedProviders = ({
                 className="me-3"
               >
                 <option key="1" value="">
-                  Tous les comptes (sans siren)
-                </option>
-                <option key="2" value="aux">
-                  Comptes fournisseurs uniquement
-                </option>
-                <option key="3" value="expenses">
-                  Autres comptes tiers
+                  Tous les comptes
                 </option>
                 <option key="4" value="significative">
                   Comptes significatifs
                 </option>
                 <option key="5" value="defaultActivity">
-                  Comptes tiers non rattachés à un secteur d'activité
+                  Comptes non rattachés à un secteur d'activité
                 </option>
                 <option
                   key="6"
                   value="significativeWithoutActivity"
-                  disabled={!renderSignificativeOption}
+                  // disabled={!renderSignificativeOption}
                 >
                   Comptes significatifs non rattachés à un secteur d'activité
                 </option>
@@ -412,7 +326,7 @@ const UnidentifiedProviders = ({
                 size="sm"
                 onChange={handleItemsPerPageChange}
                 value={itemsPerPage}
-                disabled={providers.length < 20}
+                disabled={accounts.length < 20}
               >
                 <option key="1" value="20">
                   20 fournisseurs par page
@@ -448,29 +362,20 @@ const UnidentifiedProviders = ({
       </div>
 
       <ExpenseAccountsTable
-        accounts={accounts.filter(account => /^6/.test(account.accountNum))}
+        accounts={filteredAccounts.filter(account => /^6/.test(account.accountNum))}
         significativeAccounts={significativeAccounts}
         financialPeriod={financialPeriod}
         startIndex={startIndex}
         endIndex={endIndex}
         setAccountDefaultFootprintParams={setAccountDefaultFootprintParams}
-        externalExpenses={financialData.externalExpenses}
+        externalExpenses={financialData}
       />
-
-      {/* <ExpenseAccountsTable
-        accounts={accounts.filter(account => /^2/.test(account.accountNum))}
-        significativeAccounts={significativeAccounts}
-        financialPeriod={financialPeriod}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        setAccountDefaultFootprintParams={setAccountDefaultFootprintParams}
-      /> */}
 
       <PaginationComponent
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={(newPage) =>
-          setState((prevState) => ({ ...prevState, currentPage: newPage }))
+          setViewState((prevState) => ({ ...prevState, currentPage: newPage }))
         }
       />
       {/* User Messages ---------------------------------------------------------*/}
@@ -490,7 +395,7 @@ const UnidentifiedProviders = ({
         showModal={showSyncErrorWarningModal}
         onClose={() => setShowSyncErrorWarningModal(false)}
         changeView={() =>
-          setState((prevState) => ({
+          setViewState((prevState) => ({
             ...prevState,
             currentView: "error",
             currentPage: 1,
@@ -527,61 +432,10 @@ const UnidentifiedProviders = ({
   );
 };
 
-function filterProvidersByView(currentView, providers, significativeProviders) {
-  let filteredProviders = providers.slice();
-  switch (currentView) {
-    case "aux": // provider account
-      filteredProviders = filteredProviders.filter(
-        (provider) => !provider.isDefaultProviderAccount
-      );
-      break;
-    case "expenses": // default provider account
-      filteredProviders = filteredProviders.filter(
-        (provider) => provider.isDefaultProviderAccount
-      );
-      break;
-    case "significative": // significative provider
-      filteredProviders = filteredProviders.filter((provider) =>
-        significativeProviders.includes(provider.providerNum)
-      );
-      break;
-    case "significativeWithoutActivity": // significative provider & no activity code set
-      filteredProviders = filteredProviders.filter(
-        (provider) =>
-          significativeProviders.includes(provider.providerNum) &&
-          provider.defaultFootprintParams.code === "00"
-      );
-      break;
-    case "defaultActivity": // no activity code set
-      filteredProviders = filteredProviders.filter(
-        (provider) => provider.defaultFootprintParams.code === "00"
-      );
-      break;
-    case "error":
-      filteredProviders = filteredProviders.filter(
-        (provider) => provider.footprintStatus === 500
-      );
-      break;
-    default: // default
-      break;
-  }
-
-  return filteredProviders;
-}
 function filterAccountsByView(currentView, accounts, significativeAccounts) {
   let filteredAccounts = [];
 
   switch (currentView) {
-    case "aux": // provider account
-      filteredAccounts = accounts.filter(
-        (account) => !account.isDefaultProviderAccount
-      );
-      break;
-    case "expenses": // default provider account
-      filteredAccounts = accounts.filter(
-        (account) => account.isDefaultProviderAccount
-      );
-      break;
     case "significative": // significative provider
       filteredAccounts = accounts.filter((account) =>
         significativeAccounts.includes(account.accountNum)
@@ -618,16 +472,6 @@ function isSyncButtonEnabled(providers) {
       provider.footprintStatus !== 200 ||
       !provider.footprint.isValid() ||
       provider.footprintStatus === 203
-  );
-}
-function hasSignificativeProvidersWithoutActivity(
-  providers,
-  significativeProviders
-) {
-  return providers.some(
-    (provider) =>
-      provider.defaultFootprintParams.code === "00" &&
-      significativeProviders.includes(provider.providerNum)
   );
 }
 
