@@ -98,9 +98,11 @@ const ExpenseAccountsTable = ({
             <th width={10}></th>
             <th onClick={() => handleSort("libelle")}>
               <i className="bi bi-arrow-down-up me-1"></i>
-              Libellé du compte fournisseur
+              Libellé du compte
             </th>
-            <th>Compte fournisseur</th>
+            <th onClick={() => handleSort("numero")}>
+            <i className="bi bi-arrow-down-up me-1"></i>
+              Numéro du Compte</th>
             <th>Espace économique</th>
             <th>Secteur d'activité</th>
             <th>Confiance</th>

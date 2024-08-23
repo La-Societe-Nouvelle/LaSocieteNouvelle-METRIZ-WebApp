@@ -54,14 +54,17 @@ const ProvidersSection = ({
   const [apiError, setApiError] = useState(false);
 
   // account -> Provider or Account
-  const synchronizeProviderData = async (account) => {
-    try {
+  const synchronizeAccountData = async (account) => 
+  {
+    try 
+    {
+      // fetch data
       await account.updateFromRemote();
+      // apply data
       financialData.externalExpenses
         .concat(financialData.investments)
         .filter((expense) => (expense.footprintOrigin=="provider" && expense.providerNum === account.providerNum)
-                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum)
-                          || (/^2/.test(expense.accountNum) && expense.providerNum == account.providerNum))
+                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum))
         .forEach((expense) => {
           expense.footprint = account.footprint;
         });
@@ -71,7 +74,7 @@ const ProvidersSection = ({
     }
   };
 
-  const synchronizeProviders = async (accountsToSynchronise) => 
+  const synchronizeAccounts = async (accountsToSynchronise) => 
   {
     setFetching(true);
     setProgression(0);
@@ -79,14 +82,13 @@ const ProvidersSection = ({
     const n = accountsToSynchronise.length;
     for (const account of accountsToSynchronise) {
       try {
-        await synchronizeProviderData(account);
+        await synchronizeAccountData(account);
         i++;
         setProgression(Math.round((i / n) * 100));
       } catch (error) {
         setFetching(false);
         throw error;
       }
-   
     }
 
     setFetching(false);
@@ -130,7 +132,7 @@ const ProvidersSection = ({
           minFpt={minFpt}
           maxFpt={maxFpt}
           submit={submit}
-          synchronizeProviders={synchronizeProviders}
+          synchronizeProviders={synchronizeAccounts}
           sessionDidUpdate={sessionDidUpdate}
         />
       </>
@@ -149,7 +151,7 @@ const ProvidersSection = ({
           maxFpt={maxFpt}
           prevStep={() => setStep(1)}
           submit={submit}
-          synchronizeProviders={synchronizeProviders}
+          synchronizeAccounts={synchronizeAccounts}
           sessionDidUpdate={sessionDidUpdate}
           legalUnitActivityCode={legalUnit.activityCode || comparativeData.comparativeDivision}
           useChatGPT={useChatGPT}

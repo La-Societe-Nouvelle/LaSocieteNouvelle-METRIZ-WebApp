@@ -98,9 +98,9 @@ export const getIndividualsData = async (declarations) => {
 
       let individual = individualsData.find((individual) => individual.id == id);
       if (individual != undefined) {
-        individual.workingHours += workingHours;
-        individual.wage += wage;
-        individual.apprenticeshipHours += apprenticeshipHours;
+        individual.workingHours = roundValue(individual.workingHours + workingHours, 2);
+        individual.wage = roundValue(individual.wage + wage, 2);
+        individual.apprenticeshipHours =  roundValue(individual.apprenticeshipHours + apprenticeshipHours, 2);
       } else {
         individualsData.push({
           id,
@@ -162,8 +162,8 @@ export const getInterdecileRange = async (individualsData) => {
   let indexIndividualD1 = 0;
   let hoursD1 = individualsData[indexIndividualD1].workingHours;
   while (hoursD1 < limitD1 && indexIndividualD1 < individualsData.length) {
-    indexIndividualD1 += 1;
-    hoursD1 += individualsData[indexIndividualD1].workingHours;
+    indexIndividualD1 = indexIndividualD1 + 1;
+    hoursD1 = hoursD1 + individualsData[indexIndividualD1].workingHours;
   }
   let hourlyRateD1 = individualsData[indexIndividualD1].hourlyRate;
 
@@ -171,8 +171,8 @@ export const getInterdecileRange = async (individualsData) => {
   let indexIndividualD9 = 0;
   let hoursD9 = individualsData[indexIndividualD9].workingHours;
   while (hoursD9 < limitD9 && indexIndividualD9 < individualsData.length) {
-    indexIndividualD9 += 1;
-    hoursD9 += individualsData[indexIndividualD9].workingHours;
+    indexIndividualD9 = indexIndividualD9 + 1;
+    hoursD9 = hoursD9 + individualsData[indexIndividualD9].workingHours;
   }
   let hourlyRateD9 = individualsData[indexIndividualD9].hourlyRate;
 
@@ -354,21 +354,21 @@ export const getIndividualWage = (individu, regexPeriod) => {
       remunerations
         .filter((remuneration) => remuneration.type == "001")
         .forEach((remuneration) => {
-          montantDeclaration += parseFloat(remuneration.montant);
+          montantDeclaration = montantDeclaration + parseFloat(remuneration.montant);
         });
       remunerations
         .filter((remuneration) =>
           ["012", "013", "017", "018"].includes(remuneration.type)
         )
         .forEach((remuneration) => {
-          montantDeclaration += parseFloat(remuneration.montant);
+          montantDeclaration = montantDeclaration + parseFloat(remuneration.montant);
         });
       // Primes
       let primes = versement.primes;
       primes
         .filter((prime) => primesIncludedInPay.includes(prime.type))
         .forEach((prime) => {
-          montantDeclaration += parseFloat(prime.montant);
+          montantDeclaration = montantDeclaration + parseFloat(prime.montant);
         });
       // Autres revenus
       let revenuAutres = versement.revenuAutres;
@@ -377,7 +377,7 @@ export const getIndividualWage = (individu, regexPeriod) => {
           revenuAutresIncludedInPay.includes(revenuAutre.type)
         )
         .forEach((revenuAutre) => {
-          montantDeclaration += parseFloat(revenuAutre.montant);
+          montantDeclaration = montantDeclaration + parseFloat(revenuAutre.montant);
         });
   });
 
@@ -414,9 +414,9 @@ export const getIndividualWorkingHours = (individu, regexPeriod) => {
           activites
             .filter((activite) => activite.type == "01")
             .forEach((activite) => {
-              heuresDeclaration += getQuotiteTravail(
+              heuresDeclaration = heuresDeclaration + getQuotiteTravail(
                 parseInt(activite.mesure),
-                activite.uniteMesure,
+                activite.unite,
                 uniteContrat
               );
             });
@@ -427,7 +427,7 @@ export const getIndividualWorkingHours = (individu, regexPeriod) => {
             ["012", "013", "017", "018"].includes(remuneration.type) // add to doc
         )
         .forEach((remuneration) => {
-          heuresDeclaration += parseInt(remuneration.nombreHeures);
+          heuresDeclaration = heuresDeclaration + parseInt(remuneration.nombreHeures);
         });
   });
 
@@ -455,6 +455,8 @@ export const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
       return mesure;
     case "35": // heures intermittents du spectacle
       return mesure;
+    case "40": // jours calendaires de la période d’emploi pris en compte dans le calcul du plafond de Sécurité Sociale
+      return mesure * 7;
     default:
       return 0;
   }
@@ -497,9 +499,9 @@ export const getIndividualApprenticeshipHours = (individu, regexPeriod) => {
             activites
               .filter((activite) => activite.type == "01")
               .forEach((activite) => {
-                trainingHours += getQuotiteTravail(
+                trainingHours = trainingHours + getQuotiteTravail(
                   parseInt(activite.mesure),
-                  activite.uniteMesure,
+                  activite.unite,
                   uniteContrat
                 );
               });

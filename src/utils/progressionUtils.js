@@ -87,10 +87,11 @@ export const checkProviderFootprints = (session,period) => {
   ].filter((flow) => period.regex.test(flow.date));
 
   const providersToSync = session.financialData.providers
-      .filter((provider) => externalFlowsOnPeriod.some((flow) => (flow.footprintOrigin=="provider" || /^2/.test(flow.accountNum))
-        && flow.providerNum==provider.providerNum));
+      .filter((provider) => externalFlowsOnPeriod.some((flow) => flow.footprintOrigin=="provider"
+                                                              && flow.providerNum==provider.providerNum));
   const accountsToSync = session.financialData.externalExpensesAccounts
-    .filter((account) => externalFlowsOnPeriod.some((flow) => flow.footprintOrigin=="account" && flow.accountNum==account.accountNum));
+    .filter((account) => externalFlowsOnPeriod.some((flow) => flow.footprintOrigin=="account" 
+                                                           && flow.accountNum==account.accountNum));
 
   return [...providersToSync,...accountsToSync].every((provider) => provider.footprint.isValid())
 }

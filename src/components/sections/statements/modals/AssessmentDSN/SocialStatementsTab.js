@@ -128,7 +128,7 @@ export const SocialStatementsTab = ({
         files.map(async (file) => 
         {
           const extension = file.name.split(".").pop();
-          if (extension === "edi" || extension === "txt") 
+          if (extension === "edi" || extension === "txt" || extension === "dsn") 
           {
             // read file
             const dataDSN = await new Promise((resolve, reject) => {
@@ -202,7 +202,7 @@ export const SocialStatementsTab = ({
     <div className="assessment">
       <div>
         <p>Importez les déclarations mensuelles</p>
-        <Dropzone onDrop={onDrop} accept={[".edi", ".txt"]}>
+        <Dropzone onDrop={onDrop} accept={[".edi", ".txt", ".dsn"]}>
           {({ getRootProps, getInputProps }) => (
             <div className="dropzone-section">
               <div {...getRootProps()} className="dropzone">
@@ -248,6 +248,7 @@ export const SocialStatementsTab = ({
               <thead>
                 <tr>
                   <th>Etat</th>
+                  <th>NIC</th>
                   <th>Nom du fichier</th>
                   <th>Mois</th>
                   <th>Fraction</th>
@@ -258,10 +259,13 @@ export const SocialStatementsTab = ({
               </thead>
               <tbody>
                 {socialStatements
-                  .sort((a, b) => parseInt(a.mois) - parseInt(b.mois))
+                  .sort((a, b) => a.nicEtablissement != b.nicEtablissement ? 
+                      parseInt(a.nicEtablissement) - parseInt(b.nicEtablissement) 
+                    : parseInt(a.mois) - parseInt(b.mois))
                   .map((socialStatement) => (
                     <tr key={socialStatement.id}>
                       <td>{socialStatement.error ? "ERROR" : "OK"}</td>
+                      <td>{socialStatement.nicEtablissement}</td>
                       <td>
                         {
                           metaRubriques.declaration.nature[
