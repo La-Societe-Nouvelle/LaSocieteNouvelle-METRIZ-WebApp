@@ -19,9 +19,9 @@ import { printValue } from "/src/utils/formatters";
 import { getPrevPeriod } from "../../../../../utils/periodsUtils";
 import { getEffortPercentage, getMarginPercentage } from "./summaryReportGeneratorESE";
 import { hasComparativeData } from "../../utils";
-import { roundValue } from "../../../../../utils/Utils";
+import { isValidNumber, roundValue } from "../../../../../utils/Utils";
 import { getStatementDetails } from "./utils/statementDetails";
-
+import { Indicator } from "../../../../../footprintObjects/Indicator";
 
 // --------------------------------------------------------------------------
 //  Indicator Report
@@ -58,7 +58,6 @@ export const buildStandardReport = async ({
 
   // Data
 
-  const indirectImpact = getIndirectImpact(intermediateConsumptions, fixedCapitalConsumptions, period, indic);
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
 
   const analysisNotes =
@@ -70,7 +69,7 @@ export const buildStandardReport = async ({
 
   // Metadata ------------------------------------------------------
 
-  const { libelle, unit, nbDecimals, unitDeclaration, libelleDeclaration, libelleIndirect } = metaIndics[indic];
+  const { libelle, unit, nbDecimals, libelleEmpreinteDirecte, libelleEmpreinteIndirecte } = metaIndics[indic];
 
   // ---------------------------------------------------------------
   // Charts
@@ -113,7 +112,12 @@ export const buildStandardReport = async ({
       text: `${libelle}`,
       style: "h1",
     },
-    createKeyFigures(indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, nbDecimals, period, prevPeriod, indic, unit, colors),
+    createKeyFigures(mainAggregates, period, prevPeriod, indic, colors),
+
+    // ---------------------------------------------------------------
+    // Content
+
+    createPublicationBloc(),
 
     // ---------------------------------------------------------------
     // SIG
@@ -124,17 +128,22 @@ export const buildStandardReport = async ({
     // ---------------------------------------------------------------
     // Statement 
 
-    createSectionTitle("Impacts directs", colors),
+    createSectionTitle(libelleEmpreinteDirecte, colors), // "Impacts directs"
     getStatementDetails(impactsData[period.periodKey], indic, colors),
 
-    createSectionTitle("Impacts indirects", colors),
+    createSectionTitle(libelleEmpreinteIndirecte, colors),
+    {
+      text: "Les impacts indirects liés aux consommations, intermédiaies et de capital fixe, sont obtenues "+
+            "à partir de l'empreinte de vos fournisseurs (Cf. Empreinte des principaux fournisseurs). Des "+
+            "proxys sectoriels sont utilisés en l'absence d'informations publiées.",
+    },
 
     // ---------------------------------------------------------------
     // Production Footprint & Analysis
 
     { text: '', pageBreak: 'after' },
     createSectionTitle("Performance globale", colors),
-    createProductionSection(period, indic, unit, nbDecimals, colors, production, comparativeData, productionChart, analysisNotes),
+    createProductionSection(period, indic, colors, production, comparativeData, productionChart, analysisNotes),
 
     // ---------------------------------------------------------------
     // Trend & Target
@@ -147,29 +156,32 @@ export const buildStandardReport = async ({
       margin: [0, 0, 0, 5]
     },
     {
-      text: "Tendance de la branche :",
-      style: "h2",
+      text: "Note :",
+      style: "h3",
     },
     {
-      text: "La courbe de tendance correspond à une projection des empreintes observées sur les dix dernières années.Les valeurs actuelles " +
-        "s'appuient sur l'hypothèse d’une structure macroéconomique inchangée.Des travaux sont en cours pour proposer des valeurs tenant compte de l’évolution tendancielle de la structure de " +
-        "l'économie nationale, ses interactions avec l’extérieur et de la dynamique des prix par branche."
+      text: "La courbe de tendance correspond à une projection de l'empreinte macroéconomique de la branche sur les prochaines années (jusqu'à 2030). " +
+        "Elle est construite à partir des évolutions sur les 10 dernières années de la performance directe de la branche et de celles situées en amont de la chaine de valeur, " +
+        "et sur une projection de la structure de l'économie sur les années à venir (volumes d'activité, interactions avec l'exterieur, dynamique des prix). "
     },
     {
-      text: `Source : ${metaTrends[indic].source}`, margin: [0, 5, 0, 0], style: "legendText"
+      text: `Source des données : ${metaTrends[indic].source}`, margin: [0, 5, 0, 0], 
+      //style: "legendText"
     },
     metaTargets[indic] ?
       [
         {
           text: "Objectif de la branche :",
-          style: "h2",
+          style: "h3",
           margin: [0, 5, 0, 10]
         },
         {
           text: metaTargets[indic].info
         },
         {
-          text: `Source : ${metaTargets[indic].source}`, style: "legendText", margin: [0, 5, 0, 0]
+          text: `Source : ${metaTargets[indic].source}`, 
+          //style: "legendText",
+          margin: [0, 5, 0, 0]
         },
       ] : [],
 
@@ -177,7 +189,7 @@ export const buildStandardReport = async ({
     // Target 
 
     { text: '', pageBreak: 'after' },
-    createSectionTitle("Suivi de l'objectif sectoriel", colors),
+    createSectionTitle("Détails - Ecart avec l'objectif sectoriel", colors),
 
     isTargetDataAvailable ?
       [
@@ -189,13 +201,13 @@ export const buildStandardReport = async ({
         createTargetTableSection(comparativeData, mainAggregates, indic, unit, period, nbDecimals, colors)
       ] :
       [
-        { text: "Aucun objectif sectoriel défini pour cet indicateur.", margin: [0, 0, 0, 30] }
+        { text: "Aucun objectif sectoriel n'est défini pour cet indicateur.", margin: [0, 0, 0, 30] }
       ],
 
     // ---------------------------------------------------------------
     // Branch 
 
-    createSectionTitle("Détails de la performance (Comparaison avec la branche)", colors),
+    createSectionTitle("Détails - Ecart avec la moyenne sectorielle", colors),
     createFinancialChartsSection(
       valueAddedChart,
       intermediateConsumptionsChart,
@@ -218,6 +230,11 @@ export const buildStandardReport = async ({
     // Détails comptes de charge
 
     { text: '', pageBreak: 'after' },
+    {
+      text: `Annexes`,
+      style: "h1",
+      margin: [0, 10, 0, 20],
+    },
     createSectionTitle("Empreinte des comptes de charges", colors),
     createExternalExpensesAccountsTable(externalExpensesAccounts, period, indic, colors),
 
@@ -346,12 +363,22 @@ export const buildStandardReport = async ({
 };
 
 
-const createKeyFigures = (indirectImpact, unitDeclaration, libelleDeclaration, libelleIndirect, production, netValueAdded, precision, period, prevPeriod, indic, unit, colors) => {
+const createKeyFigures = (mainAggregates, period, prevPeriod, indic, colors) => 
+{
 
-  const productionFootprint = production.periodsData[period.periodKey].footprint.indicators[indic].value.toFixed(precision);
-  const netValueAddedFootprint = netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value.toFixed(precision);
+  const { unit, nbDecimals, unitDeclaration, libelleEmpreinteDirecte, libelleEmpreinteIndirecte } = metaIndics[indic];
+  const { production } = mainAggregates;
 
-  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value.toFixed(precision) : " - ";
+  // production footprint
+  const productionFootprint = production.periodsData[period.periodKey].footprint.indicators[indic].value.toFixed(nbDecimals);
+
+  // direct impact/footprint
+  const directImpact = getDirectImpact(mainAggregates, period, indic);
+
+  // indirect impact/footprint
+  const indirectImpact = getIndirectImpact(mainAggregates, period, indic);
+
+  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value.toFixed(nbDecimals) : " - ";
 
   const createTableColumn = (value, label, unit, highlighted) => ({
     width: '*',
@@ -391,8 +418,8 @@ const createKeyFigures = (indirectImpact, unitDeclaration, libelleDeclaration, l
     columnGap: 20,
     columns: [
       createTableColumn(productionFootprint, "Empreinte\nde la production", unit, true),
-      createTableColumn(netValueAddedFootprint, libelleDeclaration, unit, false),
-      createTableColumn(indirectImpact.value, libelleIndirect, indirectImpact.unit, false),
+      createTableColumn(directImpact.value, libelleEmpreinteDirecte, directImpact.unit, false),
+      createTableColumn(indirectImpact.value, libelleEmpreinteIndirecte, indirectImpact.unit, false),
       createTableColumn(prevFootprint, "Evolution par rapport à l'exercice précédent", prevPeriod ? unitDeclaration : "", false),
     ],
   };
@@ -459,8 +486,9 @@ const createFinancialChartsSection = (
 // ----------------------------------------------------------------------------------------------------
 // Production
 
-const createProductionSection = (period, indic, unit, precision, colors, production, comparativeData, productionChartImage, analysisNotes) => {
-
+const createProductionSection = (period, indic, colors, production, comparativeData, productionChartImage, analysisNotes) => 
+{
+  const { unit, nbDecimals } = metaIndics[indic];
   const branchProductionFootprint = comparativeData.production.division.history.data[indic]?.[comparativeData.netValueAdded.division.history.data[indic].length - 1] ?? null;
   const branchProductionTarget = comparativeData.production.division.target.data[indic]?.filter(value => value.path === "GEO")?.[comparativeData.production.division.target.data[indic].filter(value => value.path === "GEO").length - 1] ?? null;
   const tableBody = [
@@ -487,7 +515,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
     ],
     [
       {
-        text: "Production",
+        text: "Empreinte de l'entreprise",
         border: [false, false, false, false]
 
       },
@@ -501,7 +529,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
         text:
           printValue(
             production.periodsData[period.periodKey].footprint.indicators[indic].value,
-            precision
+            nbDecimals
           ),
         style: "data",
         border: [false, false, false, false]
@@ -520,7 +548,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
         border: [false, false, false, false]
       },
       {
-        text: branchProductionFootprint?.value ?? " - ",
+        text: printValue(branchProductionFootprint?.value, nbDecimals) ?? " - ",
         style: "data",
         border: [false, false, false, false]
       },
@@ -528,7 +556,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
     ],
     [
       {
-        text: "Objectif sectoriel",
+        text: "Objectif sectoriel 2030",
         border: [false, false, false, true]
 
       },
@@ -538,7 +566,7 @@ const createProductionSection = (period, indic, unit, precision, colors, product
         border: [false, false, false, true]
       },
       {
-        text: branchProductionTarget?.value ?? " - ",
+        text: printValue(branchProductionTarget?.value, nbDecimals) ?? " - ",
         style: "data",
         border: [false, false, false, true]
       },
@@ -1123,13 +1151,15 @@ const createMainProvidersTable = (providers, period, indic, colors) => {
     },
   ]);
 
+  let withLegend = true;
+
   return {
     table: {
       headerRows: 1,
       widths: ['auto', 50, '*', 'auto', 'auto', 'auto'],
       body: tableBody,
     },
-    layout: tableLayout(colors),
+    layout: tableLayout(colors, withLegend),
     style: 'table',
     margin: [0, 0, 0, 25],
   };
@@ -1408,49 +1438,102 @@ const getStatementValue = (impactsData, period, indic) => {
   }
 };
 
-const getIndirectImpact = (intermediateConsumptions, fixedCapitalConsumptions, period, indic) => {
-  const { unit, unitAbsolute, nbDecimals } = metaIndics[indic];
+const getDirectImpact = (mainAggregates, period, indic) => 
+{
+  const { unit, unitAbsolute, nbDecimals, type } = metaIndics[indic];
+  const { netValueAdded } = mainAggregates;
 
-  const indicsWithGrossImpact = new Set([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat"
-  ]);
-
-  const showGrossImpact = indicsWithGrossImpact.has(indic);
-
-  const intermediateData = intermediateConsumptions.periodsData[period.periodKey];
-  const fixedCapitalData = fixedCapitalConsumptions.periodsData[period.periodKey];
-
-  const intermediateAmount = intermediateData?.amount || 0;
-  const fixedCapitalAmount = fixedCapitalData?.amount || 0;
-
-  const intermediateIndicator = intermediateData?.footprint.indicators[indic];
-  const fixedCapitalIndicator = fixedCapitalData?.footprint.indicators[indic];
-
-  if (showGrossImpact) {
-    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getGrossImpact(intermediateAmount) : 0;
-    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getGrossImpact(fixedCapitalAmount) : 0;
-
-    const totalIndirectImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
-    return { value: printValue(totalIndirectImpact, nbDecimals), unit: unitAbsolute };
-  } else {
-
-    const intermediateGrossImpact = intermediateIndicator ? intermediateIndicator.getValue() * intermediateAmount : 0;
-    const fixedCapitalGrossImpact = fixedCapitalIndicator ? fixedCapitalIndicator.getValue() * fixedCapitalAmount : 0;
-
-    const totalAmount = intermediateAmount + fixedCapitalAmount;
-    const totalGrossImpact = intermediateGrossImpact + fixedCapitalGrossImpact;
-    const indirectImpact = totalAmount > 0 ? totalGrossImpact / totalAmount : 0;
-
-    const value = printValue(parseFloat(indirectImpact), nbDecimals)
-
-    return { value, unit };
+  // return gross impact
+  if (type == "intensité") {
+    const directImpact = netValueAdded.getGrossImpact(period.periodKey, indic);
+    return { value: printValue(directImpact, nbDecimals), unit: unitAbsolute };
+  } 
+  // return footprint value
+  else {
+    const directImpact = netValueAdded.getFootprint(period.periodKey, indic).getValue();
+    return { value: printValue(directImpact, nbDecimals), unit: unit };
   }
 };
+
+const getIndirectImpact = (mainAggregates, period, indic) => 
+{
+  const { unit, unitAbsolute, nbDecimals, type } = metaIndics[indic];
+  const { intermediateConsumptions, fixedCapitalConsumptions } = mainAggregates;
+
+  // return gross impact
+  if (type == "intensité") {
+    const consumptionsFootprint = buildAggregatePeriodIndicator(indic, [intermediateConsumptions,fixedCapitalConsumptions], period.periodKey);
+    const consumptionsAmount = intermediateConsumptions.getAmount(period.periodKey) + fixedCapitalConsumptions.getAmount(period.periodKey);
+    const indirectImpact = consumptionsFootprint.getGrossImpact(consumptionsAmount);
+    return { value: printValue(indirectImpact, nbDecimals), unit: unitAbsolute };
+  } 
+  // return footprint value
+  else {
+    const consumptionsFootprint = buildAggregatePeriodIndicator(indic, [intermediateConsumptions,fixedCapitalConsumptions], period.periodKey);
+    const indirectImpact = consumptionsFootprint.getValue(indic);
+    return { value: printValue(indirectImpact, nbDecimals), unit: unit };
+  }
+};
+
+// temp
+const buildAggregatePeriodIndicator = (indic,accounts,periodKey) =>
+{
+  const { nbDecimals } = metaIndics[indic];
+  const accountsOnPeriod =  accounts.filter(account => account.periodsData.hasOwnProperty(periodKey));
+  
+  // init indicator
+  const indicator = new Indicator({indic});
+    
+  let totalAmount = 0.0;
+  let grossImpact = 0.0;
+  let grossImpactMax = 0.0;
+  let grossImpactMin = 0.0;
+
+  let missingData = false;
+
+  for (let account of accountsOnPeriod)
+  {
+    let amountAccount = account.periodsData[periodKey].amount;
+    let indicatorAccount = account.periodsData[periodKey].footprint.indicators[indic];
+
+    if (isValidNumber(amountAccount) && amountAccount!=0 && indicatorAccount.isValid()) 
+    {
+      grossImpact+= indicatorAccount.getValue()*amountAccount;
+      grossImpactMax+= indicatorAccount.getValueMax()*amountAccount;
+      grossImpactMin+= indicatorAccount.getValueMin()*amountAccount;
+      totalAmount+= amountAccount;
+    } 
+    else if (!isValidNumber(amountAccount) || (isValidNumber(amountAccount) && amountAccount!=0 && !indicatorAccount.isValid())) {
+      missingData = true;
+    }
+  }
+
+  if (!missingData && totalAmount != 0) { 
+    let value = roundValue(grossImpact/totalAmount, nbDecimals);
+    let uncertainty = getUncertainty(grossImpact,grossImpactMax,grossImpactMin);
+    indicator.setValue(value);
+    indicator.setUncertainty(uncertainty);
+  } else {
+    indicator.setValue(null); 
+    indicator.setUncertainty(null);
+  }
+
+  return indicator;
+}
+
+const getUncertainty = (value,valueMax,valueMin) => 
+{
+  if (Math.abs(value) > 0) {
+    let gapWithMax = Math.abs( valueMax-value ); // | max - value |
+    let gapWithMin = Math.abs( valueMin-value ); // | min - value |
+    let uncertainty = Math.max(gapWithMax,gapWithMin) / Math.abs(value) * 100.0;
+    return roundValue(uncertainty, 0);
+  } else {
+    return 0.0;
+  }
+}
+
+// 
 
 const createSectionTitle = (label, colors) => {
 
@@ -1485,10 +1568,61 @@ const createSectionTitle = (label, colors) => {
   };
 };
 
-const tableLayout = (colors) => {
+const createPublicationBloc = () => 
+{
+  const tableBody = [
+    [{
+      text: "L'empreinte de la production de l'entreprise n'est pas publiée au sein de la base de données ouverte SINESE.",
+      color: "#dc3545",
+      bold: true,
+      alignment: "left",
+      margin: [0, 0, 0, 0.5],
+    }],[{
+      text: "La publication de votre empreinte sociétale correspond à la mise en ligne de votre performance extra-financière au sein de la base de données SINESE "+
+            "ouverte. Elle permet de valoriser vos résultats, d’être identifié comme acteur de la transition et de permettre à vos clients de fiabiliser la mesure de "+
+            "leur propre empreinte sociétale. Seule l’empreinte de votre chiffre d’affaires est rendue publique, le détail des résultats reste à votre discretion.",
+      color: "#dc3545",
+      alignment: "left"
+    }],[{
+      text: "Vous pouvez directement publier votre empreinte via l'application Metriz.",
+      color: "#dc3545",
+      alignment: "left"
+    }]
+  ];
+
+  return {
+    table: {
+      headerRows: 0,
+      widths: ["*"],
+      body: tableBody,
+    },
+    layout: {
+      hLineWidth: function (i, node) {
+        return (i === 0 || i === node.table.body.length) ? 0.5 : 0
+      },
+      hLineColor: function (i, node) {
+        return "#fa595f";
+      },
+      vLineWidth: function (i, node) {
+        return 0.5;
+      },
+      vLineColor: function (i, node) {
+        return "#fa595f";
+      },
+      paddingTop: function (i, node) { return 4 },
+      paddingBottom: function (i, node) { return 4 },
+      paddingLeft: function (i, node) { return 4 },
+      paddingRight: function (i, node) { return 4 },
+    },
+    fillColor: "#f8d7da",
+    margin: [0, 0, 0, 20],
+  };
+};
+
+const tableLayout = (colors, withLegend) => {
   return {
     hLineWidth: function (i, node) {
-      return (i === 0 || i === 1 | i === node.table.body.length) ? 0.5 : 0;
+      return (i === 0 || i === 1 | i === (node.table.body.length - (withLegend ? 1 : 0))) ? 0.5 : 0;
     },
     hLineColor: function (i, node) {
       return colors.primary;

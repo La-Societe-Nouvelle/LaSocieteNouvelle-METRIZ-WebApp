@@ -59,20 +59,20 @@ export const createSIGtableSection = (
         style: "tableHeader",
       },
       {
-        text: `Montant\n${currentYear}`,
+        text: `Montant`, //\n${currentYear}`,
         style: "tableHeader",
-        alignment: "right",
+        alignment: "center",
         border : [false,false,true,false] 
       },
       {
         text: "Empreinte",
         style: "tableHeader",
-        alignment: "right"
+        alignment: "center"
       },
       {
         text: "Incertitude",
         style: "tableHeader",
-        alignment: "right",
+        alignment: "center",
         border : [false,false,true,true] 
       },
       // {
@@ -108,8 +108,8 @@ export const createSIGtableSection = (
           printValue(production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
         style: "tableBold",
         alignment: "right",
-        border : [false,true,true,true] 
-
+        border : [false,true,true,true], 
+        fontSize : 5 
       },
       // {
       //   text: branchProductionFootprint,

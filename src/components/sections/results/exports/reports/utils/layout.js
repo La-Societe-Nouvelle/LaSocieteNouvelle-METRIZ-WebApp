@@ -178,7 +178,7 @@ export const generateFooter = (colors) => {
       {
         columns: [
           {
-            text: "Edité le " + getShortCurrentDateString(),
+            text: "Edité le " + getShortCurrentDateString()+" - Document produit via l'application Metriz mise à disposition par La Société Nouvelle.",
             margin: [30, 10, 0, 0],
             color : colors.primary
           },

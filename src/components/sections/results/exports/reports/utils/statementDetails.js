@@ -50,7 +50,7 @@ const createARTDetailsStatement = (impactsData, nbDecimals, colors) =>
 	if (isValueAddedCrafted) {
 		const content = [
 			{
-				text: "Les activités de l'entreprise sont considérées comme artisanales.",
+				text: "Les activités de l'entreprise sont considérées comme artisanales ou faisant appel à un savoir-faire reconnu.",
 			},
 			createARTDetailsTable(impactsData, nbDecimals, colors)
 		]
@@ -79,12 +79,12 @@ const createARTDetailsTable = (impactsData, nbDecimals, colors) =>
 			{ text: "Valeur ajoutée nette", style: 'tableData' },
 			{ text: "%", style: 'tableData', alignment: 'center' },
 			{ text: nva_fpt.value.toFixed(nbDecimals), style: 'tableData', alignment: 'right' },
-			{ text: "0 %", style: 'tableData', alignment: 'right' }
+			{ text: "0 %", style: 'tableData', alignment: 'right', fontSize: 5 }
 		]
 	];
 
 	const tableContent = [
-		{ text: 'Détails des contributions', style: 'h3', margin: [0, 10, 0, 10] },
+		{ text: 'Détails des contributions directes', style: 'h3', margin: [0, 10, 0, 10] },
 		{
 			table: {
 				headerRows: 1,
