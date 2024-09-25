@@ -284,7 +284,7 @@ export const getMappingFromChatGPT = async (providers, legalUnitActivityCode) =>
   try 
   {
     const response = await axios.post(apiUrl, {
-      model: "gpt-3.5-turbo-0301",
+      model: "gpt-4-turbo",
       messages: [{"role": "user", "content": request}],
       max_tokens: 1000,
       temperature: 0.1
@@ -304,7 +304,7 @@ export const getMappingFromChatGPT = async (providers, legalUnitActivityCode) =>
       const rows = mappingChatGPT.content.split("\n");
       for (let row of rows) 
       {
-        if (/^\|.*\| [0-9]{2} \|.*\|$/.test(row)) {
+        if (/^\|.*\|(\s)*[0-9]{2}(\s)*\|.*\|$/.test(row)) {
           let rowData = row.split("|");
           let accountId = rowData[1].trim();
           let activityCode = rowData[3].trim();

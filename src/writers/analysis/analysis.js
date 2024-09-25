@@ -43,7 +43,7 @@ export const getAnalysisFromChatGPT = async ({
   try 
   {
     const response = await axios.post(apiUrl, {
-      model: "gpt-3.5-turbo-0301",
+      model: "gpt-4-turbo",
       messages: [{"role": "user", "content": request}],
       max_tokens: 500,
     }, {
@@ -59,8 +59,7 @@ export const getAnalysisFromChatGPT = async ({
       isAvailable: true
     });
   } 
-  catch (error) {
-  
+  catch (error) {  
     console.error('Error generating code:', error.message);
     return ({
       analysis: "",
