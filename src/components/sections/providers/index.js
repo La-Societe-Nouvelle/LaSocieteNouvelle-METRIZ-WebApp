@@ -63,10 +63,11 @@ const ProvidersSection = ({
       // apply data
       financialData.externalExpenses
         .concat(financialData.investments)
-        .filter((expense) => (expense.footprintOrigin=="provider" && expense.providerNum === account.providerNum)
-                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum))
+        .filter((expense) => (expense.providerNum === account.providerNum)
+                          || (expense.footprintOrigin=="account" && expense.accountNum === account.accountNum)) // only update expenses not already linked to a provider fpt
         .forEach((expense) => {
           expense.footprint = account.footprint;
+          expense.footprintOrigin = (expense.providerNum === account.providerNum) ? "provider" : "account";
         });
     } catch (error) {
       setApiError(true);
