@@ -156,20 +156,20 @@ const Results = ({ session, period, publish, goBack }) => {
           <div className="d-flex">
             <DownloadDropdown onDownload={handleDownload} view={showedView} />
 
-            <Button
+            {/* <Button
               variant="light"
               className="me-2"
               onClick={() => setShowReportGeneratorModal(true)}
             >
               <i className="bi bi-gear"></i> Générer un rapport
-            </Button>
+            </Button> */}
 
-            <ReportGeneratorModal
+            {/* <ReportGeneratorModal
               showModal={showReportGeneratorModal}
               onClose={() => setShowReportGeneratorModal(false)}
               onDownload={handleGenerate}
               indicators={session.validations[period.periodKey]}
-            />
+            /> */}
 
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats <i className="bi bi-chevron-right"></i>

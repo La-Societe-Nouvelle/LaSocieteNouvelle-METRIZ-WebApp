@@ -74,12 +74,12 @@ const createARTDetailsTable = (impactsData, nbDecimals, colors) =>
 			{ text: 'Poste', style: 'tableHeader' }, 
 			{ text: 'Unité', style: 'tableHeader' }, 
 			{ text: 'Taux de contribution', style: 'tableHeader' }, 
-			{ text: 'Incertitude', style: 'tableHeader' }
+			{ text: 'Incert.', style: 'tableHeader' }
 		],[
 			{ text: "Valeur ajoutée nette", style: 'tableData' },
 			{ text: "%", style: 'tableData', alignment: 'center' },
 			{ text: nva_fpt.value.toFixed(nbDecimals), style: 'tableData', alignment: 'right' },
-			{ text: "0 %", style: 'tableData', alignment: 'right', fontSize: 5 }
+			{ text: "0 %", style: 'tableData', alignment: 'right', fontSize: 6 }
 		]
 	];
 
@@ -121,7 +121,7 @@ const createIDRDetailsStatement = (impactsData, nbDecimals, colors) =>
 	
 	const content = [
 		{
-			text: "Ecart interne de rémunération : "+interdecileRange.toFixed(nbDecimals),
+			text: "Ecart interne de rémunération : "+parseFloat(interdecileRange).toFixed(nbDecimals),
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -163,12 +163,12 @@ const createECODetailsTable = (impactsData, nbDecimals, colors) =>
 			{ text: 'Poste', style: 'tableHeader' }, 
 			{ text: 'Unité', style: 'tableHeader' }, 
 			{ text: 'Taux de contribution', style: 'tableHeader' }, 
-			{ text: 'Incertitude', style: 'tableHeader' }
+			{ text: 'Incert.', style: 'tableHeader' }
 		],[
 			{ text: "Valeur ajoutée nette", style: 'tableData' },
 			{ text: "%", style: 'tableData', alignment: 'center' },
 			{ text: nva_fpt.value.toFixed(nbDecimals), style: 'tableData', alignment: 'right' },
-			{ text: "0 %", style: 'tableData', alignment: 'right' }
+			{ text: "0 %", style: 'tableData', alignment: 'right', fontSize: 6 }
 		]
 	];
 
@@ -210,7 +210,7 @@ const createGEQDetailsStatement = (impactsData, nbDecimals, colors) =>
 	
 	const content = [
 		{
-			text: "Ecart interne de rémunération femmes/hommes : "+wageGap.toFixed(nbDecimals)+" %",
+			text: "Ecart interne de rémunération femmes/hommes : "+parseFloat(wageGap).toFixed(nbDecimals)+" %",
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -237,8 +237,8 @@ const createGHGDetailsStatement = (impactsData, nbDecimals, colors) =>
 		const content = [
 			{
 				text: "Emissions directes de gaz à effet de serre déclarées : "
-					+ greenhouseGasEmissions.toFixed(nbDecimals)+" "+greenhouseGasEmissionsUnit
-					+ " +/- "+greenhouseGasEmissionsUncertainty.toFixed(0)+" %",
+					+ parseFloat(greenhouseGasEmissions).toFixed(nbDecimals)+" "+greenhouseGasEmissionsUnit
+					+ " +/- "+greenhouseGasEmissionsUncertainty+" %",
 				margin: [0, 0, 0, 20]
 			},
 		]
@@ -251,7 +251,10 @@ const createGHGDetailsTable = (impactsData, nbDecimals, colors) =>
 	const ghgDetails = impactsData.ghgDetails;
 
 	const tableBody = [
-		[{ text: 'Poste', style: 'tableHeader' }, { text: 'Unité', style: 'tableHeader' }, { text: 'Émissions', style: 'tableHeader' }, { text: 'Incertitude', style: 'tableHeader' }]
+		[{ text: 'Poste', style: 'tableHeader' }, 
+		 { text: 'Unité', style: 'tableHeader' }, 
+		 { text: 'Émissions', style: 'tableHeader' }, 
+		 { text: 'Incert.', style: 'tableHeader' }]
 	];
 
 	for (const key in ghgDetails) {
@@ -261,7 +264,7 @@ const createGHGDetailsTable = (impactsData, nbDecimals, colors) =>
 				{ text: item.label, style: 'tableData', },
 				{ text: "kgCO2e", style: 'tableData', },
 				{ text: `${item.ghgEmissions.toFixed(nbDecimals)}`, style: 'tableData', alignment: 'right' },
-				{ text: `${item.ghgEmissionsUncertainty} %`, style: 'tableData', alignment: 'right' }
+				{ text: `${item.ghgEmissionsUncertainty} %`, style: 'tableData', alignment: 'right', fontSize: 6 }
 			]);
 		}
 	}
@@ -304,8 +307,8 @@ const createHAZDetailsStatement = (impactsData, nbDecimals, colors) =>
 	const content = [
 		{
 			text: "Quantité utilisée de produit dangereux déclarée : "
-				+ hazardousSubstancesUse.toFixed(nbDecimals)+" "+hazardousSubstancesUseUnit
-				+ " +/- "+hazardousSubstancesUseUncertainty.toFixed(0)+" %",
+				+ parseFloat(hazardousSubstancesUse).toFixed(nbDecimals)+" "+hazardousSubstancesUseUnit
+				+ " +/- "+hazardousSubstancesUseUncertainty+" %",
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -323,7 +326,7 @@ const createKNWDetailsStatement = (impactsData, nbDecimals, colors) =>
 	const content = [
 		{
 			text: "Contribution directe à la formation et à la recherche : "
-				+ researchAndTrainingContribution.toFixed(nbDecimals)+" €",
+				+ parseFloat(researchAndTrainingContribution).toFixed(nbDecimals)+" €",
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -341,8 +344,8 @@ const createMATDetailsStatement = (impactsData, nbDecimals, colors) =>
 	const content = [
 		{
 			text: "Quantité extraite de matières premières déclarée : "
-				+ materialsExtraction.toFixed(nbDecimals)+" "+materialsExtractionUnit
-				+ " +/- "+materialsExtractionUncertainty.toFixed(0)+" %",
+				+ parseFloat(materialsExtraction).toFixed(nbDecimals)+" "+materialsExtractionUnit
+				+ " +/- "+materialsExtractionUncertainty+" %",
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -369,8 +372,8 @@ const createNRGDetailsStatement = (impactsData, nbDecimals, colors) =>
 		const content = [
 			{
 				text: "Consommation directe d'énergie déclarée : "
-					+ energyConsumption.toFixed(nbDecimals)+" "+energyConsumptionUnit
-					+ " +/- "+energyConsumptionUncertainty.toFixed(0)+" %",
+					+ parseFloat(energyConsumption).toFixed(nbDecimals)+" "+energyConsumptionUnit
+					+ " +/- "+energyConsumptionUncertainty+" %",
 				margin: [0, 0, 0, 20]
 			},
 		]
@@ -383,7 +386,10 @@ const createNRGDetailsTable = (impactsData, nbDecimals, colors) => {
 	const nrgDetails = impactsData.nrgDetails;
 
 	const tableBody = [
-		[{ text: 'Poste', style: 'tableHeader' }, { text: 'Unité', style: 'tableHeader' }, { text: 'Émissions', style: 'tableHeader' }, { text: 'Incertitude', style: 'tableHeader' }]
+		[{ text: 'Poste', style: 'tableHeader' }, 
+		 { text: 'Unité', style: 'tableHeader' }, 
+		 { text: 'Émissions', style: 'tableHeader' }, 
+		 { text: 'Incert.', style: 'tableHeader' }]
 	];
 
 	for (const key in nrgDetails) {
@@ -394,7 +400,7 @@ const createNRGDetailsTable = (impactsData, nbDecimals, colors) => {
 				{ text: fuels[item.fuelCode] ? fuels[item.fuelCode].label : "", style: 'tableData', },
 				{ text: "kJ", style: 'tableData', },
 				{ text: `${item.nrgConsumption.toFixed(nbDecimals)}`, style: 'tableData', alignment: 'right' },
-				{ text: `${item.nrgConsumptionUncertainty} %`, style: 'tableData', alignment: 'right' }
+				{ text: `${item.nrgConsumptionUncertainty} %`, style: 'tableData', alignment: 'right', fontSize: 6 }
 			]);
 		}
 	}
@@ -460,8 +466,8 @@ const createWASDetailsStatement = (impactsData, nbDecimals, colors) =>
 	const content = [
 		{
 			text: "Quantité produite de déchets : "
-				+ wasteProduction.toFixed(nbDecimals)+" "+wasteProductionUnit
-				+ " +/- "+wasteProductionUncertainty.toFixed(0)+" %",
+				+ parseFloat(wasteProduction).toFixed(nbDecimals)+" "+wasteProductionUnit
+				+ " +/- "+wasteProductionUncertainty+" %",
 			margin: [0, 0, 0, 20]
 		},
 	]
@@ -479,8 +485,8 @@ const createWATDetailsStatement = (impactsData, nbDecimals, colors) =>
 	const content = [
 		{
 			text: "Quantité consommée d'eau : "
-				+ waterConsumption.toFixed(nbDecimals)+" "+waterConsumptionUnit
-				+ " +/- "+waterConsumptionUncertainty.toFixed(0)+" %",
+				+ parseFloat(waterConsumption).toFixed(nbDecimals)+" "+waterConsumptionUnit
+				+ " +/- "+waterConsumptionUncertainty+" %",
 			margin: [0, 0, 0, 20]
 		},
 	]

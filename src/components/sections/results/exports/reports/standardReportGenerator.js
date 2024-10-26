@@ -40,7 +40,14 @@ export const buildStandardReport = async ({
 }) => {
   // Session data --------------------------------------------------
 
-  const { legalUnit, financialData, impactsData, comparativeData, analysis, availablePeriods, } = session;
+  const { 
+    legalUnit, 
+    financialData, 
+    impactsData, 
+    comparativeData, 
+    analysis, 
+    availablePeriods
+  } = session;
 
   const { mainAggregates, productionAggregates, providers, externalExpensesAccounts, immobilisations } = financialData;
   const { production, intermediateConsumptions, fixedCapitalConsumptions, netValueAdded } = mainAggregates;
@@ -49,8 +56,8 @@ export const buildStandardReport = async ({
   const currentPeriod = period.periodKey.slice(2);
 
   // get Intermediate Aggregates
-  const intermediateConsumptionsAggregates = await buildIntermediateConsumptionsAggregates(financialData, [period]);
-  const fixedCapitalConsumptionsAggregates = await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
+  const intermediateConsumptionsAggregates = await buildIntermediateConsumptionsAggregates(financialData, availablePeriods);
+  const fixedCapitalConsumptionsAggregates = await buildFixedCapitalConsumptionsAggregates(financialData, availablePeriods);
 
   const transparentProviders = getTransparentProviders(providers, period, indic);
 
@@ -85,8 +92,6 @@ export const buildStandardReport = async ({
 
   const trendChart = getChartImageData(`trend-chart-${indic}-print`)
 
-
-
   // ---------------------------------------------------------------
   // Colors
 
@@ -103,11 +108,11 @@ export const buildStandardReport = async ({
     "-" +
     indic.toUpperCase();
 
-
   // ---------------------------------------------------------------
   // Content
 
-  const content = [
+  const content = 
+  [
     {
       text: `${libelle}`,
       style: "h1",
@@ -123,7 +128,7 @@ export const buildStandardReport = async ({
     // SIG
 
     createSectionTitle("Tableau des résultats", colors),
-    createSIGtableSection(comparativeData, mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, nbDecimals, colors),
+    createSIGtableSection(mainAggregates, productionAggregates, indic, unit, intermediateConsumptionsAggregates, fixedCapitalConsumptionsAggregates, period, nbDecimals, colors, availablePeriods),
 
     // ---------------------------------------------------------------
     // Statement 
@@ -131,12 +136,12 @@ export const buildStandardReport = async ({
     createSectionTitle(libelleEmpreinteDirecte, colors), // "Impacts directs"
     getStatementDetails(impactsData[period.periodKey], indic, colors),
 
-    createSectionTitle(libelleEmpreinteIndirecte, colors),
+    /* createSectionTitle(libelleEmpreinteIndirecte, colors),
     {
       text: "Les impacts indirects liés aux consommations, intermédiaies et de capital fixe, sont obtenues "+
             "à partir de l'empreinte de vos fournisseurs (Cf. Empreinte des principaux fournisseurs). Des "+
             "proxys sectoriels sont utilisés en l'absence d'informations publiées.",
-    },
+    }, */
 
     // ---------------------------------------------------------------
     // Production Footprint & Analysis
@@ -164,26 +169,17 @@ export const buildStandardReport = async ({
         "Elle est construite à partir des évolutions sur les 10 dernières années de la performance directe de la branche et de celles situées en amont de la chaine de valeur, " +
         "et sur une projection de la structure de l'économie sur les années à venir (volumes d'activité, interactions avec l'exterieur, dynamique des prix). "
     },
-    {
-      text: `Source des données : ${metaTrends[indic].source}`, margin: [0, 5, 0, 0], 
-      //style: "legendText"
-    },
     metaTargets[indic] ?
       [
         {
-          text: "Objectif de la branche :",
-          style: "h3",
-          margin: [0, 5, 0, 10]
-        },
-        {
-          text: metaTargets[indic].info
-        },
-        {
-          text: `Source : ${metaTargets[indic].source}`, 
-          //style: "legendText",
+          text: metaTargets[indic].info,
           margin: [0, 5, 0, 0]
-        },
+        }
       ] : [],
+    {
+      text: `Source des données : ${metaTrends[indic].source}`, 
+      margin: [0, 5, 0, 0],
+    },
 
     // ---------------------------------------------------------------
     // Target 
@@ -270,7 +266,7 @@ export const buildStandardReport = async ({
     defaultStyle: {
       color: colors.text,
       font: "Roboto",
-      fontSize: 7,
+      fontSize: 8,
       alignment: "justify"
     },
     styles: {
@@ -285,15 +281,16 @@ export const buildStandardReport = async ({
       h2: {
         bold: true,
         margin: [0, 0, 0, 10],
-        fontSize: 8,
         color: colors.primary,
         font: "Raleway",
+        fontSize: 8,
       },
       h3: {
         bold: true,
         margin: [0, 0, 0, 10],
         color: colors.primary,
         font: "Raleway",
+        fontSize: 8
       },
       sectionTitle: {
         fontSize: 11,
@@ -316,12 +313,13 @@ export const buildStandardReport = async ({
         font: "Raleway",
       },
       libelle: {
-        margin: [0, 0, 0, 10],
-        alignment: 'center'
+        margin: [0, 5, 0, 10],
+        alignment: 'center',
+        fontSize: 8,
       },
       table: {
         margin: [0, 0, 0, 10],
-        fontSize: 6,
+        fontSize: 7,
       },
       tableHeader: {
         margin: [0, 5, 0, 5],
@@ -378,7 +376,8 @@ const createKeyFigures = (mainAggregates, period, prevPeriod, indic, colors) =>
   // indirect impact/footprint
   const indirectImpact = getIndirectImpact(mainAggregates, period, indic);
 
-  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value.toFixed(nbDecimals) : " - ";
+  const prevFootprint = prevPeriod ? production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value.toFixed(nbDecimals) : null;
+  const evolution = (prevFootprint && productionFootprint>0) ? roundValue(((productionFootprint-prevFootprint)/productionFootprint)*100, 0) : " - ";
 
   const createTableColumn = (value, label, unit, highlighted) => ({
     width: '*',
@@ -420,7 +419,7 @@ const createKeyFigures = (mainAggregates, period, prevPeriod, indic, colors) =>
       createTableColumn(productionFootprint, "Empreinte\nde la production", unit, true),
       createTableColumn(directImpact.value, libelleEmpreinteDirecte, directImpact.unit, false),
       createTableColumn(indirectImpact.value, libelleEmpreinteIndirecte, indirectImpact.unit, false),
-      createTableColumn(prevFootprint, "Evolution par rapport à l'exercice précédent", prevPeriod ? unitDeclaration : "", false),
+      createTableColumn(evolution, "Evolution par rapport à l'exercice précédent", prevPeriod ? "%" : "", false),
     ],
   };
 };
@@ -465,7 +464,6 @@ const createFinancialChartsSection = (
         ],
       },
       {
-
         stack: [
           {
             text: "Consommations de capital fixe ",
@@ -509,21 +507,17 @@ const createProductionSection = (period, indic, colors, production, comparativeD
         text: "Empreinte",
         style: "tableHeader",
         border: [false, true, false, false]
-
       },
-
     ],
     [
       {
         text: "Empreinte de l'entreprise",
         border: [false, false, false, false]
-
       },
       {
         text: unit,
         style: "unit",
         border: [false, false, false, false]
-
       },
       {
         text:
@@ -533,11 +527,8 @@ const createProductionSection = (period, indic, colors, production, comparativeD
           ),
         style: "data",
         border: [false, false, false, false]
-
       },
-
-    ],
-    [
+    ],[
       {
         text: "Moyenne de la branche",
         border: [false, false, false, false]
@@ -552,13 +543,10 @@ const createProductionSection = (period, indic, colors, production, comparativeD
         style: "data",
         border: [false, false, false, false]
       },
-
-    ],
-    [
+    ],[
       {
         text: "Objectif sectoriel 2030",
         border: [false, false, false, true]
-
       },
       {
         text: unit,
@@ -571,9 +559,7 @@ const createProductionSection = (period, indic, colors, production, comparativeD
         border: [false, false, false, true]
       },
     ],
-
   ];
-
 
   return {
     columnGap: 20,
@@ -604,7 +590,6 @@ const createProductionSection = (period, indic, colors, production, comparativeD
               hLineColor: function (i, node) {
                 return colors.primary;
               },
-
             },
             style: 'table',
             margin: [0, 5, 0, 20]
@@ -614,9 +599,8 @@ const createProductionSection = (period, indic, colors, production, comparativeD
       {
         width: '*',
         stack: [
-
           {
-            margin: [0, 0, 0, 20],
+            margin: [0, 0, 0, 10],
             text: "Note d'analyse",
             style: "h3",
           },
@@ -1071,7 +1055,7 @@ const createMainProvidersTable = (providers, period, indic, colors) => {
       {
         text: [
           {
-            text: "Incertitude\n"
+            text: "Incert.\n"
           },
           {
             text: "%",
@@ -1233,12 +1217,12 @@ const createPublishedProvidersTable = (providers, period, colors) => {
 
 // ----------------------------------------------------------------------------------------------------
 // External Accounts table
-const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, indic, colors) => {
-
+const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, indic, colors) => 
+{
   const { unit, nbDecimals } = metaIndics[indic];
 
-
   const mainExternalExpenses = externalExpensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
     .filter((account) => account.periodsData[period.periodKey].amount > 0)
     .sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount)
     .slice(0, 10);
@@ -1263,7 +1247,7 @@ const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, i
       {
         text: [
           {
-            text: "Incertitude\n"
+            text: "Incert.\n"
           },
           {
             text: "%",
@@ -1273,22 +1257,19 @@ const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, i
         style: "tableHeader",
         alignment: "right"
       },
-
     ],
   ];
 
 
-  mainExternalExpenses.forEach((account) => {
-
+  mainExternalExpenses.forEach((account) => 
+  {
     const footprintIndicator = account.periodsData[period.periodKey].footprint.indicators[indic];
 
     tableBody.push([
       { text: account.accountNum },
       { text: account.accountLib },
       { text: printValue(footprintIndicator.getValue(), nbDecimals), style: 'data' },
-      { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data' },
-
-
+      { text: printValue(footprintIndicator.getUncertainty(), 0), style: 'data', fontSize: 6 },
     ]);
   });
 
@@ -1307,8 +1288,8 @@ const createExternalExpensesAccountsTable = (externalExpensesAccounts, period, i
 
 // ----------------------------------------------------------------------------------------------------
 // immo table
-const createImmobilisationsTable = (immobilisations, period, indic, colors) => {
-
+const createImmobilisationsTable = (immobilisations, period, indic, colors) => 
+{
   const immobilisationsAccounts = immobilisations.slice(0, 10);
 
   const { unit, nbDecimals } = metaIndics[indic];
@@ -1333,7 +1314,7 @@ const createImmobilisationsTable = (immobilisations, period, indic, colors) => {
       {
         text: [
           {
-            text: "Incertitude\n"
+            text: "Incert.\n"
           },
           {
             text: "%",
@@ -1359,7 +1340,7 @@ const createImmobilisationsTable = (immobilisations, period, indic, colors) => {
       {
         text: [
           {
-            text: "Incertitude\n"
+            text: "Incert.\n"
           },
           {
             text: "%",
@@ -1383,7 +1364,7 @@ const createImmobilisationsTable = (immobilisations, period, indic, colors) => {
       { text: printValue(initialFootprint.getValue(), nbDecimals), style: 'data' },
       { text: printValue(initialFootprint.getUncertainty(), 0), style: 'data' },
       { text: printValue(endFootprint.getValue(), nbDecimals), style: 'data' },
-      { text: printValue(endFootprint.getUncertainty(), 0), style: 'data' },
+      { text: printValue(endFootprint.getUncertainty(), 0), style: 'data', fontSize: 6 },
 
     ]);
   });

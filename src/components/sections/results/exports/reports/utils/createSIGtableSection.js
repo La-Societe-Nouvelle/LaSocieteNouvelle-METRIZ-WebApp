@@ -1,9 +1,8 @@
 import { borderColor, margin } from "polished";
-import { getLabelPeriod } from "../../../../../../utils/periodsUtils";
+import { getLabelPeriod, getPrevPeriod, getYearPeriod } from "../../../../../../utils/periodsUtils";
 import { printValue } from "/src/utils/formatters";
 
 export const createSIGtableSection = (
-  comparativeData,
   mainAggregates,
   productionAggregates,
   indic,
@@ -12,8 +11,10 @@ export const createSIGtableSection = (
   fixedCapitalConsumptionsAggregates,
   period,
   precision,
-  colors
+  colors,
+  availablePeriods
 ) => {
+
   // FINANCIAL DATA
   const {
     revenue,
@@ -28,8 +29,9 @@ export const createSIGtableSection = (
     netValueAdded,
   } = mainAggregates;
 
-  const showPrevPeriod = false;
-  const currentYear = period.periodKey.slice(2)
+  const currentYear = getYearPeriod(period);
+  const prevPeriod = getPrevPeriod(availablePeriods, period);
+  const showPrevPeriod = prevPeriod != null;
   
   // const branchProductionFootprint = comparativeData.production.division.history.data[indic]?.[comparativeData.production.division.history.data[indic].length - 1] ?? null;
   // const branchNetValueAddedFootprint = comparativeData.netValueAdded.division.history.data[indic]?.[comparativeData.netValueAdded.division.history.data[indic].length - 1] ?? null;
@@ -41,7 +43,7 @@ export const createSIGtableSection = (
       {
         text: [{
           text: `Empreinte exprimée en `,
-          fontSize: 5,
+          fontSize: 6,
           italics: true
         }, {
           text: unit,
@@ -50,8 +52,11 @@ export const createSIGtableSection = (
       },
       { text: '', border: [false, false, false, true] },
       { text: getLabelPeriod(period), colSpan: 2, border: [true, true, true, true], style: "darkBackground", alignment: "center" },
-      { text: '', border: [false, false, false, true] },
-      // { text: '', border: [false, false, false, false] },
+      { text: '', border: [false, true, true, true] },
+      ...showPrevPeriod ? [
+        { text: getLabelPeriod(prevPeriod), colSpan: 2, border: [true, true, true, true], alignment : "center" },
+        { text: '', border: [false, true, true, true] },
+      ] : [],
     ],
     [
       {
@@ -70,16 +75,24 @@ export const createSIGtableSection = (
         alignment: "center"
       },
       {
-        text: "Incertitude",
+        text: "Incert.",
         style: "tableHeader",
         alignment: "center",
-        border : [false,false,true,true] 
+        border : [false,false,true,false] 
       },
-      // {
-      //   text: "Empreinte\nbranche",
-      //   style: "tableHeader",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: "Empreinte",
+          style: "tableHeader",
+          alignment: "center"
+        },
+        {
+          text: "Incert.",
+          style: "tableHeader",
+          alignment: "center",
+          border : [false,false,true,false] 
+        }
+      ] : [],
     ],
     [
       { text: "Production", style: "tableBold", border : [false,true,false,true] },
@@ -109,13 +122,32 @@ export const createSIGtableSection = (
         style: "tableBold",
         alignment: "right",
         border : [false,true,true,true], 
-        fontSize : 5 
+        fontSize: 6
       },
-      // {
-      //   text: branchProductionFootprint,
-      //   style: "tableBold",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,false,true] 
+        },
+        {
+          text:
+            printValue(production.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,true,true], 
+          fontSize: 6
+        }
+      ] : [],
     ],
     [
       {
@@ -128,7 +160,6 @@ export const createSIGtableSection = (
         border : [false,false,true,false] 
       },
       {
-
         style: "data",
         text: [
           {
@@ -138,21 +169,38 @@ export const createSIGtableSection = (
                 precision
               ) + " ",
           },
-
         ],
       },
       {
         style: "data",
         text:
           printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
-          border : [false,false,true,false] 
-
+          border : [false,false,true,false],
+          fontSize: 6
       },
-      // {
-      //   text: " - ",
-      //   style: "tableBold",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  revenue.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+        },
+        {
+          text:
+            printValue(revenue.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,false,true,false], 
+          fontSize: 6
+        }
+      ] : [],
     ],
     [
       {
@@ -163,7 +211,6 @@ export const createSIGtableSection = (
         text: printValue(storedProduction.periodsData[period.periodKey].amount, 0) + " €",
         style: "data",
         border : [false,false,true,false] 
-
       },
       {
         style: "data",
@@ -185,20 +232,89 @@ export const createSIGtableSection = (
             0
           ) + " %",
         style: "data",
-        border : [false,false,true,true] 
-
+        border: [false,false,true,false],
+        fontSize: 6
       },
-      // {
-      //   text: " - ",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  storedProduction.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+        },
+        {
+          text:
+            printValue(storedProduction.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,false,true,false], 
+          fontSize: 6
+        }
+      ] : [],
     ],
-    ...getImmobilisedProductionRow(
-      immobilisedProduction,
-      indic,
-      unit,
-      precision
-    ),
+    [
+      {
+        text: "Production immobilisée",
+        margin: [5, 0, 0, 0]
+      },
+      {
+        text: printValue(immobilisedProduction.periodsData[period.periodKey].amount, 0) + " €",
+        style: "data",
+        border : [false,false,true,false] 
+      },
+      {
+        style: "data",
+        text: [
+          {
+            text:
+              printValue(
+                immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].value,
+                precision
+              ) + " ",
+          },
+        ],
+      },
+      {
+        text:
+          printValue(
+            immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
+            0
+          ) + " %",
+        style: "data",
+        border: [false,false,true,false],
+        fontSize: 6
+      },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  immobilisedProduction.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+        },
+        {
+          text:
+            printValue(immobilisedProduction.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,false,true,false], 
+          fontSize: 6
+        }
+      ] : [],
+    ],
     [
       {
         text: "Consommations intermédiaires",
@@ -220,7 +336,6 @@ export const createSIGtableSection = (
                 precision
               ),
           },
-
         ],
         style: "tableBold",
         alignment: "right",
@@ -234,27 +349,47 @@ export const createSIGtableSection = (
           ) + " %",
         style: "tableBold",
         alignment: "right",
-        border: [false, true, true, true]
+        border: [false, true, true, true],
+        fontSize: 6
       },
-      // {
-      //   text: branchIntermediateConsumptionsFootprint.value,
-      //   style: "tableBold",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  intermediateConsumptions.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,false,true] 
+        },
+        {
+          text:
+            printValue(intermediateConsumptions.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,true,true], 
+          fontSize: 6
+        }
+      ] : [],
     ],
     ...getAggregateRow(
       intermediateConsumptionsAggregates,
       indic,
       unit,
       precision,
-      period
+      period,
+      prevPeriod
     ),
     [
       {
         text: "Consommations de capital fixe",
         style: "tableBold",
         border: [false, true, false, true]
-
       },
       {
         text: printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €",
@@ -271,7 +406,6 @@ export const createSIGtableSection = (
                 precision
               ) + " "
           },
-
         ],
         style: "tableBold",
         alignment: "right",
@@ -285,28 +419,47 @@ export const createSIGtableSection = (
           ) + " %",
         style: "tableBold",
         alignment: "right",
-        border: [false, true, true, true]
-
+        border: [false, true, true, true],
+        fontSize: 6
       },
-      // {
-      //   text: branchFixedCapitalConsumptionsFootprint.value,
-      //   style: "tableBold",
-      //   alignment: "right"
-      // },
+      ...showPrevPeriod ? [
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  fixedCapitalConsumptions.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,false,true] 
+        },
+        {
+          text:
+            printValue(fixedCapitalConsumptions.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,true,true], 
+          fontSize: 6
+        }
+      ] : [],
     ],
     ...getAggregateRow(
       fixedCapitalConsumptionsAggregates,
       indic,
       unit,
       precision,
-      period
+      period,
+      prevPeriod
     ),
     [
       {
         text: "Valeur ajoutée nette",
         style: "tableBold",
         border: [false, true, false, true]
-
       },
       {
         text: printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
@@ -324,7 +477,6 @@ export const createSIGtableSection = (
                 precision
               ) + " "
           },
-
         ],
         style: "tableBold",
         alignment: "right",
@@ -337,16 +489,31 @@ export const createSIGtableSection = (
         style: "tableBold",
         alignment: "right",
         border: [false, true, true, true],
+        fontSize: 6
       },
-      // {
-      //   text: branchNetValueAddedFootprint.value,
-      //   style: "tableBold",
-      //   alignment: "right"
-      // },
       ...showPrevPeriod ? [
-        { text: "", style: 'data' },
-        { text: "", style: 'data' },
-        { text: "", style: 'data', fontSize: 5 }
+        {
+          text: [
+            {
+              text:
+                printValue(
+                  netValueAdded.periodsData[prevPeriod.periodKey].footprint.indicators[indic].value,
+                  precision
+                ) + " "
+            },
+          ],
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,false,true] 
+        },
+        {
+          text:
+            printValue(netValueAdded.periodsData[prevPeriod.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
+          style: "tableBold",
+          alignment: "right",
+          border : [false,true,true,true], 
+          fontSize: 6
+        }
       ] : [],
     ],
   ];
@@ -354,8 +521,7 @@ export const createSIGtableSection = (
   return {
     table: {
       headerRows: 1,
-      // widths: ['*', 'auto', 'auto', 'auto', 'auto'],
-      widths: ['*', 'auto', 'auto', 'auto'],
+      widths: showPrevPeriod ? ['*', 'auto', 'auto', 'auto', 'auto', 'auto'] : ['*', 'auto', 'auto', 'auto'],
       body: tableBody,
     },
     layout: {
@@ -377,65 +543,14 @@ export const createSIGtableSection = (
       paddingBottom: function (i, node) { return 3 },
     },
     style: 'table',
-    margin : [0,0,0,20]
+    margin : [0, 0, 0, 20]
   };
 }
 
 /* ---------- TABLE ROWS ---------- */
 
-const getImmobilisedProductionRow = (
-  immobilisedProduction,
-  indic,
-  unit,
-  precision
-) => {
-  const immobilisedProductionRow = [];
-  // Immobilised production
-  if (immobilisedProduction > 0) {
-    immobilisedProductionRow.push(
-      {
-        text: "dont production immobilisée",
-        margin: [5, 0, 0, 0]
-      },
-      {
-        text: printValue(immobilisedProduction.periodsData[period.periodKey].amount, 0) + " €",
-        style: "data",
-        border : [false,false,true,false] 
-      },
-      {
-        style: "data",
-        text: [
-          {
-            text:
-              printValue(
-                immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].value,
-                precision
-              ) + " ",
-          },
-
-        ],
-      },
-      {
-        text:
-          printValue(
-            immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
-            0
-          ),
-        style: "data",
-
-      },
-      // {
-      //   text: " - ",
-      //   style: "data",
-      //   alignment: "right"
-      // },
-    );
-  }
-
-  return immobilisedProductionRow;
-};
-
-const getAggregateRow = (aggregates, indic, unit, precision, period) => {
+const getAggregateRow = (aggregates, indic, unit, precision, period, prevPeriod) => 
+{
   let rows = [];
   aggregates
     .map(({ label, periodsData }, index) => {
@@ -460,7 +575,6 @@ const getAggregateRow = (aggregates, indic, unit, precision, period) => {
                   precision
                 ) + " ",
             },
-
           ],
         },
         {
@@ -468,14 +582,31 @@ const getAggregateRow = (aggregates, indic, unit, precision, period) => {
             printValue(periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
             " %",
           style: "data",
-          border: [false, false, true, false]
-
+          border: [false, false, true, false],
+          fontSize: 6
         },
-        // {
-        //   text: " - ",
-        //   style: "tableBold",
-        //   alignment: "right"
-        // },
+        ...(prevPeriod != null) ? [
+          {
+            style: "data",
+            text: [
+              {
+                text:
+                  printValue(
+                    periodsData[prevPeriod.periodKey]?.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+            ],
+          },
+          {
+            text:
+              printValue(periodsData[prevPeriod.periodKey]?.footprint.indicators[indic].uncertainty, 0) +
+              " %",
+            style: "data",
+            border: [false, false, true, false],
+            fontSize: 6
+          }
+        ] : [],
       );
       rows.push(row);
     });
