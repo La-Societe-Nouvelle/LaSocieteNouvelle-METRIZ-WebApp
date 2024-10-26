@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import { Button, Dropdown, Form } from "react-bootstrap";
 
-const DownloadDropdown = ({ onDownload, view }) => {
+const DownloadDropdown = ({ onDownload, view }) => 
+{
   const currentViewFiles = [
-    {
-      id: "sig-indic-xlsx",
-      name: "Soldes intermédiaires de gestion (.xlsx)",
-    },
-    { id: "summary-report", name: "Plaquette (.pdf)" },
-
-    { id: "standard-report", name: "Rapport (.pdf)" },
-
+    { id: "sig-indic-xlsx", name: "Soldes intermédiaires de gestion (.xlsx)" },
+    /* { id: "summary-report", name: "Plaquette (.pdf)" }, */
+    { id: "standard-report", name: "Rapport indicateur (.pdf)" },
   ];
 
   const [selectedFileIds, setSelectedFileIds] = useState([]);
@@ -115,13 +111,13 @@ const DownloadDropdown = ({ onDownload, view }) => {
               type="checkbox"
               id={`checkbox-report`}
               label={
-                <label htmlFor={`checkbox-report`}>Rapport global (.pdf) </label>
+                <label htmlFor={`checkbox-report`}>Synthèse (.pdf) </label>
               }
               checked={selectedFileIds.includes("checkbox-report")}
               onChange={(event) => handleCheckboxChange(event, "checkbox-report")}
             />
           </div>
-          <div className="dropdown-item">
+          {/* <div className="dropdown-item">
             <Form.Check
               type="checkbox"
               id={`checkbox-all`}
@@ -131,7 +127,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
               checked={selectedFileIds.includes("checkbox-all")}
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
             />
-          </div>
+          </div> */}
 
           <Dropdown.Divider></Dropdown.Divider>
           <div className="dropdown-item">

@@ -3,14 +3,18 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Metadata
 import metaIndics from "/lib/indics.json";
+import styles from "/lib/styles"
 
 // Utils
 import { generateFooter, generateHeader, loadFonts } from "./utils/layout";
 import { getChartImageData, loadImageAsDataURL } from "./utils";
 import { getKeyIndics, isBetter, isWorst } from "../../utils";
 import { roundValue } from "../../../../../utils/Utils";
-import { getLabelPeriod } from "../../../../../utils/periodsUtils";
+import { getLabelPeriod, getPrevPeriod } from "../../../../../utils/periodsUtils";
 import { printValue } from "../../../../../utils/formatters";
+import { pdfMargins, pdfPageSize } from "../../../../../constants/pdfConfig";
+import { generateReportCover } from "./reportCoverGenerator";
+import { cp } from "fs";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
@@ -22,7 +26,8 @@ export const buildESEReport = async ({ session, period }) =>
     financialData,
     comparativeData,
     impactsData,
-    validations
+    validations,
+    availablePeriods
   } = session;
 
   // ---------------------------------------------------------------
@@ -52,42 +57,43 @@ export const buildESEReport = async ({ session, period }) =>
   // ---------------------------------------------------------------
   // Page Property
 
+  // ---------------------------------------------------------------
   // Colors
-  const colors = {
-    primary : "#191558",
-    secondary : "#fa595f",
-    text : "#191558",
-    light : "#ededff",
-  }
 
-  // Page size
-  const pageSize = {
-    width: 595.28,
-    height: 841.89,
-  };
+  const { colors } = styles["default"];
+
+  // ---------------------------------------------------------------
+  // Cover page
+
+  const coverPageContent = await generateReportCover(period, legalUnit);
 
   // ---------------------------------------------------------------
   // Content
 
   const content = 
   [
-    // Page 1 - Graphiques récapitulatifs ----------------------------------------------------------------- //
+    // Page 1 - Page de garde ----------------------------------------------------------------------------- //
 
+    ...coverPageContent,
+
+    // Page 2 - Graphiques récapitulatifs ----------------------------------------------------------------- //
+
+    { text: '', pageBreak: 'after' },
     {
       text: "Empreinte Sociétale de l'Entreprise",
       style: "h1",
     },
-    ...createSocialFootprintCharts(indicatorLabels, indicatorCharts),
+    ...createSocialFootprintCharts(indicatorLabels, indicatorCharts,colors),
 
-    // Page 2 - Tableau des données + impacts directs déclarées ------------------------------------------- //
+    // Page 3 - Tableau des données + impacts directs déclarées ------------------------------------------- //
 
     { text: '', pageBreak: 'after' },
     { text: "Tableau des résultats", style: "h2", },
-    createSocialFootprintTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData),
+    createSocialFootprintTable(production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData, availablePeriods),
     { text: "Caractéristiques des opérations de l'entreprise", style: "h2" },
     createStatementsTable(impactsData, period, validations, indicatorLabels, absoluteUnits, keyIndics),
 
-    // Page 3 - Analyses ---------------------------------------------------------------------------------- //
+    // Page 4 - Analyses ---------------------------------------------------------------------------------- //
 
     { text: '', pageBreak: 'after' },
     { text: "Suivi des objectifs sectoriels 2030", style: "h2" },
@@ -115,7 +121,7 @@ export const buildESEReport = async ({ session, period }) =>
       createPublishedProviderFootprintsTable(providers, validatedIndics, period),
     ] : [],
 
-    // Page 4 - Notice ------------------------------------------------------------------------------------ //
+    // Page 6 - Notice ------------------------------------------------------------------------------------ //
 
     { text: '', pageBreak: 'after' },
     buildNotePage(),
@@ -127,10 +133,15 @@ export const buildESEReport = async ({ session, period }) =>
   // Document definition
 
   const docDefinition = {
-    pageSize,
-    pageMargins: [40, 40, 40, 50],
-    header: generateHeader(corporateName, legalUnit.siren, period),
-    footer: generateFooter(""),
+    pageSize: pdfPageSize,
+    pageMargins: [
+      pdfMargins.left,
+      pdfMargins.top,
+      pdfMargins.right,
+      pdfMargins.bottom,
+    ],
+    header: generateHeader(corporateName, legalUnit.siren, period,colors),
+    footer: generateFooter(colors),
     info: {
       title: "",
       author: "",
@@ -148,30 +159,31 @@ export const buildESEReport = async ({ session, period }) =>
         bold: true,
         color: colors.primary,
         font: "Raleway",
-        margin: [0, 0, 0, 20],
+        margin: [0, 10, 0, 10],
         alignment: "center",
-        fontSize: 20
+        fontSize: 15
       },
       h2: {
         bold: true,
         margin: [0, 10, 0, 10],
         color: colors.primary,
         font: "Raleway",
-        border: "2px"
+        border: "2px",
+        fontSize: 12,
       },
       h3: {
         bold: true,
         margin: [0, 10, 0, 5],
-        fontSize: 8,
         color: colors.primary,
         font: "Raleway",
+        fontSize: 8,
       },
       table: {
         margin: [0, 10, 0, 10],
-        fontSize: 6,
+        fontSize: 7,
       },
       unit: {
-        fontSize: 5,
+        fontSize: 6,
         alignment: "right"
       },
       tableHeader: {
@@ -199,7 +211,7 @@ export const buildESEReport = async ({ session, period }) =>
         font: "Raleway",
         margin: [0, 0, 0, 5],
         alignment: "left",
-        fontSize: 8
+        fontSize: 9
       },
     },
   };
@@ -216,24 +228,25 @@ export const buildESEReport = async ({ session, period }) =>
 // ----------------------------------------------------------------------------------------------------
 // Footprint charts
 
-const createSocialFootprintCharts = (indicatorLabels, indicatorImages) => {
+const createSocialFootprintCharts = (indicatorLabels, indicatorImages,colors) => 
+{
   const content = [];
 
   Object.keys(indicatorImages).forEach(category => {
     
     // title category
-    const title = createTableTitle(category);
+    const title = createTableTitle(category,colors);
     content.push(title);
 
     let currentRow = [];
-    indicatorImages[category].forEach(({indic,image}, index) => {
-
+    indicatorImages[category].forEach(({indic,image}, index) => 
+    {
       // indic footprint chart
       currentRow.push({
-        margin: [0, 5],
+        margin: [0, 0, 0, 10],
         stack: [
           { text: splitTitle(indicatorLabels[indic]), style: "h3", alignment: "center" },
-          { image: image, width: 100, alignment: "center" }
+          { image: image, width: 100, alignment: "center", margin: [0, 5, 0, 5] }
         ],
       });
 
@@ -250,11 +263,12 @@ const createSocialFootprintCharts = (indicatorLabels, indicatorImages) => {
 // ----------------------------------------------------------------------------------------------------
 // Footprint data table
 
-const createSocialFootprintTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData) => {
-
+const createSocialFootprintTable = (production, period, indicatorLabels, indicatorUnits, keyIndics, comparativeData, availablePeriods) => 
+{
   const exclamationIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="#ffc107" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07M9 5v6h2V5zm0 8v2h2v-2z"/></svg>';
 
-  const showPrevPeriod = false;
+  const prevPeriod = getPrevPeriod(availablePeriods, period);
+  const showPrevPeriod = prevPeriod != null;
 
   const tableBody = [
     [
@@ -264,7 +278,7 @@ const createSocialFootprintTable = (production, period, indicatorLabels, indicat
       { text: getLabelPeriod(period), colSpan: 2, border: [true, true, true, true], style : "darkBackground", alignment : "center" },
       ...showPrevPeriod ? [
         { text: '', border: [false, false, false, false] },
-        { text: "Année N-1", colSpan: 2, border: [true, true, true, true], alignment : "center" }
+        { text: getLabelPeriod(prevPeriod), colSpan: 2, border: [true, true, true, true], alignment : "center" }
       ] : [],
       { text: '', border: [false, false, false, false] },
       { text: '', border: [false, false, false, false] },
@@ -275,10 +289,10 @@ const createSocialFootprintTable = (production, period, indicatorLabels, indicat
       { text: 'Unité', style: 'tableHeader' },
       { text: 'Enjeu\nsectoriel', style: 'tableHeader', alignment: "center" },
       { text: 'Empreinte', style: 'tableHeader' },
-      { text: 'Incertitude', style: 'tableHeader' },
+      { text: 'Incert.', style: 'tableHeader' },
       ...showPrevPeriod ? [
         { text: 'Empreinte', style: 'tableHeader' },
-        { text: 'Incertitude', style: 'tableHeader' }
+        { text: 'Incert.', style: 'tableHeader' }
       ] : [],
       { text: 'Moyenne\nBranche', style: 'tableHeader', alignment: "center" },
       { text: 'Objectif\nsectoriel', style: 'tableHeader', alignment: "center" }
@@ -293,10 +307,10 @@ const createSocialFootprintTable = (production, period, indicatorLabels, indicat
       { text: indicatorUnits[indic], style: 'unit' },
       keyIndics.includes(indic) ? { svg: exclamationIcon, width: 6, height: 6, alignment: "center" } : { text: '-', alignment: "center" },
       { text: getFootprintValue(production, period, indic) ? `${getFootprintValue(production, period, indic)}` : "-", style: 'data' },
-      { text: getUncertainty(production, period, indic) ? `${getUncertainty(production, period, indic)} %` : "-", style: 'data', fontSize : 5 },
+      { text: getUncertainty(production, period, indic) ? `${getUncertainty(production, period, indic)} %` : "-", style: 'data', fontSize: 6 },
       ...showPrevPeriod ? [
-        { text: getFootprintValue(production, period, indic) ? `${getFootprintValue(production, period, indic)}` : "-", style: 'data' },
-        { text: getUncertainty(production, period, indic) ? `${getUncertainty(production, period, indic)} %` : "-", style: 'data', fontSize : 5 }
+        { text: getFootprintValue(production, period, indic) ? `${getFootprintValue(production, prevPeriod, indic)}` : "-", style: 'data' },
+        { text: getUncertainty(production, period, indic) ? `${getUncertainty(production, prevPeriod, indic)} %` : "-", style: 'data', fontSize: 6 }
       ] : [],
       { text: getBranchValue(comparativeData, indic) ? `${getBranchValue(comparativeData, indic)}` : " - ", style: 'data' },
       { text: getTargetValue(comparativeData, indic) ? getTargetValue(comparativeData, indic) : "-", style: 'data' },
@@ -344,7 +358,7 @@ const createStatementsTable = (impactsData, period, validations) => {
       { text: 'Indicateur', style: 'tableHeader', alignment: "left" },
       { text: 'Unité', style: 'tableHeader' },
       { text: 'Déclaration', style: 'tableHeader', alignment: "center" },
-      { text: 'Incertitude', style: 'tableHeader' },
+      { text: 'Incert.', style: 'tableHeader' },
     ],
   ];
 
@@ -356,7 +370,7 @@ const createStatementsTable = (impactsData, period, validations) => {
       { text: metaIndics[indic].libelleDeclaration, alignment: "left" },
       { text: metaIndics[indic].unitDeclaration, style: 'unit' },
       { text: statement, style: 'data' },
-      { text: uncertainty, style: 'data', fontSize : 5 },
+      { text: uncertainty, style: 'data', fontSize: 6 },
     ]);
   });
 
@@ -457,7 +471,7 @@ const createSectorTargetsTable = (production, period, indicatorLabels, indicator
   return {
     table: {
       headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto', 'auto', 'auto'],
+      widths: ["*", 'auto', 'auto', 'auto', 'auto', 60],
       body: tableBody,
     },
     layout: tableLayout(),
@@ -515,7 +529,7 @@ const createValuableIndicatorsTable = (production, period, indicatorLabels, indi
   return {
     table: {
       headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto'],
+      widths: ["*", 25, 30, 60],
       body: tableBody,
     },
     layout: tableLayout(),
@@ -583,7 +597,7 @@ const createImprovementTable = (production, period, indicatorLabels, indicatorUn
   return {
     table: {
       headerRows: 1,
-      widths: ["*", 'auto', 'auto', 'auto'],
+      widths: ["*", 25, 30, 60],
       body: tableBody,
     },
     layout: tableLayout(),
@@ -819,6 +833,7 @@ const getStatementData = (impactsData, period, validations, indic) =>
 {
   const { nbDecimals, statementUnits } = metaIndics[indic];
   const impactsDataOnPeriod = impactsData[period.periodKey];
+  
   if (validations[period.periodKey].includes(indic))
   {
     switch(indic) {
@@ -940,6 +955,7 @@ const getIndicatorCharts = async (validatedIndics) => {
   await Promise.all(Object.keys(metaIndics).map(async (indic) => {
     const { category, type } = metaIndics[indic];
     if (validatedIndics.includes(indic)) {
+      
       const id = `socialfootprintvisual_${indic}-print`;
       const image = getChartImageData(id);
       indicatorCharts[category].push({ indic, image });  
@@ -983,7 +999,7 @@ const getTransparentProviders = (providers,period) => {
 
 // ----------------------------------------------------------------------------------
 
-const getEffortPercentage = (currentValue, targetValue) => {
+export const getEffortPercentage = (currentValue, targetValue) => {
   if (currentValue !== null && targetValue !== null && currentValue !== 0) {
     const effortPercentage = ((targetValue - currentValue) / currentValue * 100).toFixed(1);
     return effortPercentage;
@@ -991,7 +1007,7 @@ const getEffortPercentage = (currentValue, targetValue) => {
   return '-';
 };
 
-const getMarginPercentage = (indicatorValue, referenceValue) => {
+export const getMarginPercentage = (indicatorValue, referenceValue) => {
   if (indicatorValue !== null && referenceValue !== null && referenceValue !== 0) {
     const percentageValue = ((indicatorValue - referenceValue) / referenceValue * 100).toFixed(1);
     return percentageValue;
@@ -999,7 +1015,7 @@ const getMarginPercentage = (indicatorValue, referenceValue) => {
   return '-';
 };
 
-const createTableTitle = (label) => {
+const createTableTitle = (label,colors) => {
 
   const tableBody = [
     [{ 
@@ -1007,8 +1023,7 @@ const createTableTitle = (label) => {
       style: {
         fontSize: 11,
         bold: true,
-        margin: [0, 10, 0, 0],
-        color: "#fa595f",
+        color: colors.secondary,
         font: "Raleway",
         border: "2px"
       }, 
@@ -1027,14 +1042,15 @@ const createTableTitle = (label) => {
         return (i === node.table.body.length) ? 0.5 : 0;
       },
       hLineColor: function (i, node) {
-        return '#fa595f';
+        return colors.secondary;
       },
-      vLineWidth: function (i, node) { return 0 },
-      vLineColor: function (i, node) { return '#fa595f' },
-      paddingTop: function (i, node) { return 2 },
-      paddingBottom: function (i, node) { return 2 },
+      vLineWidth: function (i, node) {
+        return 0;
+      },
+      paddingLeft: function (i, node) { return 0 },
+      paddingBottom: function (i, node) { return 4 },
     },
-    margin: [0, 10, 0, 5],
+    margin: [0, 5, 0, 10],
   };
 };
 

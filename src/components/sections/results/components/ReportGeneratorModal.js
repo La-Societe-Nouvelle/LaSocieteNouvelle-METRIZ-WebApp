@@ -10,13 +10,13 @@ const ReportGeneratorModal = ({
   indicators,
 }) => {
   const [selectedIndicators, setSelectedIndicators] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState(["with-analyses"]);
 
 
   useEffect(() => {
     // Reset checkboxes when the modal view changes
     setSelectedIndicators([]);
-    setSelectedFiles([]);
+    setSelectedFiles(["with-analyses"]);
   }, [showModal]);
 
   useEffect(() => {
@@ -57,10 +57,6 @@ const ReportGeneratorModal = ({
         ? [...prevSelected, file]
         : prevSelected.filter((id) => id !== file);
 
-      // check if only "with-analyses" checkbox left
-      if (newSelected.length == 1 && newSelected.includes("with-analyses")) {
-        newSelected = [];
-      }
 
       return newSelected;
     });
@@ -122,6 +118,21 @@ const ReportGeneratorModal = ({
             onChange={(event) => handleCheckboxAll(event, "checkbox-all")}
           />
           <div className="mt-4">
+            <h6>Options</h6>
+          </div>
+          <Form.Check
+            type="checkbox"
+            id={`with-analyses`}
+            label={
+              <label htmlFor={`with-analyses`}>
+                Inclure les notes d'analyse dans les rapports
+              </label>
+            }
+            checked={selectedFiles.includes("with-analyses")}
+            onChange={(event) => handleOtherCheckboxes(event, "with-analyses")}
+          />
+
+          <div className="mt-4">
             <h6>Autres</h6>
             <Form.Check
               type="checkbox"
@@ -143,19 +154,7 @@ const ReportGeneratorModal = ({
               checked={selectedFiles.includes("standardReports")}
               onChange={(event) => handleOtherCheckboxes(event, "standardReports")}
             />
-            <Form.Check
-              type="checkbox"
-              id={`with-analyses`}
-              className="ms-4"
-              disabled={!selectedFiles.includes("standardReports")}
-              label={
-                <label htmlFor={`with-analyses`}>
-                  Inclure les notes d'analyse dans les annexes
-                </label>
-              }
-              checked={selectedFiles.includes("with-analyses")}
-              onChange={(event) => handleOtherCheckboxes(event, "with-analyses")}
-            />
+
           </div>
         </Form>
 
@@ -163,7 +162,7 @@ const ReportGeneratorModal = ({
           <Button onClick={onClose} className="me-2">
             Fermer
           </Button>
-          <Button variant="secondary" onClick={handleDownload} disabled={selectedFiles.length === 0 && selectedIndicators.length === 0}>
+          <Button variant="secondary" onClick={handleDownload} disabled={selectedIndicators.length === 0}>
             Télécharger
           </Button>
         </p>

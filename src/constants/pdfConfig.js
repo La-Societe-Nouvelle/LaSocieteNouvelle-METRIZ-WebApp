@@ -1,9 +1,9 @@
 // Constants for Document Properties
 const pdfMargins = {
-  top: 50,
-  bottom: 50,
-  left: 30,
-  right: 30,
+  top: 40,
+  bottom: 30,
+  left: 40,
+  right: 40,
 };
 
 const pdfPageSize = {
@@ -14,6 +14,15 @@ const pdfPageSize = {
 
 const defaultPosition = {
   startX: 30,
-  startY : 100,
+  startY : 90,
 };
-export { pdfMargins, pdfPageSize, defaultPosition };
+
+
+const colors = {
+  primary: "#191558",
+  secondary: "#fa595f",
+  text: "#191558",
+  light: "#ededff",
+}
+
+export { pdfMargins, pdfPageSize, defaultPosition, colors };
