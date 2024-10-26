@@ -93,6 +93,7 @@ const IndicatorCharts = ({ session, period, indic }) => {
             aggregate,
             indic,
           })}
+
           {renderSigCharts(
             session,
             aggregate,
@@ -113,6 +114,7 @@ const IndicatorCharts = ({ session, period, indic }) => {
             indic,
           }}
           printOptions={{
+            useIndicColors: true,
             printMode: true,
           }}
         />
@@ -166,6 +168,7 @@ const renderComparativeCharts = ({
   const maxFootprintValue = getMaxFootprintValue(session, period, indic);
 
   return (
+  <>
     <div key={chartId} className={"comparative-chart-container "}>
       <VerticalBarChart
         id={chartId}
@@ -178,17 +181,43 @@ const renderComparativeCharts = ({
         printOptions={{
           printMode: true,
           showDivisionData: true,
-          showAreaData: true,
-          showTargetData: true,
-          useIndicColors: false,
+          showAreaData: false,
+          showTargetData: aggregate == "production" ? true : false,
+          useIndicColors: true,
           showLegend: false,
           showXlabels: true,
-          aspectRatio: 1.5,
+          aspectRatio: 1,
           maxYAxis: maxFootprintValue,
           label: "Production",
         }}
       />
+      
     </div>
+    <div key={`target-${chartId}`} className={"comparative-chart-container "}>
+      <VerticalBarChart
+        id={`target-${chartId}`}
+        session={session}
+        datasetOptions={{
+          period,
+          aggregate,
+          indic,
+        }}
+        printOptions={{
+          printMode: true,
+          showDivisionData: false,
+          showAreaData: false,
+          showTargetData: true,
+          useIndicColors: true,
+          showLegend: false,
+          showXlabels: true,
+          aspectRatio: 1,
+          maxYAxis: maxFootprintValue,
+          label: "Production",
+        }}
+      />
+      
+    </div>
+  </>
   );
 };
 {

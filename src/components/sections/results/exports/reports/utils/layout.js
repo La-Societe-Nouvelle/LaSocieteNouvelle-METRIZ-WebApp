@@ -110,48 +110,87 @@ export const createLineObject = (
  * @param {string} period - The current period.
  * @returns {object} The header configuration.
  */
-export const generateHeader = (corporateName, siren, period) => {
+export const generateHeader = (corporateName, siren, period,colors) => {
   return {
-    columns: [
+    stack: [
       {
-        text: siren ? "SIREN : " + siren : "",
+        canvas: [
+          {
+            type: 'rect',
+            x: 0,
+            y: 0,
+            w: 595.28,
+            h: 30, 
+            color: colors.light,
+          },
+        ],
+        margin: [0, 0, 0, -30] 
       },
       {
-        alignment: "center",
-        text: corporateName,
-      },
-      {
-        text: getLabelPeriod(period),
-        alignment: "right",
+        columns: [  
+          {
+            text: siren ? "SIREN : " + siren : "",
+            margin: [20, 10, 0, 0], 
+            color : colors.primary
+          },
+          {
+            alignment: "center",
+            text: corporateName,
+            margin: [0, 10, 0, 0], 
+            color : colors.primary
+          },
+          {
+            text: getLabelPeriod(period),
+            alignment: "right",
+            margin: [0, 10, 20, 0],
+            color : colors.primary
+          },
+        ],
+        fontSize: 7,
       },
     ],
-    fontSize: 7,
-    margin: [20, 15, 20, 0],
+    margin: [0, 0, 0, 0],
   };
 };
+
 
 /**
  * Generate the footer for the document.
  * @param {string} corporateName - The name of the company.
  * @returns {object} The footer configuration.
  */
-export const generateFooter = (corporateName) => {
+export const generateFooter = (colors) => {
   return {
-    columns: [
+    stack: [
       {
-        text: "Edité le " + getShortCurrentDateString(),
-        margin: [30, 30, 0, 0],
+        canvas: [
+          {
+            type: 'rect',
+            x: 0,
+            y: 0,
+            w: 595.28, 
+            h: 30, 
+            color: colors.light
+          },
+        ],
+        margin: [0, 0, 0, -30] 
       },
       {
-        width: "50%",
-        text: corporateName,
-        margin: [0, 30, 0, 0],
+        columns: [
+          {
+            text: "Edité le " + getShortCurrentDateString()+" - Document produit via l'application Metriz mise à disposition par La Société Nouvelle.",
+            margin: [30, 10, 0, 0],
+            color : colors.primary
+          },
+ 
+        ],
+        fontSize: 7,
       },
     ],
-    alignment: "left",
-    fontSize: 7,
+    margin: [0, 0, 0, 0]
   };
 };
+
 
 // --------------------------------------------------
 // Document Properties

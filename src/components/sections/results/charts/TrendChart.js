@@ -5,6 +5,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
 Chart.register(ChartDataLabels);
+import pattern from 'patternomaly';
 
 // Utils
 import { getMaxY } from "./chartsUtils";
@@ -15,6 +16,7 @@ import metaIndics from "/lib/indics";
 // Styles
 import { tooltips, trendChartColors } from "../../../../constants/chartColors";
 import { colors } from "../../../../constants/chartColors";
+import { darken, lighten } from "polished";
 
 /* ---------- TREND CHART ---------- */
 
@@ -47,7 +49,8 @@ export const TrendChart = ({
 
   const chartData = buildChartData(
     session,
-    datasetOptions
+    datasetOptions,
+    printOptions,
   );
 
   // --------------------------------------------------
@@ -72,7 +75,8 @@ export const TrendChart = ({
 
 // ################################################## DATASET ##################################################
 
-const buildChartData = (session,datasetOptions) => 
+const buildChartData = (session,datasetOptions,printOptions) => 
+
 {
   const {
     financialData,
@@ -84,6 +88,10 @@ const buildChartData = (session,datasetOptions) =>
     indic
   } = datasetOptions;
 
+  const {
+    printMode,
+    useIndicColors
+  } = printOptions;
   const datasets = [];
   const labels = [];
 
@@ -96,6 +104,7 @@ const buildChartData = (session,datasetOptions) =>
     indic
   );
 
+
   const lastItemIndex = legalUnitData.length - 1;
   const legalunitEvolutionDataset = {
     label : "Unité légale",
@@ -104,12 +113,12 @@ const buildChartData = (session,datasetOptions) =>
     type: "line",
     fill: false,
     tension: 0.3,
-    borderColor : trendChartColors.legalunit,
+    borderColor : useIndicColors ? metaIndics[indic].color : trendChartColors.legalunit,
     borderWidth: (context) => {
       return context.dataset.type === 'line' ? 4 : 1;
     }, 
-    pointBorderColor: trendChartColors.legalunit,
-    backgroundColor: trendChartColors.legalunit,
+    pointBorderColor: useIndicColors ? metaIndics[indic].color : trendChartColors.legalunit,
+    backgroundColor: useIndicColors ? metaIndics[indic].color : trendChartColors.legalunit,
     pointRadius: (context) => {
       return context.dataIndex !== lastItemIndex || legalUnitData.length == 1  ?  4 :  6;
     },
@@ -135,7 +144,7 @@ const buildChartData = (session,datasetOptions) =>
       })),
       serieType: "target",
       skipNull: true,
-      borderColor: trendChartColors.legalunitTarget,
+      borderColor:  trendChartColors.legalunitTarget,
       backgroundColor: trendChartColors.legalunitTarget,
       borderWidth: 4,
       order: 2,
@@ -186,10 +195,10 @@ const buildChartData = (session,datasetOptions) =>
       y: item.value,
     })),
     serieType: "historical",
-    borderColor: trendChartColors.trend,
-    backgroundColor: trendChartColors.trend,
+    borderColor: useIndicColors ? lighten('0.3', metaIndics[indic].color) : trendChartColors.trend,
+    backgroundColor: useIndicColors ? lighten('0.3', metaIndics[indic].color) : trendChartColors.trend,
     order: 3,
-    borderWidth: 4,
+    borderWidth: printMode ? 2 : 4,
     tension: 0.3,
   };
   datasets.push(branchHistoricalDataset);
@@ -212,9 +221,9 @@ const buildChartData = (session,datasetOptions) =>
         y: data.value 
       })),
       serieType: "trend",
-      borderColor: trendChartColors.trend,
-      backgroundColor: trendChartColors.trend,
-      borderWidth: 4,
+      borderColor: useIndicColors ? lighten('0.3', metaIndics[indic].color) : trendChartColors.trend,
+      backgroundColor: useIndicColors ? lighten('0.3', metaIndics[indic].color) : trendChartColors.trend,
+      borderWidth: printMode ? 2 : 4,
       borderDash: [12, 6],
       order: 4,
       tension: 0.3,
@@ -241,9 +250,9 @@ const buildChartData = (session,datasetOptions) =>
       })),
       serieType: "target",
       skipNull: true,
-      borderColor: trendChartColors.target,
+      borderColor: useIndicColors ? darken('0.1', metaIndics[indic].color) : trendChartColors.target,
       backgroundColor: trendChartColors.target,
-      borderWidth: 4,
+      borderWidth: printMode ? 2 : 4,
       order: 5,
       tension: 0.3,
     };
@@ -394,7 +403,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
 
   const chartOptions = {
     devicePixelRatio: 2,
-    maintainAspectRatio: printMode ? false : true,
+    maintainAspectRatio: true,
     pointRadius: 0,
     scales: {
       y: {
@@ -407,25 +416,25 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 10 : 11,
             family: "Roboto",
           },
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: printMode ? 0 : 1,
+          lineWidth: 1,
         },
       },
       x: {
         ticks: {
           color: colors.textColor,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 9 : 11,
           },
         },
         grid: {
           color: colors.gridColor,
-          lineWidth: 2,
+          lineWidth: 1,
         },
         type: "time",
         time: {
@@ -446,7 +455,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
           color: colors.textColor,
           padding: 20,
           font: {
-            size: printMode ? 13 : 11,
+            size: printMode ? 8 : 11,
             family: "Roboto",
           },
           generateLabels: function (chart) {
@@ -501,7 +510,7 @@ const buildChartOptions = (printOptions,datasetOptions,chartData) =>
         text: unit,
         color: colors.textColor,
         font: {
-          size: 12,
+          size: printMode ? 9 : 12,
         },
       },
       tooltip: {

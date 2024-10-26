@@ -1,0 +1,19 @@
+{
+  "default": {
+    "colors": {
+      "mainTitle": "",
+      "sectionTitle": "",
+      "backgroundHeaderTable": "",
+      "backgroundHeaderPage": "",
+      "textHeaderPage": "",
+      "darkMode": false,
+      "primary": "#191558",
+      "secondary": "#fa595f",
+      "light": "#ededff",
+      "background": "#ededff",
+      "lightSecondary": "#fee0e1",
+      "text": "#191558",
+      "lightText": "#666671"
+    }
+  }
+}

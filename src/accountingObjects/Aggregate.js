@@ -56,4 +56,9 @@ export class Aggregate {
       return this.periodsData[periodKey].footprint;
     }
   }
+
+  getGrossImpact = (periodKey,indic) => {
+    let amount = this.getAmount(periodKey);
+    return this.getFootprint(periodKey,indic).getGrossImpact(amount);
+  }
 }

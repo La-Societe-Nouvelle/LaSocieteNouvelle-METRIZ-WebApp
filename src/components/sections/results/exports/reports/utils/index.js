@@ -1,4 +1,5 @@
 // Utils
+import metaIndics from "/lib/indics.json";
 
 // --------------------------------------------------
 // Images
@@ -104,7 +105,7 @@ export const addUncertaintyText = (
     ],
     absolutePosition: {
       x: defaultPosition.startX,
-      y: pdfPageSize.height - pdfMargins.bottom - 32,
+      y: pdfPageSize.height - pdfMargins.bottom - 40,
     },
     style: "legend",
   };
@@ -198,8 +199,6 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
   return description;
 }
 
-
-
 // --------------------------------------------------
 // Formulas
 
@@ -263,3 +262,17 @@ export function calculateAverageEvolutionRate(data) {
 
   return averageEvolutionRate.toFixed(0);
 }
+
+
+export const getTransparentProviders = (providers,period,indic) => {
+  const transparentProviders = providers
+    .filter((provider) => !provider.isDefaultProviderAccount)
+    .filter((provider) => !provider.useDefaultFootprint)
+    .filter((provider) => provider.periodsData.hasOwnProperty(period.periodKey))
+    .filter((provider) => provider.footprint.indicators[indic]?.flag === "p")
+    .sort((a,b) => a.legalUnitData.denomination.localeCompare(b.legalUnitData.denomination));
+  return transparentProviders
+}
+
+
+
