@@ -32,8 +32,7 @@ const StatementKNW = ({
   onUpdate
 }) => {
 
-  const [researchAndTrainingContribution, setResearchAndTrainingContribution] =
-    useState(valueOrDefault(impactsData.researchAndTrainingContribution, ""));
+  const [researchAndTrainingContribution, setResearchAndTrainingContribution] = useState(valueOrDefault(impactsData.researchAndTrainingContribution, ""));
   const [info, setInfo] = useState(impactsData.comments.knw || " ");
   const [showModal, setShowModal] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
@@ -48,8 +47,8 @@ const StatementKNW = ({
   // update state when props update
   useEffect(() => 
   {
-    if (impactsData.researchAndTrainingContribution!=researchAndTrainingContribution) {
-      setResearchAndTrainingContribution(impactsData.researchAndTrainingContribution || "");
+    if (impactsData.researchAndTrainingContribution!==researchAndTrainingContribution) {
+      setResearchAndTrainingContribution(impactsData.researchAndTrainingContribution);
     }
   }, [impactsData.researchAndTrainingContribution]);
 
@@ -63,7 +62,7 @@ const StatementKNW = ({
 
   const onAssessmentSubmit = () => 
   {
-    if (impactsData.researchAndTrainingContribution!=researchAndTrainingContribution) {
+    if (impactsData.researchAndTrainingContribution!==researchAndTrainingContribution) {
       setResearchAndTrainingContribution(researchAndTrainingContribution)
     } 
     setShowModal(false);
