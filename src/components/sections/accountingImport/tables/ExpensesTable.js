@@ -32,11 +32,13 @@ export const ExpensesTable = ({financialData, period}) => {
         });
         break;
       case "amount":
-        accounts.sort((a, b) => {
-          const amountA = a.periodsData[periodKey].amount;
-          const amountB = b.periodsData[periodKey].amount;
-          const comparison = amountA - amountB;
-          return isDescending ? -comparison : comparison;
+        accounts
+          .filter(account => account.periodsData.hasOwnProperty(periodKey))
+          .sort((a, b) => {
+            const amountA = a.periodsData[periodKey].amount;
+            const amountB = b.periodsData[periodKey].amount;
+            const comparison = amountA - amountB;
+            return isDescending ? -comparison : comparison;
         });
         break;
       case "label":
@@ -99,17 +101,19 @@ export const ExpensesTable = ({financialData, period}) => {
           </tr>
         </thead>
         <tbody>
-          {externalExpensesAccounts.map((account) => (
-            <tr key={account.accountNum}>
-              <td>{account.accountNum}</td>
-              <td>
-                {account.accountLib.charAt(0).toUpperCase() +
-                  account.accountLib.slice(1).toLowerCase()}
-              </td>
-              <td className="text-end">
-                {printValue(account.periodsData[periodKey].amount, 0)} &euro;
-              </td>
-            </tr>
+          {externalExpensesAccounts
+            .filter((account) => account.periodsData.hasOwnProperty(periodKey))
+            .map((account) => (
+              <tr key={account.accountNum}>
+                <td>{account.accountNum}</td>
+                <td>
+                  {account.accountLib.charAt(0).toUpperCase() +
+                    account.accountLib.slice(1).toLowerCase()}
+                </td>
+                <td className="text-end">
+                  {printValue(account.periodsData[periodKey].amount, 0)} &euro;
+                </td>
+              </tr>
           ))}
         </tbody>
       </Table>
