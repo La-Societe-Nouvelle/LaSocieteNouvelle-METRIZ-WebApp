@@ -96,12 +96,21 @@ export const checkProviderFootprints = (session,period) => {
   return [...providersToSync,...accountsToSync].every((provider) => provider.footprint.isValid())
 }
 
-export const checkExternalFootprints = (session,period) => {
+export const checkExternalFootprints = (session,period) => 
+{
+  // amortisable immoiblisations
+  let amortisableImmobilisations = session.financialData.immobilisations
+    .filter(immobilisation => immobilisation.isAmortisable)
+    .map(immobilisation => immobilisation.accountNum);
+  
+  // external flows to check (external expense + investments for amortisable immobilisation accounts)
   let externalFlows = [
     ...session.financialData.externalExpenses,
     ...session.financialData.investments
     ]
-    .filter((expense) => period.regex.test(expense.date));
+    .filter((expense) => period.regex.test(expense.date))
+    .filter((expense) => !/^2/.test(expense.accountNum) || amortisableImmobilisations.includes(expense.accountNum));
+  
   return externalFlows.every((expense) => expense.footprint.isValid())
 }
 
