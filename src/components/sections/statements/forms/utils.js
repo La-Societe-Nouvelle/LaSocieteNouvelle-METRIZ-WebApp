@@ -253,7 +253,7 @@ export const checkStatementKNW = (impactsData) =>
     researchAndTrainingContribution,
   } = impactsData;
 
-  if (researchAndTrainingContribution=="" || researchAndTrainingContribution==null) {
+  if (researchAndTrainingContribution==="" || researchAndTrainingContribution===null) {
     return({ status: "incomplete", errorMessage: null });
   } else if (isValidNumber(researchAndTrainingContribution,0,netValueAdded)) {
     return({ status: "ok", errorMessage: null });

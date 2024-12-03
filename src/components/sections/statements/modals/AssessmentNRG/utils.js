@@ -1,6 +1,10 @@
-import { isValidNumber } from "../../../../../utils/Utils";
+// La Société Nouvelle
+
+// Lib
 import fuels from "/lib/emissionFactors/fuels.json";
 
+// Utils
+import { isValidNumber, roundValue } from "../../../../../utils/Utils";
 
 /* ----------------- ITEMS ----------------- */
 
@@ -176,7 +180,7 @@ export const getTotalNrgConsumption = (nrgDetails) => {
   const sum = Object.entries(nrgDetails)
     .map(([_, data]) => data.nrgConsumption)
     .reduce((a, b) => a + b, 0);
-  return sum;
+  return roundValue(sum, 0);
 };
 
 export const getTotalNrgConsumptionUncertainty = (nrgDetails) => {

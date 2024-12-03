@@ -455,8 +455,8 @@ export const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
       return mesure;
     case "35": // heures intermittents du spectacle
       return mesure;
-    case "40": // jours calendaires de la période d’emploi pris en compte dans le calcul du plafond de Sécurité Sociale
-      return mesure * 7;
+    case "40": // jours calendaires de la période d’emploi pris en compte dans le calcul du plafond de Sécurité Sociale 
+      return 0; // ignore (mesure * 7)
     default:
       return 0;
   }
