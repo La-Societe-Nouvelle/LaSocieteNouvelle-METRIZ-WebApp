@@ -32,12 +32,35 @@ export const refetchData = async (session) =>
     try {
       // fetch footprint
       await provider.updateFromRemote();
+
       // assign to expenses & investments
       financialData.externalExpenses
         .concat(financialData.investments)
+        .filter((expense) => expense.footprintOrigin == "provider")
         .filter((expense) => expense.providerNum == provider.providerNum)
         .forEach((expense) => {
           expense.footprint = provider.footprint;
+        });
+    } 
+    catch (error) {
+      console.log(error); // add to log
+    }
+  }
+
+  // Récupération des données génériques (empreintes comptes de charges) -------------------------------- //
+
+  for (let account of financialData.externalExpensesAccounts) 
+  {
+    try {
+      // fetch footprint
+      await account.updateFromRemote();
+
+      // assign to expenses & investments
+      financialData.externalExpenses
+        .filter((expense) => expense.footprintOrigin == "account")
+        .filter((expense) => expense.accountNum == account.accountNum)
+        .forEach((expense) => {
+          expense.footprint = account.footprint;
         });
     } 
     catch (error) {
