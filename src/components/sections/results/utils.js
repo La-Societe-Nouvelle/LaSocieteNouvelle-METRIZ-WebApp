@@ -258,21 +258,21 @@ export const getTagsIndic = (
   if (isBetter(indic,companyFootprint,divisionFootprint,10)) {
     return([{
       type: "good",
-      text: "Niveau supérieur à la branche",
+      text: "Performance supérieure à la branche",
       class: "success"
     }])
   } 
   else if (isWorst(indic,companyFootprint,divisionFootprint,10)) {
     return([{
       type: "bad",
-      text: "Niveau inférieur à la branche",
+      text: "Performance inférieure à la branche",
       class: "warning"
     }])
   } 
   else {
     return([{
       type: "medium",
-      text: "Niveau de la branche",
+      text: "Performance équivalente à la branche",
       class: "primary"
     }])
   }
