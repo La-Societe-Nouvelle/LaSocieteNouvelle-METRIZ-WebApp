@@ -2,7 +2,7 @@
 
 // React / Next
 import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+import {  Button  } from "react-bootstrap";
 
 // Error Handler
 import ErrorBoundary from "/src/utils/ErrorBoundary";
@@ -26,12 +26,12 @@ import { logUserProgress, sendAnonymousStatReport } from "./statReportService/St
 
 // Utils
 import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
-import { 
-  checkExternalFootprints, 
-  checkFinancialData, 
-  checkImpactsStatements, 
-  checkInitialStates, 
-  getProgression 
+import {
+  checkExternalFootprints,
+  checkFinancialData,
+  checkImpactsStatements,
+  checkInitialStates,
+  getProgression
 } from "./utils/progressionUtils";
 
 // Modal
@@ -41,14 +41,13 @@ import SaveModal from "./components/modals/SaveModal";
 /* ---------------------------------------- APP ---------------------------------------- */
 /* ------------------------------------------------------------------------------------- */
 
-export const Metriz = () => 
-{
+export const Metriz = () => {
   const [session, setSession] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
   const [stepMax, setStepMax] = useState(0);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [sessionSaved, setSessionSaved] = useState(false); 
+  const [sessionSaved, setSessionSaved] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(async () => {
@@ -59,17 +58,17 @@ export const Metriz = () =>
       behavior: "instant",
     });
     // update step max
-    let progression = await getProgression(session,selectedPeriod);
+    let progression = await getProgression(session, selectedPeriod);
     setStepMax(progression);
-  }, [step]); 
+  }, [step]);
 
 
-// Smoothly scroll to the top of the page -----------------
+  // Smoothly scroll to the top of the page -----------------
 
   useEffect(() => {
     //Handle scroll and show/hide the button accordingly
     const handleScroll = () => {
-      const scrollThreshold = 200; 
+      const scrollThreshold = 200;
       setShowScrollButton(window.scrollY > scrollThreshold);
     };
 
@@ -104,8 +103,7 @@ export const Metriz = () =>
     setSessionSaved(true);
   };
 
-  const sessionDidUpdate = async () => 
-  {
+  const sessionDidUpdate = async () => {
     // update footprints
     await session.updateFootprints(selectedPeriod);
 
@@ -115,21 +113,19 @@ export const Metriz = () =>
 
   // Init session -------------------------------------
 
-  const initSession = (session) => 
-  {
+  const initSession = (session) => {
     // console logs
     console.log("--------------------------------------------------");
     console.log("Initialisation d'une nouvelle session");
     console.log(session);
 
     setSession(session);
-    setStep(1); 
+    setStep(1);
   };
 
-  const resumeSession = async (session) => 
-  {
+  const resumeSession = async (session) => {
     let defaultPeriod = getMoreRecentYearlyPeriod(session.availablePeriods);
-    let progression = await getProgression(session,defaultPeriod);
+    let progression = await getProgression(session, defaultPeriod);
 
     setSession(session);
     setSelectedPeriod(defaultPeriod);
@@ -139,8 +135,7 @@ export const Metriz = () =>
   // Validations --------------------------------------
 
   // imported data
-  const validFinancialData = async () => 
-  {
+  const validFinancialData = async () => {
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des données comptables");
@@ -149,13 +144,13 @@ export const Metriz = () =>
     console.log("Objet session : ", session);
 
     // validation
-    let stepValidation = checkFinancialData(session,selectedPeriod);
+    let stepValidation = checkFinancialData(session, selectedPeriod);
     if (!stepValidation) {
       // log error
     }
 
     // next step
-    let initialStatesValidation = checkInitialStates(session,selectedPeriod);
+    let initialStatesValidation = checkInitialStates(session, selectedPeriod);
     if (!initialStatesValidation) {
       setStep(2); // initial states section
     } else {
@@ -168,8 +163,7 @@ export const Metriz = () =>
     }
   };
 
-  const validInitialStates = async () => 
-  {
+  const validInitialStates = async () => {
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des états initiaux");
@@ -179,7 +173,7 @@ export const Metriz = () =>
     console.log("Objet session : ", session);
 
     // validation
-    let stepValidation = checkInitialStates(session,selectedPeriod);
+    let stepValidation = checkInitialStates(session, selectedPeriod);
     if (!stepValidation) {
       // log error
     }
@@ -190,12 +184,11 @@ export const Metriz = () =>
     }
 
     // next step
-    const progression = await getProgression(session,selectedPeriod);
+    const progression = await getProgression(session, selectedPeriod);
     setStep(progression); // providers section
   };
 
-  const validProviders = async () => 
-  {
+  const validProviders = async () => {
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des empreintes fournisseurs");
@@ -203,31 +196,30 @@ export const Metriz = () =>
     console.log("Objet session : ", session);
 
     // validation
-    let stepValidation = checkExternalFootprints(session,selectedPeriod);
+    let stepValidation = checkExternalFootprints(session, selectedPeriod);
     if (!stepValidation) {
       // log error
     }
-    
+
     // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 3, []);
     }
 
     // next step
-    const progression = await getProgression(session,selectedPeriod);
+    const progression = await getProgression(session, selectedPeriod);
     setStep(progression); // providers section
   };
 
-  const validStatements = async () => 
-  {
+  const validStatements = async () => {
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des déclarations d'impacts directs");
-    console.log("Données d'impacts : ",session.impactsData[selectedPeriod.periodKey]);
+    console.log("Données d'impacts : ", session.impactsData[selectedPeriod.periodKey]);
     console.log("Objet session : ", session);
-    
+
     // validation
-    let stepValidation = checkImpactsStatements(session,selectedPeriod);
+    let stepValidation = checkImpactsStatements(session, selectedPeriod);
     if (!stepValidation) {
       // log error
     }
@@ -242,8 +234,7 @@ export const Metriz = () =>
     }
 
     // Anonymous stats report
-    if (session.sendStatReport) 
-    {
+    if (session.sendStatReport) {
       try {
         sendAnonymousStatReport(
           session,
@@ -253,29 +244,28 @@ export const Metriz = () =>
         console.log(error);
       }
     }
-    
+
     // next step
-    const progression = await getProgression(session,selectedPeriod);
+    const progression = await getProgression(session, selectedPeriod);
     setStep(progression); // results section
-    if (progression==5) {
+    if (progression == 5) {
       setShowSaveModal(true);
     }
   };
 
   // Sections Views
-  const buildSectionView = () => 
-  {
-    
+  const buildSectionView = () => {
+
     const sections = [
-      <StartSection 
+      <StartSection
         initSession={initSession}
         resumeSession={resumeSession}
       />,
-      <AccountingImportSection 
+      <AccountingImportSection
         session={session}
         period={selectedPeriod}
         onSelectPeriod={updateSelectedPeriod}
-        submit={validFinancialData} 
+        submit={validFinancialData}
       />,
       <InitialStatesSection
         session={session}
@@ -302,7 +292,7 @@ export const Metriz = () =>
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
       />,
-      <PublishStatementSection 
+      <PublishStatementSection
         session={session}
         period={selectedPeriod}
       />,
@@ -314,6 +304,18 @@ export const Metriz = () =>
   return (
     <>
       {/* Header */}
+      <div className="bg-danger text-white p-2 text-center text-danger d-flex justify-content-center align-items-center">
+        <p className=" mb-0 me-3">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>  
+          <b>Cette version de l'application n'est plus maintenue.</b> Rendez-vous sur la nouvelle version de Metriz et <b>créez gratuitement votre compte</b> !
+        </p>
+        <Button  
+          className="bg-white border-danger text-danger shadow-sm"
+        href="https://partners.metriz.lasocietenouvelle.org/" target="_blank" size="sm">
+          Accéder à la nouvelle application <i className="bi bi-arrow-right"></i> 
+        </Button>
+      </div>
+
       <ErrorBoundary session={session}>
         {step > 0 && step < 6 && (
           <HeaderSection
@@ -352,7 +354,7 @@ export const Metriz = () =>
 
 
       {/* Scroll button */}
-      {showScrollButton  && step !== 0 && (
+      {showScrollButton && step !== 0 && (
         <button className="scroll-to-top-button" onClick={scrollToTop}>
           <i className="bi bi-chevron-up"></i>
         </button>
