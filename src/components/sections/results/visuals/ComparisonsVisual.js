@@ -18,6 +18,7 @@ export const ComparisonsVisual = ({
         session={session}
         indic={indic}
         period={period}
+        showTarget={isTargetDataAvailable}
       />
       <ComparativeTable
         session={session}

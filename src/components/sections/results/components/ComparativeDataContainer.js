@@ -7,7 +7,8 @@ import { getMaxFootprintValue } from "../charts/chartsUtils";
 export const ComparativeDataContainer = ({
   session,
   period,
-  indic
+  indic,
+  showTarget
 }) => {
 
   // Define the aggregates and their corresponding titles
@@ -42,7 +43,7 @@ export const ComparativeDataContainer = ({
                   printMode: false,
                   showDivisionData: true,
                   showAreaData: true,
-                  showTargetData: true,
+                  showTargetData: showTarget,
                   useIndicColors: false,
                   showLegend : false,
                   showXlabels : true,

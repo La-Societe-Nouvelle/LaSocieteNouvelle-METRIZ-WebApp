@@ -80,11 +80,11 @@ export const IndicatorView = ({
 
       {/* ----------Gross Impact Chart ----------  */}
       {metaIndic.type === "intensité" && (
-            <GrossImpactDistributionVisual
-              session={session}
-              period={period}
-              indic={indic}
-            />
+        <GrossImpactDistributionVisual
+          session={session}
+          period={period}
+          indic={indic}
+        />
       )}
 
       {/* --------- Comparative data charts & Table ----------  */}
@@ -97,13 +97,25 @@ export const IndicatorView = ({
       )}
 
       {/* ---------Comparative data charts & Table ----------  */}
-      <ComparisonsVisual session={session} period={period} indic={indic} />
+      <ComparisonsVisual 
+        session={session} 
+        period={period} 
+        indic={indic}
+      />
 
       {/* ---------- Evolution Curves Chart ----------  */}
-      <EvolutionCurvesVisual session={session} period={period} indic={indic} />
+      <EvolutionCurvesVisual 
+        session={session} 
+        period={period} 
+        indic={indic} 
+      />
 
       {/* ---------- Analysis Note Text  ----------  */}
-      <AnalysisNoteVisual session={session} period={period} indic={indic} />
+      <AnalysisNoteVisual 
+        session={session} 
+        period={period} 
+        indic={indic} 
+      />
     </>
   );
 }
