@@ -79,7 +79,8 @@ export const checkIndividualData = (individualData) =>
   }
 }
 
-export const getIndividualsData = async (declarations) => {
+export const getIndividualsData = async (declarations) => 
+{
   // period
   let regexPeriod = buildRegexPeriod(declarations);
   // array of data
@@ -341,12 +342,13 @@ export const getIndividualSex = (individu) =>
  *    - 018
  */
 
-export const getIndividualWage = (individu, regexPeriod) => {
+export const getIndividualWage = (individu, regexPeriod) => 
+{
   let montantDeclaration = 0;
 
   let versements = individu.versements;
   versements
-    .filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
+    //.filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
     .forEach((versement) => 
     {
       // Rémunérations
@@ -393,12 +395,13 @@ export const getIndividualWage = (individu, regexPeriod) => {
  *    - 018
  */
 
-export const getIndividualWorkingHours = (individu, regexPeriod) => {
+export const getIndividualWorkingHours = (individu, regexPeriod) => 
+{
   let heuresDeclaration = 0;
 
   let versements = individu.versements;
   versements
-    .filter((versement) => regexPeriod.test(versement.date))
+    //.filter((versement) => regexPeriod.test(versement.date))
     .forEach((versement) => 
     {
       // Rémunérations
@@ -477,7 +480,7 @@ export const getIndividualApprenticeshipHours = (individu, regexPeriod) => {
 
   let versements = individu.versements;
   versements
-    .filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
+    //.filter((versement) => regexPeriod.test(versement.date)) // check if relative to period
     .forEach((versement) => 
     {
       // Rémunérations
