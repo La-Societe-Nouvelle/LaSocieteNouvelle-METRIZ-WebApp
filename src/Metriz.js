@@ -304,17 +304,18 @@ export const Metriz = () => {
   return (
     <>
       {/* Header */}
-      <div className="bg-danger text-white p-2 text-center text-danger d-flex justify-content-center align-items-center">
-        <p className=" mb-0 me-3">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>  
-          <b>Cette version de l'application n'est plus maintenue.</b> Rendez-vous sur la nouvelle version de Metriz et <b>créez gratuitement votre compte</b> !
-        </p>
-        <Button  
-          className="bg-white border-danger text-danger shadow-sm"
-        href="https://partners.metriz.lasocietenouvelle.org/" target="_blank" size="sm">
-          Accéder à la nouvelle application <i className="bi bi-arrow-right"></i> 
-        </Button>
-      </div>
+      {step == 0 && 
+        <div className="bg-success text-white p-2 text-center text-success d-flex justify-content-center align-items-center">
+          <p className=" mb-0 me-3">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>  
+            <b>Une nouvelle version de l'application est disponible !</b> Rendez-vous sur la version partenaire et <b>créez gratuitement votre compte</b> !
+          </p>
+          <Button  
+            className="bg-white border-success text-success shadow-sm"
+            href="https://partners.metriz.lasocietenouvelle.org/" target="_blank" size="sm">
+            Accéder à la nouvelle application <i className="bi bi-arrow-right"></i> 
+          </Button>
+        </div>}
 
       <ErrorBoundary session={session}>
         {step > 0 && step < 6 && (
