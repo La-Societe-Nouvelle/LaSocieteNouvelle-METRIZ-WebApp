@@ -1,12 +1,12 @@
 // La Société Nouvelle
 
-// API
+//-- API
 import api from "/config/api";
 
-// Objects
+//-- Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-// Utils
+//-- Utils
 import { getAmountItems } from "../utils/Utils";
 
 // ################################################## ACCOUNT OBJECT ##################################################

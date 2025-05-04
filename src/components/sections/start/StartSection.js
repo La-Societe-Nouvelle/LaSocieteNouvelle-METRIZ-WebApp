@@ -17,7 +17,6 @@ import { checkResults } from "../../../utils/progressionUtils";
 // Updater
 import { updateVersion } from "/src/version/updateVersion";
 import FloatingActionButton from "../../pageComponents/FloatingActionButton";
-import CarouselModal from "../../modals/CarouselModal";
 
 /* ------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- START SECTION -------------------------------------------------- */
@@ -36,7 +35,6 @@ export const StartSection = ({ initSession, resumeSession }) =>
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDataUpdater, setShowDataUpdater] = useState(false);
-  const [showCarousel, setShowCarousel] = useState(false);
   
   // Start new session
   
@@ -108,14 +106,6 @@ export const StartSection = ({ initSession, resumeSession }) =>
     console.log(updatedSession);
   };
 
-  const handleFloatingButtonClick = () => {
-    setShowCarousel(true);
-  };
-
-  const handleCloseCarousel = () => {
-    setShowCarousel(false);
-  };
-
   return (
     <div className="bg-white">
       <header className="px-5 py-4 ">
@@ -171,7 +161,7 @@ export const StartSection = ({ initSession, resumeSession }) =>
 
                     <Button
                       variant="primary"
-                      href="https://docs.lasocietenouvelle.org/application-web/tutorial"
+                      href="https://docs.lasocietenouvelle.org/application-web/tutorial-v3"
                       target="_blank"
                     >
                       Guide d'utilisation
@@ -271,8 +261,6 @@ export const StartSection = ({ initSession, resumeSession }) =>
               </Col>
             </Row>
           </Container>
-          <FloatingActionButton onClick={handleFloatingButtonClick} />
-          <CarouselModal show={showCarousel} onHide={handleCloseCarousel} />
         </div>
       </div>
     </div>

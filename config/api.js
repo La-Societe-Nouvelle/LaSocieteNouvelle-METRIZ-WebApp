@@ -1,9 +1,13 @@
+// La Société Nouvelle
+
+//-- Packages
 import axios from 'axios';
+
+//-- Services
 import { saveErrorLog } from '../src/statReportService/StatReportService';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-
 });
 
 // Global error handler

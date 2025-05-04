@@ -16,7 +16,7 @@ export const Footer = () =>
         <Row>
           <Col>
             <p>
-              &copy; 2023 La Société Nouvelle
+              &copy; 2024 La Société Nouvelle
             </p>
           </Col>
           <Col>

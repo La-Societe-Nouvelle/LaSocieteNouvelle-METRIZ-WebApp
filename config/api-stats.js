@@ -1,6 +1,10 @@
-import axios from 'axios';
-import { saveErrorLog } from '../src/statReportService/StatReportService';
+// La Société Nouvelle
 
+//-- Packages
+import axios from 'axios';
+
+//-- Service
+import { saveErrorLog } from '../src/statReportService/StatReportService';
 
 const apiStats = axios.create({
   baseURL: process.env.NEXT_PUBLIC_APISTAT_URL,
@@ -20,4 +24,3 @@ apiStats.interceptors.response.use(
 );
 
 export default apiStats;
-

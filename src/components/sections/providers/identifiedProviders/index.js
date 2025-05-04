@@ -130,18 +130,13 @@ const IdentifiedProviders = (props) => {
           </p>
           <p className="mt-1">Pour établir la correspondance entre les
               numéros de compte auxiliaire dans vos écritures comptables et les
-              numéros SIREN, trois approches sont possibles : <br></br>
+              numéros SIREN, deux approches sont possibles : <br></br>
           </p>
           <ul className="small mb-1 mt-1 ms-1 p-1">
             <li>
               <strong>Import </strong> des numéros SIREN de vos fournisseurs
               via un fichier au format Excel (.xlsx) ou CSV (.csv). Le fichier vide
               est exportable pour être complété.
-            </li>
-            <li>
-              <strong>Dépôt </strong> des factures au format PDF (.pdf) pour 
-              permettre une reconnaissance des numéros SIREN et une association automatique
-              via les montants et dates présents au sein des factures.
             </li>
             <li>
               <strong>Complétion </strong> manuelle du tableau
@@ -161,12 +156,6 @@ const IdentifiedProviders = (props) => {
           providers={providers}
           updateProviders={updateProviders}
           handleSynchronize={handleSynchronize}
-        />
-
-        <InvoicesProvidersView
-          providers={providers}
-          externalExpenses={financialData.externalExpenses}
-          updateProviders={updateProviders}
         />
       </div>
       <div ref={scrollTargetRef}>
