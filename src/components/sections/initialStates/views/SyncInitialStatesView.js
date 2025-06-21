@@ -37,8 +37,7 @@ export const SyncInitialStatesView = ({
   const synchroniseAll = async () => 
   {
     // accounts
-    const accountsToSync = assets
-      .filter((asset) => asset.initialStateType == "defaultData");
+    const accountsToSync = assets.filter((asset) => asset.initialStateType == "defaultData");
 
     // init progression
     setFetching(true);
@@ -82,7 +81,7 @@ export const SyncInitialStatesView = ({
   return (
     <>
       <div className="step p-4 my-3">
-        <h3 className="mb-3"> Initialisation des états initiaux </h3>
+        <h3 className="mb-3"> Catégorisation des immobilisations </h3>
 
         {isSyncButtonEnable ? (
           <div className="alert alert-warning">
@@ -112,13 +111,13 @@ export const SyncInitialStatesView = ({
               <tr>
                 <td>Compte</td>
                 <td>Libellé</td>
-                <td colSpan="2">États initiaux - Empreinte sociétale</td>
+                <td>Activités économiques associées</td>
                 <td className="text-end">Montant</td>
               </tr>
             </thead>
             <tbody>
               {assets.map((account) => (
-                <Row
+                <RowTableImmobilisation
                   key={account.accountNum}
                   account={account}
                   period={period}
@@ -153,16 +152,4 @@ export const SyncInitialStatesView = ({
       <ErrorAPIModal hasError={errorAPI} onClose={() => setErrorAPI(false)} />
     </>
   );
-}
-
-/* ---------- ROWS ---------- */
-
-const Row = (props) => 
-{
-  switch (props.account.accountNum.charAt(0)) {
-    case "2":
-      return <RowTableImmobilisation {...props} />;
-    case "3":
-      return <RowTableStock {...props} />;
-  }
 }

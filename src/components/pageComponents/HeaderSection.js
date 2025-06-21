@@ -8,14 +8,11 @@ import { Container, Navbar } from "react-bootstrap";
 
 // Components
 import { Topbar } from "./Topbar";
-import { getProgression } from "../../utils/progressionUtils";
-import { useState } from "react";
-import { useEffect } from "react";
 
 // Step names
 const stepNames = [
   "Import comptable",
-  "Import des états initiaux",
+  "Catégorisation des immobilisations",
   "Traitement des fournisseurs",
   "Déclaration des impacts directs",
   "Résultats",

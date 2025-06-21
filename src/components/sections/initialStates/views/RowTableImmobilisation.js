@@ -17,41 +17,14 @@ import branches from "/lib/branches";
 
 const branchesOptions = getBranchesOptions(branches);
 
-/* ---------- ROW FOR STOCK ACCOUNT  ---------- */
+/* ---------- ROW FOR IMMOBILISATION ACCOUNT  ---------- */
 
-/** Row for stock account
- *
- */
-
-const metaInitialStates = {
-  none: {
-    value: "none",
-    label: "---",
-  },
-  prevFootprint: {
-    value: "prevFootprint",
-    label: "Reprise sur exercice précédent",
-  },
-  currentFootprint: {
-    value: "currentFootprint",
-    label: "Estimée sur exercice courant",
-  },
-  defaultData: {
-    value: "defaultData",
-    label: "Valeurs par défaut",
-  },
-};
-
-export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
-  const { accountNum, accountLib, isAmortisable, initialState } = account;
+export const RowTableImmobilisation = ({ account, period, onUpdate }) => 
+{
+  const { accountNum, accountLib, isAmortisable } = account;
 
   const prevStateDateEnd = getPrevDate(period.dateStart);
-  const isPrevPeriodAvailable =
-    parseInt(initialState.date) < parseInt(prevStateDateEnd);
 
-  const [initialStateType, setInitialStateType] = useState(
-    account.initialStateType
-  );
   const [initialStateSet, setInitialStateSet] = useState(
     account.initialStateSet
   );
@@ -62,9 +35,6 @@ export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
   // ----------------------------------------------------------------------------------------------------
 
   useEffect(() => {
-    if (initialStateType != account.initialStateType) {
-      setInitialStateType(account.initialStateType);
-    }
     if (initialStateSet != account.initialStateSet) {
       setInitialStateSet(account.initialStateSet);
     }
@@ -72,17 +42,15 @@ export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
       setInitialStateSet(account.initialFootprintParams);
     }
   }, [
-    account.initialStateType,
     account.initialStateSet,
     account.initialFootprintParams,
   ]);
 
   useEffect(() => {
-    account.initialStateType = initialStateType;
     account.initialStateSet = initialStateSet;
     account.initialFootprintParams = initialFootprintParams;
     onUpdate();
-  }, [initialStateType, initialStateSet, initialFootprintParams]);
+  }, [initialStateSet, initialFootprintParams]);
 
   // ----------------------------------------------------------------------------------------------------
 
@@ -95,24 +63,7 @@ export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
     setInitialStateSet(false);
   };
 
-  const onInitialStateTypeChange = (event) => {
-    const nextType = event.value;
-    setInitialStateType(nextType);
-
-    if (nextType == "defaultData") {
-      setInitialStateSet(false);
-      setInitialFootprintParams({
-        code: "TOTAL",
-        area: "FRA",
-        aggregate: "TRESS",
-      });
-    }
-  };
-
   // ----------------------------------------------------------------------------------------------------
-
-  // options
-  const initialStateOptions = [metaInitialStates.defaultData];
 
   return (
     <tr>
@@ -122,54 +73,29 @@ export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
       </td>
       {/* Immobilisation non amortie */}
       {!isAmortisable && (
-        <td colSpan="2">
+        <td colSpan="1">
           &nbsp;&nbsp;Immobilisation non amortie sur l'exercice
         </td>
       )}
-      {/* Empreinte reprise sur exercice précédent */}
-      {isAmortisable && isPrevPeriodAvailable && (
-        <td colSpan={2}>
+
+      {/* Empreinte par défaut à définir */}
+      {isAmortisable && (
+        <td>
           <Select
-            className={"success"}
-            value={metaInitialStates.prevFootprint}
-            isDisabled
+            defaultValue={{
+              label:
+                initialFootprintParams.code +
+                " - " +
+                branches[initialFootprintParams.code],
+              value: initialFootprintParams.code,
+            }}
+            placeholder={"Choisissez une branche"}
+            className={initialStateSet ? "success" : ""}
+            options={branchesOptions}
+            onChange={onActivityCodeChange}
             styles={customSelectStyles()}
           />
         </td>
-      )}
-      {/* Empreinte par défaut à définir */}
-
-      {isAmortisable && !isPrevPeriodAvailable && (
-        <>
-          <td colSpan={initialStateType == "defaultData" ? 1 : 2}>
-            <Select
-              styles={customSelectStyles()}
-              value={metaInitialStates[initialStateType]}
-              placeholder={"Choisissez..."}
-              className={initialStateSet ? "success" : ""}
-              options={initialStateOptions}
-              onChange={onInitialStateTypeChange}
-            />
-          </td>
-          {initialStateType == "defaultData" && (
-            <td>
-              <Select
-                defaultValue={{
-                  label:
-                    initialFootprintParams.code +
-                    " - " +
-                    branches[initialFootprintParams.code],
-                  value: initialFootprintParams.code,
-                }}
-                placeholder={"Choisissez une branche"}
-                className={initialStateSet ? "success" : ""}
-                options={branchesOptions}
-                onChange={onActivityCodeChange}
-                styles={customSelectStyles()}
-              />
-            </td>
-          )}
-        </>
       )}
       <td className="text-end">
         {printValue(account.states[prevStateDateEnd].amount, 0)} &euro;
